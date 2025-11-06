@@ -3,5 +3,7 @@
 ## Coverage
 
 <!-- Pytest Coverage Comment:Begin -->
-<!-- This is a test -->
+
+<img src='coverage.svg' alt='Code Coverage Badge' />
+
 <!-- Pytest Coverage Comment:End -->
