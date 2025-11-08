@@ -1,0 +1,55 @@
+name: Generate and Update Pytest Coverage Badge
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  update-badge:
+    if: ${{ github.actor != 'github-actions[bot]' }}
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: 1. Checkout Repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: 2. Verify Python Installation and Upgrade pip
+        run: |
+          python3 --version
+          python3 -m pip install --upgrade pip
+
+      - name: 3. Install Dependencies
+        run: |
+          python3 -m pip install -r requirements.txt
+          python3 -m pip install pytest-cov coverage-badge
+
+      - name: 4. Execute Tests with Coverage
+        run: |
+          export PYTHONPATH=.
+          python3 -m pytest --cov-report=xml --cov=app tests/ | tee pytest-coverage.txt
+
+      - name: 5. Generate Coverage Badge SVG
+        id: coverage
+        run: |
+          rm -f coverage.svg
+          coverage-badge -o coverage.svg
+
+      - name: 6. Insert Badge into README.md
+        run: |
+          BADGE_LINE="<img src='coverage.svg' alt='Code Coverage Badge' />"
+          sed -i '/<!-- Pytest Coverage Comment:Begin -->/,/<!-- Pytest Coverage Comment:End -->/c\<!-- Pytest Coverage Comment:Begin -->\n\n'"$BADGE_LINE"'\n\n<!-- Pytest Coverage Comment:End -->' README.md
+
+      - name: 7. Commit and Push Changes if Badge Updated
+        if: success()
+        uses: stefanzweifel/git-auto-commit-action@v5
+        with:
+          commit_message: 'ci: Update coverage badge'
+          file_pattern: README.md coverage.svg

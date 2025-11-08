@@ -1,0 +1,62 @@
+name: Build and Deploy Sphinx Docs
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  # Allows manual workflow execution
+  workflow_dispatch:
+
+permissions:
+  contents: write # Required for peaceiris/actions-gh-pages
+  pages: write # For native GitHub Pages deployment
+  id-token: write # For native GitHub Pages deployment
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+
+    steps:
+      - name: 1. Checkout repository
+        uses: actions/checkout@v4
+
+      - name: 2. Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.10"
+
+      - name: 3. Install All Project Dependencies (Explicit List)
+        run: |
+          # Install Application dependencies (Flask, SQLAlchemy, Gunicorn) 
+          # and Documentation dependencies (Sphinx, MyST, Furo) directly.
+          pip install Flask Flask-SQLAlchemy gunicorn
+          pip install Sphinx myst-parser furo
+
+      - name: 4. Build HTML documentation
+        run: |
+          # sphinx-build: builds the documentation
+          # -b html: builds in HTML format
+          # docs: the source documentation directory (where conf.py is located)
+          # docs/_build/html: the output directory
+          sphinx-build -b html docs docs/_build/html
+
+      - name: 5. Upload Documentation Artifact
+        if: ${{ github.repository != '' }} 
+        uses: actions/upload-artifact@v4
+        with:
+          name: documentation-html
+          path: docs/_build/html
+          retention-days: 7
+
+      - name: 6. Deploy Documentation
+        if: github.ref == 'refs/heads/main' && github.repository != '' 
+        uses: peaceiris/actions-gh-pages@v4
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: docs/_build/html
+          publish_branch: gh-pages # Deploys to the 'gh-pages' branch

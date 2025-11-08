@@ -77,4 +77,3 @@ def sample_weights(app, sample_user):
             app.storage.add_weight_entry(weight)
         return weights
 
-
