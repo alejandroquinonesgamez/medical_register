@@ -3,7 +3,7 @@
   <head><meta charset="utf-8">
     <meta name="viewport" content="width=device-width,initial-scale=1">
     <meta name="color-scheme" content="light dark"><meta name="viewport" content="width=device-width, initial-scale=1" />
-<link rel="index" title="Index" href="genindex.html"><link rel="search" title="Search" href="search.html"><link rel="next" title="Plan de Pruebas de Seguridad: PE (Pruebas de Penetración) y AVL (Análisis de Vulnerabilidades)" href="PE-AVL.html"><link rel="prev" title="Medical Register" href="index.html">
+<link rel="index" title="Index" href="genindex.html"><link rel="search" title="Search" href="search.html"><link rel="next" title="📋 Documento de Requerimientos Funcionales - Aplicación Web de Registro de Peso e IMC" href="requeriments.html"><link rel="prev" title="Medical Register" href="index.html">
 
     <!-- Generated with Sphinx 8.1.3 and Furo 2025.09.25 -->
         <title>📝 Manual de Usuario - Registro Personal de Peso e IMC - Medical Register 0.1.0 documentation</title>
@@ -194,7 +194,6 @@
   <p class="caption" role="heading"><span class="caption-text">Contenido:</span></p>
 <ul class="current">
 <li class="toctree-l1 current current-page"><a class="current reference internal" href="#">📝 Manual de Usuario - Registro Personal de Peso e IMC</a></li>
-<li class="toctree-l1"><a class="reference internal" href="PE-AVL.html">Plan de Pruebas de Seguridad: PE (Pruebas de Penetración) y AVL (Análisis de Vulnerabilidades)</a></li>
 <li class="toctree-l1"><a class="reference internal" href="requeriments.html">📋 Documento de Requerimientos Funcionales - Aplicación Web de Registro de Peso e IMC</a></li>
 </ul>
 
@@ -263,7 +262,27 @@
 <p>En la sección principal de la aplicación, encontrarás el formulario de registro:</p>
 <ul class="simple">
 <li><p><strong>Peso (en kilos)</strong>: Introduce tu peso actual en kilogramos (ejemplo: <code class="docutils literal notranslate"><span class="pre">78.5</span></code>).</p></li>
-<li><p>Pulsa el botón <strong>“Registrar Peso”</strong> para guardar la entrada con la fecha y hora actuales.</p></li>
+<li><p>Pulsa el botón <strong>“Guardar Peso”</strong> para guardar la entrada con la fecha y hora actuales.</p></li>
+</ul>
+<p><strong>Registros Múltiples en el Mismo Día:</strong></p>
+<ul class="simple">
+<li><p>Si registras más de un peso en el mismo día, el nuevo registro <strong>reemplazará automáticamente</strong> al anterior del mismo día.</p></li>
+<li><p>Esto significa que solo se mantendrá el último peso registrado de cada día.</p></li>
+<li><p>Esta funcionalidad te permite corregir un registro erróneo simplemente introduciendo el peso correcto nuevamente.</p></li>
+</ul>
+<p><strong>Validación de Variación de Peso:</strong>
+La aplicación incluye una validación de seguridad que limita la variación de peso permitida según los días transcurridos desde el último registro de un día diferente. Esta limitación se basa en consideraciones físicas realistas:</p>
+<ul class="simple">
+<li><p><strong>Límite de variación</strong>: No se permite una variación mayor a <strong>5 kilogramos por día</strong> desde el último registro de peso de un día diferente.</p></li>
+<li><p><strong>Ejemplo</strong>: Si han pasado 3 días desde tu último registro de un día diferente, la variación máxima permitida será de 15 kg (3 días × 5 kg/día).</p></li>
+<li><p><strong>Importante</strong>: La validación se realiza comparando con el último peso registrado de un día diferente. Si registras múltiples pesos el mismo día, la validación siempre se hace respecto al último peso de un día anterior.</p></li>
+<li><p>Si intentas registrar un peso que excede esta variación, la aplicación mostrará un mensaje de error informativo que indica:</p>
+<ul>
+<li><p>Cuántos días han pasado desde el último registro de un día diferente</p></li>
+<li><p>La variación máxima permitida según los días transcurridos</p></li>
+<li><p>La diferencia actual entre el peso que intentas registrar y el último peso registrado de un día diferente</p></li>
+</ul>
+</li>
 </ul>
 </section>
 <section id="calculo-y-descripcion-del-imc">
@@ -301,6 +320,20 @@ $$\text{IMC} = \frac{\text{Peso (kg)}}{\text{Talla (m)}^2}$$</p></li>
 <li><p><strong>Importante</strong>: Si borras la caché o los datos de navegación de tu navegador, <strong>perderás todos los datos</strong> de esta aplicación. Es crucial evitar borrar los “Datos de sitios web” si quieres conservar tu historial.</p></li>
 </ul>
 </section>
+<section id="validaciones-y-restricciones">
+<h2>⚠️ Validaciones y Restricciones<a class="headerlink" href="#validaciones-y-restricciones" title="Link to this heading">¶</a></h2>
+<p>La aplicación incluye las siguientes validaciones para garantizar la integridad de los datos:</p>
+<section id="validaciones-de-entrada">
+<h3>Validaciones de Entrada<a class="headerlink" href="#validaciones-de-entrada" title="Link to this heading">¶</a></h3>
+<ul class="simple">
+<li><p><strong>Talla</strong>: Debe estar entre 0.4 y 2.72 metros.</p></li>
+<li><p><strong>Peso</strong>: Debe estar entre 2 y 650 kilogramos.</p></li>
+<li><p><strong>Fecha de Nacimiento</strong>: Debe estar entre el año 1900 y la fecha actual.</p></li>
+<li><p><strong>Variación de Peso Diaria</strong>: No se permite una variación mayor a 5 kg por día desde el último registro de un día diferente. Si registras múltiples pesos el mismo día, el nuevo reemplazará al anterior y la validación se realizará respecto al último peso de un día diferente.</p></li>
+</ul>
+<p>Si alguna de estas validaciones falla, la aplicación mostrará un mensaje de error claro indicando el problema y cómo corregirlo.</p>
+</section>
+</section>
 </section>
 
         </article>
@@ -308,12 +341,12 @@ $$\text{IMC} = \frac{\text{Peso (kg)}}{\text{Talla (m)}^2}$$</p></li>
       <footer>
         
         <div class="related-pages">
-          <a class="next-page" href="PE-AVL.html">
+          <a class="next-page" href="requeriments.html">
               <div class="page-info">
                 <div class="context">
                   <span>Next</span>
                 </div>
-                <div class="title">Plan de Pruebas de Seguridad: PE (Pruebas de Penetración) y AVL (Análisis de Vulnerabilidades)</div>
+                <div class="title">📋 Documento de Requerimientos Funcionales - Aplicación Web de Registro de Peso e IMC</div>
               </div>
               <svg class="furo-related-icon"><use href="#svg-arrow-right"></use></svg>
             </a>
@@ -376,6 +409,10 @@ $$\text{IMC} = \frac{\text{Peso (kg)}}{\text{Talla (m)}^2}$$</p></li>
 </ul>
 </li>
 <li><a class="reference internal" href="#consideraciones-tecnicas">🔒 Consideraciones Técnicas</a></li>
+<li><a class="reference internal" href="#validaciones-y-restricciones">⚠️ Validaciones y Restricciones</a><ul>
+<li><a class="reference internal" href="#validaciones-de-entrada">Validaciones de Entrada</a></li>
+</ul>
+</li>
 </ul>
 </li>
 </ul>

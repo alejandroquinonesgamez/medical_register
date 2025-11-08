@@ -28,7 +28,23 @@ Esta es la funcionalidad central de la aplicación. Te permite registrar nuevos 
 En la sección principal de la aplicación, encontrarás el formulario de registro:
 
 * **Peso (en kilos)**: Introduce tu peso actual en kilogramos (ejemplo: `78.5`).
-* Pulsa el botón **"Registrar Peso"** para guardar la entrada con la fecha y hora actuales.
+* Pulsa el botón **"Guardar Peso"** para guardar la entrada con la fecha y hora actuales.
+
+**Registros Múltiples en el Mismo Día:**
+* Si registras más de un peso en el mismo día, el nuevo registro **reemplazará automáticamente** al anterior del mismo día.
+* Esto significa que solo se mantendrá el último peso registrado de cada día.
+* Esta funcionalidad te permite corregir un registro erróneo simplemente introduciendo el peso correcto nuevamente.
+
+**Validación de Variación de Peso:**
+La aplicación incluye una validación de seguridad que limita la variación de peso permitida según los días transcurridos desde el último registro de un día diferente. Esta limitación se basa en consideraciones físicas realistas:
+
+* **Límite de variación**: No se permite una variación mayor a **5 kilogramos por día** desde el último registro de peso de un día diferente.
+* **Ejemplo**: Si han pasado 3 días desde tu último registro de un día diferente, la variación máxima permitida será de 15 kg (3 días × 5 kg/día).
+* **Importante**: La validación se realiza comparando con el último peso registrado de un día diferente. Si registras múltiples pesos el mismo día, la validación siempre se hace respecto al último peso de un día anterior.
+* Si intentas registrar un peso que excede esta variación, la aplicación mostrará un mensaje de error informativo que indica:
+  - Cuántos días han pasado desde el último registro de un día diferente
+  - La variación máxima permitida según los días transcurridos
+  - La diferencia actual entre el peso que intentas registrar y el último peso registrado de un día diferente
 
 ### 2. **Cálculo y Descripción del IMC**
 
@@ -62,3 +78,16 @@ Se indicará el **Peso Mínimo** que has introducido desde que comenzaste a usar
 
 * **Almacenamiento de Datos**: Dado que la aplicación es solo para ti, todos tus datos (nombre, peso, etc.) se almacenan localmente en tu **navegador web** (usando tecnologías como `localStorage`).
 * **Importante**: Si borras la caché o los datos de navegación de tu navegador, **perderás todos los datos** de esta aplicación. Es crucial evitar borrar los "Datos de sitios web" si quieres conservar tu historial.
+
+## ⚠️ Validaciones y Restricciones
+
+La aplicación incluye las siguientes validaciones para garantizar la integridad de los datos:
+
+### Validaciones de Entrada
+
+* **Talla**: Debe estar entre 0.4 y 2.72 metros.
+* **Peso**: Debe estar entre 2 y 650 kilogramos.
+* **Fecha de Nacimiento**: Debe estar entre el año 1900 y la fecha actual.
+* **Variación de Peso Diaria**: No se permite una variación mayor a 5 kg por día desde el último registro de un día diferente. Si registras múltiples pesos el mismo día, el nuevo reemplazará al anterior y la validación se realizará respecto al último peso de un día diferente.
+
+Si alguna de estas validaciones falla, la aplicación mostrará un mensaje de error claro indicando el problema y cómo corregirlo.
