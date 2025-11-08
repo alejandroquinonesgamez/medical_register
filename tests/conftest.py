@@ -1,36 +1,80 @@
-import os
-import shutil
-import tempfile
-
+"""
+Configuración de pytest y fixtures compartidas
+"""
 import pytest
+from datetime import datetime, date
+from flask import Flask
+from app.storage import MemoryStorage, UserData, WeightEntryData
+from app.routes import api
 
-from app import create_app
-from app.database import db
+
+# Helpers para hacer los tests más legibles
+def assert_success(response):
+    """Verifica que la respuesta sea exitosa (200 OK)"""
+    assert response.status_code == 200, f"Esperado 200 OK, obtenido {response.status_code}: {response.get_data(as_text=True)}"
 
 
-@pytest.fixture(scope="session")
+def assert_created(response):
+    """Verifica que el recurso fue creado (201 Created)"""
+    assert response.status_code == 201, f"Esperado 201 Created, obtenido {response.status_code}: {response.get_data(as_text=True)}"
+
+
+def assert_bad_request(response):
+    """Verifica que la respuesta sea un error de petición inválida (400 Bad Request)"""
+    assert response.status_code == 400, f"Esperado 400 Bad Request, obtenido {response.status_code}: {response.get_data(as_text=True)}"
+
+
+def assert_not_found(response):
+    """Verifica que el recurso no fue encontrado (404 Not Found)"""
+    assert response.status_code == 404, f"Esperado 404 Not Found, obtenido {response.status_code}: {response.get_data(as_text=True)}"
+
+
+@pytest.fixture
 def app():
-    # Create a temporary instance folder for the SQLite DB used by create_app
-    temp_instance_dir = tempfile.mkdtemp(prefix="flask_instance_")
-
-    os.environ["FLASK_ENV"] = "testing"
-
-    app = create_app()
-
-    # Point Flask instance path to the temp dir so DB is isolated
-    app.instance_path = temp_instance_dir
-
-    with app.app_context():
-        # Recreate tables to ensure a clean slate
-        db.drop_all()
-        db.create_all()
-
+    """Crea una aplicación Flask para testing con almacenamiento en memoria"""
+    app = Flask(__name__, template_folder='../app/templates', static_folder='../app/static')
+    app.config['TESTING'] = True
+    app.config['WTF_CSRF_ENABLED'] = False
+    
+    # Usar almacenamiento en memoria para tests
+    app.storage = MemoryStorage()
+    app.register_blueprint(api)
+    
     yield app
 
-    # Cleanup temp instance directory
-    shutil.rmtree(temp_instance_dir, ignore_errors=True)
 
-
-@pytest.fixture()
+@pytest.fixture
 def client(app):
+    """Cliente de prueba para hacer requests HTTP"""
     return app.test_client()
+
+
+@pytest.fixture
+def sample_user(app):
+    """Crea un usuario de prueba usando el storage"""
+    with app.app_context():
+        user = UserData(
+            user_id=1,
+            first_name="Juan",
+            last_name="Pérez García",
+            birth_date=date(1990, 5, 15),
+            height_m=1.75
+        )
+        app.storage.save_user(user)
+        return user
+
+
+@pytest.fixture
+def sample_weights(app, sample_user):
+    """Crea varios registros de peso de prueba usando el storage"""
+    with app.app_context():
+        weights = [
+            WeightEntryData(entry_id=0, user_id=1, weight_kg=70.0, recorded_date=datetime(2024, 1, 1, 10, 0)),
+            WeightEntryData(entry_id=0, user_id=1, weight_kg=72.5, recorded_date=datetime(2024, 1, 15, 10, 0)),
+            WeightEntryData(entry_id=0, user_id=1, weight_kg=75.0, recorded_date=datetime(2024, 2, 1, 10, 0)),
+        ]
+        for weight in weights:
+            app.storage.add_weight_entry(weight)
+        return weights
+
+

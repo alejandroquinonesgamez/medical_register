@@ -1,99 +1,148 @@
-from flask import request, jsonify, render_template, Blueprint
-from datetime import datetime
-from sqlalchemy import func
+from flask import request, jsonify, render_template, Blueprint, current_app
+from datetime import datetime, date
 
-from .database import db
-from .models import User, WeightEntry
+from .storage import UserData, WeightEntryData
 from .helpers import calculate_bmi, get_bmi_description
+from .translations import get_error, get_message, get_text, get_days_text, HTML_TEXTS
+from .config import USER_ID, VALIDATION_LIMITS
 
 
 api = Blueprint('api', __name__)
 
-USER_ID = 1
-
 
 @api.route('/')
 def index():
-    return render_template('index.html')
+    return render_template('index.html', html_texts=HTML_TEXTS)
 
 
 @api.route('/api/user', methods=['GET'])
 def get_user():
-    user = User.query.get(USER_ID)
+    storage = current_app.storage
+    user = storage.get_user(USER_ID)
     if not user:
-        return jsonify({"error": "Usuario no encontrado"}), 404
+        return jsonify({"error": get_error("user_not_found")}), 404
     return jsonify({
-        "nombre": user.nombre,
-        "apellidos": user.apellidos,
-        "fecha_nacimiento": user.fecha_nacimiento.isoformat(),
-        "talla_m": user.talla_m
+        "nombre": user.first_name,
+        "apellidos": user.last_name,
+        "fecha_nacimiento": user.birth_date.isoformat(),
+        "talla_m": user.height_m
     })
 
 
 @api.route('/api/user', methods=['POST'])
 def create_or_update_user():
+    storage = current_app.storage
     data = request.json or {}
-    user = User.query.get(USER_ID)
 
-    if not user:
-        user = User(
-            id=USER_ID,
-            nombre=data['nombre'],
-            apellidos=data['apellidos'],
-            fecha_nacimiento=datetime.strptime(data['fecha_nacimiento'], '%Y-%m-%d').date(),
-            talla_m=float(data['talla_m'])
-        )
-        db.session.add(user)
-    else:
-        user.nombre = data['nombre']
-        user.apellidos = data['apellidos']
-        user.fecha_nacimiento = datetime.strptime(data['fecha_nacimiento'], '%Y-%m-%d').date()
-        user.talla_m = float(data['talla_m'])
+    try:
+        height_m = float(data['talla_m'])
+    except Exception:
+        return jsonify({"error": get_error("invalid_height")}), 400
+    if not (VALIDATION_LIMITS["height_min"] <= height_m <= VALIDATION_LIMITS["height_max"]):
+        return jsonify({"error": get_error("height_out_of_range")}), 400
 
-    db.session.commit()
-    return jsonify({"message": "Usuario guardado"}), 200
+    try:
+        birth_date = datetime.strptime(data['fecha_nacimiento'], '%Y-%m-%d').date()
+    except (ValueError, KeyError):
+        return jsonify({"error": get_error("invalid_birth_date")}), 400
+    
+    min_date = VALIDATION_LIMITS["birth_date_min"]
+    max_date = datetime.now().date()
+    if birth_date < min_date or birth_date > max_date:
+        return jsonify({"error": get_error("birth_date_out_of_range")}), 400
+
+    user = UserData(
+        user_id=USER_ID,
+        first_name=data['nombre'],
+        last_name=data['apellidos'],
+        birth_date=birth_date,
+        height_m=height_m
+    )
+    storage.save_user(user)
+    
+    return jsonify({"message": get_message("user_saved")}), 200
 
 
 @api.route('/api/weight', methods=['POST'])
 def add_weight():
+    storage = current_app.storage
     data = request.json or {}
-    user = User.query.get(USER_ID)
+    
+    user = storage.get_user(USER_ID)
     if not user:
-        return jsonify({"error": "Debe configurar el usuario primero"}), 400
+        return jsonify({"error": get_error("user_must_be_configured")}), 400
 
-    nuevo_peso = WeightEntry(
+    try:
+        weight_kg = float(data['peso_kg'])
+    except Exception:
+        return jsonify({"error": get_error("invalid_weight")}), 400
+    if not (VALIDATION_LIMITS["weight_min"] <= weight_kg <= VALIDATION_LIMITS["weight_max"]):
+        return jsonify({"error": get_error("weight_out_of_range")}), 400
+
+    current_date = date.today()
+    
+    # Obtener el último peso de un día diferente para validar variación
+    # Si hay múltiples entradas del mismo día, se reemplazarán
+    last_weight_different_date = storage.get_last_weight_entry_from_different_date(USER_ID, current_date)
+    
+    if last_weight_different_date:
+        last_registration_date = last_weight_different_date.recorded_date.date()
+        days_elapsed = (current_date - last_registration_date).days
+        
+        # Validar variación respecto al último peso de un día diferente
+        max_allowed_difference = days_elapsed * VALIDATION_LIMITS["weight_variation_per_day"]
+        weight_difference = abs(weight_kg - last_weight_different_date.weight_kg)
+        
+        if weight_difference > max_allowed_difference:
+            days_text = get_days_text(days_elapsed)
+            
+            return jsonify({
+                "error": get_error("weight_variation_exceeded", 
+                                  days_text=days_text,
+                                  max_allowed_difference=max_allowed_difference,
+                                  weight_difference=weight_difference)
+            }), 400
+
+    new_weight = WeightEntryData(
+        entry_id=0,
         user_id=USER_ID,
-        peso_kg=float(data['peso_kg'])
+        weight_kg=weight_kg,
+        recorded_date=datetime.now()
     )
-    db.session.add(nuevo_peso)
-    db.session.commit()
-    return jsonify({"message": "Peso registrado"}), 201
+    storage.add_weight_entry(new_weight)
+    
+    return jsonify({"message": get_message("weight_registered")}), 201
 
 
 @api.route('/api/imc', methods=['GET'])
 def get_current_imc():
-    user = User.query.get(USER_ID)
+    storage = current_app.storage
+    
+    user = storage.get_user(USER_ID)
     if not user:
-        return jsonify({"error": "Usuario no configurado"}), 404
+        return jsonify({"error": get_error("user_not_configured")}), 404
 
-    ultimo_peso = WeightEntry.query.filter_by(user_id=USER_ID).order_by(WeightEntry.fecha_registro.desc()).first()
-    if not ultimo_peso:
-        return jsonify({"imc": 0, "description": "Sin registros de peso"}), 200
+    last_weight = storage.get_last_weight_entry(USER_ID)
+    if not last_weight:
+        return jsonify({"imc": 0, "description": get_text("no_weight_records")}), 200
 
-    imc = calculate_bmi(ultimo_peso.peso_kg, user.talla_m)
-    description = get_bmi_description(imc)
-    return jsonify({"imc": imc, "description": description})
+    bmi = calculate_bmi(last_weight.weight_kg, user.height_m)
+    description = get_bmi_description(bmi)
+    return jsonify({"imc": bmi, "description": description})
 
 
 @api.route('/api/stats', methods=['GET'])
 def get_stats():
-    num_pesajes = WeightEntry.query.filter_by(user_id=USER_ID).count()
-    peso_max = db.session.query(func.max(WeightEntry.peso_kg)).filter_by(user_id=USER_ID).scalar()
-    peso_min = db.session.query(func.min(WeightEntry.peso_kg)).filter_by(user_id=USER_ID).scalar()
+    storage = current_app.storage
+    
+    weight_count = storage.get_weight_count(USER_ID)
+    max_weight = storage.get_max_weight(USER_ID)
+    min_weight = storage.get_min_weight(USER_ID)
+    
     return jsonify({
-        "num_pesajes": num_pesajes or 0,
-        "peso_max": peso_max or 0,
-        "peso_min": peso_min or 0
+        "num_pesajes": weight_count or 0,
+        "peso_max": max_weight or 0,
+        "peso_min": min_weight or 0
     })
 
 

@@ -1,17 +1,20 @@
-def calculate_bmi(peso_kg, talla_m):
-    if talla_m <= 0:
+from .translations import get_bmi_description as get_bmi_text
+
+
+def calculate_bmi(weight_kg, height_m):
+    if height_m <= 0:
         return 0
-    return round(peso_kg / (talla_m ** 2), 1)
+    return round(weight_kg / (height_m ** 2), 1)
 
 
-def get_bmi_description(imc):
-    if imc < 18.5:
-        return "Bajo peso"
-    elif 18.5 <= imc < 25:
-        return "Peso normal"
-    elif 25 <= imc < 30:
-        return "Sobrepeso"
+def get_bmi_description(bmi):
+    if bmi < 18.5:
+        return get_bmi_text("underweight")
+    elif 18.5 <= bmi < 25:
+        return get_bmi_text("normal")
+    elif 25 <= bmi < 30:
+        return get_bmi_text("overweight")
     else:
-        return "Obesidad"
+        return get_bmi_text("obese")
 
 
