@@ -7,7 +7,7 @@ from datetime import datetime, date
 
 from .storage import UserData, WeightEntryData
 from .helpers import calculate_bmi, get_bmi_description
-from .translations import get_error, get_message, get_text, get_days_text
+from .translations import get_error, get_message, get_text, get_days_text, get_frontend_messages
 from .config import USER_ID, VALIDATION_LIMITS
 
 
@@ -143,5 +143,11 @@ def get_stats():
         "peso_max": max_weight or 0,
         "peso_min": min_weight or 0
     })
+
+
+@api.route('/messages', methods=['GET'])
+def get_messages():
+    """Endpoint que devuelve todos los mensajes para el frontend"""
+    return jsonify(get_frontend_messages())
 
 

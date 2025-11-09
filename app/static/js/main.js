@@ -29,7 +29,7 @@ function getBMIDescription(bmi) {
     }
     
     // Obtener la descripción del diccionario
-    return MESSAGES.bmiDescriptions[key] || `IMC: ${bmi}`;
+    return MESSAGES.bmi_descriptions[key] || `IMC: ${bmi}`;
 }
 
 document.addEventListener('DOMContentLoaded', () => {
@@ -66,7 +66,7 @@ document.addEventListener('DOMContentLoaded', () => {
         
         if (!user || !lastWeight) {
             imcValue.textContent = '0';
-            imcDescription.textContent = MESSAGES.texts.noWeightRecords || "Sin registros de peso";
+            imcDescription.textContent = MESSAGES.texts.no_weight_records || "Sin registros de peso";
             return;
         }
 
@@ -95,7 +95,7 @@ document.addEventListener('DOMContentLoaded', () => {
         
         const talla_m = parseFloat(document.getElementById('talla_m').value);
         if (talla_m < 0.4 || talla_m > 2.72) {
-            alert(MESSAGES.errors.heightOutOfRange || 'La talla debe estar entre 0.4 y 2.72 metros');
+            alert(MESSAGES.errors.height_out_of_range || 'La talla debe estar entre 0.4 y 2.72 metros');
             return;
         }
 
@@ -110,7 +110,7 @@ document.addEventListener('DOMContentLoaded', () => {
             userModal.style.display = 'none';
             updateDashboard();
         } else {
-            alert(MESSAGES.errors.saveUser || 'Error al guardar usuario');
+            alert(MESSAGES.errors.save_user || 'Error al guardar usuario');
         }
     });
 
@@ -119,7 +119,7 @@ document.addEventListener('DOMContentLoaded', () => {
         
         const user = LocalStorageManager.getUser();
         if (!user) {
-            alert(MESSAGES.errors.userMustBeConfigured || 'Debes configurar tu perfil primero');
+            alert(MESSAGES.errors.user_must_be_configured || 'Debes configurar tu perfil primero');
             userModal.style.display = 'flex';
             return;
         }
@@ -128,7 +128,7 @@ document.addEventListener('DOMContentLoaded', () => {
         if (!weight_kg) return;
 
         if (weight_kg < 2 || weight_kg > 650) {
-            alert(MESSAGES.errors.weightOutOfRange || 'El peso debe estar entre 2 y 650 kg');
+            alert(MESSAGES.errors.weight_out_of_range || 'El peso debe estar entre 2 y 650 kg');
             return;
         }
 
@@ -157,7 +157,7 @@ document.addEventListener('DOMContentLoaded', () => {
             document.getElementById('peso').value = '';
             updateDashboard();
         } else {
-            alert(MESSAGES.errors.saveWeight || 'Error al guardar peso');
+            alert(MESSAGES.errors.save_weight || 'Error al guardar peso');
         }
     });
 

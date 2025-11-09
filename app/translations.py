@@ -58,6 +58,21 @@ TEXTS = {
     "no_weight_records": "Sin registros de peso",
 }
 
+# Mensajes para el frontend (JavaScript)
+FRONTEND_MESSAGES = {
+    "errors": {
+        "save_weight": "Error al guardar el peso",
+        "save_user": "Error al guardar usuario",
+        "height_out_of_range": "La talla debe estar entre 0.4 y 2.72 metros",
+        "weight_out_of_range": "El peso debe estar entre 2 y 650 kg",
+        "user_must_be_configured": "Debes configurar tu perfil primero",
+    },
+    "texts": {
+        "no_weight_records": "Sin registros de peso",
+    },
+    "bmi_descriptions": BMI_COMPLETE_DESCRIPTIONS,
+}
+
 # Textos de la interfaz HTML
 HTML_TEXTS = {
     "title": "Registro de IMC",
@@ -105,8 +120,6 @@ def get_bmi_complete_description(key):
 
 def get_days_text(days):
     """Obtiene el texto de días transcurridos"""
-    # La lógica es simple: buscar en el diccionario o usar el template
-    # Los datos (textos) están en el diccionario, no en la lógica
     return DAYS_TEXT_MAP.get(days, DAYS_TEXT_TEMPLATE.format(days=days))
 
 
@@ -116,4 +129,17 @@ def get_text(key, **kwargs):
     if kwargs:
         return message.format(**kwargs)
     return message
+
+
+def get_frontend_messages():
+    """Obtiene todos los mensajes para el frontend"""
+    return FRONTEND_MESSAGES
+
+
+def get_weight_variation_error_message(max_allowed, days):
+    """Obtiene el mensaje de error de variación de peso con formato singular/plural"""
+    if days == 1:
+        return f"El peso no puede variar más de {max_allowed} kg en 1 día"
+    else:
+        return f"El peso no puede variar más de {max_allowed} kg en {days} días"
 
