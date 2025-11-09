@@ -3,9 +3,7 @@ Configuración de pytest y fixtures compartidas
 """
 import pytest
 from datetime import datetime, date
-from flask import Flask
-from app.storage import MemoryStorage, UserData, WeightEntryData
-from app.routes import api
+from app.storage import UserData, WeightEntryData
 
 
 # Helpers para hacer los tests más legibles
@@ -32,13 +30,11 @@ def assert_not_found(response):
 @pytest.fixture
 def app():
     """Crea una aplicación Flask para testing con almacenamiento en memoria"""
-    app = Flask(__name__, template_folder='../app/templates', static_folder='../app/static')
+    from app import create_app
+    
+    app = create_app()
     app.config['TESTING'] = True
     app.config['WTF_CSRF_ENABLED'] = False
-    
-    # Usar almacenamiento en memoria para tests
-    app.storage = MemoryStorage()
-    app.register_blueprint(api)
     
     yield app
 

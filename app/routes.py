@@ -1,21 +1,20 @@
-from flask import request, jsonify, render_template, Blueprint, current_app
+"""
+Blueprint para las rutas de API REST
+Maneja todas las operaciones de la API (usuarios, pesos, IMC, estadísticas)
+"""
+from flask import request, jsonify, Blueprint, current_app
 from datetime import datetime, date
 
 from .storage import UserData, WeightEntryData
 from .helpers import calculate_bmi, get_bmi_description
-from .translations import get_error, get_message, get_text, get_days_text, HTML_TEXTS
+from .translations import get_error, get_message, get_text, get_days_text
 from .config import USER_ID, VALIDATION_LIMITS
 
 
-api = Blueprint('api', __name__)
+api = Blueprint('api', __name__, url_prefix='/api')
 
 
-@api.route('/')
-def index():
-    return render_template('index.html', html_texts=HTML_TEXTS)
-
-
-@api.route('/api/user', methods=['GET'])
+@api.route('/user', methods=['GET'])
 def get_user():
     storage = current_app.storage
     user = storage.get_user(USER_ID)
@@ -29,7 +28,7 @@ def get_user():
     })
 
 
-@api.route('/api/user', methods=['POST'])
+@api.route('/user', methods=['POST'])
 def create_or_update_user():
     storage = current_app.storage
     data = request.json or {}
@@ -63,7 +62,7 @@ def create_or_update_user():
     return jsonify({"message": get_message("user_saved")}), 200
 
 
-@api.route('/api/weight', methods=['POST'])
+@api.route('/weight', methods=['POST'])
 def add_weight():
     storage = current_app.storage
     data = request.json or {}
@@ -114,7 +113,7 @@ def add_weight():
     return jsonify({"message": get_message("weight_registered")}), 201
 
 
-@api.route('/api/imc', methods=['GET'])
+@api.route('/imc', methods=['GET'])
 def get_current_imc():
     storage = current_app.storage
     
@@ -131,7 +130,7 @@ def get_current_imc():
     return jsonify({"imc": bmi, "description": description})
 
 
-@api.route('/api/stats', methods=['GET'])
+@api.route('/stats', methods=['GET'])
 def get_stats():
     storage = current_app.storage
     
