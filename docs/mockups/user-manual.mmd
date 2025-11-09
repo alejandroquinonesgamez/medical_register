@@ -1,0 +1,17 @@
+flowchart TD
+    A[Inicio] --> B[Registro de datos]
+    B -->|Registro de datos| C[Nombre, apellidos, fecha de nacimiento y talla]
+    C --> D[Guardar datos personales en el navegador en 'localStorage']
+    D --> G[Pantalla Principal]
+    B -->|Datos ya registrados| G
+
+    G -->|Una vez al día| H[Registrar peso]
+    H --> J[Cálculo del IMC]
+    J --> K[Guardar registro]
+
+    K --> L[Actualizar Histórico]
+
+    G --> Q[Consultar Estadísticas]
+    Q --> M[Mostrar número total de pesajes]
+    Q --> N[Mostrar peso máximo y mínimo]
+

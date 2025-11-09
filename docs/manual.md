@@ -1,6 +1,6 @@
-# 📝 Manual de Usuario - Registro Personal de Peso e IMC
+# Manual de Usuario - Registro Personal de Peso e IMC
 
-## 🚀 Inicio de Sesión y Bienvenida
+## Inicio de Sesión y Bienvenida
 
 Esta aplicación es estrictamente **monousuario** y no requiere un sistema de inicio de sesión tradicional (usuario/contraseña). La primera vez que accedas, te pediremos tus datos básicos.
 
@@ -19,7 +19,7 @@ Una vez guardados tus datos, cada vez que inicies la aplicación, serás recibid
 
 ---
 
-## 📊 Registro de Peso y Visualización del IMC
+## Registro de Peso y Visualización del IMC
 
 Esta es la funcionalidad central de la aplicación. Te permite registrar nuevos datos y te da una retroalimentación inmediata sobre tu IMC.
 
@@ -56,30 +56,30 @@ Inmediatamente después de registrar un nuevo peso, la aplicación mostrará tu 
 
 ---
 
-## 📈 Estadísticas Históricas de Peso
+## Estadísticas Históricas de Peso
 
 La aplicación lleva un control automático de todos tus registros para ofrecerte datos resumidos de tu progreso.
 
 ### 1. **Contador de Pesajes**
 
-La aplicación mostrará claramente el **Número de Pesajes Realizados** hasta la fecha, indicando la cantidad total de registros que has guardado en la aplicación.
+La aplicación mostrará claramente el **número de pesajes realizados** hasta la fecha, indicando la cantidad total de registros que has guardado en la aplicación.
 
 ### 2. **Peso Máximo Registrado**
 
-Se indicará el **Peso Máximo** que has introducido desde que comenzaste a usar la aplicación.
+Se indicará el **peso máximo** que has introducido desde que comenzaste a usar la aplicación.
 
 ### 3. **Peso Mínimo Registrado**
 
-Se indicará el **Peso Mínimo** que has introducido desde que comenzaste a usar la aplicación.
+Se indicará el **peso mínimo** que has introducido desde que comenzaste a usar la aplicación.
 
 ---
 
-## 🔒 Consideraciones Técnicas
+## Consideraciones Técnicas
 
 * **Almacenamiento de Datos**: Dado que la aplicación es solo para ti, todos tus datos (nombre, peso, etc.) se almacenan localmente en tu **navegador web** (usando tecnologías como `localStorage`).
 * **Importante**: Si borras la caché o los datos de navegación de tu navegador, **perderás todos los datos** de esta aplicación. Es crucial evitar borrar los "Datos de sitios web" si quieres conservar tu historial.
 
-## ⚠️ Validaciones y Restricciones
+## Validaciones y Restricciones
 
 La aplicación incluye las siguientes validaciones para garantizar la integridad de los datos:
 
@@ -91,3 +91,9 @@ La aplicación incluye las siguientes validaciones para garantizar la integridad
 * **Variación de Peso Diaria**: No se permite una variación mayor a 5 kg por día desde el último registro de un día diferente. Si registras múltiples pesos el mismo día, el nuevo reemplazará al anterior y la validación se realizará respecto al último peso de un día diferente.
 
 Si alguna de estas validaciones falla, la aplicación mostrará un mensaje de error claro indicando el problema y cómo corregirlo.
+
+## Diagrama
+
+Aquí puedes ver un resumen del funcionamiento mediante un diagrama.
+
+![user manual mermaid](./mockups/user-manual.png)

@@ -1,4 +1,4 @@
-# 📋 Documento de Requerimientos Funcionales - Aplicación Web de Registro de Peso e IMC
+# Requerimientos Funcionales
 
 ## 1. Alcance y Usuarios
 
