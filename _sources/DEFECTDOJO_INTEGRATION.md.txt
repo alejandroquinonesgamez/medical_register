@@ -17,12 +17,11 @@ Este documento describe la integración de **DefectDojo** en la aplicación méd
 La integración incluye los siguientes componentes:
 
 ```
-┌─────────────────┐
-│  Aplicación Web │ (Puerto 5001)
-│     Flask       │
-└────────┬────────┘
-         │
-         ▼
+┌─────────────────┐        ┌─────────────────┐
+│  Aplicación Web │ 5001 ► │   Usuarios       │
+│     Flask       │        │                 │
+└─────────────────┘        └─────────────────┘
+
 ┌─────────────────┐        ┌─────────────────┐
 │ DefectDojo Nginx│ 8080 ► │   Usuarios       │
 │ (Proxy estático)│        │                 │
@@ -62,9 +61,10 @@ La integración incluye los siguientes componentes:
 ### 2. DefectDojo Nginx (Proxy y estáticos)
 
 - **Imagen**: `defectdojo/defectdojo-nginx:latest`
-- **Puerto**: `8080` (acceso público http://localhost:8080)
+- **Puerto interno**: `8080` (no expuesto directamente)
 - **Función**: Sirve los estáticos ya compilados y actúa como proxy hacia el servicio `defectdojo` (alias interno `uwsgi:3031`)
 - **Volúmenes**: Comparte `defectdojo_static` para los assets generados por `collectstatic`
+- **Puerto**: `8080` (acceso público http://localhost:8080)
 
 ### 3. PostgreSQL Database
 
@@ -95,7 +95,8 @@ La integración incluye los siguientes componentes:
 ### Requisitos Previos
 
 - Docker y Docker Compose instalados
-- Puertos 5001, 8080, 5432 y 6379 disponibles
+- Puerto 80 disponible (nginx principal)
+- Puertos internos: 5001 (Flask), 8080 (DefectDojo nginx), 5432 (PostgreSQL), 6379 (Redis)
 
 ### Iniciar los Servicios
 
@@ -298,13 +299,16 @@ docker-compose restart
    docker-compose ps defectdojo-db
    ```
 
-### Puerto 8080 ya en uso
+### Puerto 80 ya en uso
 
-Modifica el puerto en `docker-compose.yml`:
+Si el puerto 80 está en uso, modifica el puerto del nginx principal en `docker-compose.yml`:
 ```yaml
-ports:
-  - "8081:8000"  # Cambiar 8080 por 8081
+nginx:
+  ports:
+    - "8080:80"  # Cambiar 80 por otro puerto, por ejemplo 8080
 ```
+
+Luego accede a DefectDojo en `http://localhost:8080`
 
 ### Celery no procesa tareas
 

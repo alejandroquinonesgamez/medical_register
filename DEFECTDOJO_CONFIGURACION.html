@@ -3,10 +3,10 @@
   <head><meta charset="utf-8">
     <meta name="viewport" content="width=device-width,initial-scale=1">
     <meta name="color-scheme" content="light dark"><meta name="viewport" content="width=device-width, initial-scale=1" />
-<link rel="index" title="Index" href="genindex.html"><link rel="search" title="Search" href="search.html"><link rel="next" title="Análisis de Seguridad según CWE-699" href="ANALISIS_CWE_699.html"><link rel="prev" title="Manual de Usuario - Registro Personal de Peso e IMC" href="manual.html">
+<link rel="index" title="Index" href="genindex.html"><link rel="search" title="Search" href="search.html"><link rel="next" title="Credenciales de DefectDojo" href="DEFECTDOJO_CREDENTIALS.html"><link rel="prev" title="Integración de DefectDojo" href="DEFECTDOJO_INTEGRATION.html">
 
     <!-- Generated with Sphinx 8.1.3 and Furo 2025.09.25 -->
-        <title>Requerimientos Funcionales - Medical Register 0.1.0 documentation</title>
+        <title>Configuración de DefectDojo - Medical Register 0.1.0 documentation</title>
       <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=d111a655" />
     <link rel="stylesheet" type="text/css" href="_static/styles/furo.css?v=580074bf" />
     <link rel="stylesheet" type="text/css" href="_static/styles/furo-extensions.css?v=8dab3a3b" />
@@ -194,11 +194,11 @@
   <p class="caption" role="heading"><span class="caption-text">Contenido:</span></p>
 <ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="manual.html">Manual de Usuario - Registro Personal de Peso e IMC</a></li>
-<li class="toctree-l1 current current-page"><a class="current reference internal" href="#">Requerimientos Funcionales</a></li>
+<li class="toctree-l1"><a class="reference internal" href="requeriments.html">Requerimientos Funcionales</a></li>
 <li class="toctree-l1"><a class="reference internal" href="ANALISIS_CWE_699.html">Análisis de Seguridad según CWE-699</a></li>
 <li class="toctree-l1"><a class="reference internal" href="ESTADO_ACTUAL_CWE_699.html">Estado Actual del Programa - Análisis CWE-699</a></li>
 <li class="toctree-l1"><a class="reference internal" href="DEFECTDOJO_INTEGRATION.html">Integración de DefectDojo</a></li>
-<li class="toctree-l1"><a class="reference internal" href="DEFECTDOJO_CONFIGURACION.html">Configuración de DefectDojo</a></li>
+<li class="toctree-l1 current current-page"><a class="current reference internal" href="#">Configuración de DefectDojo</a></li>
 <li class="toctree-l1"><a class="reference internal" href="DEFECTDOJO_CREDENTIALS.html">Credenciales de DefectDojo</a></li>
 <li class="toctree-l1"><a class="reference internal" href="DEFECTDOJO_ENLACES.html">Enlaces Rápidos a DefectDojo</a></li>
 </ul>
@@ -221,7 +221,7 @@
         </a>
         <div class="content-icon-container">
           <div class="view-this-page">
-  <a class="muted-link" href="_sources/requeriments.md.txt" title="View this page">
+  <a class="muted-link" href="_sources/DEFECTDOJO_CONFIGURACION.md.txt" title="View this page">
     <svg><use href="#svg-eye"></use></svg>
     <span class="visually-hidden">View this page</span>
   </a>
@@ -239,83 +239,135 @@
           </label>
         </div>
         <article role="main" id="furo-main-content">
-          <section id="requerimientos-funcionales">
-<h1>Requerimientos Funcionales<a class="headerlink" href="#requerimientos-funcionales" title="Link to this heading">¶</a></h1>
-<section id="alcance-y-usuarios">
-<h2>1. Alcance y Usuarios<a class="headerlink" href="#alcance-y-usuarios" title="Link to this heading">¶</a></h2>
-<p>La aplicación es una herramienta <strong>monousuario</strong> diseñada exclusivamente para el registro personal de la talla, el peso y el cálculo del IMC del cliente. <strong>No se requiere</strong> autenticación compleja (usuario/contraseña) ni capacidades multiusuario.</p>
-</section>
-<section id="requerimientos-de-datos-del-cliente-persistencia">
-<h2>2. Requerimientos de Datos del Cliente (Persistencia)<a class="headerlink" href="#requerimientos-de-datos-del-cliente-persistencia" title="Link to this heading">¶</a></h2>
-<p>La aplicación debe solicitar y <strong>almacenar de forma persistente</strong> (localmente en el navegador) los siguientes datos personales del cliente:</p>
-<ul class="simple">
-<li><p><strong>Nombre</strong></p></li>
-<li><p><strong>Apellidos</strong></p></li>
-<li><p><strong>Fecha de Nacimiento</strong></p></li>
-<li><p><strong>Talla (en metros)</strong></p></li>
-</ul>
-</section>
-<section id="requerimientos-de-funcionalidad-de-registro">
-<h2>3. Requerimientos de Funcionalidad de Registro<a class="headerlink" href="#requerimientos-de-funcionalidad-de-registro" title="Link to this heading">¶</a></h2>
-<section id="registro-de-peso">
-<h3>3.1. Registro de Peso<a class="headerlink" href="#registro-de-peso" title="Link to this heading">¶</a></h3>
-<p>La aplicación debe permitir al cliente registrar su peso actual.</p>
-<ul class="simple">
-<li><p><strong>Dato a registrar:</strong> Peso (en kilogramos).</p></li>
-<li><p><strong>Almacenamiento:</strong> Cada registro de peso debe guardarse junto con la <strong>fecha y hora</strong> del momento del registro.</p></li>
-</ul>
-</section>
-</section>
-<section id="requerimientos-de-interfaz-y-experiencia-de-usuario-ux">
-<h2>4. Requerimientos de Interfaz y Experiencia de Usuario (UX)<a class="headerlink" href="#requerimientos-de-interfaz-y-experiencia-de-usuario-ux" title="Link to this heading">¶</a></h2>
-<section id="bienvenida-personalizada">
-<h3>4.1. Bienvenida Personalizada<a class="headerlink" href="#bienvenida-personalizada" title="Link to this heading">¶</a></h3>
-<p>Al iniciar la aplicación, debe mostrar un <strong>saludo personalizado</strong> utilizando el nombre del cliente almacenado.</p>
-</section>
-<section id="visualizacion-del-imc">
-<h3>4.2. Visualización del IMC<a class="headerlink" href="#visualizacion-del-imc" title="Link to this heading">¶</a></h3>
-<p>La aplicación debe mostrar el <strong>Índice de Masa Corporal (IMC)</strong> del cliente basándose en el último peso registrado y la talla almacenada.</p>
-<ul class="simple">
-<li><p><strong>Fórmula:</strong> $\text{IMC} = \frac{\text{Peso (kg)}}{\text{Talla (m)}^2}$</p></li>
-<li><p><strong>Descripción Requerida:</strong> Se debe incluir una <strong>breve descripción</strong> que explique el significado del valor actual del IMC (ej. “Bajo peso,” “Peso normal,” etc.).</p></li>
-</ul>
-</section>
-</section>
-<section id="requerimientos-de-estadisticas-reportes">
-<h2>5. Requerimientos de Estadísticas (Reportes)<a class="headerlink" href="#requerimientos-de-estadisticas-reportes" title="Link to this heading">¶</a></h2>
-<p>La aplicación debe calcular y mostrar de forma visible las siguientes estadísticas históricas basadas en todos los registros de peso guardados:</p>
-<div class="table-wrapper colwidths-auto docutils container">
-<table class="docutils align-default">
-<thead>
-<tr class="row-odd"><th class="head text-left"><p>ID</p></th>
-<th class="head text-left"><p>Estadística Requerida</p></th>
-<th class="head text-left"><p>Detalle</p></th>
-</tr>
-</thead>
-<tbody>
-<tr class="row-even"><td class="text-left"><p><strong>5.1</strong></p></td>
-<td class="text-left"><p><strong>Número de Pesajes</strong></p></td>
-<td class="text-left"><p>El total de entradas de peso realizadas por el cliente.</p></td>
-</tr>
-<tr class="row-odd"><td class="text-left"><p><strong>5.2</strong></p></td>
-<td class="text-left"><p><strong>Peso Máximo Registrado</strong></p></td>
-<td class="text-left"><p>El valor más alto de peso (en kilos) registrado en la historia.</p></td>
-</tr>
-<tr class="row-even"><td class="text-left"><p><strong>5.3</strong></p></td>
-<td class="text-left"><p><strong>Peso Mínimo Registrado</strong></p></td>
-<td class="text-left"><p>El valor más bajo de peso (en kilos) registrado en la historia.</p></td>
-</tr>
-</tbody>
-</table>
-</div>
+          <section id="configuracion-de-defectdojo">
+<h1>Configuración de DefectDojo<a class="headerlink" href="#configuracion-de-defectdojo" title="Link to this heading">¶</a></h1>
+<section id="resumen">
+<h2>Resumen<a class="headerlink" href="#resumen" title="Link to this heading">¶</a></h2>
+<p>DefectDojo está configurado principalmente con valores <strong>estándar</strong>, con algunas <strong>personalizaciones necesarias</strong> para integrar el servicio Nginx oficial.</p>
 </section>
 <hr class="docutils" />
-<section id="restricciones-y-exclusiones">
-<h2>6. Restricciones y Exclusiones<a class="headerlink" href="#restricciones-y-exclusiones" title="Link to this heading">¶</a></h2>
+<section id="configuraciones-estandar-por-defecto">
+<h2>Configuraciones ESTÁNDAR (Por Defecto)<a class="headerlink" href="#configuraciones-estandar-por-defecto" title="Link to this heading">¶</a></h2>
+<section id="servicios-base">
+<h3>Servicios Base<a class="headerlink" href="#servicios-base" title="Link to this heading">¶</a></h3>
 <ul class="simple">
-<li><p><strong>Restricción de Multi-usuario:</strong> La aplicación es estrictamente monousuario.</p></li>
-<li><p><strong>Exclusión de Funcionalidad Adicional:</strong> No se deben añadir funcionalidades no especificadas (ej. gestión de metas, gráficos, exportación de datos, edición de registros, sistema de autenticación complejo, etc.).</p></li>
-<li><p><strong>Unidades:</strong> Los datos se manejarán estrictamente en <strong>metros (talla)</strong> y <strong>kilogramos (peso)</strong>.</p></li>
+<li><p>✅ <strong>Imagen oficial</strong>: <code class="docutils literal notranslate"><span class="pre">defectdojo/defectdojo-django:latest</span></code></p></li>
+<li><p>✅ <strong>Base de datos</strong>: PostgreSQL 15 (estándar de DefectDojo)</p></li>
+<li><p>✅ <strong>Cache/Broker</strong>: Redis 7 (estándar de DefectDojo)</p></li>
+<li><p>✅ <strong>Celery Worker</strong>: Para tareas asíncronas (estándar)</p></li>
+<li><p>✅ <strong>Celery Beat</strong>: Para tareas programadas (estándar)</p></li>
+</ul>
+</section>
+<section id="variables-de-entorno-estandar">
+<h3>Variables de Entorno Estándar<a class="headerlink" href="#variables-de-entorno-estandar" title="Link to this heading">¶</a></h3>
+<ul class="simple">
+<li><p>✅ Variables de entorno de DefectDojo (<code class="docutils literal notranslate"><span class="pre">DD_*</span></code>) con valores estándar</p></li>
+<li><p>✅ Configuración de base de datos estándar</p></li>
+<li><p>✅ Configuración de Celery estándar</p></li>
+<li><p>✅ <code class="docutils literal notranslate"><span class="pre">DD_DEBUG:</span> <span class="pre">&quot;True&quot;</span></code> (estándar para desarrollo)</p></li>
+<li><p>✅ <code class="docutils literal notranslate"><span class="pre">DD_ALLOWED_HOSTS:</span> <span class="pre">&quot;*&quot;</span></code> (estándar para desarrollo)</p></li>
+</ul>
+</section>
+<section id="configuracion-de-django">
+<h3>Configuración de Django<a class="headerlink" href="#configuracion-de-django" title="Link to this heading">¶</a></h3>
+<ul class="simple">
+<li><p>✅ Configuraciones de Django por defecto de DefectDojo</p></li>
+<li><p>✅ Sistema de auditoría (django-auditlog) estándar</p></li>
+<li><p>✅ API habilitada por defecto</p></li>
+<li><p>✅ Sin modificaciones en el código fuente de DefectDojo</p></li>
+</ul>
+</section>
+</section>
+<hr class="docutils" />
+<section id="configuraciones-personalizadas-modificadas">
+<h2>Configuraciones PERSONALIZADAS (Modificadas)<a class="headerlink" href="#configuraciones-personalizadas-modificadas" title="Link to this heading">¶</a></h2>
+<section id="servicio-nginx-oficial">
+<h3>1. Servicio Nginx Oficial<a class="headerlink" href="#servicio-nginx-oficial" title="Link to this heading">¶</a></h3>
+<p><strong>Razón</strong>: Servir archivos estáticos de forma eficiente y hacer proxy a uwsgi</p>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="nt">defectdojo-nginx</span><span class="p">:</span>
+<span class="w">  </span><span class="nt">image</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">defectdojo/defectdojo-nginx:latest</span>
+<span class="w">  </span><span class="nt">ports</span><span class="p">:</span>
+<span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="s">&quot;8080:8080&quot;</span>
+</pre></div>
+</div>
+<p><strong>Estado</strong>: ✅ <strong>Estándar de DefectDojo</strong> - Es el servicio Nginx oficial recomendado</p>
+</section>
+<section id="deshabilitacion-de-whitenoise">
+<h3>2. Deshabilitación de WhiteNoise<a class="headerlink" href="#deshabilitacion-de-whitenoise" title="Link to this heading">¶</a></h3>
+<p><strong>Razón</strong>: Nginx sirve los archivos estáticos, no es necesario WhiteNoise</p>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="nt">DD_WHITENOISE</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;False&quot;</span>
+</pre></div>
+</div>
+<p><strong>Estado</strong>: ⚠️ <strong>Personalizado</strong> - Necesario cuando se usa Nginx oficial</p>
+</section>
+<section id="puerto-interno-8081">
+<h3>3. Puerto Interno 8081<a class="headerlink" href="#puerto-interno-8081" title="Link to this heading">¶</a></h3>
+<p><strong>Razón</strong>: Nginx expone el puerto 8080, Django corre internamente en 8081</p>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="nt">expose</span><span class="p">:</span>
+<span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="s">&quot;8081&quot;</span><span class="w">  </span><span class="c1"># No se expone directamente</span>
+</pre></div>
+</div>
+<p><strong>Estado</strong>: ⚠️ <strong>Personalizado</strong> - Arquitectura con Nginx como proxy</p>
+</section>
+<section id="alias-de-red-uwsgi">
+<h3>4. Alias de Red ‘uwsgi’<a class="headerlink" href="#alias-de-red-uwsgi" title="Link to this heading">¶</a></h3>
+<p><strong>Razón</strong>: El Nginx oficial busca el servicio Django por el nombre ‘uwsgi’</p>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="nt">networks</span><span class="p">:</span>
+<span class="w">  </span><span class="nt">defectdojo-network</span><span class="p">:</span>
+<span class="w">    </span><span class="nt">aliases</span><span class="p">:</span>
+<span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">uwsgi</span>
+</pre></div>
+</div>
+<p><strong>Estado</strong>: ⚠️ <strong>Personalizado</strong> - Requerido por la configuración del Nginx oficial</p>
+</section>
+<section id="volumen-compartido-para-estaticos">
+<h3>5. Volumen Compartido para Estáticos<a class="headerlink" href="#volumen-compartido-para-estaticos" title="Link to this heading">¶</a></h3>
+<p><strong>Razón</strong>: Nginx y Django necesitan acceso a los archivos estáticos</p>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="nt">volumes</span><span class="p">:</span>
+<span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">defectdojo_static:/app/static</span>
+</pre></div>
+</div>
+<p><strong>Estado</strong>: ⚠️ <strong>Personalizado</strong> - Necesario para la integración con Nginx</p>
+</section>
+<section id="healthchecks-personalizados">
+<h3>6. Healthchecks Personalizados<a class="headerlink" href="#healthchecks-personalizados" title="Link to this heading">¶</a></h3>
+<p><strong>Razón</strong>: Verificar que los servicios funcionen correctamente</p>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="nt">healthcheck</span><span class="p">:</span>
+<span class="w">  </span><span class="nt">test</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="s">&quot;CMD&quot;</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="s">&quot;python&quot;</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="s">&quot;-c&quot;</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="s">&quot;import</span><span class="nv"> </span><span class="s">urllib.request;</span><span class="nv"> </span><span class="s">urllib.request.urlopen(&#39;http://localhost:8081/&#39;)&quot;</span><span class="p p-Indicator">]</span>
+</pre></div>
+</div>
+<p><strong>Estado</strong>: ⚠️ <strong>Personalizado</strong> - Adaptado a nuestra arquitectura</p>
+</section>
+</section>
+<hr class="docutils" />
+<section id="configuraciones-de-desarrollo-no-para-produccion">
+<h2>Configuraciones de Desarrollo (No para Producción)<a class="headerlink" href="#configuraciones-de-desarrollo-no-para-produccion" title="Link to this heading">¶</a></h2>
+<p>⚠️ <strong>IMPORTANTE</strong>: Estas configuraciones son para desarrollo y deben cambiarse en producción:</p>
+<ol class="arabic simple">
+<li><p><strong><code class="docutils literal notranslate"><span class="pre">DD_DEBUG:</span> <span class="pre">&quot;True&quot;</span></code></strong> → Cambiar a <code class="docutils literal notranslate"><span class="pre">&quot;False&quot;</span></code> en producción</p></li>
+<li><p><strong><code class="docutils literal notranslate"><span class="pre">DD_ALLOWED_HOSTS:</span> <span class="pre">&quot;*&quot;</span></code></strong> → Restringir a dominios específicos en producción</p></li>
+<li><p><strong><code class="docutils literal notranslate"><span class="pre">DD_SECRET_KEY</span></code></strong> → Cambiar por una clave segura en producción</p></li>
+<li><p><strong>Contraseñas de base de datos</strong> → Cambiar todas las contraseñas en producción</p></li>
+</ol>
+</section>
+<hr class="docutils" />
+<section id="conclusion">
+<h2>Conclusión<a class="headerlink" href="#conclusion" title="Link to this heading">¶</a></h2>
+<p><strong>DefectDojo está configurado principalmente con valores estándar</strong>, con las siguientes personalizaciones necesarias para la integración del servicio Nginx oficial:</p>
+<ul class="simple">
+<li><p>✅ Uso del servicio Nginx oficial de DefectDojo (recomendado)</p></li>
+<li><p>✅ Configuración adaptada para que Nginx sirva estáticos</p></li>
+<li><p>✅ Arquitectura con proxy reverso (Nginx → Django)</p></li>
+<li><p>✅ Healthchecks adaptados a la arquitectura</p></li>
+</ul>
+<p><strong>No hay modificaciones inusuales o problemáticas</strong>. Todas las personalizaciones son estándar cuando se usa el servicio Nginx oficial de DefectDojo.</p>
+</section>
+<hr class="docutils" />
+<section id="referencias">
+<h2>Referencias<a class="headerlink" href="#referencias" title="Link to this heading">¶</a></h2>
+<ul class="simple">
+<li><p><a class="reference external" href="https://docs.defectdojo.com">Documentación oficial de DefectDojo</a></p></li>
+<li><p><a class="reference external" href="https://github.com/DefectDojo/django-DefectDojo">Docker Compose de DefectDojo</a></p></li>
 </ul>
 </section>
 </section>
@@ -325,23 +377,23 @@
       <footer>
         
         <div class="related-pages">
-          <a class="next-page" href="ANALISIS_CWE_699.html">
+          <a class="next-page" href="DEFECTDOJO_CREDENTIALS.html">
               <div class="page-info">
                 <div class="context">
                   <span>Next</span>
                 </div>
-                <div class="title">Análisis de Seguridad según CWE-699</div>
+                <div class="title">Credenciales de DefectDojo</div>
               </div>
               <svg class="furo-related-icon"><use href="#svg-arrow-right"></use></svg>
             </a>
-          <a class="prev-page" href="manual.html">
+          <a class="prev-page" href="DEFECTDOJO_INTEGRATION.html">
               <svg class="furo-related-icon"><use href="#svg-arrow-right"></use></svg>
               <div class="page-info">
                 <div class="context">
                   <span>Previous</span>
                 </div>
                 
-                <div class="title">Manual de Usuario - Registro Personal de Peso e IMC</div>
+                <div class="title">Integración de DefectDojo</div>
                 
               </div>
             </a>
@@ -375,20 +427,26 @@
         <div class="toc-tree-container">
           <div class="toc-tree">
             <ul>
-<li><a class="reference internal" href="#">Requerimientos Funcionales</a><ul>
-<li><a class="reference internal" href="#alcance-y-usuarios">1. Alcance y Usuarios</a></li>
-<li><a class="reference internal" href="#requerimientos-de-datos-del-cliente-persistencia">2. Requerimientos de Datos del Cliente (Persistencia)</a></li>
-<li><a class="reference internal" href="#requerimientos-de-funcionalidad-de-registro">3. Requerimientos de Funcionalidad de Registro</a><ul>
-<li><a class="reference internal" href="#registro-de-peso">3.1. Registro de Peso</a></li>
+<li><a class="reference internal" href="#">Configuración de DefectDojo</a><ul>
+<li><a class="reference internal" href="#resumen">Resumen</a></li>
+<li><a class="reference internal" href="#configuraciones-estandar-por-defecto">Configuraciones ESTÁNDAR (Por Defecto)</a><ul>
+<li><a class="reference internal" href="#servicios-base">Servicios Base</a></li>
+<li><a class="reference internal" href="#variables-de-entorno-estandar">Variables de Entorno Estándar</a></li>
+<li><a class="reference internal" href="#configuracion-de-django">Configuración de Django</a></li>
 </ul>
 </li>
-<li><a class="reference internal" href="#requerimientos-de-interfaz-y-experiencia-de-usuario-ux">4. Requerimientos de Interfaz y Experiencia de Usuario (UX)</a><ul>
-<li><a class="reference internal" href="#bienvenida-personalizada">4.1. Bienvenida Personalizada</a></li>
-<li><a class="reference internal" href="#visualizacion-del-imc">4.2. Visualización del IMC</a></li>
+<li><a class="reference internal" href="#configuraciones-personalizadas-modificadas">Configuraciones PERSONALIZADAS (Modificadas)</a><ul>
+<li><a class="reference internal" href="#servicio-nginx-oficial">1. Servicio Nginx Oficial</a></li>
+<li><a class="reference internal" href="#deshabilitacion-de-whitenoise">2. Deshabilitación de WhiteNoise</a></li>
+<li><a class="reference internal" href="#puerto-interno-8081">3. Puerto Interno 8081</a></li>
+<li><a class="reference internal" href="#alias-de-red-uwsgi">4. Alias de Red ‘uwsgi’</a></li>
+<li><a class="reference internal" href="#volumen-compartido-para-estaticos">5. Volumen Compartido para Estáticos</a></li>
+<li><a class="reference internal" href="#healthchecks-personalizados">6. Healthchecks Personalizados</a></li>
 </ul>
 </li>
-<li><a class="reference internal" href="#requerimientos-de-estadisticas-reportes">5. Requerimientos de Estadísticas (Reportes)</a></li>
-<li><a class="reference internal" href="#restricciones-y-exclusiones">6. Restricciones y Exclusiones</a></li>
+<li><a class="reference internal" href="#configuraciones-de-desarrollo-no-para-produccion">Configuraciones de Desarrollo (No para Producción)</a></li>
+<li><a class="reference internal" href="#conclusion">Conclusión</a></li>
+<li><a class="reference internal" href="#referencias">Referencias</a></li>
 </ul>
 </li>
 </ul>

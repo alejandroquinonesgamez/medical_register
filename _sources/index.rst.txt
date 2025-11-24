@@ -11,4 +11,10 @@ Documentación del proyecto Medical Register. Ahora mismo en desarrollo.
 
    manual
    requeriments
+   ANALISIS_CWE_699
+   ESTADO_ACTUAL_CWE_699
+   DEFECTDOJO_INTEGRATION
+   DEFECTDOJO_CONFIGURACION
+   DEFECTDOJO_CREDENTIALS
+   DEFECTDOJO_ENLACES
 
