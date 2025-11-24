@@ -255,12 +255,16 @@
 │     Flask       │
 └────────┬────────┘
          │
-         ├─────────────────┐
-         │                 │
-         ▼                 ▼
+         ▼
+┌─────────────────┐        ┌─────────────────┐
+│ DefectDojo Nginx│ 8080 ► │   Usuarios       │
+│ (Proxy estático)│        │                 │
+└────────┬────────┘        └─────────────────┘
+         │
+         ▼
 ┌─────────────────┐  ┌─────────────────┐
-│   DefectDojo     │  │   PostgreSQL 15  │
-│   (Puerto 8080) │  │   (Puerto 5432)  │
+│   DefectDojo     │  │   PostgreSQL 15 │
+│   (Puerto 8081) │  │   (Puerto 5432) │
 └────────┬────────┘  └─────────────────┘
          │
          ├─────────────────┐
@@ -285,14 +289,23 @@
 <h3>1. DefectDojo (Aplicación Principal)<a class="headerlink" href="#defectdojo-aplicacion-principal" title="Link to this heading">¶</a></h3>
 <ul class="simple">
 <li><p><strong>Imagen</strong>: <code class="docutils literal notranslate"><span class="pre">defectdojo/defectdojo-django:latest</span></code></p></li>
-<li><p><strong>Puerto</strong>: <code class="docutils literal notranslate"><span class="pre">8080</span></code></p></li>
-<li><p><strong>URL de acceso</strong>: http://localhost:8080</p></li>
+<li><p><strong>Puerto interno</strong>: <code class="docutils literal notranslate"><span class="pre">8081</span></code></p></li>
+<li><p><strong>Exposición</strong>: No se expone directamente; se atiende únicamente a través de Nginx (<code class="docutils literal notranslate"><span class="pre">defectdojo-nginx</span></code>)</p></li>
 <li><p><strong>Base de datos</strong>: PostgreSQL (servicio <code class="docutils literal notranslate"><span class="pre">defectdojo-db</span></code>)</p></li>
 <li><p><strong>Cache/Tareas</strong>: Redis (servicio <code class="docutils literal notranslate"><span class="pre">defectdojo-redis</span></code>)</p></li>
 </ul>
 </section>
+<section id="defectdojo-nginx-proxy-y-estaticos">
+<h3>2. DefectDojo Nginx (Proxy y estáticos)<a class="headerlink" href="#defectdojo-nginx-proxy-y-estaticos" title="Link to this heading">¶</a></h3>
+<ul class="simple">
+<li><p><strong>Imagen</strong>: <code class="docutils literal notranslate"><span class="pre">defectdojo/defectdojo-nginx:latest</span></code></p></li>
+<li><p><strong>Puerto</strong>: <code class="docutils literal notranslate"><span class="pre">8080</span></code> (acceso público http://localhost:8080)</p></li>
+<li><p><strong>Función</strong>: Sirve los estáticos ya compilados y actúa como proxy hacia el servicio <code class="docutils literal notranslate"><span class="pre">defectdojo</span></code> (alias interno <code class="docutils literal notranslate"><span class="pre">uwsgi:3031</span></code>)</p></li>
+<li><p><strong>Volúmenes</strong>: Comparte <code class="docutils literal notranslate"><span class="pre">defectdojo_static</span></code> para los assets generados por <code class="docutils literal notranslate"><span class="pre">collectstatic</span></code></p></li>
+</ul>
+</section>
 <section id="postgresql-database">
-<h3>2. PostgreSQL Database<a class="headerlink" href="#postgresql-database" title="Link to this heading">¶</a></h3>
+<h3>3. PostgreSQL Database<a class="headerlink" href="#postgresql-database" title="Link to this heading">¶</a></h3>
 <ul class="simple">
 <li><p><strong>Imagen</strong>: <code class="docutils literal notranslate"><span class="pre">postgres:15-alpine</span></code></p></li>
 <li><p><strong>Puerto</strong>: <code class="docutils literal notranslate"><span class="pre">5432</span></code></p></li>
@@ -302,7 +315,7 @@
 </ul>
 </section>
 <section id="redis">
-<h3>3. Redis<a class="headerlink" href="#redis" title="Link to this heading">¶</a></h3>
+<h3>4. Redis<a class="headerlink" href="#redis" title="Link to this heading">¶</a></h3>
 <ul class="simple">
 <li><p><strong>Imagen</strong>: <code class="docutils literal notranslate"><span class="pre">redis:7-alpine</span></code></p></li>
 <li><p><strong>Puerto</strong>: <code class="docutils literal notranslate"><span class="pre">6379</span></code></p></li>
@@ -310,14 +323,14 @@
 </ul>
 </section>
 <section id="celery-worker">
-<h3>4. Celery Worker<a class="headerlink" href="#celery-worker" title="Link to this heading">¶</a></h3>
+<h3>5. Celery Worker<a class="headerlink" href="#celery-worker" title="Link to this heading">¶</a></h3>
 <ul class="simple">
 <li><p><strong>Imagen</strong>: <code class="docutils literal notranslate"><span class="pre">defectdojo/defectdojo-django:latest</span></code></p></li>
 <li><p><strong>Función</strong>: Procesa tareas asíncronas (análisis de escaneos, etc.)</p></li>
 </ul>
 </section>
 <section id="celery-beat">
-<h3>5. Celery Beat<a class="headerlink" href="#celery-beat" title="Link to this heading">¶</a></h3>
+<h3>6. Celery Beat<a class="headerlink" href="#celery-beat" title="Link to this heading">¶</a></h3>
 <ul class="simple">
 <li><p><strong>Imagen</strong>: <code class="docutils literal notranslate"><span class="pre">defectdojo/defectdojo-django:latest</span></code></p></li>
 <li><p><strong>Función</strong>: Ejecuta tareas programadas (sincronizaciones, limpiezas, etc.)</p></li>
@@ -348,17 +361,21 @@ docker-compose<span class="w"> </span>logs<span class="w"> </span>-f<span class=
 </section>
 <section id="inicializacion-de-defectdojo">
 <h3>Inicialización de DefectDojo<a class="headerlink" href="#inicializacion-de-defectdojo" title="Link to this heading">¶</a></h3>
-<p>La primera vez que se inicia DefectDojo, necesita inicializar la base de datos:</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="c1"># Ejecutar migraciones y crear usuario administrador</span>
+<p>La primera vez que se inicia DefectDojo, es necesario preparar la base de datos y crear el usuario administrador:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="c1"># Ejecutar migraciones</span>
 docker-compose<span class="w"> </span><span class="nb">exec</span><span class="w"> </span>defectdojo<span class="w"> </span>python<span class="w"> </span>manage.py<span class="w"> </span>migrate
-docker-compose<span class="w"> </span><span class="nb">exec</span><span class="w"> </span>defectdojo<span class="w"> </span>python<span class="w"> </span>manage.py<span class="w"> </span>createsuperuser
+
+<span class="c1"># Crear un superusuario (ajusta las credenciales antes de ejecutarlo)</span>
+docker-compose<span class="w"> </span><span class="nb">exec</span><span class="w"> </span>defectdojo<span class="w"> </span>/bin/sh<span class="w"> </span>-c<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span><span class="s2">&quot;DJANGO_SUPERUSER_USERNAME=admin \</span>
+<span class="s2">   DJANGO_SUPERUSER_EMAIL=admin@example.com \</span>
+<span class="s2">   DJANGO_SUPERUSER_PASSWORD=admin \</span>
+<span class="s2">   python manage.py createsuperuser --noinput&quot;</span>
 </pre></div>
 </div>
-<p>O usar el script de inicialización automática:</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="c1"># Inicializar DefectDojo (crea usuario admin/admin por defecto)</span>
-docker-compose<span class="w"> </span><span class="nb">exec</span><span class="w"> </span>defectdojo<span class="w"> </span>python<span class="w"> </span>manage.py<span class="w"> </span>initial_setup
-</pre></div>
-</div>
+<blockquote>
+<div><p>💡 Usa el comando anterior para generar rápidamente <code class="docutils literal notranslate"><span class="pre">admin/admin</span></code> y cambia la contraseña en el primer acceso.</p>
+</div></blockquote>
 </section>
 <section id="verificar-el-estado">
 <h3>Verificar el Estado<a class="headerlink" href="#verificar-el-estado" title="Link to this heading">¶</a></h3>
@@ -389,13 +406,18 @@ docker-compose<span class="w"> </span>logs<span class="w"> </span>defectdojo-cel
 </section>
 <section id="acceso-directo">
 <h3>Acceso Directo<a class="headerlink" href="#acceso-directo" title="Link to this heading">¶</a></h3>
-<ul class="simple">
-<li><p><strong>URL</strong>: http://localhost:8080</p></li>
-<li><p><strong>Credenciales iniciales</strong>:</p>
 <ul>
-<li><p>Usuario: <code class="docutils literal notranslate"><span class="pre">admin</span></code> (después de ejecutar <code class="docutils literal notranslate"><span class="pre">createsuperuser</span></code> o <code class="docutils literal notranslate"><span class="pre">initial_setup</span></code>)</p></li>
-<li><p>Contraseña: La que configuraste durante la creación del usuario</p></li>
+<li><p><strong>URL</strong>: http://localhost:8080</p></li>
+<li><p><strong>Credenciales iniciales</strong> (si usaste el comando anterior):</p>
+<ul class="simple">
+<li><p>Usuario: <code class="docutils literal notranslate"><span class="pre">admin</span></code></p></li>
+<li><p>Contraseña: <code class="docutils literal notranslate"><span class="pre">admin</span></code></p></li>
 </ul>
+</li>
+<li><p>Cambia la contraseña desde la interfaz (<code class="docutils literal notranslate"><span class="pre">Admin</span> <span class="pre">→</span> <span class="pre">Users</span> <span class="pre">→</span> <span class="pre">admin</span></code>) o ejecuta:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>docker-compose<span class="w"> </span><span class="nb">exec</span><span class="w"> </span>defectdojo<span class="w"> </span>python<span class="w"> </span>manage.py<span class="w"> </span>changepassword<span class="w"> </span>admin
+</pre></div>
+</div>
 </li>
 </ul>
 </section>
@@ -476,26 +498,6 @@ docker-compose<span class="w"> </span>logs<span class="w"> </span>defectdojo-cel
 <li><p><strong>CWE-942</strong>: CORS demasiado permisivo</p></li>
 </ul>
 <p>Puedes crear findings manualmente o importar resultados de herramientas de análisis estático que detecten estas vulnerabilidades.</p>
-</section>
-<section id="integracion-con-herramientas-de-analisis">
-<h2>Integración con Herramientas de Análisis<a class="headerlink" href="#integracion-con-herramientas-de-analisis" title="Link to this heading">¶</a></h2>
-<section id="bandit-sast-para-python">
-<h3>Bandit (SAST para Python)<a class="headerlink" href="#bandit-sast-para-python" title="Link to this heading">¶</a></h3>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="c1"># Ejecutar Bandit en el código</span>
-bandit<span class="w"> </span>-r<span class="w"> </span>app/<span class="w"> </span>-f<span class="w"> </span>json<span class="w"> </span>-o<span class="w"> </span>bandit-report.json
-
-<span class="c1"># Importar en DefectDojo</span>
-<span class="c1"># Usar la API o la interfaz web para importar el reporte</span>
-</pre></div>
-</div>
-</section>
-<section id="owasp-zap-dast">
-<h3>OWASP ZAP (DAST)<a class="headerlink" href="#owasp-zap-dast" title="Link to this heading">¶</a></h3>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="c1"># Ejecutar ZAP y generar reporte</span>
-<span class="c1"># Importar el reporte XML en DefectDojo</span>
-</pre></div>
-</div>
-</section>
 </section>
 <section id="mantenimiento">
 <h2>Mantenimiento<a class="headerlink" href="#mantenimiento" title="Link to this heading">¶</a></h2>
@@ -695,10 +697,11 @@ docker-compose<span class="w"> </span>restart
 <li><a class="reference internal" href="#arquitectura-de-la-integracion">Arquitectura de la Integración</a></li>
 <li><a class="reference internal" href="#servicios-docker">Servicios Docker</a><ul>
 <li><a class="reference internal" href="#defectdojo-aplicacion-principal">1. DefectDojo (Aplicación Principal)</a></li>
-<li><a class="reference internal" href="#postgresql-database">2. PostgreSQL Database</a></li>
-<li><a class="reference internal" href="#redis">3. Redis</a></li>
-<li><a class="reference internal" href="#celery-worker">4. Celery Worker</a></li>
-<li><a class="reference internal" href="#celery-beat">5. Celery Beat</a></li>
+<li><a class="reference internal" href="#defectdojo-nginx-proxy-y-estaticos">2. DefectDojo Nginx (Proxy y estáticos)</a></li>
+<li><a class="reference internal" href="#postgresql-database">3. PostgreSQL Database</a></li>
+<li><a class="reference internal" href="#redis">4. Redis</a></li>
+<li><a class="reference internal" href="#celery-worker">5. Celery Worker</a></li>
+<li><a class="reference internal" href="#celery-beat">6. Celery Beat</a></li>
 </ul>
 </li>
 <li><a class="reference internal" href="#instalacion-y-configuracion">Instalación y Configuración</a><ul>
@@ -725,11 +728,6 @@ docker-compose<span class="w"> </span>restart
 </ul>
 </li>
 <li><a class="reference internal" href="#relacion-con-el-analisis-cwe-699">Relación con el Análisis CWE-699</a></li>
-<li><a class="reference internal" href="#integracion-con-herramientas-de-analisis">Integración con Herramientas de Análisis</a><ul>
-<li><a class="reference internal" href="#bandit-sast-para-python">Bandit (SAST para Python)</a></li>
-<li><a class="reference internal" href="#owasp-zap-dast">OWASP ZAP (DAST)</a></li>
-</ul>
-</li>
 <li><a class="reference internal" href="#mantenimiento">Mantenimiento</a><ul>
 <li><a class="reference internal" href="#backup-de-la-base-de-datos">Backup de la Base de Datos</a></li>
 <li><a class="reference internal" href="#actualizar-defectdojo">Actualizar DefectDojo</a></li>

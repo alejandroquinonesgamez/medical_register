@@ -379,26 +379,11 @@
 </section>
 </section>
 <hr class="docutils" />
-<section id="user-session-errors-errores-de-sesion-planificado-para-futuro">
-<h3>5. User Session Errors (Errores de Sesión) ⏸️ <strong>PLANIFICADO PARA FUTURO</strong><a class="headerlink" href="#user-session-errors-errores-de-sesion-planificado-para-futuro" title="Link to this heading">¶</a></h3>
-<section id="cwe-488-exposure-of-data-element-to-wrong-session">
-<h4>5.1 CWE-488: Exposure of Data Element to Wrong Session<a class="headerlink" href="#cwe-488-exposure-of-data-element-to-wrong-session" title="Link to this heading">¶</a></h4>
-<p><strong>Estado</strong>: ⏸️ <strong>PENDIENTE - PLANIFICADO</strong></p>
-<p><strong>Ubicación</strong>: <code class="docutils literal notranslate"><span class="pre">app/config.py</span></code> línea 8</p>
-<p><strong>Estado actual</strong>:</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">USER_ID</span> <span class="o">=</span> <span class="mi">1</span>  <span class="c1"># Monousuario fijo</span>
-</pre></div>
-</div>
-<p><strong>Nota</strong>: El desarrollador ha indicado que implementará soporte multi-usuario en el futuro. Esta debilidad se abordará cuando se implemente autenticación y gestión de sesiones.</p>
-<p><strong>Impacto actual</strong>: Ninguno si la aplicación se despliega como monousuario. Alta severidad si se despliega en entorno multi-usuario sin modificar.</p>
-</section>
-</section>
-<hr class="docutils" />
-<section id="cors-configuration-planificado-para-futuro">
-<h3>6. CORS Configuration ⏸️ <strong>PLANIFICADO PARA FUTURO</strong><a class="headerlink" href="#cors-configuration-planificado-para-futuro" title="Link to this heading">¶</a></h3>
+<section id="cors-configuration-pendiente">
+<h3>5. CORS Configuration ⏸️ <strong>PENDIENTE</strong><a class="headerlink" href="#cors-configuration-pendiente" title="Link to this heading">¶</a></h3>
 <section id="cwe-942-overly-permissive-cross-domain-whitelist">
-<h4>6.1 CWE-942: Overly Permissive Cross-domain Whitelist<a class="headerlink" href="#cwe-942-overly-permissive-cross-domain-whitelist" title="Link to this heading">¶</a></h4>
-<p><strong>Estado</strong>: ⏸️ <strong>PENDIENTE - PLANIFICADO</strong></p>
+<h4>5.1 CWE-942: Overly Permissive Cross-domain Whitelist<a class="headerlink" href="#cwe-942-overly-permissive-cross-domain-whitelist" title="Link to this heading">¶</a></h4>
+<p><strong>Estado</strong>: ⏸️ <strong>PENDIENTE</strong></p>
 <p><strong>Ubicación</strong>: <code class="docutils literal notranslate"><span class="pre">app/__init__.py</span></code> líneas 13-19</p>
 <p><strong>Estado actual</strong>:</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">CORS</span><span class="p">(</span><span class="n">app</span><span class="p">,</span> <span class="n">resources</span><span class="o">=</span><span class="p">{</span>
@@ -410,13 +395,12 @@
 <span class="p">})</span>
 </pre></div>
 </div>
-<p><strong>Nota</strong>: El desarrollador ha indicado que ajustará la configuración de CORS cuando implemente autenticación y defina la arquitectura de despliegue final.</p>
-<p><strong>Impacto actual</strong>: Cualquier sitio web puede hacer peticiones a la API. Riesgo de CSRF si se implementa autenticación sin ajustar CORS.</p>
+<p><strong>Impacto actual</strong>: Cualquier sitio web puede hacer peticiones a la API si el backend se expone fuera de <code class="docutils literal notranslate"><span class="pre">localhost</span></code>.</p>
 </section>
 </section>
 <hr class="docutils" />
 <section id="data-integrity-integridad-de-datos-implementado">
-<h3>7. Data Integrity (Integridad de Datos) ✅ <strong>IMPLEMENTADO</strong><a class="headerlink" href="#data-integrity-integridad-de-datos-implementado" title="Link to this heading">¶</a></h3>
+<h3>6. Data Integrity (Integridad de Datos) ✅ <strong>IMPLEMENTADO</strong><a class="headerlink" href="#data-integrity-integridad-de-datos-implementado" title="Link to this heading">¶</a></h3>
 <section id="validacion-defensiva">
 <h4>7.1 Validación Defensiva<a class="headerlink" href="#validacion-defensiva" title="Link to this heading">¶</a></h4>
 <p><strong>Estado</strong>: ✅ <strong>IMPLEMENTADO CORRECTAMENTE</strong></p>
@@ -493,22 +477,15 @@
 <td><p>Baja</p></td>
 <td><p>Mejorar excepciones en conversiones de <code class="docutils literal notranslate"><span class="pre">float()</span></code></p></td>
 </tr>
-<tr class="row-odd"><td><p><strong>CWE-488</strong></p></td>
-<td><p>Exposición de datos entre sesiones</p></td>
-<td><p>⏸️ Planificado</p></td>
-<td><p>Alta*</p></td>
-<td><p>Implementar autenticación (futuro)</p></td>
-</tr>
-<tr class="row-even"><td><p><strong>CWE-942</strong></p></td>
+<tr class="row-odd"><td><p><strong>CWE-942</strong></p></td>
 <td><p>CORS demasiado permisivo</p></td>
-<td><p>⏸️ Planificado</p></td>
+<td><p>⏸️ Pendiente</p></td>
 <td><p>Media/Alta</p></td>
-<td><p>Restringir CORS (futuro)</p></td>
+<td><p>Restringir CORS cuando se exponga el backend</p></td>
 </tr>
 </tbody>
 </table>
 </div>
-<p>*Alta solo si se despliega en entorno multi-usuario</p>
 </section>
 <hr class="docutils" />
 <section id="puntos-fuertes-del-programa">
@@ -579,7 +556,7 @@
 <li><p><strong>Headers de seguridad</strong>: Implementar protección contra clickjacking</p></li>
 <li><p><strong>Manejo de excepciones</strong>: Especificar excepciones en lugar de <code class="docutils literal notranslate"><span class="pre">Exception</span></code> genérico</p></li>
 </ol>
-<p>Las áreas planificadas para futuro (multi-usuario, CORS) están correctamente documentadas y no requieren acción inmediata si la aplicación se despliega como monousuario.</p>
+<p>Las acciones pendientes de CORS y cabeceras se aplicarán cuando el backend salga del entorno local.</p>
 <p><strong>Estado general</strong>: ⚠️ <strong>BUENO CON ÁREAS DE MEJORA IDENTIFICADAS</strong></p>
 <hr class="docutils" />
 <p><strong>Última actualización</strong>: 2025-01-27</p>
@@ -643,15 +620,11 @@
 <li><a class="reference internal" href="#cwe-703-improper-check-or-handling-of-exceptional-conditions">4.1 CWE-703: Improper Check or Handling of Exceptional Conditions</a></li>
 </ul>
 </li>
-<li><a class="reference internal" href="#user-session-errors-errores-de-sesion-planificado-para-futuro">5. User Session Errors (Errores de Sesión) ⏸️ <strong>PLANIFICADO PARA FUTURO</strong></a><ul>
-<li><a class="reference internal" href="#cwe-488-exposure-of-data-element-to-wrong-session">5.1 CWE-488: Exposure of Data Element to Wrong Session</a></li>
+<li><a class="reference internal" href="#cors-configuration-pendiente">5. CORS Configuration ⏸️ <strong>PENDIENTE</strong></a><ul>
+<li><a class="reference internal" href="#cwe-942-overly-permissive-cross-domain-whitelist">5.1 CWE-942: Overly Permissive Cross-domain Whitelist</a></li>
 </ul>
 </li>
-<li><a class="reference internal" href="#cors-configuration-planificado-para-futuro">6. CORS Configuration ⏸️ <strong>PLANIFICADO PARA FUTURO</strong></a><ul>
-<li><a class="reference internal" href="#cwe-942-overly-permissive-cross-domain-whitelist">6.1 CWE-942: Overly Permissive Cross-domain Whitelist</a></li>
-</ul>
-</li>
-<li><a class="reference internal" href="#data-integrity-integridad-de-datos-implementado">7. Data Integrity (Integridad de Datos) ✅ <strong>IMPLEMENTADO</strong></a><ul>
+<li><a class="reference internal" href="#data-integrity-integridad-de-datos-implementado">6. Data Integrity (Integridad de Datos) ✅ <strong>IMPLEMENTADO</strong></a><ul>
 <li><a class="reference internal" href="#validacion-defensiva">7.1 Validación Defensiva</a></li>
 </ul>
 </li>

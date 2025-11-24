@@ -265,42 +265,7 @@ except (ValueError, TypeError, KeyError) as e:
 
 ---
 
-## 5. User Session Errors (Errores de Sesión)
-
-### 5.1 CWE-488: Exposure of Data Element to Wrong Session
-
-**Ubicación**: `app/config.py` línea 8
-
-**Problema identificado**:
-- La aplicación usa un `USER_ID = 1` fijo, lo que significa que todos los usuarios comparten los mismos datos.
-- No hay autenticación ni gestión de sesiones.
-
-**Código afectado**:
-```python
-USER_ID = 1  # Monousuario fijo
-```
-
-**Riesgo**: 
-- En un entorno multi-usuario, todos los usuarios verían y modificarían los mismos datos.
-- No hay aislamiento de datos entre usuarios.
-
-**Estado**: ⏸️ **PENDIENTE - PLANIFICADO PARA FUTURO**
-
-**Nota**: El desarrollador ha indicado que tiene planificado implementar soporte multi-usuario en el futuro. Esta debilidad se abordará cuando se implemente la funcionalidad de autenticación y gestión de sesiones.
-
-**Severidad**: Alta (si se despliega en entorno multi-usuario)
-
----
-
-### 5.2 CWE-613: Insufficient Session Expiration
-
-**Ubicación**: No aplicable (aplicación sin sesiones)
-
-**Estado**: No hay gestión de sesiones en la aplicación actual.
-
----
-
-## 6. CORS Configuration (Configuración CORS)
+## 5. CORS Configuration (Configuración CORS)
 
 ### 6.1 CWE-942: Overly Permissive Cross-domain Whitelist
 
@@ -322,13 +287,11 @@ CORS(app, resources={
 
 **Riesgo**: 
 - Cualquier sitio web puede hacer peticiones a la API.
-- Riesgo de CSRF (Cross-Site Request Forgery) si se implementa autenticación en el futuro.
+- Aumenta la superficie de ataque si se expone el backend fuera de `localhost`.
 
-**Estado**: ⏸️ **PENDIENTE - PLANIFICADO PARA FUTURO**
+**Estado**: ⏸️ **PENDIENTE**
 
-**Nota**: El desarrollador ha indicado que tiene planificado implementar soporte multi-usuario en el futuro. La configuración de CORS se ajustará cuando se implemente la funcionalidad de autenticación y se defina la arquitectura de despliegue final.
-
-**Recomendación futura**:
+**Recomendación**:
 ```python
 # En producción, restringir a dominios específicos
 CORS(app, resources={
@@ -344,7 +307,7 @@ CORS(app, resources={
 
 ---
 
-## 7. Data Integrity (Integridad de Datos)
+## 6. Data Integrity (Integridad de Datos)
 
 ### 7.1 Validación Defensiva Implementada ✅
 
@@ -373,28 +336,24 @@ if not (VALIDATION_LIMITS["weight_min"] <= last_weight.weight_kg <= VALIDATION_L
 | CWE-1021 | Falta de protección contra clickjacking | Media | `__init__.py` | ⚠️ Requiere atención |
 | CWE-20 | Validación de entrada insuficiente (nombres) | Media | `routes.py`, `helpers.py`, `main.js` | ✅ **RESUELTO** |
 | CWE-703 | Manejo de excepciones demasiado genérico | Baja | `routes.py`, `sync.js` | ⚠️ **MEJORADO PARCIALMENTE** |
-| CWE-488 | Exposición de datos entre sesiones | Alta* | `config.py` | ⏸️ Pendiente (planificado) |
-| CWE-942 | CORS demasiado permisivo | Media/Alta | `__init__.py` | ⏸️ Pendiente (planificado) |
-
-*Alta solo si se despliega en entorno multi-usuario
+| CWE-942 | CORS demasiado permisivo | Media/Alta | `__init__.py` | ⏸️ Pendiente |
 
 ---
 
 ## Recomendaciones Prioritarias
 
 ### Prioridad Alta
-1. ~~**Restringir CORS en producción**~~ - ⏸️ Pendiente (planificado para implementación multi-usuario)
-2. ~~**Documentar o corregir USER_ID fijo**~~ - ⏸️ Pendiente (planificado para implementación multi-usuario)
-3. **Agregar headers de seguridad** - Implementar X-Frame-Options y CSP
+1. **Restringir CORS en producción** - Limitar orígenes permitidos cuando la API se exponga fuera de `localhost`
+2. **Agregar headers de seguridad** - Implementar X-Frame-Options y CSP
 
 ### Prioridad Media
-4. **Validar tipos antes de conversión** - Verificar que los datos sean del tipo esperado antes de `float()` o `parseFloat()`
-5. ~~**Validar y sanitizar nombres**~~ - ✅ **IMPLEMENTADO** - Validación robusta en backend y frontend
-6. **Manejar NaN e Infinity** - Validar que los números sean finitos después de conversión
+3. **Validar tipos antes de conversión** - Verificar que los datos sean del tipo esperado antes de `float()` o `parseFloat()`
+4. ~~**Validar y sanitizar nombres**~~ - ✅ **IMPLEMENTADO** - Validación robusta en backend y frontend
+5. **Manejar NaN e Infinity** - Validar que los números sean finitos después de conversión
 
 ### Prioridad Baja
-7. **Mejorar manejo de excepciones** - ⚠️ **MEJORADO PARCIALMENTE**: La validación de nombres usa manejo estructurado de errores. Pendiente: mejorar conversiones de `float()` y manejo en `sync.js`
-8. **Mejorar advertencias en UI** - Hacer más claras las advertencias para acciones destructivas
+6. **Mejorar manejo de excepciones** - ⚠️ **MEJORADO PARCIALMENTE**: La validación de nombres usa manejo estructurado de errores. Pendiente: mejorar conversiones de `float()` y manejo en `sync.js`
+7. **Mejorar advertencias en UI** - Hacer más claras las advertencias para acciones destructivas
 
 ---
 
@@ -405,7 +364,6 @@ La aplicación implementa buenas prácticas de validación defensiva y manejo de
 1. **Validación de tipos más estricta** antes de conversiones
 2. **Configuración de seguridad** (CORS, headers de seguridad)
 3. **Validación de entrada** más completa (especialmente en campos de texto)
-4. **Documentación clara** sobre el modelo de usuario (monousuario vs multi-usuario)
 
 La mayoría de las debilidades identificadas son de severidad media o baja, y pueden corregirse sin cambios arquitectónicos significativos.
 

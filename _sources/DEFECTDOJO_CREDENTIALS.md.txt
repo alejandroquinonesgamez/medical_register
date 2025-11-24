@@ -2,25 +2,25 @@
 
 ## Usuario Administrador
 
-Se ha creado automáticamente un usuario administrador durante la inicialización:
+El proceso de inicialización crea un usuario **monousuario** para acceder a la consola:
 
 - **Usuario**: `admin`
-- **Email**: `admin@localhost`
-- **Contraseña**: Se debe establecer manualmente (ver abajo)
+- **Email**: `admin@example.com`
+- **Contraseña inicial**: `admin` (creada automáticamente con `createsuperuser --noinput`)
 
-## Establecer Contraseña del Administrador
+> ⚠️ **Importante**: Cambia la contraseña en el primer inicio de sesión.
 
-Para establecer la contraseña del usuario `admin`, ejecuta:
+## Actualizar la Contraseña del Administrador
 
 ```bash
 docker-compose exec defectdojo python manage.py changepassword admin
 ```
 
-Te pedirá que ingreses la nueva contraseña dos veces.
+Introduce la nueva contraseña dos veces cuando el comando lo solicite.
 
 ## Alternativa: Crear Nuevo Superusuario
 
-Si prefieres crear un nuevo usuario administrador:
+Si prefieres registrar otro usuario (por ejemplo, para entornos de pruebas vs. producción) ejecuta:
 
 ```bash
 docker-compose exec defectdojo python manage.py createsuperuser
@@ -31,11 +31,21 @@ Te pedirá:
 - Email address
 - Password (dos veces)
 
+Para automatizar la creación (útil en CI/CD) puedes usar:
+
+```bash
+docker-compose exec defectdojo /bin/sh -c \
+  "DJANGO_SUPERUSER_USERNAME=nuevo_admin \
+   DJANGO_SUPERUSER_EMAIL=nuevo@ejemplo.com \
+   DJANGO_SUPERUSER_PASSWORD=contraseña_segura \
+   python manage.py createsuperuser --noinput"
+```
+
 ## Acceso Inicial
 
 1. Abre DefectDojo en http://localhost:8080
-2. Inicia sesión con el usuario `admin` y la contraseña que hayas configurado
-3. Después del primer acceso, cambia la contraseña por razones de seguridad
+2. Inicia sesión con `admin / admin` (o las credenciales que hayas configurado)
+3. Cambia la contraseña inmediatamente desde la interfaz o con `changepassword`
 
 ## Nota sobre las Credenciales del docker-compose.yml
 

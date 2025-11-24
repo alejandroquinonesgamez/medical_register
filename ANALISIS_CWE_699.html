@@ -488,39 +488,8 @@
 </section>
 </section>
 <hr class="docutils" />
-<section id="user-session-errors-errores-de-sesion">
-<h2>5. User Session Errors (Errores de Sesión)<a class="headerlink" href="#user-session-errors-errores-de-sesion" title="Link to this heading">¶</a></h2>
-<section id="cwe-488-exposure-of-data-element-to-wrong-session">
-<h3>5.1 CWE-488: Exposure of Data Element to Wrong Session<a class="headerlink" href="#cwe-488-exposure-of-data-element-to-wrong-session" title="Link to this heading">¶</a></h3>
-<p><strong>Ubicación</strong>: <code class="docutils literal notranslate"><span class="pre">app/config.py</span></code> línea 8</p>
-<p><strong>Problema identificado</strong>:</p>
-<ul class="simple">
-<li><p>La aplicación usa un <code class="docutils literal notranslate"><span class="pre">USER_ID</span> <span class="pre">=</span> <span class="pre">1</span></code> fijo, lo que significa que todos los usuarios comparten los mismos datos.</p></li>
-<li><p>No hay autenticación ni gestión de sesiones.</p></li>
-</ul>
-<p><strong>Código afectado</strong>:</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">USER_ID</span> <span class="o">=</span> <span class="mi">1</span>  <span class="c1"># Monousuario fijo</span>
-</pre></div>
-</div>
-<p><strong>Riesgo</strong>:</p>
-<ul class="simple">
-<li><p>En un entorno multi-usuario, todos los usuarios verían y modificarían los mismos datos.</p></li>
-<li><p>No hay aislamiento de datos entre usuarios.</p></li>
-</ul>
-<p><strong>Estado</strong>: ⏸️ <strong>PENDIENTE - PLANIFICADO PARA FUTURO</strong></p>
-<p><strong>Nota</strong>: El desarrollador ha indicado que tiene planificado implementar soporte multi-usuario en el futuro. Esta debilidad se abordará cuando se implemente la funcionalidad de autenticación y gestión de sesiones.</p>
-<p><strong>Severidad</strong>: Alta (si se despliega en entorno multi-usuario)</p>
-</section>
-<hr class="docutils" />
-<section id="cwe-613-insufficient-session-expiration">
-<h3>5.2 CWE-613: Insufficient Session Expiration<a class="headerlink" href="#cwe-613-insufficient-session-expiration" title="Link to this heading">¶</a></h3>
-<p><strong>Ubicación</strong>: No aplicable (aplicación sin sesiones)</p>
-<p><strong>Estado</strong>: No hay gestión de sesiones en la aplicación actual.</p>
-</section>
-</section>
-<hr class="docutils" />
 <section id="cors-configuration-configuracion-cors">
-<h2>6. CORS Configuration (Configuración CORS)<a class="headerlink" href="#cors-configuration-configuracion-cors" title="Link to this heading">¶</a></h2>
+<h2>5. CORS Configuration (Configuración CORS)<a class="headerlink" href="#cors-configuration-configuracion-cors" title="Link to this heading">¶</a></h2>
 <section id="cwe-942-overly-permissive-cross-domain-whitelist">
 <h3>6.1 CWE-942: Overly Permissive Cross-domain Whitelist<a class="headerlink" href="#cwe-942-overly-permissive-cross-domain-whitelist" title="Link to this heading">¶</a></h3>
 <p><strong>Ubicación</strong>: <code class="docutils literal notranslate"><span class="pre">app/__init__.py</span></code> línea 13-19</p>
@@ -541,11 +510,10 @@
 <p><strong>Riesgo</strong>:</p>
 <ul class="simple">
 <li><p>Cualquier sitio web puede hacer peticiones a la API.</p></li>
-<li><p>Riesgo de CSRF (Cross-Site Request Forgery) si se implementa autenticación en el futuro.</p></li>
+<li><p>Aumenta la superficie de ataque si se expone el backend fuera de <code class="docutils literal notranslate"><span class="pre">localhost</span></code>.</p></li>
 </ul>
-<p><strong>Estado</strong>: ⏸️ <strong>PENDIENTE - PLANIFICADO PARA FUTURO</strong></p>
-<p><strong>Nota</strong>: El desarrollador ha indicado que tiene planificado implementar soporte multi-usuario en el futuro. La configuración de CORS se ajustará cuando se implemente la funcionalidad de autenticación y se defina la arquitectura de despliegue final.</p>
-<p><strong>Recomendación futura</strong>:</p>
+<p><strong>Estado</strong>: ⏸️ <strong>PENDIENTE</strong></p>
+<p><strong>Recomendación</strong>:</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># En producción, restringir a dominios específicos</span>
 <span class="n">CORS</span><span class="p">(</span><span class="n">app</span><span class="p">,</span> <span class="n">resources</span><span class="o">=</span><span class="p">{</span>
     <span class="sa">r</span><span class="s2">&quot;/api/*&quot;</span><span class="p">:</span> <span class="p">{</span>
@@ -561,7 +529,7 @@
 </section>
 <hr class="docutils" />
 <section id="data-integrity-integridad-de-datos">
-<h2>7. Data Integrity (Integridad de Datos)<a class="headerlink" href="#data-integrity-integridad-de-datos" title="Link to this heading">¶</a></h2>
+<h2>6. Data Integrity (Integridad de Datos)<a class="headerlink" href="#data-integrity-integridad-de-datos" title="Link to this heading">¶</a></h2>
 <section id="validacion-defensiva-implementada">
 <h3>7.1 Validación Defensiva Implementada ✅<a class="headerlink" href="#validacion-defensiva-implementada" title="Link to this heading">¶</a></h3>
 <p><strong>Ubicación</strong>: <code class="docutils literal notranslate"><span class="pre">app/routes.py</span></code> líneas 130-133, <code class="docutils literal notranslate"><span class="pre">app/static/js/main.js</span></code> líneas 100-114</p>
@@ -625,22 +593,15 @@
 <td><p><code class="docutils literal notranslate"><span class="pre">routes.py</span></code>, <code class="docutils literal notranslate"><span class="pre">sync.js</span></code></p></td>
 <td><p>⚠️ <strong>MEJORADO PARCIALMENTE</strong></p></td>
 </tr>
-<tr class="row-even"><td><p>CWE-488</p></td>
-<td><p>Exposición de datos entre sesiones</p></td>
-<td><p>Alta*</p></td>
-<td><p><code class="docutils literal notranslate"><span class="pre">config.py</span></code></p></td>
-<td><p>⏸️ Pendiente (planificado)</p></td>
-</tr>
-<tr class="row-odd"><td><p>CWE-942</p></td>
+<tr class="row-even"><td><p>CWE-942</p></td>
 <td><p>CORS demasiado permisivo</p></td>
 <td><p>Media/Alta</p></td>
 <td><p><code class="docutils literal notranslate"><span class="pre">__init__.py</span></code></p></td>
-<td><p>⏸️ Pendiente (planificado)</p></td>
+<td><p>⏸️ Pendiente</p></td>
 </tr>
 </tbody>
 </table>
 </div>
-<p>*Alta solo si se despliega en entorno multi-usuario</p>
 </section>
 <hr class="docutils" />
 <section id="recomendaciones-prioritarias">
@@ -648,14 +609,13 @@
 <section id="prioridad-alta">
 <h3>Prioridad Alta<a class="headerlink" href="#prioridad-alta" title="Link to this heading">¶</a></h3>
 <ol class="arabic simple">
-<li><p>~~<strong>Restringir CORS en producción</strong>~~ - ⏸️ Pendiente (planificado para implementación multi-usuario)</p></li>
-<li><p>~~<strong>Documentar o corregir USER_ID fijo</strong>~~ - ⏸️ Pendiente (planificado para implementación multi-usuario)</p></li>
+<li><p><strong>Restringir CORS en producción</strong> - Limitar orígenes permitidos cuando la API se exponga fuera de <code class="docutils literal notranslate"><span class="pre">localhost</span></code></p></li>
 <li><p><strong>Agregar headers de seguridad</strong> - Implementar X-Frame-Options y CSP</p></li>
 </ol>
 </section>
 <section id="prioridad-media">
 <h3>Prioridad Media<a class="headerlink" href="#prioridad-media" title="Link to this heading">¶</a></h3>
-<ol class="arabic simple" start="4">
+<ol class="arabic simple" start="3">
 <li><p><strong>Validar tipos antes de conversión</strong> - Verificar que los datos sean del tipo esperado antes de <code class="docutils literal notranslate"><span class="pre">float()</span></code> o <code class="docutils literal notranslate"><span class="pre">parseFloat()</span></code></p></li>
 <li><p>~~<strong>Validar y sanitizar nombres</strong>~~ - ✅ <strong>IMPLEMENTADO</strong> - Validación robusta en backend y frontend</p></li>
 <li><p><strong>Manejar NaN e Infinity</strong> - Validar que los números sean finitos después de conversión</p></li>
@@ -663,7 +623,7 @@
 </section>
 <section id="prioridad-baja">
 <h3>Prioridad Baja<a class="headerlink" href="#prioridad-baja" title="Link to this heading">¶</a></h3>
-<ol class="arabic simple" start="7">
+<ol class="arabic simple" start="6">
 <li><p><strong>Mejorar manejo de excepciones</strong> - ⚠️ <strong>MEJORADO PARCIALMENTE</strong>: La validación de nombres usa manejo estructurado de errores. Pendiente: mejorar conversiones de <code class="docutils literal notranslate"><span class="pre">float()</span></code> y manejo en <code class="docutils literal notranslate"><span class="pre">sync.js</span></code></p></li>
 <li><p><strong>Mejorar advertencias en UI</strong> - Hacer más claras las advertencias para acciones destructivas</p></li>
 </ol>
@@ -677,7 +637,6 @@
 <li><p><strong>Validación de tipos más estricta</strong> antes de conversiones</p></li>
 <li><p><strong>Configuración de seguridad</strong> (CORS, headers de seguridad)</p></li>
 <li><p><strong>Validación de entrada</strong> más completa (especialmente en campos de texto)</p></li>
-<li><p><strong>Documentación clara</strong> sobre el modelo de usuario (monousuario vs multi-usuario)</p></li>
 </ol>
 <p>La mayoría de las debilidades identificadas son de severidad media o baja, y pueden corregirse sin cambios arquitectónicos significativos.</p>
 <hr class="docutils" />
@@ -745,16 +704,11 @@
 <li><a class="reference internal" href="#cwe-703-improper-check-or-handling-of-exceptional-conditions">4.1 CWE-703: Improper Check or Handling of Exceptional Conditions</a></li>
 </ul>
 </li>
-<li><a class="reference internal" href="#user-session-errors-errores-de-sesion">5. User Session Errors (Errores de Sesión)</a><ul>
-<li><a class="reference internal" href="#cwe-488-exposure-of-data-element-to-wrong-session">5.1 CWE-488: Exposure of Data Element to Wrong Session</a></li>
-<li><a class="reference internal" href="#cwe-613-insufficient-session-expiration">5.2 CWE-613: Insufficient Session Expiration</a></li>
-</ul>
-</li>
-<li><a class="reference internal" href="#cors-configuration-configuracion-cors">6. CORS Configuration (Configuración CORS)</a><ul>
+<li><a class="reference internal" href="#cors-configuration-configuracion-cors">5. CORS Configuration (Configuración CORS)</a><ul>
 <li><a class="reference internal" href="#cwe-942-overly-permissive-cross-domain-whitelist">6.1 CWE-942: Overly Permissive Cross-domain Whitelist</a></li>
 </ul>
 </li>
-<li><a class="reference internal" href="#data-integrity-integridad-de-datos">7. Data Integrity (Integridad de Datos)</a><ul>
+<li><a class="reference internal" href="#data-integrity-integridad-de-datos">6. Data Integrity (Integridad de Datos)</a><ul>
 <li><a class="reference internal" href="#validacion-defensiva-implementada">7.1 Validación Defensiva Implementada ✅</a></li>
 </ul>
 </li>

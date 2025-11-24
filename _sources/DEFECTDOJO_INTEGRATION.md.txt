@@ -22,12 +22,16 @@ La integración incluye los siguientes componentes:
 │     Flask       │
 └────────┬────────┘
          │
-         ├─────────────────┐
-         │                 │
-         ▼                 ▼
+         ▼
+┌─────────────────┐        ┌─────────────────┐
+│ DefectDojo Nginx│ 8080 ► │   Usuarios       │
+│ (Proxy estático)│        │                 │
+└────────┬────────┘        └─────────────────┘
+         │
+         ▼
 ┌─────────────────┐  ┌─────────────────┐
-│   DefectDojo     │  │   PostgreSQL 15  │
-│   (Puerto 8080) │  │   (Puerto 5432)  │
+│   DefectDojo     │  │   PostgreSQL 15 │
+│   (Puerto 8081) │  │   (Puerto 5432) │
 └────────┬────────┘  └─────────────────┘
          │
          ├─────────────────┐
@@ -50,12 +54,19 @@ La integración incluye los siguientes componentes:
 ### 1. DefectDojo (Aplicación Principal)
 
 - **Imagen**: `defectdojo/defectdojo-django:latest`
-- **Puerto**: `8080`
-- **URL de acceso**: http://localhost:8080
+- **Puerto interno**: `8081`
+- **Exposición**: No se expone directamente; se atiende únicamente a través de Nginx (`defectdojo-nginx`)
 - **Base de datos**: PostgreSQL (servicio `defectdojo-db`)
 - **Cache/Tareas**: Redis (servicio `defectdojo-redis`)
 
-### 2. PostgreSQL Database
+### 2. DefectDojo Nginx (Proxy y estáticos)
+
+- **Imagen**: `defectdojo/defectdojo-nginx:latest`
+- **Puerto**: `8080` (acceso público http://localhost:8080)
+- **Función**: Sirve los estáticos ya compilados y actúa como proxy hacia el servicio `defectdojo` (alias interno `uwsgi:3031`)
+- **Volúmenes**: Comparte `defectdojo_static` para los assets generados por `collectstatic`
+
+### 3. PostgreSQL Database
 
 - **Imagen**: `postgres:15-alpine`
 - **Puerto**: `5432`
@@ -63,18 +74,18 @@ La integración incluye los siguientes componentes:
 - **Usuario**: `defectdojo`
 - **Contraseña**: `defectdojo_password` (⚠️ **Cambiar en producción**)
 
-### 3. Redis
+### 4. Redis
 
 - **Imagen**: `redis:7-alpine`
 - **Puerto**: `6379`
 - **Uso**: Cache y broker de mensajes para Celery
 
-### 4. Celery Worker
+### 5. Celery Worker
 
 - **Imagen**: `defectdojo/defectdojo-django:latest`
 - **Función**: Procesa tareas asíncronas (análisis de escaneos, etc.)
 
-### 5. Celery Beat
+### 6. Celery Beat
 
 - **Imagen**: `defectdojo/defectdojo-django:latest`
 - **Función**: Ejecuta tareas programadas (sincronizaciones, limpiezas, etc.)
@@ -101,20 +112,21 @@ docker-compose logs -f defectdojo
 
 ### Inicialización de DefectDojo
 
-La primera vez que se inicia DefectDojo, necesita inicializar la base de datos:
+La primera vez que se inicia DefectDojo, es necesario preparar la base de datos y crear el usuario administrador:
 
 ```bash
-# Ejecutar migraciones y crear usuario administrador
+# Ejecutar migraciones
 docker-compose exec defectdojo python manage.py migrate
-docker-compose exec defectdojo python manage.py createsuperuser
+
+# Crear un superusuario (ajusta las credenciales antes de ejecutarlo)
+docker-compose exec defectdojo /bin/sh -c \
+  "DJANGO_SUPERUSER_USERNAME=admin \
+   DJANGO_SUPERUSER_EMAIL=admin@example.com \
+   DJANGO_SUPERUSER_PASSWORD=admin \
+   python manage.py createsuperuser --noinput"
 ```
 
-O usar el script de inicialización automática:
-
-```bash
-# Inicializar DefectDojo (crea usuario admin/admin por defecto)
-docker-compose exec defectdojo python manage.py initial_setup
-```
+> 💡 Usa el comando anterior para generar rápidamente `admin/admin` y cambia la contraseña en el primer acceso.
 
 ### Verificar el Estado
 
@@ -143,9 +155,13 @@ docker-compose logs defectdojo-celeryworker
 ### Acceso Directo
 
 - **URL**: http://localhost:8080
-- **Credenciales iniciales**: 
-  - Usuario: `admin` (después de ejecutar `createsuperuser` o `initial_setup`)
-  - Contraseña: La que configuraste durante la creación del usuario
+- **Credenciales iniciales** (si usaste el comando anterior):
+  - Usuario: `admin`
+  - Contraseña: `admin`
+- Cambia la contraseña desde la interfaz (`Admin → Users → admin`) o ejecuta:
+  ```bash
+  docker-compose exec defectdojo python manage.py changepassword admin
+  ```
 
 ## Configuración de DefectDojo
 
@@ -213,25 +229,6 @@ DefectDojo puede ayudar a gestionar las vulnerabilidades identificadas en el an�
 - **CWE-942**: CORS demasiado permisivo
 
 Puedes crear findings manualmente o importar resultados de herramientas de análisis estático que detecten estas vulnerabilidades.
-
-## Integración con Herramientas de Análisis
-
-### Bandit (SAST para Python)
-
-```bash
-# Ejecutar Bandit en el código
-bandit -r app/ -f json -o bandit-report.json
-
-# Importar en DefectDojo
-# Usar la API o la interfaz web para importar el reporte
-```
-
-### OWASP ZAP (DAST)
-
-```bash
-# Ejecutar ZAP y generar reporte
-# Importar el reporte XML en DefectDojo
-```
 
 ## Mantenimiento
 
