@@ -4,6 +4,7 @@ Maneja todas las operaciones de la API (usuarios, pesos, IMC, estadísticas)
 """
 from flask import request, jsonify, Blueprint, current_app
 from datetime import datetime, date
+import math
 
 from .storage import UserData, WeightEntryData
 from .helpers import calculate_bmi, get_bmi_description, validate_and_sanitize_name
@@ -33,10 +34,25 @@ def create_or_update_user():
     storage = current_app.storage
     data = request.json or {}
 
-    try:
-        height_m = float(data['talla_m'])
-    except Exception:
+    # Validar y convertir altura con validación de tipo y finitud
+    talla_raw = data.get('talla_m')
+    if talla_raw is None:
         return jsonify({"error": get_error("invalid_height")}), 400
+    
+    # Validar que sea convertible a float
+    if not isinstance(talla_raw, (int, float, str)):
+        return jsonify({"error": get_error("invalid_height")}), 400
+    
+    try:
+        height_m = float(talla_raw)
+    except (ValueError, TypeError):
+        current_app.logger.warning(f"Error al convertir altura: {talla_raw}")
+        return jsonify({"error": get_error("invalid_height")}), 400
+    
+    # Verificar que sea un número finito (no NaN ni Infinity)
+    if not math.isfinite(height_m):
+        return jsonify({"error": get_error("invalid_height")}), 400
+    
     if not (VALIDATION_LIMITS["height_min"] <= height_m <= VALIDATION_LIMITS["height_max"]):
         return jsonify({"error": get_error("height_out_of_range")}), 400
 
@@ -91,10 +107,25 @@ def add_weight():
     if not user:
         return jsonify({"error": get_error("user_must_be_configured")}), 400
 
-    try:
-        weight_kg = float(data['peso_kg'])
-    except Exception:
+    # Validar y convertir peso con validación de tipo y finitud
+    peso_raw = data.get('peso_kg')
+    if peso_raw is None:
         return jsonify({"error": get_error("invalid_weight")}), 400
+    
+    # Validar que sea convertible a float
+    if not isinstance(peso_raw, (int, float, str)):
+        return jsonify({"error": get_error("invalid_weight")}), 400
+    
+    try:
+        weight_kg = float(peso_raw)
+    except (ValueError, TypeError):
+        current_app.logger.warning(f"Error al convertir peso: {peso_raw}")
+        return jsonify({"error": get_error("invalid_weight")}), 400
+    
+    # Verificar que sea un número finito (no NaN ni Infinity)
+    if not math.isfinite(weight_kg):
+        return jsonify({"error": get_error("invalid_weight")}), 400
+    
     if not (VALIDATION_LIMITS["weight_min"] <= weight_kg <= VALIDATION_LIMITS["weight_max"]):
         return jsonify({"error": get_error("weight_out_of_range")}), 400
 

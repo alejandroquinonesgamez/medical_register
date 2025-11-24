@@ -43,7 +43,7 @@ docker-compose exec defectdojo /bin/sh -c \
 
 ## Acceso Inicial
 
-1. Abre DefectDojo en http://localhost:8080
+1. Abre DefectDojo en http://localhost/defectdojo/
 2. Inicia sesión con `admin / admin` (o las credenciales que hayas configurado)
 3. Cambia la contraseña inmediatamente desde la interfaz o con `changepassword`
 

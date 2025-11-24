@@ -136,7 +136,15 @@ document.addEventListener('DOMContentLoaded', async () => {
     userForm.addEventListener('submit', async (e) => {
         e.preventDefault();
         
-        const talla_m = parseFloat(document.getElementById('talla_m').value);
+        const talla_m_raw = document.getElementById('talla_m').value;
+        const talla_m = parseFloat(talla_m_raw);
+        
+        // Validar que parseFloat() retornó un número válido (no NaN ni Infinity)
+        if (isNaN(talla_m) || !isFinite(talla_m)) {
+            alert(MESSAGES.errors.invalid_height || 'La talla debe ser un número válido');
+            return;
+        }
+        
         const limits = AppConfig.getValidationLimits();
         if (!AppConfig.validateHeight(talla_m)) {
             alert(MESSAGES.errors.height_out_of_range || 
@@ -204,7 +212,15 @@ document.addEventListener('DOMContentLoaded', async () => {
             return;
         }
 
-        const weight_kg = parseFloat(document.getElementById('peso').value);
+        const weight_kg_raw = document.getElementById('peso').value;
+        const weight_kg = parseFloat(weight_kg_raw);
+        
+        // Validar que parseFloat() retornó un número válido (no NaN ni Infinity)
+        if (isNaN(weight_kg) || !isFinite(weight_kg)) {
+            alert(MESSAGES.errors.invalid_weight || 'El peso debe ser un número válido');
+            return;
+        }
+        
         if (!weight_kg) return;
 
         const limits = AppConfig.getValidationLimits();

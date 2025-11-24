@@ -117,7 +117,16 @@ class SyncManager {
 
             return true;
         } catch (error) {
-            console.warn('Error al sincronizar desde backend (modo offline):', error);
+            // Diferenciar tipos de errores para mejor debugging
+            if (error instanceof TypeError) {
+                console.warn('Error de tipo al sincronizar desde backend:', error.message);
+            } else if (error instanceof SyntaxError) {
+                console.warn('Error de sintaxis al sincronizar desde backend:', error.message);
+            } else if (error instanceof NetworkError || error.name === 'NetworkError') {
+                console.warn('Error de red al sincronizar desde backend (modo offline):', error.message);
+            } else {
+                console.warn('Error al sincronizar desde backend (modo offline):', error);
+            }
             return false;
         }
     }

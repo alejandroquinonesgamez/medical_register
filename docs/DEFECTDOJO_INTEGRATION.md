@@ -24,11 +24,19 @@ La integración incluye los siguientes componentes:
          │
          ▼
 ┌─────────────────┐        ┌─────────────────┐
-│ DefectDojo Nginx│ 8080 ► │   Usuarios       │
-│ (Proxy estático)│        │                 │
+│  Nginx Principal│  80 ►  │   Usuarios       │
+│  (Proxy reverso)│        │                 │
 └────────┬────────┘        └─────────────────┘
          │
-         ▼
+    ┌────┴────┐
+    │         │
+    ▼         ▼
+┌─────────┐ ┌─────────────────┐
+│  Flask  │ │ DefectDojo Nginx │
+│  /      │ │ /defectdojo      │
+└─────────┘ └────────┬────────┘
+                     │
+                     ▼
 ┌─────────────────┐  ┌─────────────────┐
 │   DefectDojo     │  │   PostgreSQL 15 │
 │   (Puerto 8081) │  │   (Puerto 5432) │
@@ -62,9 +70,10 @@ La integración incluye los siguientes componentes:
 ### 2. DefectDojo Nginx (Proxy y estáticos)
 
 - **Imagen**: `defectdojo/defectdojo-nginx:latest`
-- **Puerto**: `8080` (acceso público http://localhost:8080)
+- **Puerto interno**: `8080` (no expuesto directamente)
 - **Función**: Sirve los estáticos ya compilados y actúa como proxy hacia el servicio `defectdojo` (alias interno `uwsgi:3031`)
 - **Volúmenes**: Comparte `defectdojo_static` para los assets generados por `collectstatic`
+- **Acceso**: A través del nginx principal en http://localhost/defectdojo/
 
 ### 3. PostgreSQL Database
 
@@ -95,7 +104,8 @@ La integración incluye los siguientes componentes:
 ### Requisitos Previos
 
 - Docker y Docker Compose instalados
-- Puertos 5001, 8080, 5432 y 6379 disponibles
+- Puerto 80 disponible (nginx principal)
+- Puertos internos: 5001 (Flask), 8080 (DefectDojo nginx), 5432 (PostgreSQL), 6379 (Redis)
 
 ### Iniciar los Servicios
 
@@ -154,7 +164,7 @@ docker-compose logs defectdojo-celeryworker
 
 ### Acceso Directo
 
-- **URL**: http://localhost:8080
+- **URL**: http://localhost/defectdojo/
 - **Credenciales iniciales** (si usaste el comando anterior):
   - Usuario: `admin`
   - Contraseña: `admin`
@@ -185,7 +195,7 @@ environment:
 
 ### 1. Configuración Inicial
 
-1. Accede a DefectDojo en http://localhost:8080
+1. Accede a DefectDojo en http://localhost/defectdojo/
 2. Inicia sesión con las credenciales del superusuario
 3. Configura:
    - **Products**: Crea un producto para tu aplicación médica
@@ -298,13 +308,16 @@ docker-compose restart
    docker-compose ps defectdojo-db
    ```
 
-### Puerto 8080 ya en uso
+### Puerto 80 ya en uso
 
-Modifica el puerto en `docker-compose.yml`:
+Si el puerto 80 está en uso, modifica el puerto del nginx principal en `docker-compose.yml`:
 ```yaml
-ports:
-  - "8081:8000"  # Cambiar 8080 por 8081
+nginx:
+  ports:
+    - "8080:80"  # Cambiar 80 por otro puerto, por ejemplo 8080
 ```
+
+Luego accede a DefectDojo en `http://localhost:8080/defectdojo/`
 
 ### Celery no procesa tareas
 

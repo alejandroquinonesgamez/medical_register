@@ -79,9 +79,16 @@ class LocalStorageManager {
                 return weightDate !== today;
             });
             
+            // Validar que parseFloat() retornó un número válido (no NaN ni Infinity)
+            const peso_kg_parsed = parseFloat(weight.peso_kg);
+            if (isNaN(peso_kg_parsed) || !isFinite(peso_kg_parsed)) {
+                console.error('Error: peso_kg no es un número válido:', weight.peso_kg);
+                return null;
+            }
+            
             const newWeight = {
                 id: Date.now(), // ID único basado en timestamp
-                peso_kg: parseFloat(weight.peso_kg),
+                peso_kg: peso_kg_parsed,
                 fecha_registro: currentDate.toISOString()
             };
             filteredWeights.push(newWeight);

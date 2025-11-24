@@ -1,8 +1,8 @@
 services:
   web:
     build: .
-    ports:
-      - "5001:5001"
+    expose:
+      - "5001"
     volumes:
       - .:/app
     environment:
@@ -13,6 +13,29 @@ services:
       timeout: 3s
       start_period: 5s
       retries: 3
+    networks:
+      - main-network
+
+  # Nginx principal - Proxy reverso para ambas aplicaciones
+  nginx:
+    image: nginx:alpine
+    container_name: main-nginx
+    ports:
+      - "80:80"
+    volumes:
+      - ./nginx.conf:/etc/nginx/nginx.conf:ro
+    depends_on:
+      - web
+      - defectdojo-nginx
+    networks:
+      - main-network
+      - defectdojo-network
+    healthcheck:
+      test: ["CMD-SHELL", "wget --no-verbose --tries=1 --spider http://localhost:80/ || exit 1"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 5s
 
   # Servicio opcional para ejecutar tests del frontend
   # Uso: docker-compose run --rm frontend-tests
@@ -80,7 +103,8 @@ services:
       DD_ALLOWED_HOSTS: "*"
       DD_WHITENOISE: "False"
       DD_STATIC_ROOT: /app/static
-      DD_STATIC_URL: /static/
+      DD_STATIC_URL: /defectdojo/static/
+      FORCE_SCRIPT_NAME: /defectdojo
       DD_DATABASE_ENGINE: django.db.backends.postgresql
       DD_DATABASE_NAME: defectdojo
       DD_DATABASE_USER: defectdojo
@@ -106,8 +130,8 @@ services:
   defectdojo-nginx:
     image: defectdojo/defectdojo-nginx:latest
     container_name: defectdojo-nginx
-    ports:
-      - "8080:8080"
+    expose:
+      - "8080"
     depends_on:
       defectdojo:
         condition: service_healthy
@@ -115,6 +139,7 @@ services:
       - defectdojo_static:/app/static
     networks:
       - defectdojo-network
+      - main-network
     healthcheck:
       test: ["CMD-SHELL", "wget --no-verbose --tries=1 --spider http://localhost:8080/ || exit 1"]
       interval: 30s
@@ -172,5 +197,7 @@ volumes:
 
 networks:
   defectdojo-network:
+    driver: bridge
+  main-network:
     driver: bridge
 

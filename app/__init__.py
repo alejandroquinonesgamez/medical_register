@@ -25,6 +25,16 @@ def create_app():
     app.register_blueprint(views)
     app.register_blueprint(api)
 
+    # Agregar headers de seguridad para prevenir clickjacking y otros ataques
+    @app.after_request
+    def set_security_headers(response):
+        """Agrega headers de seguridad a todas las respuestas"""
+        response.headers['X-Frame-Options'] = 'DENY'
+        response.headers['X-Content-Type-Options'] = 'nosniff'
+        response.headers['Content-Security-Policy'] = "frame-ancestors 'none'"
+        response.headers['X-XSS-Protection'] = '1; mode=block'
+        return response
+
     return app
 
 
