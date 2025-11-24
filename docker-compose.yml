@@ -64,8 +64,13 @@ services:
   defectdojo:
     image: defectdojo/defectdojo-django:latest
     container_name: defectdojo
-    ports:
-      - "8080:8081"
+    # No exponemos puerto directamente, nginx lo hará
+    expose:
+      - "8081"
+    networks:
+      defectdojo-network:
+        aliases:
+          - uwsgi
     environment:
       DD_DATABASE_URL: postgresql://defectdojo:defectdojo_password@defectdojo-db:5432/defectdojo
       DD_CELERY_BROKER_URL: redis://defectdojo-redis:6379/0
@@ -73,7 +78,7 @@ services:
       DD_SECRET_KEY: defectdojo_secret_key_change_in_production
       DD_DEBUG: "True"
       DD_ALLOWED_HOSTS: "*"
-      DD_WHITENOISE: "True"
+      DD_WHITENOISE: "False"
       DD_STATIC_ROOT: /app/static
       DD_STATIC_URL: /static/
       DD_DATABASE_ENGINE: django.db.backends.postgresql
@@ -89,16 +94,33 @@ services:
         condition: service_healthy
     volumes:
       - defectdojo_media:/app/media
-      # No montamos static como volumen para evitar problemas de permisos
-      # Los archivos estáticos se recopilan dentro del contenedor
-    networks:
-      - defectdojo-network
+      - defectdojo_static:/app/static
     healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:8081/"]
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8081/')"]
       interval: 30s
       timeout: 10s
       retries: 5
       start_period: 120s
+
+  # DefectDojo Nginx - Servidor web para servir archivos estáticos y hacer proxy
+  defectdojo-nginx:
+    image: defectdojo/defectdojo-nginx:latest
+    container_name: defectdojo-nginx
+    ports:
+      - "8080:8080"
+    depends_on:
+      defectdojo:
+        condition: service_healthy
+    volumes:
+      - defectdojo_static:/app/static
+    networks:
+      - defectdojo-network
+    healthcheck:
+      test: ["CMD", "wget", "--quiet", "--tries=1", "--spider", "http://localhost:8080/"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 10s
 
   # DefectDojo Celery Worker (tareas asíncronas)
   defectdojo-celeryworker:
