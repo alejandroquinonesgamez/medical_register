@@ -150,28 +150,10 @@ if (!nombreValidation.isValid) {
 
 ---
 
-### 5. User Session Errors (Errores de Sesión) ⏸️ **PLANIFICADO PARA FUTURO**
+### 5. CORS Configuration ⏸️ **PENDIENTE**
 
-#### 5.1 CWE-488: Exposure of Data Element to Wrong Session
-**Estado**: ⏸️ **PENDIENTE - PLANIFICADO**
-
-**Ubicación**: `app/config.py` línea 8
-
-**Estado actual**:
-```python
-USER_ID = 1  # Monousuario fijo
-```
-
-**Nota**: El desarrollador ha indicado que implementará soporte multi-usuario en el futuro. Esta debilidad se abordará cuando se implemente autenticación y gestión de sesiones.
-
-**Impacto actual**: Ninguno si la aplicación se despliega como monousuario. Alta severidad si se despliega en entorno multi-usuario sin modificar.
-
----
-
-### 6. CORS Configuration ⏸️ **PLANIFICADO PARA FUTURO**
-
-#### 6.1 CWE-942: Overly Permissive Cross-domain Whitelist
-**Estado**: ⏸️ **PENDIENTE - PLANIFICADO**
+#### 5.1 CWE-942: Overly Permissive Cross-domain Whitelist
+**Estado**: ⏸️ **PENDIENTE**
 
 **Ubicación**: `app/__init__.py` líneas 13-19
 
@@ -186,13 +168,11 @@ CORS(app, resources={
 })
 ```
 
-**Nota**: El desarrollador ha indicado que ajustará la configuración de CORS cuando implemente autenticación y defina la arquitectura de despliegue final.
-
-**Impacto actual**: Cualquier sitio web puede hacer peticiones a la API. Riesgo de CSRF si se implementa autenticación sin ajustar CORS.
+**Impacto actual**: Cualquier sitio web puede hacer peticiones a la API si el backend se expone fuera de `localhost`.
 
 ---
 
-### 7. Data Integrity (Integridad de Datos) ✅ **IMPLEMENTADO**
+### 6. Data Integrity (Integridad de Datos) ✅ **IMPLEMENTADO**
 
 #### 7.1 Validación Defensiva
 **Estado**: ✅ **IMPLEMENTADO CORRECTAMENTE**
@@ -237,10 +217,7 @@ if (!AppConfig.validateWeight(lastWeight.peso_kg)) {
 | **CWE-1021** | Falta de protección contra clickjacking | ⚠️ Pendiente | Media | Agregar headers de seguridad |
 | **CWE-20** | Validación de entrada insuficiente (nombres) | ✅ Resuelto | - | Ninguna |
 | **CWE-703** | Manejo de excepciones demasiado genérico | ⚠️ Mejorado parcialmente | Baja | Mejorar excepciones en conversiones de `float()` |
-| **CWE-488** | Exposición de datos entre sesiones | ⏸️ Planificado | Alta* | Implementar autenticación (futuro) |
-| **CWE-942** | CORS demasiado permisivo | ⏸️ Planificado | Media/Alta | Restringir CORS (futuro) |
-
-*Alta solo si se despliega en entorno multi-usuario
+| **CWE-942** | CORS demasiado permisivo | ⏸️ Pendiente | Media/Alta | Restringir CORS cuando se exponga el backend |
 
 ---
 
@@ -289,7 +266,7 @@ El programa ha mejorado significativamente en validación de entrada y manejo de
 2. **Headers de seguridad**: Implementar protección contra clickjacking
 3. **Manejo de excepciones**: Especificar excepciones en lugar de `Exception` genérico
 
-Las áreas planificadas para futuro (multi-usuario, CORS) están correctamente documentadas y no requieren acción inmediata si la aplicación se despliega como monousuario.
+Las acciones pendientes de CORS y cabeceras se aplicarán cuando el backend salga del entorno local.
 
 **Estado general**: ⚠️ **BUENO CON ÁREAS DE MEJORA IDENTIFICADAS**
 
