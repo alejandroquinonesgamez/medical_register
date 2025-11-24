@@ -15,6 +15,12 @@ ERRORS = {
     "invalid_weight": "Peso no válido",
     "weight_out_of_range": "Peso fuera de rango (2 - 650 kg)",
     "weight_variation_exceeded": "El peso no puede variar más de 5 kg por día desde el último registro. Han pasado {days_text}, por lo que la variación máxima permitida es {max_allowed_difference:.1f} kg. Diferencia actual: {weight_difference:.1f} kg",
+    "invalid_name": "El nombre no es válido. Debe tener entre 1 y 100 caracteres y contener solo letras, espacios, guiones y apóstrofes.",
+    "invalid_last_name": "Los apellidos no son válidos. Deben tener entre 1 y 100 caracteres y contener solo letras, espacios, guiones y apóstrofes.",
+    "name_too_long": "El nombre es demasiado largo (máximo 100 caracteres)",
+    "last_name_too_long": "Los apellidos son demasiado largos (máximo 100 caracteres)",
+    "name_empty": "El nombre no puede estar vacío",
+    "last_name_empty": "Los apellidos no pueden estar vacíos",
 }
 
 # Mensajes de éxito
@@ -66,6 +72,12 @@ FRONTEND_MESSAGES = {
         "height_out_of_range": "La talla debe estar entre 0.4 y 2.72 metros",
         "weight_out_of_range": "El peso debe estar entre 2 y 650 kg",
         "user_must_be_configured": "Debes configurar tu perfil primero",
+        "invalid_name": "El nombre no es válido. Debe tener entre 1 y 100 caracteres y contener solo letras, espacios, guiones y apóstrofes.",
+        "invalid_last_name": "Los apellidos no son válidos. Deben tener entre 1 y 100 caracteres y contener solo letras, espacios, guiones y apóstrofes.",
+        "name_too_long": "El nombre es demasiado largo (máximo 100 caracteres)",
+        "last_name_too_long": "Los apellidos son demasiado largos (máximo 100 caracteres)",
+        "name_empty": "El nombre no puede estar vacío",
+        "last_name_empty": "Los apellidos no pueden estar vacíos",
     },
     "texts": {
         "no_weight_records": "Sin registros de peso",

@@ -6,7 +6,7 @@ from flask import request, jsonify, Blueprint, current_app
 from datetime import datetime, date
 
 from .storage import UserData, WeightEntryData
-from .helpers import calculate_bmi, get_bmi_description
+from .helpers import calculate_bmi, get_bmi_description, validate_and_sanitize_name
 from .translations import get_error, get_message, get_text, get_days_text, get_frontend_messages
 from .config import USER_ID, VALIDATION_LIMITS
 
@@ -50,10 +50,30 @@ def create_or_update_user():
     if birth_date < min_date or birth_date > max_date:
         return jsonify({"error": get_error("birth_date_out_of_range")}), 400
 
+    # Validar y sanitizar nombre
+    nombre_raw = data.get('nombre', '')
+    is_valid_nombre, nombre_sanitized, error_key_nombre = validate_and_sanitize_name(
+        nombre_raw,
+        min_length=VALIDATION_LIMITS["name_min_length"],
+        max_length=VALIDATION_LIMITS["name_max_length"]
+    )
+    if not is_valid_nombre:
+        return jsonify({"error": get_error(error_key_nombre or "invalid_name")}), 400
+
+    # Validar y sanitizar apellidos
+    apellidos_raw = data.get('apellidos', '')
+    is_valid_apellidos, apellidos_sanitized, error_key_apellidos = validate_and_sanitize_name(
+        apellidos_raw,
+        min_length=VALIDATION_LIMITS["name_min_length"],
+        max_length=VALIDATION_LIMITS["name_max_length"]
+    )
+    if not is_valid_apellidos:
+        return jsonify({"error": get_error(error_key_apellidos or "invalid_last_name")}), 400
+
     user = UserData(
         user_id=USER_ID,
-        first_name=data['nombre'],
-        last_name=data['apellidos'],
+        first_name=nombre_sanitized,
+        last_name=apellidos_sanitized,
         birth_date=birth_date,
         height_m=height_m
     )
@@ -198,7 +218,9 @@ def get_config():
             "weight_min": VALIDATION_LIMITS["weight_min"],
             "weight_max": VALIDATION_LIMITS["weight_max"],
             "birth_date_min": VALIDATION_LIMITS["birth_date_min"].isoformat(),
-            "weight_variation_per_day": VALIDATION_LIMITS["weight_variation_per_day"]
+            "weight_variation_per_day": VALIDATION_LIMITS["weight_variation_per_day"],
+            "name_min_length": VALIDATION_LIMITS["name_min_length"],
+            "name_max_length": VALIDATION_LIMITS["name_max_length"]
         }
     }
     

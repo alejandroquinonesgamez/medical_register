@@ -144,9 +144,31 @@ document.addEventListener('DOMContentLoaded', async () => {
             return;
         }
 
+        // Validar y sanitizar nombre
+        const nombreInput = document.getElementById('nombre').value;
+        const nombreValidation = AppConfig.validateAndSanitizeName(nombreInput);
+        if (!nombreValidation.isValid) {
+            const errorMsg = MESSAGES.errors[nombreValidation.errorKey] || 
+                           MESSAGES.errors.invalid_name || 
+                           'El nombre no es válido';
+            alert(errorMsg);
+            return;
+        }
+
+        // Validar y sanitizar apellidos
+        const apellidosInput = document.getElementById('apellidos').value;
+        const apellidosValidation = AppConfig.validateAndSanitizeName(apellidosInput);
+        if (!apellidosValidation.isValid) {
+            const errorMsg = MESSAGES.errors[apellidosValidation.errorKey] || 
+                           MESSAGES.errors.invalid_last_name || 
+                           'Los apellidos no son válidos';
+            alert(errorMsg);
+            return;
+        }
+
         const user = {
-            nombre: document.getElementById('nombre').value,
-            apellidos: document.getElementById('apellidos').value,
+            nombre: nombreValidation.sanitized,
+            apellidos: apellidosValidation.sanitized,
             fecha_nacimiento: document.getElementById('fecha_nacimiento').value,
             talla_m: talla_m
         };

@@ -15,6 +15,8 @@ VALIDATION_LIMITS = {
     "weight_max": 650,  # kilogramos
     "birth_date_min": datetime(1900, 1, 1).date(),
     "weight_variation_per_day": 5,  # kg por día
+    "name_min_length": 1,  # caracteres mínimos
+    "name_max_length": 100,  # caracteres máximos
 }
 
 # Configuración del servidor

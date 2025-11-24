@@ -24,3 +24,131 @@ services:
       - .:/app
     command: npm test
 
+  # Base de datos PostgreSQL para DefectDojo
+  defectdojo-db:
+    image: postgres:15-alpine
+    container_name: defectdojo-postgres
+    environment:
+      POSTGRES_USER: defectdojo
+      POSTGRES_PASSWORD: defectdojo_password
+      POSTGRES_DB: defectdojo
+    ports:
+      - "5432:5432"
+    volumes:
+      - defectdojo_db_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U defectdojo"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - defectdojo-network
+
+  # Redis para DefectDojo (cache y tareas asíncronas)
+  defectdojo-redis:
+    image: redis:7-alpine
+    container_name: defectdojo-redis
+    ports:
+      - "6379:6379"
+    volumes:
+      - defectdojo_redis_data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - defectdojo-network
+
+  # DefectDojo - Gestión de Vulnerabilidades de Seguridad
+  defectdojo:
+    image: defectdojo/defectdojo-django:latest
+    container_name: defectdojo
+    ports:
+      - "8080:8081"
+    environment:
+      DD_DATABASE_URL: postgresql://defectdojo:defectdojo_password@defectdojo-db:5432/defectdojo
+      DD_CELERY_BROKER_URL: redis://defectdojo-redis:6379/0
+      DD_CELERY_RESULT_BACKEND: redis://defectdojo-redis:6379/0
+      DD_SECRET_KEY: defectdojo_secret_key_change_in_production
+      DD_DEBUG: "True"
+      DD_ALLOWED_HOSTS: "*"
+      DD_WHITENOISE: "True"
+      DD_STATIC_ROOT: /app/static
+      DD_STATIC_URL: /static/
+      DD_DATABASE_ENGINE: django.db.backends.postgresql
+      DD_DATABASE_NAME: defectdojo
+      DD_DATABASE_USER: defectdojo
+      DD_DATABASE_PASSWORD: defectdojo_password
+      DD_DATABASE_HOST: defectdojo-db
+      DD_DATABASE_PORT: "5432"
+    depends_on:
+      defectdojo-db:
+        condition: service_healthy
+      defectdojo-redis:
+        condition: service_healthy
+    volumes:
+      - defectdojo_media:/app/media
+      # No montamos static como volumen para evitar problemas de permisos
+      # Los archivos estáticos se recopilan dentro del contenedor
+    networks:
+      - defectdojo-network
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8081/"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 120s
+
+  # DefectDojo Celery Worker (tareas asíncronas)
+  defectdojo-celeryworker:
+    image: defectdojo/defectdojo-django:latest
+    container_name: defectdojo-celeryworker
+    command: celery -A dojo worker -l info --concurrency 2
+    environment:
+      DD_DATABASE_URL: postgresql://defectdojo:defectdojo_password@defectdojo-db:5432/defectdojo
+      DD_CELERY_BROKER_URL: redis://defectdojo-redis:6379/0
+      DD_CELERY_RESULT_BACKEND: redis://defectdojo-redis:6379/0
+      DD_SECRET_KEY: defectdojo_secret_key_change_in_production
+      DD_DEBUG: "True"
+      DD_ALLOWED_HOSTS: "*"
+    depends_on:
+      - defectdojo-db
+      - defectdojo-redis
+      - defectdojo
+    volumes:
+      - defectdojo_media:/app/media
+    networks:
+      - defectdojo-network
+
+  # DefectDojo Celery Beat (tareas programadas)
+  defectdojo-celerybeat:
+    image: defectdojo/defectdojo-django:latest
+    container_name: defectdojo-celerybeat
+    command: celery -A dojo beat -l info
+    environment:
+      DD_DATABASE_URL: postgresql://defectdojo:defectdojo_password@defectdojo-db:5432/defectdojo
+      DD_CELERY_BROKER_URL: redis://defectdojo-redis:6379/0
+      DD_CELERY_RESULT_BACKEND: redis://defectdojo-redis:6379/0
+      DD_SECRET_KEY: defectdojo_secret_key_change_in_production
+      DD_DEBUG: "True"
+      DD_ALLOWED_HOSTS: "*"
+    depends_on:
+      - defectdojo-db
+      - defectdojo-redis
+      - defectdojo
+    volumes:
+      - defectdojo_media:/app/media
+    networks:
+      - defectdojo-network
+
+volumes:
+  defectdojo_db_data:
+  defectdojo_redis_data:
+  defectdojo_media:
+  defectdojo_static:
+
+networks:
+  defectdojo-network:
+    driver: bridge
+

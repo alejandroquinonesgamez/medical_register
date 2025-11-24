@@ -1,3 +1,4 @@
+import re
 from .translations import get_bmi_complete_description
 
 
@@ -25,5 +26,67 @@ def get_bmi_description(bmi):
         key = "obese_class_iii"
     
     return get_bmi_complete_description(key)
+
+
+def validate_and_sanitize_name(name, min_length=1, max_length=100):
+    """
+    Valida y sanitiza un nombre o apellido.
+    
+    Permite:
+    - Letras (incluyendo acentos y caracteres internacionales)
+    - Espacios
+    - Guiones (-)
+    - Apóstrofes (')
+    
+    Elimina:
+    - Caracteres peligrosos: < > " ' (comillas dobles y simples)
+    - Espacios múltiples (normaliza a un solo espacio)
+    - Espacios al inicio y final
+    
+    Args:
+        name: String con el nombre a validar
+        min_length: Longitud mínima permitida
+        max_length: Longitud máxima permitida
+    
+    Returns:
+        tuple: (is_valid: bool, sanitized_name: str, error_key: str or None)
+    """
+    if not isinstance(name, str):
+        return False, "", "invalid_name"
+    
+    # Eliminar espacios al inicio y final
+    name = name.strip()
+    
+    # Validar que no esté vacío
+    if not name:
+        return False, "", "name_empty"
+    
+    # Validar longitud
+    if len(name) > max_length:
+        return False, "", "name_too_long"
+    if len(name) < min_length:
+        return False, "", "invalid_name"
+    
+    # Eliminar caracteres peligrosos que podrían causar problemas de renderizado o seguridad
+    # Eliminar: < > " ' (comillas dobles y simples)
+    dangerous_chars = ['<', '>', '"', "'"]
+    for char in dangerous_chars:
+        name = name.replace(char, '')
+    
+    # Normalizar espacios múltiples a un solo espacio
+    name = re.sub(r'\s+', ' ', name)
+    
+    # Validar que solo contenga caracteres permitidos
+    # Permitir: letras (incluyendo Unicode), espacios, guiones, apóstrofes
+    # Verificar manualmente que todos los caracteres sean letras, espacios, guiones o apóstrofes
+    for char in name:
+        if not (char.isalpha() or char.isspace() or char == '-' or char == "'"):
+            return False, "", "invalid_name"
+    
+    # Verificar que no sean solo espacios después de la sanitización
+    if not name.strip():
+        return False, "", "invalid_name"
+    
+    return True, name, None
 
 

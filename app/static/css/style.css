@@ -9,6 +9,29 @@ header {
     padding: 24px 16px 0;
 }
 
+.security-nav {
+    margin-top: 12px;
+    margin-bottom: 16px;
+}
+
+.defectdojo-link {
+    display: inline-block;
+    padding: 8px 16px;
+    background: #1e293b;
+    color: #60a5fa;
+    text-decoration: none;
+    border-radius: 8px;
+    border: 1px solid #334155;
+    font-size: 14px;
+    transition: all 0.2s;
+}
+
+.defectdojo-link:hover {
+    background: #334155;
+    color: #93c5fd;
+    border-color: #475569;
+}
+
 .container {
     max-width: 960px;
     margin: 0 auto;

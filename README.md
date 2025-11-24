@@ -19,6 +19,7 @@ Aplicación web monousuario para el registro personal de peso, talla y cálculo 
 - **Frontend**: JavaScript vanilla con localStorage
 - **Almacenamiento**: Memoria (backend) + localStorage (frontend)
 - **Tests**: 86 tests backend (pytest) + ~66 tests frontend (Jest)
+- **DefectDojo**: Integrado para gestión de vulnerabilidades de seguridad
 
 ## Validaciones Defensivas
 
@@ -33,6 +34,45 @@ La aplicación implementa validaciones defensivas en múltiples capas para garan
 - Validación en formularios antes de enviar datos
 - **Validación defensiva antes de calcular IMC**: Verifica que los datos locales estén dentro de los límites antes de calcular
 - Validación de variación de peso en tiempo real
+
+## DefectDojo - Gestión de Vulnerabilidades
+
+La aplicación incluye **DefectDojo** integrado, una plataforma open source para la gestión centralizada de vulnerabilidades de seguridad.
+
+### Características de DefectDojo
+
+- ✅ Gestión centralizada de vulnerabilidades
+- ✅ Integración con más de 180 herramientas de seguridad (SAST, DAST, SCA)
+- ✅ Priorización basada en riesgos
+- ✅ Automatización de flujos de trabajo de seguridad
+- ✅ Reportes y dashboards de seguridad
+
+### Acceso a DefectDojo
+
+1. **Desde la interfaz web**: Haz clic en el enlace "🔒 DefectDojo" en el header de la aplicación
+2. **Acceso directo**: http://localhost:8080 (cuando los servicios estén ejecutándose)
+
+### Iniciar DefectDojo
+
+```bash
+# Iniciar todos los servicios (aplicación + DefectDojo + PostgreSQL + Redis)
+docker-compose up -d
+
+# Ver logs de DefectDojo
+docker-compose logs -f defectdojo
+
+# Verificar estado de los servicios
+docker-compose ps
+```
+
+### Configuración
+
+- **Puerto**: 8080 (DefectDojo)
+- **Base de datos**: PostgreSQL 15 (puerto 5432)
+- **Redis**: Puerto 6379 (cache y tareas asíncronas)
+- **Credenciales por defecto**: Ver `docker-compose.yml` (cambiar en producción)
+
+Para más información, consulta la [documentación de integración de DefectDojo](docs/DEFECTDOJO_INTEGRATION.md).
 
 ## Coverage
 
