@@ -1,7 +1,7 @@
 #!/bin/bash
 # Script para marcar findings como resueltos en DefectDojo
 
-DEFECTDOJO_URL="http://localhost/defectdojo/api/v2"
+DEFECTDOJO_URL="http://localhost:8080/api/v2"
 TOKEN=$(curl -s -X POST "${DEFECTDOJO_URL}/api-token-auth/" \
     -H "Content-Type: application/json" \
     -d '{"username":"admin","password":"admin"}' | \
@@ -93,5 +93,5 @@ echo "✓ CWE-1021: Resuelto"
 echo "✓ CWE-703: Resuelto"
 echo "⏸️ CWE-942: Aceptado temporalmente (monousuario)"
 echo ""
-echo "Puedes ver los findings actualizados en: http://localhost/defectdojo/test/1/findings"
+echo "Puedes ver los findings actualizados en: http://localhost:8080/test/1/findings"
 

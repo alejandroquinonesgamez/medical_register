@@ -3,14 +3,14 @@
 ## Acceso Directo a Findings
 
 ### Auditoría de Seguridad CWE-699
-- **Engagement (RECOMENDADO)**: [http://localhost/defectdojo/engagement/1/](http://localhost/defectdojo/engagement/1/)
+- **Engagement (RECOMENDADO)**: [http://localhost:8080/engagement/1/](http://localhost:8080/engagement/1/)
   - Desde aquí puedes ver todos los tests y findings del engagement
   - Muestra el engagement "Auditoría de Seguridad CWE-699" con toda su información
 
 ### Rutas Alternativas
-- **Test**: [http://localhost/defectdojo/test/1/](http://localhost/defectdojo/test/1/)
-- **Findings del test**: [http://localhost/defectdojo/test/1/findings](http://localhost/defectdojo/test/1/findings)
-- **Producto**: [http://localhost/defectdojo/product/1/](http://localhost/defectdojo/product/1/)
+- **Test**: [http://localhost:8080/test/1/](http://localhost:8080/test/1/)
+- **Findings del test**: [http://localhost:8080/test/1/findings](http://localhost:8080/test/1/findings)
+- **Producto**: [http://localhost:8080/product/1/](http://localhost:8080/product/1/)
 
 ## Estructura
 
@@ -29,7 +29,7 @@ Aplicación Médica (Producto)
 
 ## Recomendación
 
-**Usa la ruta del engagement**: `http://localhost/defectdojo/engagement/1/`
+**Usa la ruta del engagement**: `http://localhost:8080/engagement/1/`
 
 Esta es la ruta más descriptiva porque:
 - El engagement se llama "Auditoría de Seguridad CWE-699" (nombre descriptivo)

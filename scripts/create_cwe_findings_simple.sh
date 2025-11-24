@@ -1,7 +1,7 @@
 #!/bin/bash
 # Script simplificado para crear findings de CWE-699 en DefectDojo usando archivos JSON
 
-DEFECTDOJO_URL="http://localhost/defectdojo/api/v2"
+DEFECTDOJO_URL="http://localhost:8080/api/v2"
 USERNAME="admin"
 PASSWORD="admin"
 TEMP_DIR=$(mktemp -d)
@@ -236,5 +236,5 @@ rm -rf "${TEMP_DIR}"
 echo ""
 echo "=== Resumen ==="
 echo "Findings creados: $CREATED/6"
-echo "Puedes ver los findings en: http://localhost/defectdojo/test/1/findings"
+echo "Puedes ver los findings en: http://localhost:8080/test/1/findings"
 

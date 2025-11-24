@@ -17,26 +17,17 @@ Este documento describe la integración de **DefectDojo** en la aplicación méd
 La integración incluye los siguientes componentes:
 
 ```
-┌─────────────────┐
-│  Aplicación Web │ (Puerto 5001)
-│     Flask       │
-└────────┬────────┘
-         │
-         ▼
 ┌─────────────────┐        ┌─────────────────┐
-│  Nginx Principal│  80 ►  │   Usuarios       │
-│  (Proxy reverso)│        │                 │
+│  Aplicación Web │ 5001 ► │   Usuarios       │
+│     Flask       │        │                 │
+└─────────────────┘        └─────────────────┘
+
+┌─────────────────┐        ┌─────────────────┐
+│ DefectDojo Nginx│ 8080 ► │   Usuarios       │
+│ (Proxy estático)│        │                 │
 └────────┬────────┘        └─────────────────┘
          │
-    ┌────┴────┐
-    │         │
-    ▼         ▼
-┌─────────┐ ┌─────────────────┐
-│  Flask  │ │ DefectDojo Nginx │
-│  /      │ │ /defectdojo      │
-└─────────┘ └────────┬────────┘
-                     │
-                     ▼
+         ▼
 ┌─────────────────┐  ┌─────────────────┐
 │   DefectDojo     │  │   PostgreSQL 15 │
 │   (Puerto 8081) │  │   (Puerto 5432) │
@@ -73,7 +64,7 @@ La integración incluye los siguientes componentes:
 - **Puerto interno**: `8080` (no expuesto directamente)
 - **Función**: Sirve los estáticos ya compilados y actúa como proxy hacia el servicio `defectdojo` (alias interno `uwsgi:3031`)
 - **Volúmenes**: Comparte `defectdojo_static` para los assets generados por `collectstatic`
-- **Acceso**: A través del nginx principal en http://localhost/defectdojo/
+- **Puerto**: `8080` (acceso público http://localhost:8080)
 
 ### 3. PostgreSQL Database
 
@@ -164,7 +155,7 @@ docker-compose logs defectdojo-celeryworker
 
 ### Acceso Directo
 
-- **URL**: http://localhost/defectdojo/
+- **URL**: http://localhost:8080
 - **Credenciales iniciales** (si usaste el comando anterior):
   - Usuario: `admin`
   - Contraseña: `admin`
@@ -195,7 +186,7 @@ environment:
 
 ### 1. Configuración Inicial
 
-1. Accede a DefectDojo en http://localhost/defectdojo/
+1. Accede a DefectDojo en http://localhost:8080
 2. Inicia sesión con las credenciales del superusuario
 3. Configura:
    - **Products**: Crea un producto para tu aplicación médica
@@ -317,7 +308,7 @@ nginx:
     - "8080:80"  # Cambiar 80 por otro puerto, por ejemplo 8080
 ```
 
-Luego accede a DefectDojo en `http://localhost:8080/defectdojo/`
+Luego accede a DefectDojo en `http://localhost:8080`
 
 ### Celery no procesa tareas
 

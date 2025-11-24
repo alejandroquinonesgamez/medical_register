@@ -18,9 +18,6 @@ Aplicación web monousuario para el registro personal de peso, talla y cálculo 
 - **Backend**: Flask (Python) con API REST
 - **Frontend**: JavaScript vanilla con localStorage
 - **Almacenamiento**: Memoria (backend) + localStorage (frontend)
-- **Proxy Reverso**: Nginx principal (puerto 80) que enruta:
-  - `/` → Aplicación Flask
-  - `/defectdojo/` → DefectDojo
 - **Tests**: 86 tests backend (pytest) + ~66 tests frontend (Jest)
 - **DefectDojo**: Integrado para gestión de vulnerabilidades de seguridad
 
@@ -53,8 +50,8 @@ La aplicación incluye **DefectDojo** integrado, una plataforma open source para
 ### Acceso a DefectDojo
 
 1. **Desde la interfaz web**: Haz clic en el enlace "🔒 DefectDojo" en el header de la aplicación
-2. **Acceso directo**: http://localhost/defectdojo/ (cuando los servicios estén ejecutándose)
-3. **Aplicación Flask**: http://localhost/ (raíz)
+2. **Acceso directo**: http://localhost:8080 (cuando los servicios estén ejecutándose)
+3. **Aplicación Flask**: http://localhost:5001
 
 ### Iniciar DefectDojo
 
@@ -71,11 +68,9 @@ docker-compose ps
 
 ### Configuración
 
-- **Nginx Principal**: Puerto 80 (proxy reverso para ambas aplicaciones)
-  - **Aplicación Flask**: http://localhost/
-  - **DefectDojo**: http://localhost/defectdojo/
-- **Base de datos**: PostgreSQL 15 (puerto 5432, interno)
-- **Redis**: Puerto 6379 (cache y tareas asíncronas, interno)
+- **Puerto**: 8080 (DefectDojo)
+- **Base de datos**: PostgreSQL 15 (puerto 5432)
+- **Redis**: Puerto 6379 (cache y tareas asíncronas)
 - **Credenciales por defecto**: Ver `docker-compose.yml` (cambiar en producción)
 
 Para más información, consulta la [documentación de integración de DefectDojo](docs/DEFECTDOJO_INTEGRATION.md).
