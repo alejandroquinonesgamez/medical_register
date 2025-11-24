@@ -11,6 +11,7 @@ Documentación del proyecto Medical Register. Ahora mismo en desarrollo.
 
    manual
    requeriments
+   INFORME_SEGURIDAD_ASVS
    ANALISIS_CWE_699
    ESTADO_ACTUAL_CWE_699
    DEFECTDOJO_INTEGRATION
