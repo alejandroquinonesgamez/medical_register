@@ -25,7 +25,10 @@ services:
     command: npm test
 
   # Base de datos PostgreSQL para DefectDojo
+  # Perfil: defectdojo - Solo se arranca con --profile defectdojo
   defectdojo-db:
+    profiles:
+      - defectdojo
     image: postgres:15-alpine
     container_name: defectdojo-postgres
     environment:
@@ -35,36 +38,44 @@ services:
     ports:
       - "5432:5432"
     volumes:
-      - defectdojo_db_data:/var/lib/postgresql/data
+      - ./data/postgres:/var/lib/postgresql/data
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U defectdojo"]
-      interval: 10s
-      timeout: 5s
-      retries: 5
+      interval: 15s
+      timeout: 10s
+      retries: 10
+      start_period: 30s
     networks:
       - defectdojo-network
 
   # Redis para DefectDojo (cache y tareas asíncronas)
+  # Perfil: defectdojo - Solo se arranca con --profile defectdojo
   defectdojo-redis:
+    profiles:
+      - defectdojo
     image: redis:7-alpine
     container_name: defectdojo-redis
     ports:
       - "6379:6379"
     volumes:
-      - defectdojo_redis_data:/data
+      - ./data/redis:/data
+    command: redis-server --maxmemory 256mb --maxmemory-policy allkeys-lru
     healthcheck:
       test: ["CMD", "redis-cli", "ping"]
-      interval: 10s
-      timeout: 5s
-      retries: 5
+      interval: 15s
+      timeout: 10s
+      retries: 10
+      start_period: 20s
     networks:
       - defectdojo-network
 
   # DefectDojo - Gestión de Vulnerabilidades de Seguridad
+  # Perfil: defectdojo - Solo se arranca con --profile defectdojo
   defectdojo:
+    profiles:
+      - defectdojo
     image: defectdojo/defectdojo-django:latest
     container_name: defectdojo
-    # No exponemos puerto directamente, nginx lo hará
     expose:
       - "8081"
     networks:
@@ -93,17 +104,20 @@ services:
       defectdojo-redis:
         condition: service_healthy
     volumes:
-      - defectdojo_media:/app/media
-      - defectdojo_static:/app/static
+      - ./data/defectdojo/media:/app/media
+      - ./data/defectdojo/static:/app/static
     healthcheck:
       test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8081/')"]
-      interval: 30s
-      timeout: 10s
-      retries: 5
-      start_period: 120s
+      interval: 60s
+      timeout: 30s
+      retries: 10
+      start_period: 300s
 
   # DefectDojo Nginx - Servidor web para servir archivos estáticos y hacer proxy
+  # Perfil: defectdojo - Solo se arranca con --profile defectdojo
   defectdojo-nginx:
+    profiles:
+      - defectdojo
     image: defectdojo/defectdojo-nginx:latest
     container_name: defectdojo-nginx
     ports:
@@ -112,21 +126,24 @@ services:
       defectdojo:
         condition: service_healthy
     volumes:
-      - defectdojo_static:/app/static
+      - ./data/defectdojo/static:/app/static
     networks:
       - defectdojo-network
     healthcheck:
       test: ["CMD-SHELL", "wget --no-verbose --tries=1 --spider http://localhost:8080/ || exit 1"]
-      interval: 30s
-      timeout: 10s
-      retries: 5
-      start_period: 10s
+      interval: 60s
+      timeout: 20s
+      retries: 10
+      start_period: 30s
 
   # DefectDojo Celery Worker (tareas asíncronas)
+  # Perfil: defectdojo - Solo se arranca con --profile defectdojo
   defectdojo-celeryworker:
+    profiles:
+      - defectdojo
     image: defectdojo/defectdojo-django:latest
     container_name: defectdojo-celeryworker
-    command: celery -A dojo worker -l info --concurrency 2
+    command: celery -A dojo worker -l info
     environment:
       DD_DATABASE_URL: postgresql://defectdojo:defectdojo_password@defectdojo-db:5432/defectdojo
       DD_CELERY_BROKER_URL: redis://defectdojo-redis:6379/0
@@ -139,12 +156,15 @@ services:
       - defectdojo-redis
       - defectdojo
     volumes:
-      - defectdojo_media:/app/media
+      - ./data/defectdojo/media:/app/media
     networks:
       - defectdojo-network
 
   # DefectDojo Celery Beat (tareas programadas)
+  # Perfil: defectdojo - Solo se arranca con --profile defectdojo
   defectdojo-celerybeat:
+    profiles:
+      - defectdojo
     image: defectdojo/defectdojo-django:latest
     container_name: defectdojo-celerybeat
     command: celery -A dojo beat -l info
@@ -160,15 +180,9 @@ services:
       - defectdojo-redis
       - defectdojo
     volumes:
-      - defectdojo_media:/app/media
+      - ./data/defectdojo/media:/app/media
     networks:
       - defectdojo-network
-
-volumes:
-  defectdojo_db_data:
-  defectdojo_redis_data:
-  defectdojo_media:
-  defectdojo_static:
 
 networks:
   defectdojo-network:
