@@ -272,6 +272,245 @@ document.addEventListener('DOMContentLoaded', async () => {
         }
     });
 
+    // Funcionalidad de DefectDojo: Exportar e Importar Dump
+    const exportDumpBtn = document.getElementById('export-dump-btn');
+    const importDumpInput = document.getElementById('import-dump-input');
+
+    if (exportDumpBtn) {
+        exportDumpBtn.addEventListener('click', async () => {
+            try {
+                exportDumpBtn.disabled = true;
+                exportDumpBtn.textContent = '⏳ Exportando...';
+                
+                const response = await fetch('/api/defectdojo/export-dump');
+                
+                if (!response.ok) {
+                    const error = await response.json();
+                    throw new Error(error.error || 'Error al exportar el dump');
+                }
+                
+                // Descargar el archivo
+                const blob = await response.blob();
+                const url = window.URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = 'defectdojo_db_dump.sql';
+                document.body.appendChild(a);
+                a.click();
+                window.URL.revokeObjectURL(url);
+                document.body.removeChild(a);
+                
+                exportDumpBtn.textContent = '✅ Exportado';
+                setTimeout(() => {
+                    exportDumpBtn.textContent = '📥 Exportar Dump';
+                    exportDumpBtn.disabled = false;
+                }, 2000);
+                
+            } catch (error) {
+                alert('Error al exportar dump: ' + error.message);
+                exportDumpBtn.textContent = '📥 Exportar Dump';
+                exportDumpBtn.disabled = false;
+            }
+        });
+    }
+
+    if (importDumpInput) {
+        importDumpInput.addEventListener('change', async (e) => {
+            const file = e.target.files[0];
+            if (!file) return;
+            
+            // Validar extensión
+            if (!file.name.endsWith('.sql')) {
+                alert('El archivo debe ser un dump SQL (.sql)');
+                importDumpInput.value = '';
+                return;
+            }
+            
+            // Confirmar acción
+            if (!confirm('¿Estás seguro de que quieres importar este dump? Esto reemplazará los datos actuales de DefectDojo.')) {
+                importDumpInput.value = '';
+                return;
+            }
+            
+            try {
+                const formData = new FormData();
+                formData.append('file', file);
+                
+                const label = document.querySelector('label[for="import-dump-input"]');
+                label.textContent = '⏳ Importando...';
+                label.style.pointerEvents = 'none';
+                
+                const response = await fetch('/api/defectdojo/import-dump', {
+                    method: 'POST',
+                    body: formData
+                });
+                
+                const result = await response.json();
+                
+                if (!response.ok) {
+                    throw new Error(result.error || 'Error al importar el dump');
+                }
+                
+                alert(result.message || 'Dump importado correctamente. DefectDojo se está reiniciando.');
+                label.textContent = '✅ Importado';
+                
+                setTimeout(() => {
+                    label.textContent = '📤 Importar Dump';
+                    label.style.pointerEvents = 'auto';
+                    importDumpInput.value = '';
+                }, 3000);
+                
+            } catch (error) {
+                alert('Error al importar dump: ' + error.message);
+                const label = document.querySelector('label[for="import-dump-input"]');
+                label.textContent = '📤 Importar Dump';
+                label.style.pointerEvents = 'auto';
+                importDumpInput.value = '';
+            }
+        });
+    }
+
+    // Función para cargar y mostrar los últimos pesos
+    async function loadRecentWeights() {
+        const recentWeightsList = document.getElementById('recent-weights-list');
+        if (!recentWeightsList) return;
+
+        let weights = [];
+
+        // Función auxiliar para cargar desde localStorage
+        const loadFromLocalStorage = () => {
+            try {
+                const allWeights = LocalStorageManager.getWeights();
+                console.log('Pesos obtenidos de localStorage:', allWeights);
+                
+                if (allWeights.length === 0) {
+                    console.log('No hay pesos en localStorage');
+                    return [];
+                }
+                
+                // Ordenar por fecha descendente y tomar los últimos 5
+                const sortedWeights = allWeights.sort((a, b) => {
+                    // getWeights() ya devuelve objetos Date, pero por si acaso normalizamos
+                    const dateA = a.fecha_registro instanceof Date ? a.fecha_registro : new Date(a.fecha_registro);
+                    const dateB = b.fecha_registro instanceof Date ? b.fecha_registro : new Date(b.fecha_registro);
+                    return dateB - dateA; // Descendente
+                });
+                
+                return sortedWeights.slice(0, 5).map(w => {
+                    // Normalizar fecha a string ISO para consistencia
+                    let fechaStr;
+                    if (w.fecha_registro instanceof Date) {
+                        fechaStr = w.fecha_registro.toISOString();
+                    } else if (typeof w.fecha_registro === 'string') {
+                        fechaStr = w.fecha_registro;
+                    } else {
+                        fechaStr = new Date(w.fecha_registro).toISOString();
+                    }
+                    
+                    return {
+                        peso_kg: w.peso_kg,
+                        fecha_registro: fechaStr
+                    };
+                });
+            } catch (localError) {
+                console.error('Error al cargar desde localStorage:', localError);
+                return [];
+            }
+        };
+
+        // Intentar cargar desde el backend primero
+        try {
+            const response = await fetch('/api/weights/recent');
+            if (response.ok) {
+                const data = await response.json();
+                weights = data.weights || [];
+                
+                // Si el backend devuelve un array vacío, usar localStorage como respaldo
+                if (weights.length === 0) {
+                    console.log('Backend devolvió array vacío, cargando desde localStorage...');
+                    weights = loadFromLocalStorage();
+                } else {
+                    console.log('Pesos cargados desde backend:', weights);
+                }
+            } else {
+                throw new Error('Backend no disponible');
+            }
+        } catch (error) {
+            // Si falla el backend, usar localStorage como respaldo
+            console.log('Error al cargar desde backend, usando localStorage:', error);
+            weights = loadFromLocalStorage();
+        }
+        
+        if (weights.length > 0) {
+            console.log('Pesos procesados para mostrar:', weights);
+        }
+
+        // Mostrar los pesos
+        if (weights.length === 0) {
+            recentWeightsList.innerHTML = '<li class="no-data">No hay registros de peso aún</li>';
+            return;
+        }
+
+        // Formatear y mostrar los pesos
+        recentWeightsList.innerHTML = weights.map(entry => {
+            try {
+                // Normalizar fecha: puede venir como string ISO o como objeto Date
+                let date;
+                if (entry.fecha_registro instanceof Date) {
+                    date = entry.fecha_registro;
+                } else if (typeof entry.fecha_registro === 'string') {
+                    date = new Date(entry.fecha_registro);
+                } else {
+                    date = new Date(entry.fecha_registro);
+                }
+                
+                // Validar que la fecha es válida
+                if (isNaN(date.getTime())) {
+                    console.error('Fecha inválida:', entry.fecha_registro);
+                    return `
+                        <li class="recent-weight-item">
+                            <span class="weight-value">${entry.peso_kg} kg</span>
+                            <span class="weight-date">Fecha inválida</span>
+                        </li>
+                    `;
+                }
+                
+                const formattedDate = date.toLocaleDateString('es-ES', {
+                    year: 'numeric',
+                    month: 'short',
+                    day: 'numeric'
+                });
+                const formattedTime = date.toLocaleTimeString('es-ES', {
+                    hour: '2-digit',
+                    minute: '2-digit'
+                });
+                
+                return `
+                    <li class="recent-weight-item">
+                        <span class="weight-value">${entry.peso_kg} kg</span>
+                        <span class="weight-date">${formattedDate} ${formattedTime}</span>
+                    </li>
+                `;
+            } catch (error) {
+                console.error('Error al formatear peso:', entry, error);
+                return `
+                    <li class="recent-weight-item">
+                        <span class="weight-value">${entry.peso_kg || 'N/A'} kg</span>
+                        <span class="weight-date">Error al formatear fecha</span>
+                    </li>
+                `;
+            }
+        }).join('');
+    }
+
+    // Modificar updateDashboard para incluir la carga de últimos pesos
+    const originalUpdateDashboard = updateDashboard;
+    updateDashboard = async function() {
+        originalUpdateDashboard();
+        await loadRecentWeights();
+    };
+
+    // Cargar los últimos pesos al iniciar
     updateDashboard();
 });
 

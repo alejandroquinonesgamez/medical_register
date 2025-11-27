@@ -174,17 +174,21 @@ class DevTools {
             return; // No crear panel en producción
         }
 
+        // Buscar el sidebar derecho donde insertar el panel
+        const sidebarRight = document.getElementById('dev-tools-sidebar');
+        if (!sidebarRight) {
+            console.warn('No se encontró el sidebar derecho para herramientas de desarrollo');
+            return;
+        }
+
         // Crear contenedor del panel con el mismo estilo que la aplicación
         const devPanel = document.createElement('div');
         devPanel.id = 'dev-tools-panel';
         devPanel.className = 'panel';
         devPanel.style.cssText = `
-            position: fixed;
-            bottom: 20px;
-            right: 20px;
-            max-width: 320px;
-            z-index: 10000;
             font-size: 14px;
+            width: 100%;
+            box-sizing: border-box;
         `;
 
         devPanel.innerHTML = `
@@ -226,7 +230,8 @@ class DevTools {
             </div>
         `;
 
-        document.body.appendChild(devPanel);
+        // Insertar el panel en el sidebar derecho
+        sidebarRight.appendChild(devPanel);
 
         // Event listeners
         document.getElementById('dev-toggle-sync').addEventListener('click', () => {

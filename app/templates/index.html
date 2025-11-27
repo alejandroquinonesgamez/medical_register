@@ -9,14 +9,31 @@
 <body>
     <header>
         <h1 id="welcome-header">{{ html_texts.welcome_header_loading }}</h1>
-        <nav class="security-nav">
-            <a href="/defectdojo" target="_blank" class="defectdojo-link" title="Abrir DefectDojo en nueva pestaña">
-                🔒 DefectDojo - Gestión de Vulnerabilidades
-            </a>
-        </nav>
     </header>
 
-    <main class="container">
+    <div class="main-layout">
+        <!-- Columna izquierda: DefectDojo -->
+        <aside class="sidebar sidebar-left">
+            <nav class="security-nav">
+                <div class="defectdojo-menu">
+                    <a href="/defectdojo" target="_blank" class="defectdojo-link" title="Abrir DefectDojo en nueva pestaña">
+                        🔒 DefectDojo - Gestión de Vulnerabilidades
+                    </a>
+                    <div class="defectdojo-actions">
+                        <button id="export-dump-btn" class="defectdojo-action-btn" title="Descargar dump de la base de datos">
+                            📥 Exportar Dump
+                        </button>
+                        <label for="import-dump-input" class="defectdojo-action-btn" title="Cargar dump de la base de datos" style="cursor: pointer;">
+                            📤 Importar Dump
+                        </label>
+                        <input type="file" id="import-dump-input" accept=".sql" style="display: none;">
+                    </div>
+                </div>
+            </nav>
+        </aside>
+
+        <!-- Columna central: Contenido principal -->
+        <main class="container">
         <section class="panel">
             <h2>{{ html_texts.register_weight }}</h2>
             <form id="weight-form">
@@ -40,7 +57,20 @@
                 <li>{{ html_texts.min_weight }} <strong id="stat-min">0</strong></li>
             </ul>
         </section>
-    </main>
+
+        <section class="panel">
+            <h2>Últimos Registros de Peso</h2>
+            <ul id="recent-weights-list" class="recent-weights-list">
+                <li class="loading">Cargando...</li>
+            </ul>
+        </section>
+        </main>
+
+        <!-- Columna derecha: Herramientas de desarrollo -->
+        <aside class="sidebar sidebar-right" id="dev-tools-sidebar">
+            <!-- Las herramientas de desarrollo se insertarán aquí dinámicamente -->
+        </aside>
+    </div>
 
     <div id="user-modal" class="modal-overlay">
         <div class="modal-content">

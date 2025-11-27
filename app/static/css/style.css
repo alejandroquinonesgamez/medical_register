@@ -7,6 +7,59 @@ body {
 
 header {
     padding: 24px 16px 0;
+    text-align: center;
+}
+
+header h1 {
+    margin: 0;
+}
+
+.main-layout {
+    display: flex;
+    gap: 16px;
+    align-items: flex-start;
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 16px;
+    box-sizing: border-box;
+}
+
+.sidebar {
+    flex: 0 0 250px;
+    min-width: 0;
+    align-self: flex-start;
+}
+
+.sidebar-left {
+    order: 1;
+}
+
+.sidebar-right {
+    order: 3;
+}
+
+/* Responsive: en pantallas pequeñas, las sidebars se apilan */
+@media (max-width: 1024px) {
+    .main-layout {
+        flex-direction: column;
+    }
+    
+    .sidebar {
+        flex: 0 0 auto;
+        width: 100%;
+    }
+    
+    .container {
+        order: 2;
+    }
+    
+    .sidebar-left {
+        order: 1;
+    }
+    
+    .sidebar-right {
+        order: 3;
+    }
 }
 
 .security-nav {
@@ -32,10 +85,52 @@ header {
     border-color: #475569;
 }
 
+.defectdojo-menu {
+    display: inline-block;
+}
+
+.defectdojo-actions {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+    margin-top: 8px;
+}
+
+.defectdojo-action-btn {
+    flex: 1;
+    min-width: 0;
+    padding: 6px 12px;
+    background: #1e293b;
+    color: #60a5fa;
+    text-decoration: none;
+    border-radius: 6px;
+    border: 1px solid #334155;
+    font-size: 12px;
+    transition: all 0.2s;
+    cursor: pointer;
+    font-family: inherit;
+    margin: 0;
+    text-align: center;
+    box-sizing: border-box;
+}
+
+.defectdojo-action-btn:hover {
+    background: #334155;
+    color: #93c5fd;
+    border-color: #475569;
+}
+
+.defectdojo-action-btn:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
 .container {
-    max-width: 960px;
-    margin: 0 auto;
-    padding: 16px;
+    flex: 1 1 auto;
+    min-width: 0;
+    padding: 0;
+    box-sizing: border-box;
+    order: 2;
 }
 
 .panel {
@@ -44,16 +139,20 @@ header {
     border-radius: 12px;
     padding: 16px;
     margin: 12px 0;
+    box-sizing: border-box;
+    overflow: hidden;
 }
 
 label { display: block; margin: 8px 0 4px; }
 input[type="number"], input[type="text"], input[type="date"] {
     width: 100%;
+    max-width: 100%;
     padding: 10px 12px;
     border-radius: 10px;
     border: 1px solid #1e293b;
     background: #0d152c;
     color: #e2e8f0;
+    box-sizing: border-box;
 }
 
 button {
@@ -64,6 +163,9 @@ button {
     padding: 10px 14px;
     border-radius: 10px;
     cursor: pointer;
+    box-sizing: border-box;
+    width: 100%;
+    max-width: 100%;
 }
 
 .imc-display { display: flex; gap: 12px; align-items: baseline; }
@@ -71,6 +173,51 @@ button {
 
 .stats-list { list-style: none; padding-left: 0; }
 .stats-list li { margin: 6px 0; }
+
+.recent-weights-list {
+    list-style: none;
+    padding-left: 0;
+    margin: 0;
+}
+
+.recent-weights-list li {
+    padding: 10px 12px;
+    margin: 6px 0;
+    background: #0d152c;
+    border: 1px solid #1e293b;
+    border-radius: 8px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.recent-weight-item {
+    transition: background 0.2s;
+}
+
+.recent-weight-item:hover {
+    background: #121b36;
+}
+
+.recent-weight-item .weight-value {
+    font-weight: 600;
+    color: #60a5fa;
+    font-size: 15px;
+}
+
+.recent-weight-item .weight-date {
+    font-size: 12px;
+    color: #94a3b8;
+}
+
+.recent-weights-list .loading,
+.recent-weights-list .no-data,
+.recent-weights-list .error {
+    padding: 12px;
+    text-align: center;
+    color: #94a3b8;
+    font-style: italic;
+}
 
 .modal-overlay {
     position: fixed;
@@ -88,6 +235,7 @@ button {
     border: 1px solid #1e293b;
     border-radius: 12px;
     padding: 16px;
+    box-sizing: border-box;
 }
 
 

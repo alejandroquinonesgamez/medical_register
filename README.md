@@ -27,6 +27,7 @@ Aplicación web monousuario para el registro personal de peso, talla y cálculo 
 
 - Docker y docker-compose instalados
 - Git (para clonar el repositorio)
+- Make (opcional, para usar comandos simplificados)
 
 ### Pasos de Instalación
 
@@ -47,20 +48,42 @@ Este script:
 - Construye la imagen de la aplicación
 
 3. **Arrancar la aplicación principal**:
+
+**Opción A - Usando Make (recomendado)**:
 ```bash
-docker-compose up -d
+make up
 ```
+
+**Opción B - Usando docker-compose directamente**:
+```bash
+COMPOSE_DOCKER_CLI_BUILD=0 DOCKER_BUILDKIT=0 docker-compose up -d
+```
+
+> **Nota**: El proyecto incluye un `Makefile` que desactiva automáticamente BuildKit para evitar errores de gRPC. Se recomienda usar `make` para mayor compatibilidad.
 
 4. **Arrancar DefectDojo (opcional)**:
+
+**Opción A - Usando Make (recomendado)**:
 ```bash
-docker-compose --profile defectdojo up -d
-./scripts/init_defectdojo.sh
+make up-defectdojo
 ```
 
-El script `init_defectdojo.sh` ejecuta automáticamente:
-- Migraciones de la base de datos
+O para arrancar todo de una vez:
+```bash
+make up-all
+```
+
+**Opción B - Usando docker-compose directamente**:
+```bash
+COMPOSE_DOCKER_CLI_BUILD=0 DOCKER_BUILDKIT=0 docker-compose --profile defectdojo up -d
+```
+
+**La inicialización es automática** al arrancar DefectDojo. El contenedor ejecuta:
+- Migraciones de la base de datos (si son necesarias)
 - Recolección de archivos estáticos
-- Creación del usuario admin (admin/admin)
+- Creación/verificación del usuario admin (admin/admin)
+
+> **Nota**: El script `reset_defectdojo.sh` está disponible para hacer un reset manual si es necesario.
 
 5. **Acceder a las aplicaciones**:
 - **Aplicación Flask**: http://localhost:5001
@@ -102,21 +125,55 @@ La aplicación incluye **DefectDojo** integrado, una plataforma open source para
 
 ### Iniciar DefectDojo
 
+**Usando Make (recomendado)**:
 ```bash
 # Iniciar DefectDojo y sus dependencias
-docker-compose --profile defectdojo up -d
+make up-defectdojo
 
-# Inicializar DefectDojo (migraciones y usuario admin)
-./scripts/init_defectdojo.sh
+# O arrancar todo de una vez (aplicación + DefectDojo)
+make up-all
 
 # Ver logs de DefectDojo
-docker-compose --profile defectdojo logs -f defectdojo
+make logs-defectdojo
 
 # Verificar estado de los servicios
-docker-compose --profile defectdojo ps
+make ps
 ```
 
-> **Nota**: El script `init_defectdojo.sh` solo necesita ejecutarse una vez, o cuando se necesite reinicializar la base de datos.
+**Usando docker-compose directamente**:
+```bash
+# Iniciar DefectDojo y sus dependencias
+COMPOSE_DOCKER_CLI_BUILD=0 DOCKER_BUILDKIT=0 docker-compose --profile defectdojo up -d
+
+# Ver logs de DefectDojo
+COMPOSE_DOCKER_CLI_BUILD=0 DOCKER_BUILDKIT=0 docker-compose --profile defectdojo logs -f defectdojo
+
+# Verificar estado de los servicios
+COMPOSE_DOCKER_CLI_BUILD=0 DOCKER_BUILDKIT=0 docker-compose --profile defectdojo ps
+```
+
+> **Nota**: El script `reset_defectdojo.sh` está disponible para hacer un reset manual de DefectDojo si es necesario. La inicialización automática se ejecuta al arrancar el contenedor.
+
+### Comandos Make Disponibles
+
+El proyecto incluye un `Makefile` con comandos útiles. Para ver todos los comandos disponibles:
+
+```bash
+make help
+```
+
+Comandos principales:
+- `make up` - Arrancar la aplicación principal
+- `make up-defectdojo` - Arrancar solo DefectDojo
+- `make up-all` - Arrancar todo (aplicación + DefectDojo)
+- `make down` - Detener todos los contenedores
+- `make logs` - Ver logs de la aplicación
+- `make logs-defectdojo` - Ver logs de DefectDojo
+- `make ps` - Ver estado de los contenedores
+- `make test` - Ejecutar tests
+- `make clean` - Limpiar contenedores, imágenes y volúmenes no utilizados
+
+Para ver todos los comandos disponibles: `make help`
 
 ### Configuración
 

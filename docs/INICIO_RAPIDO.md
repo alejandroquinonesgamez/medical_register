@@ -43,10 +43,12 @@ Accede a: **http://localhost:5001**
 ```bash
 # Arrancar DefectDojo y dependencias
 docker-compose --profile defectdojo up -d
-
-# Inicializar DefectDojo (migraciones y usuario admin)
-./scripts/init_defectdojo.sh
 ```
+
+**La inicialización es automática**: Al arrancar, DefectDojo ejecuta automáticamente:
+- ✅ Migraciones de la base de datos
+- ✅ Recolección de archivos estáticos  
+- ✅ Creación del usuario admin (admin/admin)
 
 Accede a:
 - **Aplicación Flask**: http://localhost:5001
@@ -114,12 +116,12 @@ rm -rf data/postgres/* data/redis/* data/defectdojo/*
 
 # Arrancar de nuevo
 docker-compose --profile defectdojo up -d
-./scripts/init_defectdojo.sh
+./scripts/reset_defectdojo.sh
 ```
 
 ## ⚠️ Notas Importantes
 
-1. **Primera vez**: El script `init_defectdojo.sh` solo necesita ejecutarse una vez, o cuando se reinicialice la base de datos.
+1. **Inicialización automática**: La inicialización de DefectDojo (migraciones, estáticos, usuario admin) se ejecuta automáticamente al arrancar el contenedor. No necesitas ejecutar scripts manualmente.
 
 2. **Tiempo de inicio**: DefectDojo puede tardar varios minutos en iniciar la primera vez (descarga de imágenes, migraciones, etc.).
 
@@ -129,7 +131,7 @@ docker-compose --profile defectdojo up -d
 
 ## 🆘 Solución de Problemas
 
-### El script `init_defectdojo.sh` falla
+### El script `reset_defectdojo.sh` falla
 
 Asegúrate de que los servicios estén arrancados:
 
@@ -151,7 +153,7 @@ Si algún servicio no está "healthy", espera unos minutos y vuelve a intentar.
    docker-compose --profile defectdojo logs defectdojo
    ```
 
-3. Asegúrate de haber ejecutado `init_defectdojo.sh`
+3. La inicialización es automática, pero puedes ejecutar `reset_defectdojo.sh` si hay problemas
 
 ### La base de datos está vacía
 

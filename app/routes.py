@@ -230,6 +230,33 @@ def get_all_weights():
     })
 
 
+@api.route('/weights/recent', methods=['GET'])
+def get_recent_weights():
+    """Obtiene los últimos 5 registros de peso del usuario"""
+    storage = current_app.storage
+    
+    # Obtener todas las entradas de peso (ya están ordenadas por fecha descendente)
+    # No requiere usuario configurado, similar a /stats
+    all_entries = storage.get_all_weight_entries(USER_ID)
+    
+    # Limitar a los últimos 5
+    recent_entries = all_entries[:5]
+    
+    # Convertir a formato JSON
+    weights_data = [
+        {
+            "id": entry.entry_id,
+            "peso_kg": entry.weight_kg,
+            "fecha_registro": entry.recorded_date.isoformat()
+        }
+        for entry in recent_entries
+    ]
+    
+    return jsonify({
+        "weights": weights_data
+    })
+
+
 @api.route('/messages', methods=['GET'])
 def get_messages():
     """Endpoint que devuelve todos los mensajes para el frontend"""
@@ -256,5 +283,130 @@ def get_config():
     }
     
     return jsonify(config)
+
+
+@api.route('/defectdojo/export-dump', methods=['GET'])
+def export_defectdojo_dump():
+    """Exportar el dump de la base de datos de DefectDojo"""
+    import subprocess
+    import os
+    from flask import send_file
+    
+    try:
+        # Ruta del archivo de dump
+        dump_file = os.path.join(os.path.dirname(os.path.dirname(__file__)), 'data', 'defectdojo_db_dump.sql')
+        dump_dir = os.path.dirname(dump_file)
+        
+        # Crear directorio si no existe
+        os.makedirs(dump_dir, exist_ok=True)
+        
+        # Exportar la base de datos usando docker-compose
+        result = subprocess.run(
+            ['docker-compose', '--profile', 'defectdojo', 'exec', '-T', 'defectdojo-db', 
+             'pg_dump', '-U', 'defectdojo', 'defectdojo'],
+            capture_output=True,
+            text=True,
+            timeout=300  # 5 minutos máximo
+        )
+        
+        if result.returncode != 0:
+            current_app.logger.error(f"Error al exportar dump: {result.stderr}")
+            return jsonify({"error": "Error al exportar la base de datos"}), 500
+        
+        # Guardar el dump en un archivo temporal
+        with open(dump_file, 'w', encoding='utf-8') as f:
+            f.write(result.stdout)
+        
+        # Enviar el archivo como descarga
+        return send_file(
+            dump_file,
+            as_attachment=True,
+            download_name='defectdojo_db_dump.sql',
+            mimetype='application/sql'
+        )
+        
+    except subprocess.TimeoutExpired:
+        current_app.logger.error("Timeout al exportar dump")
+        return jsonify({"error": "Timeout al exportar la base de datos"}), 500
+    except Exception as e:
+        current_app.logger.error(f"Error inesperado al exportar dump: {str(e)}")
+        return jsonify({"error": f"Error al exportar: {str(e)}"}), 500
+
+
+@api.route('/defectdojo/import-dump', methods=['POST'])
+def import_defectdojo_dump():
+    """Importar un dump de la base de datos de DefectDojo"""
+    import subprocess
+    import os
+    from werkzeug.utils import secure_filename
+    
+    try:
+        # Verificar que se haya enviado un archivo
+        if 'file' not in request.files:
+            return jsonify({"error": "No se envió ningún archivo"}), 400
+        
+        file = request.files['file']
+        
+        if file.filename == '':
+            return jsonify({"error": "No se seleccionó ningún archivo"}), 400
+        
+        # Validar extensión
+        if not file.filename.endswith('.sql'):
+            return jsonify({"error": "El archivo debe ser un dump SQL (.sql)"}), 400
+        
+        # Guardar el archivo temporalmente
+        temp_dir = os.path.join(os.path.dirname(os.path.dirname(__file__)), 'data', 'temp')
+        os.makedirs(temp_dir, exist_ok=True)
+        
+        filename = secure_filename(file.filename)
+        temp_file = os.path.join(temp_dir, filename)
+        file.save(temp_file)
+        
+        try:
+            # Leer el contenido del archivo
+            with open(temp_file, 'r', encoding='utf-8') as f:
+                dump_content = f.read()
+            
+            # Cargar el dump en PostgreSQL
+            result = subprocess.run(
+                ['docker-compose', '--profile', 'defectdojo', 'exec', '-T', 'defectdojo-db',
+                 'psql', '-U', 'defectdojo', '-d', 'defectdojo'],
+                input=dump_content,
+                capture_output=True,
+                text=True,
+                timeout=300  # 5 minutos máximo
+            )
+            
+            if result.returncode != 0:
+                current_app.logger.error(f"Error al importar dump: {result.stderr}")
+                return jsonify({"error": f"Error al importar: {result.stderr}"}), 500
+            
+            # Reiniciar DefectDojo para aplicar cambios
+            restart_result = subprocess.run(
+                ['docker-compose', '--profile', 'defectdojo', 'restart', 'defectdojo'],
+                capture_output=True,
+                text=True,
+                timeout=60
+            )
+            
+            if restart_result.returncode != 0:
+                current_app.logger.warning(f"Advertencia al reiniciar DefectDojo: {restart_result.stderr}")
+            
+            return jsonify({
+                "message": "Dump importado correctamente. DefectDojo se está reiniciando.",
+                "success": True
+            })
+            
+        finally:
+            # Eliminar archivo temporal
+            if os.path.exists(temp_file):
+                os.remove(temp_file)
+        
+    except subprocess.TimeoutExpired:
+        current_app.logger.error("Timeout al importar dump")
+        return jsonify({"error": "Timeout al importar la base de datos"}), 500
+    except Exception as e:
+        current_app.logger.error(f"Error inesperado al importar dump: {str(e)}")
+        return jsonify({"error": f"Error al importar: {str(e)}"}), 500
 
 
