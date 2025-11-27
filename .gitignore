@@ -38,3 +38,8 @@ data/postgres/
 data/redis/
 data/defectdojo/
 !data/.gitkeep
+
+# Database dumps (excepto el dump inicial que está en el repositorio)
+data/*_db_dump.sql
+*.sql
+!data/defectdojo_db_initial.sql

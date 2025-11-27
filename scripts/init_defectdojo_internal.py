@@ -452,6 +452,17 @@ def mark_findings_resolved(findings):
     if 'CWE-942' in findings:
         print("  ℹ️ CWE-942 se mantiene como aceptado temporalmente (aplicación monousuario)")
 
+def check_database_has_data():
+    """Verificar si la base de datos ya tiene datos (findings)"""
+    django.setup()
+    from dojo.models import Finding
+    
+    try:
+        finding_count = Finding.objects.count()
+        return finding_count > 0
+    except Exception:
+        return False
+
 def main():
     """Función principal"""
     print("🔧 Inicializando DefectDojo...")
@@ -470,6 +481,16 @@ def main():
         
         # Crear usuario admin
         create_admin_user()
+        
+        # Verificar si la base de datos ya tiene datos
+        # Si tiene datos (por ejemplo, de un dump cargado), saltar la creación de findings
+        if check_database_has_data():
+            print("")
+            print("ℹ️  La base de datos ya contiene datos (probablemente de un dump)")
+            print("   Saltando creación de findings para evitar duplicados")
+            print("")
+            print("✅ Inicialización completada")
+            return 0
         
         # Configurar Test y Engagement para findings
         print("")
