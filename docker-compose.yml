@@ -106,6 +106,8 @@ services:
     volumes:
       - ./data/defectdojo/media:/app/media
       - ./data/defectdojo/static:/app/static
+      - ./scripts/init_defectdojo_internal.py:/app/init_defectdojo.py:ro
+    entrypoint: ["/bin/sh", "-c", "python /app/init_defectdojo.py && exec /entrypoint-uwsgi.sh"]
     healthcheck:
       test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8081/')"]
       interval: 60s
