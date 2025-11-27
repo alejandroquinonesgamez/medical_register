@@ -285,11 +285,14 @@
 <h4>Con DefectDojo (Gestión de Vulnerabilidades)<a class="headerlink" href="#con-defectdojo-gestion-de-vulnerabilidades" title="Link to this heading">¶</a></h4>
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="c1"># Arrancar DefectDojo y dependencias</span>
 docker-compose<span class="w"> </span>--profile<span class="w"> </span>defectdojo<span class="w"> </span>up<span class="w"> </span>-d
-
-<span class="c1"># Inicializar DefectDojo (migraciones y usuario admin)</span>
-./scripts/init_defectdojo.sh
 </pre></div>
 </div>
+<p><strong>La inicialización es automática</strong>: Al arrancar, DefectDojo ejecuta automáticamente:</p>
+<ul class="simple">
+<li><p>✅ Migraciones de la base de datos</p></li>
+<li><p>✅ Recolección de archivos estáticos</p></li>
+<li><p>✅ Creación del usuario admin (admin/admin)</p></li>
+</ul>
 <p>Accede a:</p>
 <ul class="simple">
 <li><p><strong>Aplicación Flask</strong>: http://localhost:5001</p></li>
@@ -359,7 +362,7 @@ rm<span class="w"> </span>-rf<span class="w"> </span>data/postgres/*<span class=
 
 <span class="c1"># Arrancar de nuevo</span>
 docker-compose<span class="w"> </span>--profile<span class="w"> </span>defectdojo<span class="w"> </span>up<span class="w"> </span>-d
-./scripts/init_defectdojo.sh
+./scripts/reset_defectdojo.sh
 </pre></div>
 </div>
 </section>
@@ -367,7 +370,7 @@ docker-compose<span class="w"> </span>--profile<span class="w"> </span>defectdoj
 <section id="notas-importantes">
 <h2>⚠️ Notas Importantes<a class="headerlink" href="#notas-importantes" title="Link to this heading">¶</a></h2>
 <ol class="arabic simple">
-<li><p><strong>Primera vez</strong>: El script <code class="docutils literal notranslate"><span class="pre">init_defectdojo.sh</span></code> solo necesita ejecutarse una vez, o cuando se reinicialice la base de datos.</p></li>
+<li><p><strong>Inicialización automática</strong>: La inicialización de DefectDojo (migraciones, estáticos, usuario admin) se ejecuta automáticamente al arrancar el contenedor. No necesitas ejecutar scripts manualmente.</p></li>
 <li><p><strong>Tiempo de inicio</strong>: DefectDojo puede tardar varios minutos en iniciar la primera vez (descarga de imágenes, migraciones, etc.).</p></li>
 <li><p><strong>Credenciales</strong>: Las credenciales por defecto (<code class="docutils literal notranslate"><span class="pre">admin/admin</span></code>) son solo para desarrollo. <strong>Cambia las contraseñas en producción</strong>.</p></li>
 <li><p><strong>Raspberry Pi</strong>: Si estás usando Raspberry Pi, DefectDojo puede requerir emulación QEMU y será más lento. Consulta <code class="docutils literal notranslate"><span class="pre">docs/RASPBERRY_PI_SETUP.md</span></code> para más información.</p></li>
@@ -375,8 +378,8 @@ docker-compose<span class="w"> </span>--profile<span class="w"> </span>defectdoj
 </section>
 <section id="solucion-de-problemas">
 <h2>🆘 Solución de Problemas<a class="headerlink" href="#solucion-de-problemas" title="Link to this heading">¶</a></h2>
-<section id="el-script-init-defectdojo-sh-falla">
-<h3>El script <code class="docutils literal notranslate"><span class="pre">init_defectdojo.sh</span></code> falla<a class="headerlink" href="#el-script-init-defectdojo-sh-falla" title="Link to this heading">¶</a></h3>
+<section id="el-script-reset-defectdojo-sh-falla">
+<h3>El script <code class="docutils literal notranslate"><span class="pre">reset_defectdojo.sh</span></code> falla<a class="headerlink" href="#el-script-reset-defectdojo-sh-falla" title="Link to this heading">¶</a></h3>
 <p>Asegúrate de que los servicios estén arrancados:</p>
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>docker-compose<span class="w"> </span>--profile<span class="w"> </span>defectdojo<span class="w"> </span>ps
 </pre></div>
@@ -396,7 +399,7 @@ docker-compose<span class="w"> </span>--profile<span class="w"> </span>defectdoj
 </pre></div>
 </div>
 </li>
-<li><p>Asegúrate de haber ejecutado <code class="docutils literal notranslate"><span class="pre">init_defectdojo.sh</span></code></p></li>
+<li><p>La inicialización es automática, pero puedes ejecutar <code class="docutils literal notranslate"><span class="pre">reset_defectdojo.sh</span></code> si hay problemas</p></li>
 </ol>
 </section>
 <section id="la-base-de-datos-esta-vacia">
@@ -478,7 +481,7 @@ docker-compose<span class="w"> </span>--profile<span class="w"> </span>defectdoj
 </li>
 <li><a class="reference internal" href="#notas-importantes">⚠️ Notas Importantes</a></li>
 <li><a class="reference internal" href="#solucion-de-problemas">🆘 Solución de Problemas</a><ul>
-<li><a class="reference internal" href="#el-script-init-defectdojo-sh-falla">El script <code class="docutils literal notranslate"><span class="pre">init_defectdojo.sh</span></code> falla</a></li>
+<li><a class="reference internal" href="#el-script-reset-defectdojo-sh-falla">El script <code class="docutils literal notranslate"><span class="pre">reset_defectdojo.sh</span></code> falla</a></li>
 <li><a class="reference internal" href="#no-puedo-acceder-a-defectdojo">No puedo acceder a DefectDojo</a></li>
 <li><a class="reference internal" href="#la-base-de-datos-esta-vacia">La base de datos está vacía</a></li>
 </ul>
