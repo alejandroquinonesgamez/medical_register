@@ -13,7 +13,7 @@
 # Uso: make [comando]
 # Ejemplo: make help
 
-.PHONY: help initDefectDojo update up logs logs-defectdojo ps down pdf_ASVS setup-env clean-temp clean-all
+.PHONY: help initDefectDojo update up logs logs-defectdojo ps down pdf_ASVS setup-env clean-temp clean-all purge
 
 # Variables
 # Cargar .env si existe para configurar COMPOSE_PROJECT_NAME
@@ -82,6 +82,7 @@ help: ## Mostrar esta ayuda
 	@echo "  make update         # Despliegue completo y actualización"
 	@echo "  make clean-temp     # Limpia archivos temporales"
 	@echo "  make clean-all      # Limpieza completa (DESTRUCTIVO)"
+	@echo "  make purge          # Detener servicios y limpiar TODO (DESTRUCTIVO)"
 	@echo ""
 
 up: setup-env ## Levantar aplicación principal y DefectDojo vacío (sin findings)
@@ -201,3 +202,7 @@ clean-temp: ## Limpiar archivos temporales del proyecto
 clean-all: ## Limpiar TODO y volver al estado como recién clonado (DESTRUCTIVO)
 	@echo "⚠️  Ejecutando limpieza completa (DESTRUCTIVO)..."
 	@bash scripts/clean_all.sh
+
+purge: down clean-all ## Detener todos los servicios y limpiar TODO (DESTRUCTIVO)
+	@echo ""
+	@echo "✅ Purge completado"

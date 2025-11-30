@@ -163,6 +163,8 @@ function Show-Help {
     Write-Host "Limpiar archivos temporales del proyecto"
     Write-Host "  clean-all        " -NoNewline -ForegroundColor Yellow
     Write-Host "Limpiar TODO y volver al estado como recien clonado (DESTRUCTIVO)"
+    Write-Host "  purge            " -NoNewline -ForegroundColor Yellow
+    Write-Host "Detener servicios y limpiar TODO (DESTRUCTIVO: down + clean-all)"
     Write-Host "  check            " -NoNewline -ForegroundColor Yellow
     Write-Host "Verificar requisitos previos (Docker, Docker Compose)"
     Write-Host "  help             " -NoNewline -ForegroundColor Yellow
@@ -405,6 +407,19 @@ function Clean-All {
     }
 }
 
+function Purge-All {
+    Write-Host "Purgando proyecto (detener servicios + limpieza completa)..." -ForegroundColor Yellow
+    Write-Host ""
+    Write-Host "Paso 1/2: Deteniendo todos los servicios..." -ForegroundColor Cyan
+    Stop-All
+    Write-Host ""
+    Write-Host "Paso 2/2: Limpiando todos los datos..." -ForegroundColor Cyan
+    Write-Host ""
+    Clean-All
+    Write-Host ""
+    Write-Host "Purge completado" -ForegroundColor Green
+}
+
 # Ejecutar el comando solicitado
 switch ($Command.ToLower()) {
     "default" {
@@ -451,6 +466,9 @@ switch ($Command.ToLower()) {
     }
     "cleanall" {
         Clean-All
+    }
+    "purge" {
+        Purge-All
     }
     "help" {
         Show-Help
