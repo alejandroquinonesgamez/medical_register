@@ -6,7 +6,7 @@
 <link rel="index" title="Index" href="../genindex.html"><link rel="search" title="Search" href="../search.html"><link rel="prev" title="Flujo de Creación → Resolución Implementado en DefectDojo" href="DEFECTDOJO_FLUJO_IMPLEMENTADO.html">
 
     <!-- Generated with Sphinx 8.1.3 and Furo 2025.09.25 -->
-        <title>Uso de make all - Flujo Completo de DefectDojo - Medical Register 0.1.0 documentation</title>
+        <title>Uso de make update - Flujo Completo de DefectDojo - Medical Register 0.1.0 documentation</title>
       <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=d111a655" />
     <link rel="stylesheet" type="text/css" href="../_static/styles/furo.css?v=580074bf" />
     <link rel="stylesheet" type="text/css" href="../_static/styles/furo-extensions.css?v=8dab3a3b" />
@@ -209,7 +209,7 @@
 <li class="toctree-l1"><a class="reference internal" href="DEFECTDOJO_INTEGRATION.html">Integración de DefectDojo</a></li>
 <li class="toctree-l1"><a class="reference internal" href="DEFECTDOJO_FLUJO_CREACION_RESOLUCION.html">Flujo de Creación y Resolución de Findings en DefectDojo</a></li>
 <li class="toctree-l1"><a class="reference internal" href="DEFECTDOJO_FLUJO_IMPLEMENTADO.html">Flujo de Creación → Resolución Implementado en DefectDojo</a></li>
-<li class="toctree-l1 current current-page"><a class="current reference internal" href="#">Uso de <code class="docutils literal notranslate"><span class="pre">make</span> <span class="pre">all</span></code> - Flujo Completo de DefectDojo</a></li>
+<li class="toctree-l1 current current-page"><a class="current reference internal" href="#">Uso de <code class="docutils literal notranslate"><span class="pre">make</span> <span class="pre">update</span></code> - Flujo Completo de DefectDojo</a></li>
 </ul>
 
 </div>
@@ -248,53 +248,51 @@
           </label>
         </div>
         <article role="main" id="furo-main-content">
-          <section id="uso-de-make-all-flujo-completo-de-defectdojo">
-<h1>Uso de <code class="docutils literal notranslate"><span class="pre">make</span> <span class="pre">all</span></code> - Flujo Completo de DefectDojo<a class="headerlink" href="#uso-de-make-all-flujo-completo-de-defectdojo" title="Link to this heading">¶</a></h1>
+          <section id="uso-de-make-update-flujo-completo-de-defectdojo">
+<h1>Uso de <code class="docutils literal notranslate"><span class="pre">make</span> <span class="pre">update</span></code> - Flujo Completo de DefectDojo<a class="headerlink" href="#uso-de-make-update-flujo-completo-de-defectdojo" title="Link to this heading">¶</a></h1>
 <section id="descripcion">
 <h2>📋 Descripción<a class="headerlink" href="#descripcion" title="Link to this heading">¶</a></h2>
-<p>El comando <code class="docutils literal notranslate"><span class="pre">make</span> <span class="pre">all</span></code> ejecuta el flujo completo para configurar DefectDojo con el historial de creación → resolución de findings.</p>
+<p>El comando <code class="docutils literal notranslate"><span class="pre">make</span> <span class="pre">update</span></code> (o <code class="docutils literal notranslate"><span class="pre">.\make.ps1</span> <span class="pre">update</span></code> en PowerShell) ejecuta el flujo completo para configurar DefectDojo con el historial de creación → resolución de findings.</p>
 </section>
-<section id="que-hace-make-all">
-<h2>🎯 ¿Qué hace <code class="docutils literal notranslate"><span class="pre">make</span> <span class="pre">all</span></code>?<a class="headerlink" href="#que-hace-make-all" title="Link to this heading">¶</a></h2>
+<section id="que-hace-make-update">
+<h2>🎯 ¿Qué hace <code class="docutils literal notranslate"><span class="pre">make</span> <span class="pre">update</span></code>?<a class="headerlink" href="#que-hace-make-update" title="Link to this heading">¶</a></h2>
 <p>El comando ejecuta automáticamente:</p>
 <ol class="arabic simple">
-<li><p><strong>Paso 1</strong>: Arranca DefectDojo (esto crea todos los findings como <strong>activos/pendientes</strong>)</p></li>
-<li><p><strong>Paso 2</strong>: Espera 60 segundos para que DefectDojo esté completamente inicializado</p></li>
-<li><p><strong>Paso 3</strong>: Marca los findings resueltos como <strong>resueltos</strong> con sus fechas históricas</p></li>
+<li><p><strong>Paso 1</strong>: Verifica y arranca la aplicación principal si es necesario</p></li>
+<li><p><strong>Paso 2</strong>: Verifica y arranca DefectDojo si es necesario (esto crea todos los findings como <strong>activos/pendientes</strong>)</p></li>
+<li><p><strong>Paso 3</strong>: Ejecuta el script consolidado <code class="docutils literal notranslate"><span class="pre">manage_findings.py</span></code> que:</p>
+<ul class="simple">
+<li><p>Crea/actualiza todos los findings</p></li>
+<li><p>Marca los findings resueltos (CWE-20, CWE-1021) como <strong>resueltos</strong> con sus fechas históricas</p></li>
+</ul>
+</li>
 </ol>
 </section>
 <section id="uso">
 <h2>🚀 Uso<a class="headerlink" href="#uso" title="Link to this heading">¶</a></h2>
 <section id="en-linux-mac-o-git-bash-windows">
 <h3>En Linux/Mac o Git Bash (Windows)<a class="headerlink" href="#en-linux-mac-o-git-bash-windows" title="Link to this heading">¶</a></h3>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>make<span class="w"> </span>all
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>make<span class="w"> </span>update
 </pre></div>
 </div>
 </section>
-<section id="en-powershell-windows-alternativa">
-<h3>En PowerShell (Windows) - Alternativa<a class="headerlink" href="#en-powershell-windows-alternativa" title="Link to this heading">¶</a></h3>
+<section id="en-powershell-windows">
+<h3>En PowerShell (Windows)<a class="headerlink" href="#en-powershell-windows" title="Link to this heading">¶</a></h3>
 <p>Si <code class="docutils literal notranslate"><span class="pre">make</span></code> no está disponible, puedes usar el script PowerShell equivalente:</p>
-<div class="highlight-powershell notranslate"><div class="highlight"><pre><span></span><span class="p">.\</span><span class="n">scripts</span><span class="p">\</span><span class="n">resolve_findings_all</span><span class="p">.</span><span class="n">ps1</span>
+<div class="highlight-powershell notranslate"><div class="highlight"><pre><span></span><span class="p">.\</span><span class="n">make</span><span class="p">.</span><span class="n">ps1</span> <span class="n">update</span>
 </pre></div>
 </div>
-<p>O ejecutar los pasos manualmente:</p>
-<div class="highlight-powershell notranslate"><div class="highlight"><pre><span></span><span class="c"># Paso 1: Arrancar DefectDojo</span>
-<span class="nv">$env:COMPOSE_DOCKER_CLI_BUILD</span><span class="p">=</span><span class="s2">&quot;0&quot;</span>
-<span class="nv">$env:DOCKER_BUILDKIT</span><span class="p">=</span><span class="s2">&quot;0&quot;</span>
-<span class="n">docker-compose</span> <span class="p">-</span><span class="n">-profile</span> <span class="n">defectdojo</span> <span class="n">up</span> <span class="n">-d</span>
-
-<span class="c"># Paso 2: Esperar (60 segundos)</span>
-<span class="nb">Start-Sleep</span> <span class="n">-Seconds</span> <span class="n">60</span>
-
-<span class="c"># Paso 3: Marcar findings como resueltos</span>
-<span class="p">.\</span><span class="n">scripts</span><span class="p">\</span><span class="n">mark_findings_resolved_with_dates</span><span class="p">.</span><span class="n">sh</span>
-</pre></div>
-</div>
+<p>Este comando hace exactamente lo mismo que <code class="docutils literal notranslate"><span class="pre">make</span> <span class="pre">update</span></code>:</p>
+<ol class="arabic simple">
+<li><p>Verifica y arranca la aplicación principal si es necesario</p></li>
+<li><p>Verifica y arranca DefectDojo si es necesario</p></li>
+<li><p>Ejecuta el script consolidado <code class="docutils literal notranslate"><span class="pre">manage_findings.py</span></code> para gestionar todos los findings</p></li>
+</ol>
 </section>
 </section>
 <section id="fechas-que-se-establecen">
 <h2>📅 Fechas que se Establecen<a class="headerlink" href="#fechas-que-se-establecen" title="Link to this heading">¶</a></h2>
-<p>Después de ejecutar <code class="docutils literal notranslate"><span class="pre">make</span> <span class="pre">all</span></code>, los findings tendrán:</p>
+<p>Después de ejecutar <code class="docutils literal notranslate"><span class="pre">make</span> <span class="pre">update</span></code>, los findings tendrán:</p>
 <section id="cwe-20-validacion-de-entrada">
 <h3>CWE-20 (Validación de entrada)<a class="headerlink" href="#cwe-20-validacion-de-entrada" title="Link to this heading">¶</a></h3>
 <ul class="simple">
@@ -319,7 +317,7 @@
 </section>
 <section id="resultado">
 <h2>✅ Resultado<a class="headerlink" href="#resultado" title="Link to this heading">¶</a></h2>
-<p>Después de ejecutar <code class="docutils literal notranslate"><span class="pre">make</span> <span class="pre">all</span></code>:</p>
+<p>Después de ejecutar <code class="docutils literal notranslate"><span class="pre">make</span> <span class="pre">update</span></code>:</p>
 <ol class="arabic simple">
 <li><p><strong>Todos los findings están creados</strong> como activos inicialmente</p></li>
 <li><p><strong>CWE-20 y CWE-1021 están marcados como resueltos</strong> con:</p>
@@ -362,13 +360,14 @@
 <h2>🔧 Solución de Problemas<a class="headerlink" href="#solucion-de-problemas" title="Link to this heading">¶</a></h2>
 <section id="si-el-script-falla-al-marcar-como-resueltos">
 <h3>Si el script falla al marcar como resueltos<a class="headerlink" href="#si-el-script-falla-al-marcar-como-resueltos" title="Link to this heading">¶</a></h3>
-<p>Si después de ejecutar <code class="docutils literal notranslate"><span class="pre">make</span> <span class="pre">all</span></code> los findings no están marcados como resueltos:</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="c1"># Esperar un poco más y ejecutar solo el paso de resolución</span>
-make<span class="w"> </span>resolve-findings
+<p>Si después de ejecutar <code class="docutils literal notranslate"><span class="pre">make</span> <span class="pre">update</span></code> los findings no están marcados como resueltos:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="c1"># Esperar un poco más y volver a ejecutar</span>
+make<span class="w"> </span>update
 </pre></div>
 </div>
-<p>O manualmente:</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>bash<span class="w"> </span>scripts/mark_findings_resolved_with_dates.sh
+<p>O ejecutar el script consolidado manualmente:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>docker<span class="w"> </span>cp<span class="w"> </span>scripts/manage_findings.py<span class="w"> </span>defectdojo:/tmp/manage_findings.py
+docker-compose<span class="w"> </span>--profile<span class="w"> </span>defectdojo<span class="w"> </span><span class="nb">exec</span><span class="w"> </span>-T<span class="w"> </span>defectdojo<span class="w"> </span>python3<span class="w"> </span>/tmp/manage_findings.py
 </pre></div>
 </div>
 </section>
@@ -378,7 +377,7 @@ make<span class="w"> </span>resolve-findings
 <ol class="arabic simple">
 <li><p>Verifica los logs: <code class="docutils literal notranslate"><span class="pre">make</span> <span class="pre">logs-defectdojo</span></code></p></li>
 <li><p>Espera hasta que esté listo</p></li>
-<li><p>Ejecuta solo: <code class="docutils literal notranslate"><span class="pre">make</span> <span class="pre">resolve-findings</span></code></p></li>
+<li><p>Vuelve a ejecutar: <code class="docutils literal notranslate"><span class="pre">make</span> <span class="pre">update</span></code></p></li>
 </ol>
 </section>
 <section id="verificar-estado-de-los-contenedores">
@@ -402,7 +401,11 @@ make<span class="w"> </span>resolve-findings
 </section>
 <section id="comando-completo">
 <h2>🎉 Comando Completo<a class="headerlink" href="#comando-completo" title="Link to this heading">¶</a></h2>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>make<span class="w"> </span>all
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>make<span class="w"> </span>update
+</pre></div>
+</div>
+<p>O en PowerShell:</p>
+<div class="highlight-powershell notranslate"><div class="highlight"><pre><span></span><span class="p">.\</span><span class="n">make</span><span class="p">.</span><span class="n">ps1</span> <span class="n">update</span>
 </pre></div>
 </div>
 <p>¡Y listo! El flujo completo se ejecutará automáticamente.</p>
@@ -456,12 +459,12 @@ make<span class="w"> </span>resolve-findings
         <div class="toc-tree-container">
           <div class="toc-tree">
             <ul>
-<li><a class="reference internal" href="#">Uso de <code class="docutils literal notranslate"><span class="pre">make</span> <span class="pre">all</span></code> - Flujo Completo de DefectDojo</a><ul>
+<li><a class="reference internal" href="#">Uso de <code class="docutils literal notranslate"><span class="pre">make</span> <span class="pre">update</span></code> - Flujo Completo de DefectDojo</a><ul>
 <li><a class="reference internal" href="#descripcion">📋 Descripción</a></li>
-<li><a class="reference internal" href="#que-hace-make-all">🎯 ¿Qué hace <code class="docutils literal notranslate"><span class="pre">make</span> <span class="pre">all</span></code>?</a></li>
+<li><a class="reference internal" href="#que-hace-make-update">🎯 ¿Qué hace <code class="docutils literal notranslate"><span class="pre">make</span> <span class="pre">update</span></code>?</a></li>
 <li><a class="reference internal" href="#uso">🚀 Uso</a><ul>
 <li><a class="reference internal" href="#en-linux-mac-o-git-bash-windows">En Linux/Mac o Git Bash (Windows)</a></li>
-<li><a class="reference internal" href="#en-powershell-windows-alternativa">En PowerShell (Windows) - Alternativa</a></li>
+<li><a class="reference internal" href="#en-powershell-windows">En PowerShell (Windows)</a></li>
 </ul>
 </li>
 <li><a class="reference internal" href="#fechas-que-se-establecen">📅 Fechas que se Establecen</a><ul>

@@ -209,7 +209,7 @@
 <li class="toctree-l1"><a class="reference internal" href="DEFECTDOJO_INTEGRATION.html">Integración de DefectDojo</a></li>
 <li class="toctree-l1 current current-page"><a class="current reference internal" href="#">Flujo de Creación y Resolución de Findings en DefectDojo</a></li>
 <li class="toctree-l1"><a class="reference internal" href="DEFECTDOJO_FLUJO_IMPLEMENTADO.html">Flujo de Creación → Resolución Implementado en DefectDojo</a></li>
-<li class="toctree-l1"><a class="reference internal" href="MAKE_ALL_USO.html">Uso de <code class="docutils literal notranslate"><span class="pre">make</span> <span class="pre">all</span></code> - Flujo Completo de DefectDojo</a></li>
+<li class="toctree-l1"><a class="reference internal" href="MAKE_ALL_USO.html">Uso de <code class="docutils literal notranslate"><span class="pre">make</span> <span class="pre">update</span></code> - Flujo Completo de DefectDojo</a></li>
 </ul>
 
 </div>
@@ -355,13 +355,20 @@
 </section>
 <section id="ejemplo-de-flujo">
 <h2>Ejemplo de Flujo<a class="headerlink" href="#ejemplo-de-flujo" title="Link to this heading">¶</a></h2>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="c1"># Paso 1: Inicializar DefectDojo (crea todos los findings como activos)</span>
-./scripts/init_defectdojo_wrapper.sh
-
-<span class="c1"># Paso 2: Marcar como resueltos los que ya están resueltos en el código</span>
-./scripts/mark_findings_resolved.sh
+<p>El flujo se ejecuta automáticamente usando el comando:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="c1"># Flujo completo automatizado</span>
+make<span class="w"> </span>update
 </pre></div>
 </div>
+<p>O en PowerShell:</p>
+<div class="highlight-powershell notranslate"><div class="highlight"><pre><span></span><span class="p">.\</span><span class="n">make</span><span class="p">.</span><span class="n">ps1</span> <span class="n">update</span>
+</pre></div>
+</div>
+<p>Este comando:</p>
+<ol class="arabic simple">
+<li><p>Inicializa DefectDojo (crea todos los findings como activos)</p></li>
+<li><p>Ejecuta el script consolidado <code class="docutils literal notranslate"><span class="pre">manage_findings.py</span></code> que marca como resueltos los que ya están resueltos en el código</p></li>
+</ol>
 </section>
 <section id="notas-importantes">
 <h2>Notas Importantes<a class="headerlink" href="#notas-importantes" title="Link to this heading">¶</a></h2>

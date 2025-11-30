@@ -86,13 +86,22 @@ Agregar un flag al script de inicialización:
 
 ## Ejemplo de Flujo
 
-```bash
-# Paso 1: Inicializar DefectDojo (crea todos los findings como activos)
-./scripts/init_defectdojo_wrapper.sh
+El flujo se ejecuta automáticamente usando el comando:
 
-# Paso 2: Marcar como resueltos los que ya están resueltos en el código
-./scripts/mark_findings_resolved.sh
+```bash
+# Flujo completo automatizado
+make update
 ```
+
+O en PowerShell:
+
+```powershell
+.\make.ps1 update
+```
+
+Este comando:
+1. Inicializa DefectDojo (crea todos los findings como activos)
+2. Ejecuta el script consolidado `manage_findings.py` que marca como resueltos los que ya están resueltos en el código
 
 ## Notas Importantes
 
