@@ -12,12 +12,16 @@
     </header>
 
     <div class="main-layout">
-        <!-- Columna izquierda: DefectDojo -->
-        <aside class="sidebar sidebar-left">
+        <!-- Columna izquierda: OWASP ASVS -->
+        <aside class="sidebar sidebar-left" id="owasp-asvs-sidebar">
+            <div class="panel" id="owasp-asvs-frame">
+                <h2 style="margin-top: 0; margin-bottom: 12px; color: #e2e8f0; border-bottom: 2px solid #254F6D; padding-bottom: 8px;">
+                    🛡️ OWASP ASVS
+                </h2>
             <nav class="security-nav">
                 <div class="defectdojo-menu">
-                    <a href="/defectdojo" target="_blank" class="defectdojo-link" title="Abrir DefectDojo en nueva pestaña">
-                        🔒 DefectDojo - Gestión de Vulnerabilidades
+                        <a href="/defectdojo" target="_blank" class="defectdojo-link" title="Abrir DefectDojo en nueva pestaña" style="width: 100%; text-align: center; display: block; margin-bottom: 12px; font-size: 12px; padding: 6px 8px; box-sizing: border-box; white-space: normal; word-wrap: break-word;">
+                            🔒 DefectDojo
                     </a>
                     <div class="defectdojo-actions">
                         <button id="export-dump-btn" class="defectdojo-action-btn" title="Descargar dump de la base de datos">
@@ -27,9 +31,13 @@
                             📤 Importar Dump
                         </label>
                         <input type="file" id="import-dump-input" accept=".sql" style="display: none;">
+                            <button id="generate-pdf-btn" class="defectdojo-action-btn" title="Generar PDF del informe de seguridad ASVS" style="flex: 1 1 100%; min-width: 100%;">
+                                📄 Generar PDF Informe
+                            </button>
+                        </div>
                     </div>
+                </nav>
                 </div>
-            </nav>
         </aside>
 
         <!-- Columna central: Contenido principal -->

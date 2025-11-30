@@ -195,6 +195,12 @@ class DevTools {
             <h2 style="margin-top: 0; margin-bottom: 12px; color: #e2e8f0;">
                 🛠️ Herramientas de Desarrollo
             </h2>
+            <div style="margin-bottom: 16px; padding-bottom: 16px; border-bottom: 1px solid #1e293b;">
+                <label style="display: flex; align-items: center; gap: 8px; cursor: pointer; color: #e2e8f0;">
+                    <input type="checkbox" id="dev-toggle-owasp-asvs" checked style="cursor: pointer;">
+                    <span>Mostrar OWASP ASVS</span>
+                </label>
+            </div>
             <div id="dev-sync-status" style="margin-bottom: 12px; padding: 8px; background: #0d152c; border: 1px solid #1e293b; border-radius: 8px; font-size: 12px;">
                 <span style="color: #e2e8f0;">Sincronización: </span>
                 <span id="dev-sync-status-text" style="font-weight: 600;">-</span>
@@ -280,6 +286,24 @@ class DevTools {
             }
         });
 
+        // Checkbutton para mostrar/ocultar frame OWASP ASVS
+        const toggleOwaspAsvs = document.getElementById('dev-toggle-owasp-asvs');
+        if (toggleOwaspAsvs) {
+            // Cargar estado guardado
+            const savedState = localStorage.getItem('dev_owasp_asvs_visible');
+            if (savedState !== null) {
+                toggleOwaspAsvs.checked = savedState === 'true';
+            }
+            
+            // Aplicar estado inicial
+            this.toggleOwaspAsvsFrame(toggleOwaspAsvs.checked);
+            
+            toggleOwaspAsvs.addEventListener('change', (e) => {
+                this.toggleOwaspAsvsFrame(e.target.checked);
+                localStorage.setItem('dev_owasp_asvs_visible', e.target.checked.toString());
+            });
+        }
+
         // Actualizar estado periódicamente
         this.updateStatus();
         this.updateSyncStatus();
@@ -287,6 +311,21 @@ class DevTools {
             this.updateStatus();
             this.updateSyncStatus();
         }, 1000);
+    }
+    
+    /**
+     * Muestra u oculta el frame de OWASP ASVS
+     * @param {boolean} visible - Si es true, muestra el frame; si es false, lo oculta
+     */
+    static toggleOwaspAsvsFrame(visible) {
+        const owaspAsvsSidebar = document.getElementById('owasp-asvs-sidebar');
+        if (owaspAsvsSidebar) {
+            if (visible) {
+                owaspAsvsSidebar.style.display = '';
+            } else {
+                owaspAsvsSidebar.style.display = 'none';
+            }
+        }
     }
 
     /**

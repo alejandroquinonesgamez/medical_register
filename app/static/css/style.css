@@ -63,8 +63,22 @@ header h1 {
 }
 
 .security-nav {
-    margin-top: 12px;
-    margin-bottom: 16px;
+    margin-top: 0;
+    margin-bottom: 0;
+}
+
+#owasp-asvs-frame .security-nav {
+    margin-top: 0;
+    margin-bottom: 0;
+}
+
+#owasp-asvs-frame {
+    width: 100%;
+}
+
+#owasp-asvs-frame h2 {
+    font-size: 16px;
+    margin-bottom: 12px;
 }
 
 .defectdojo-link {
@@ -75,8 +89,12 @@ header h1 {
     text-decoration: none;
     border-radius: 8px;
     border: 1px solid #334155;
-    font-size: 14px;
+    font-size: 12px;
     transition: all 0.2s;
+    box-sizing: border-box;
+    max-width: 100%;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 
 .defectdojo-link:hover {

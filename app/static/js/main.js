@@ -370,6 +370,57 @@ document.addEventListener('DOMContentLoaded', async () => {
         });
     }
 
+    // Botón para generar PDF del informe ASVS
+    const generatePdfBtn = document.getElementById('generate-pdf-btn');
+    if (generatePdfBtn) {
+        generatePdfBtn.addEventListener('click', async () => {
+            try {
+                generatePdfBtn.disabled = true;
+                generatePdfBtn.textContent = '⏳ Generando...';
+                
+                const response = await fetch('/api/defectdojo/generate-pdf');
+                
+                if (!response.ok) {
+                    const error = await response.json();
+                    throw new Error(error.error || 'Error al generar el PDF');
+                }
+                
+                // Descargar el archivo
+                const blob = await response.blob();
+                const url = window.URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                
+                // Obtener el nombre del archivo del header Content-Disposition o usar un nombre por defecto
+                const contentDisposition = response.headers.get('Content-Disposition');
+                let filename = 'INFORME_SEGURIDAD_ASVS.pdf';
+                if (contentDisposition) {
+                    const filenameMatch = contentDisposition.match(/filename="?([^"]+)"?/);
+                    if (filenameMatch) {
+                        filename = filenameMatch[1];
+                    }
+                }
+                
+                a.download = filename;
+                document.body.appendChild(a);
+                a.click();
+                window.URL.revokeObjectURL(url);
+                document.body.removeChild(a);
+                
+                generatePdfBtn.textContent = '✅ Generado';
+                setTimeout(() => {
+                    generatePdfBtn.textContent = '📄 Generar PDF Informe';
+                    generatePdfBtn.disabled = false;
+                }, 2000);
+                
+            } catch (error) {
+                alert('Error al generar PDF: ' + error.message);
+                generatePdfBtn.textContent = '📄 Generar PDF Informe';
+                generatePdfBtn.disabled = false;
+            }
+        });
+    }
+
     // Función para cargar y mostrar los últimos pesos
     async function loadRecentWeights() {
         const recentWeightsList = document.getElementById('recent-weights-list');

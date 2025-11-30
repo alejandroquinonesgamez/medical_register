@@ -410,3 +410,68 @@ def import_defectdojo_dump():
         return jsonify({"error": f"Error al importar: {str(e)}"}), 500
 
 
+@api.route('/defectdojo/generate-pdf', methods=['GET'])
+def generate_pdf_report():
+    """Generar PDF del informe de seguridad ASVS"""
+    import subprocess
+    import os
+    from flask import send_file
+    from datetime import datetime
+    
+    try:
+        # Obtener el directorio del proyecto
+        project_root = os.path.dirname(os.path.dirname(__file__))
+        script_path = os.path.join(project_root, 'scripts', 'generate_pdf_report.py')
+        
+        # Verificar que existe el script
+        if not os.path.exists(script_path):
+            return jsonify({"error": "Script de generación de PDF no encontrado"}), 500
+        
+        # Ejecutar el script para generar el PDF
+        result = subprocess.run(
+            ['python', script_path],
+            capture_output=True,
+            text=True,
+            timeout=60,  # 1 minuto máximo
+            cwd=project_root
+        )
+        
+        if result.returncode != 0:
+            current_app.logger.error(f"Error al generar PDF: {result.stderr}")
+            return jsonify({"error": f"Error al generar PDF: {result.stderr}"}), 500
+        
+        # Buscar el PDF más reciente generado
+        informes_dir = os.path.join(project_root, 'docs', 'informes')
+        
+        # Crear la carpeta si no existe
+        if not os.path.exists(informes_dir):
+            os.makedirs(informes_dir, exist_ok=True)
+        
+        pdf_files = [f for f in os.listdir(informes_dir) if f.startswith('INFORME_SEGURIDAD_ASVS_') and f.endswith('.pdf')]
+        
+        if not pdf_files:
+            return jsonify({"error": "No se encontró el PDF generado"}), 500
+        
+        # Obtener el PDF más reciente
+        pdf_files_with_time = [(f, os.path.getmtime(os.path.join(informes_dir, f))) for f in pdf_files]
+        pdf_files_with_time.sort(key=lambda x: x[1], reverse=True)
+        latest_pdf = pdf_files_with_time[0][0]
+        
+        pdf_path = os.path.join(informes_dir, latest_pdf)
+        
+        # Enviar el archivo como descarga
+        return send_file(
+            pdf_path,
+            as_attachment=True,
+            download_name=latest_pdf,
+            mimetype='application/pdf'
+        )
+        
+    except subprocess.TimeoutExpired:
+        current_app.logger.error("Timeout al generar PDF")
+        return jsonify({"error": "Timeout al generar el PDF"}), 500
+    except Exception as e:
+        current_app.logger.error(f"Error inesperado al generar PDF: {str(e)}")
+        return jsonify({"error": f"Error al generar PDF: {str(e)}"}), 500
+
+

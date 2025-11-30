@@ -66,20 +66,20 @@ curl -s -X PATCH "${DEFECTDOJO_URL}/findings/${CWE843_ID}/" \
     -d "$UPDATE_DATA" > /dev/null
 echo "  ✓ CWE-843 actualizado"
 
-# CWE-1021: Pendiente - actualizar descripción con estado actual
-echo "Actualizando CWE-1021 (Pendiente)..."
+# CWE-1021: Resuelto - marcar como resuelto
+echo "Actualizando CWE-1021 (Resuelto)..."
 UPDATE_DATA='{
-    "description": "No se implementan headers de seguridad (X-Frame-Options, Content-Security-Policy) para prevenir clickjacking. La aplicación es vulnerable a ataques de clickjacking.\n\nESTADO ACTUAL: ⚠️ PENDIENTE DE CORRECCIÓN\n\nUbicación: app/__init__.py\n\nAcción requerida:\n- Agregar headers de seguridad en app/__init__.py después de create_app()\n- X-Frame-Options: DENY\n- Content-Security-Policy: frame-ancestors '\''none'\''\n- X-Content-Type-Options: nosniff",
-    "mitigation": "Agregar headers de seguridad en app/__init__.py después de create_app() usando @app.after_request. Implementar X-Frame-Options: DENY, Content-Security-Policy: frame-ancestors '\''none'\'', X-Content-Type-Options: nosniff",
-    "active": true,
-    "verified": false,
-    "status": "Active"
+    "description": "Vulnerabilidad de clickjacking resuelta mediante la implementación de headers de seguridad.\n\nESTADO ACTUAL: ✅ RESUELTO\n\nMitigación implementada: Se agregaron headers de seguridad en app/__init__.py (líneas 28-36) que incluyen:\n- X-Frame-Options: DENY\n- Content-Security-Policy: frame-ancestors '\''none'\''\n- X-Content-Type-Options: nosniff\n- X-XSS-Protection: 1; mode=block\n\nEstos headers previenen que la aplicación sea embebida en iframes maliciosos y protegen contra ataques de clickjacking.",
+    "mitigation": "✅ RESUELTO: Se implementaron headers de seguridad en app/__init__.py usando @app.after_request que agrega X-Frame-Options: DENY, Content-Security-Policy: frame-ancestors '\''none'\'', X-Content-Type-Options: nosniff, y X-XSS-Protection: 1; mode=block a todas las respuestas HTTP.",
+    "active": false,
+    "verified": true,
+    "status": "Verified"
 }'
 curl -s -X PATCH "${DEFECTDOJO_URL}/findings/${CWE1021_ID}/" \
     -H "Authorization: Token ${TOKEN}" \
     -H "Content-Type: application/json" \
     -d "$UPDATE_DATA" > /dev/null
-echo "  ✓ CWE-1021 actualizado"
+echo "  ✓ CWE-1021 marcado como resuelto"
 
 # CWE-703: Mejorado parcialmente - actualizar descripción con estado actual
 echo "Actualizando CWE-703 (Mejorado parcialmente)..."
@@ -116,7 +116,7 @@ echo "=== Resumen ==="
 echo "✓ CWE-20: Resuelto (Verified, Active: False)"
 echo "⚠️ CWE-1287: Pendiente (Active, Verified: False)"
 echo "⚠️ CWE-843: Pendiente (Active, Verified: False)"
-echo "⚠️ CWE-1021: Pendiente (Active, Verified: False)"
+echo "✓ CWE-1021: Resuelto (Verified, Active: False)"
 echo "⚠️ CWE-703: Mejorado parcialmente (Active, Verified: False)"
 echo "⏸️ CWE-942: Pendiente - Aceptado temporalmente (Active, Verified: False)"
 echo ""

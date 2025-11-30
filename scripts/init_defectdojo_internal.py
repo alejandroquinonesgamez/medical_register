@@ -203,14 +203,14 @@ def create_findings(test, admin_user):
     
     findings_data = {
         'CWE-20': {
-            'title': 'CWE-20: Validación de entrada insuficiente (nombres) - RESUELTO',
-            'description': 'Vulnerabilidad de validación de entrada en campos de nombre. Se ha implementado validación robusta con sanitización en backend y frontend.\n\nMitigación: Se implementó la función validate_and_sanitize_name() en app/helpers.py que valida longitud, elimina caracteres peligrosos, y normaliza espacios. Validación también implementada en frontend (app/static/js/config.js).\n\nImpacto: Bajo - Ya resuelto',
+            'title': 'CWE-20: Validación de entrada insuficiente (nombres)',
+            'description': 'Vulnerabilidad de validación de entrada en campos de nombre. Se requiere implementar validación robusta con sanitización en backend y frontend.\n\nProblema: Falta validación de longitud, eliminación de caracteres peligrosos, y normalización de espacios.\n\nImpacto: Riesgo de inyección de caracteres peligrosos (XSS potencial) y corrupción de datos almacenados.',
             'severity': 'Medium',
             'cwe': 20,
-            'active': False,
-            'verified': True,
-            'mitigation': 'Se implementó la función validate_and_sanitize_name() en app/helpers.py que valida longitud, elimina caracteres peligrosos, y normaliza espacios. Validación también implementada en frontend (app/static/js/config.js).',
-            'impact': 'Bajo - Ya resuelto',
+            'active': True,
+            'verified': False,
+            'mitigation': 'Implementar validación robusta de nombres con sanitización. Validar longitud (1-100 caracteres), eliminar caracteres peligrosos (< > " \'), normalizar espacios múltiples, y validar caracteres permitidos (letras Unicode, espacios, guiones, apóstrofes). Implementar en backend (app/helpers.py) y frontend (app/static/js/config.js) para defensa en profundidad.',
+            'impact': 'Puede causar inyección de caracteres peligrosos (XSS potencial) y corrupción de datos almacenados',
             'references': 'https://cwe.mitre.org/data/definitions/20.html',
             'file_path': 'app/helpers.py, app/routes.py, app/static/js/config.js',
             'line': 53
@@ -243,16 +243,16 @@ def create_findings(test, admin_user):
         },
         'CWE-1021': {
             'title': 'CWE-1021: Falta de protección contra clickjacking',
-            'description': 'No se implementan headers de seguridad (X-Frame-Options, Content-Security-Policy) para prevenir clickjacking. La aplicación es vulnerable a ataques de clickjacking.',
+            'description': 'No se implementan headers de seguridad (X-Frame-Options, Content-Security-Policy) para prevenir clickjacking. La aplicación es vulnerable a ataques de clickjacking.\n\nProblema: La aplicación puede ser embebida en iframes maliciosos, permitiendo que los usuarios sean engañados para realizar acciones no deseadas mediante superposición de elementos.\n\nUbicación: app/__init__.py',
             'severity': 'Medium',
             'cwe': 1021,
             'active': True,
             'verified': False,
-            'mitigation': 'Agregar headers de seguridad en app/__init__.py: X-Frame-Options: DENY, Content-Security-Policy: frame-ancestors \'none\', X-Content-Type-Options: nosniff',
-            'impact': 'Vulnerabilidad de seguridad conocida. Permite que la aplicación sea embebida en iframes maliciosos',
+            'mitigation': 'Agregar headers de seguridad en app/__init__.py después de create_app() usando @app.after_request. Implementar X-Frame-Options: DENY, Content-Security-Policy: frame-ancestors \'none\', X-Content-Type-Options: nosniff, y X-XSS-Protection: 1; mode=block.',
+            'impact': 'Vulnerabilidad de seguridad conocida. Permite que la aplicación sea embebida en iframes maliciosos, comprometiendo la confidencialidad e integridad de los datos',
             'references': 'https://cwe.mitre.org/data/definitions/1021.html',
             'file_path': 'app/__init__.py',
-            'line': None
+            'line': 28
         },
         'CWE-703': {
             'title': 'CWE-703: Manejo de excepciones demasiado genérico - MEJORADO PARCIALMENTE',
@@ -388,8 +388,8 @@ def update_findings(findings):
             'mitigation': 'Validar NaN e Infinity después de parseFloat() usando isNaN() e isFinite(). Agregar validación antes de usar valores en cálculos críticos como el IMC.'
         },
         'CWE-1021': {
-            'description': 'No se implementan headers de seguridad (X-Frame-Options, Content-Security-Policy) para prevenir clickjacking. La aplicación es vulnerable a ataques de clickjacking.\n\nESTADO ACTUAL: ⚠️ PENDIENTE DE CORRECCIÓN\n\nUbicación: app/__init__.py\n\nAcción requerida:\n- Agregar headers de seguridad en app/__init__.py después de create_app()\n- X-Frame-Options: DENY\n- Content-Security-Policy: frame-ancestors \'none\'\n- X-Content-Type-Options: nosniff',
-            'mitigation': 'Agregar headers de seguridad en app/__init__.py después de create_app() usando @app.after_request. Implementar X-Frame-Options: DENY, Content-Security-Policy: frame-ancestors \'none\', X-Content-Type-Options: nosniff'
+            'description': 'Vulnerabilidad de clickjacking resuelta mediante la implementación de headers de seguridad.\n\nESTADO ACTUAL: ✅ RESUELTO\n\nMitigación implementada: Se agregaron headers de seguridad en app/__init__.py (líneas 28-36) que incluyen:\n- X-Frame-Options: DENY\n- Content-Security-Policy: frame-ancestors \'none\'\n- X-Content-Type-Options: nosniff\n- X-XSS-Protection: 1; mode=block\n\nEstos headers previenen que la aplicación sea embebida en iframes maliciosos y protegen contra ataques de clickjacking.',
+            'mitigation': '✅ RESUELTO: Se implementaron headers de seguridad en app/__init__.py usando @app.after_request que agrega X-Frame-Options: DENY, Content-Security-Policy: frame-ancestors \'none\', X-Content-Type-Options: nosniff, y X-XSS-Protection: 1; mode=block a todas las respuestas HTTP.'
         },
         'CWE-703': {
             'description': 'Uso de Exception genérico en conversiones de float() que puede ocultar errores inesperados.\n\nESTADO ACTUAL: ⚠️ MEJORADO PARCIALMENTE\n\n✅ MEJORAS IMPLEMENTADAS:\n- La validación de nombres (CWE-20) ya usa manejo estructurado de errores\n- Retorna códigos de error específicos (name_empty, name_too_long, invalid_name)\n- Manejo proactivo en lugar de reactivo (try/except)\n\n⚠️ PENDIENTE:\n- Líneas 38 y 96 en app/routes.py aún usan Exception genérico en conversiones de float()\n- app/static/js/sync.js línea 119 captura cualquier error sin diferenciar tipos\n\nAcción requerida:\n- Especificar excepciones específicas (ValueError, TypeError, KeyError) en lugar de Exception genérico\n- Agregar logging para debugging',
@@ -407,6 +407,10 @@ def update_findings(findings):
                 update_data = updates[cwe_name]
                 finding.description = update_data['description']
                 finding.mitigation = update_data['mitigation']
+                # Marcar CWE-1021 como resuelto
+                if cwe_name == 'CWE-1021':
+                    finding.active = False
+                    finding.verified = True
                 finding.save()
                 print(f"  ✓ {cwe_name} actualizado")
             except Exception as e:
@@ -482,9 +486,16 @@ def main():
         # Crear usuario admin
         create_admin_user()
         
+        # Verificar si se debe saltar la creación de findings (variable de entorno)
+        skip_findings = os.environ.get('DD_SKIP_FINDINGS', 'False').lower() in ('true', '1', 'yes')
+        
         # Verificar si la base de datos ya tiene datos
         # Si tiene datos (por ejemplo, de un dump cargado), saltar la creación de findings
-        if check_database_has_data():
+        if skip_findings or check_database_has_data():
+            if skip_findings:
+                print("")
+                print("ℹ️  Variable DD_SKIP_FINDINGS activada - Saltando creación de findings")
+            else:
             print("")
             print("ℹ️  La base de datos ya contiene datos (probablemente de un dump)")
             print("   Saltando creación de findings para evitar duplicados")

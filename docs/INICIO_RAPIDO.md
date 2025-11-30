@@ -19,8 +19,14 @@ cd medical_register
 
 ### 2. Configurar el Proyecto
 
+**En Linux/Mac o Git Bash (Windows):**
 ```bash
 ./scripts/setup.sh
+```
+
+**En PowerShell (Windows):**
+```powershell
+.\scripts\setup.ps1
 ```
 
 Este script:
@@ -30,16 +36,52 @@ Este script:
 
 ### 3. Arrancar los Servicios
 
-#### Solo la Aplicación Principal
+#### Opción A: Usando Make/make.ps1 (Recomendado)
 
+**En Linux/Mac o Git Bash (Windows):**
+```bash
+# Solo la aplicación principal (por defecto)
+make
+# o explícitamente:
+make default
+
+# Iniciar DefectDojo vacío (sin findings)
+make initDefectDojo
+
+# Despliegue completo con actualización de findings
+make update
+
+# Ver ayuda con todos los comandos
+make help
+```
+
+**En PowerShell (Windows):**
+```powershell
+# Solo la aplicación principal (por defecto)
+.\make.ps1
+# o explícitamente:
+.\make.ps1 default
+
+# Iniciar DefectDojo vacío (sin findings)
+.\make.ps1 initDefectDojo
+
+# Despliegue completo con actualización de findings
+.\make.ps1 update
+
+# Ver ayuda con todos los comandos
+.\make.ps1 help
+```
+
+#### Opción B: Usando docker-compose directamente
+
+**Solo la Aplicación Principal:**
 ```bash
 docker-compose up -d
 ```
 
 Accede a: **http://localhost:5001**
 
-#### Con DefectDojo (Gestión de Vulnerabilidades)
-
+**Con DefectDojo (Gestión de Vulnerabilidades):**
 ```bash
 # Arrancar DefectDojo y dependencias
 docker-compose --profile defectdojo up -d
@@ -73,7 +115,32 @@ Estos directorios se crean automáticamente y están en `.gitignore` (no se sube
 
 ## 🔧 Comandos Útiles
 
-### Ver Estado de los Servicios
+### Comandos Disponibles (Make/make.ps1)
+
+#### Comandos Principales
+
+| Comando | Descripción |
+|---------|-------------|
+| `make` / `.\make.ps1` | Arrancar solo la aplicación principal (por defecto) |
+| `make default` / `.\make.ps1 default` | Arrancar solo la aplicación principal |
+| `make initDefectDojo` / `.\make.ps1 initDefectDojo` | Iniciar DefectDojo vacío (sin findings) |
+| `make update` / `.\make.ps1 update` | Levantar aplicación y DefectDojo, y actualizar flujo de findings |
+| `make pdf_ASVS` / `.\make.ps1 pdf_ASVS` | Generar PDF del informe de seguridad ASVS con fecha |
+
+#### Comandos de Gestión
+
+| Comando | Descripción |
+|---------|-------------|
+| `make logs` / `.\make.ps1 logs` | Ver logs de la aplicación principal |
+| `make logs-defectdojo` / `.\make.ps1 logs-defectdojo` | Ver logs de DefectDojo |
+| `make ps` / `.\make.ps1 ps` | Ver estado de todos los contenedores |
+| `make down` / `.\make.ps1 down` | Detener todos los servicios |
+| `make check` / `.\make.ps1 check` | Verificar requisitos previos (Docker, Docker Compose) |
+| `make help` / `.\make.ps1 help` | Mostrar ayuda con todos los comandos |
+
+### Usando docker-compose directamente
+
+#### Ver Estado de los Servicios
 
 ```bash
 # Solo aplicación principal
@@ -83,7 +150,7 @@ docker-compose ps
 docker-compose --profile defectdojo ps
 ```
 
-### Ver Logs
+#### Ver Logs
 
 ```bash
 # Aplicación principal
@@ -93,7 +160,7 @@ docker-compose logs -f web
 docker-compose --profile defectdojo logs -f defectdojo
 ```
 
-### Detener Servicios
+#### Detener Servicios
 
 ```bash
 # Solo aplicación principal
@@ -103,7 +170,7 @@ docker-compose down
 docker-compose --profile defectdojo down
 ```
 
-### Reinicializar DefectDojo
+#### Reinicializar DefectDojo
 
 Si necesitas empezar de cero con DefectDojo:
 
@@ -112,7 +179,10 @@ Si necesitas empezar de cero con DefectDojo:
 docker-compose --profile defectdojo down
 
 # Eliminar datos (¡CUIDADO! Esto borra todo)
+# En Linux/Mac:
 rm -rf data/postgres/* data/redis/* data/defectdojo/*
+# En PowerShell (Windows):
+Remove-Item -Path "data\postgres\*", "data\redis\*", "data\defectdojo\*" -Recurse -Force
 
 # Arrancar de nuevo
 docker-compose --profile defectdojo up -d
@@ -166,8 +236,8 @@ docker-compose --profile defectdojo exec defectdojo python manage.py migrate
 ## 📚 Más Información
 
 - [Uso de Docker Compose](DOCKER_COMPOSE_USO.md)
-- [Configuración de DefectDojo](DEFECTDOJO_CONFIGURACION.md)
-- [Credenciales de DefectDojo](DEFECTDOJO_CREDENTIALS.md)
-- [Integración de DefectDojo](DEFECTDOJO_INTEGRATION.md)
+- [Configuración de DefectDojo](defectdojo/DEFECTDOJO_CONFIGURACION.md)
+- [Credenciales de DefectDojo](defectdojo/DEFECTDOJO_CREDENTIALS.md)
+- [Integración de DefectDojo](defectdojo/DEFECTDOJO_INTEGRATION.md)
 - [Configuración para Raspberry Pi](RASPBERRY_PI_SETUP.md)
 
