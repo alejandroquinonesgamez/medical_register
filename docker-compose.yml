@@ -25,6 +25,10 @@ services:
     build: .
     ports:
       - "5001:5001"
+    container_name: flask_medical_register
+    networks:
+      - proxy-network
+    restart: unless-stopped
     volumes:
       - .:/app
     environment:
@@ -45,6 +49,7 @@ services:
     build:
       context: .
       dockerfile: Dockerfile.test
+    restart: unless-stopped
     volumes:
       - .:/app
     command: npm test
@@ -56,6 +61,7 @@ services:
       - defectdojo
     image: postgres:15-alpine
     container_name: defectdojo-postgres
+    restart: unless-stopped
     environment:
       POSTGRES_USER: defectdojo
       POSTGRES_PASSWORD: defectdojo_password
@@ -80,6 +86,7 @@ services:
       - defectdojo
     image: redis:7-alpine
     container_name: defectdojo-redis
+    restart: unless-stopped
     ports:
       - "6379:6379"
     volumes:
@@ -101,6 +108,7 @@ services:
       - defectdojo
     image: defectdojo/defectdojo-django:latest
     container_name: defectdojo
+    restart: unless-stopped
     expose:
       - "8081"
     networks:
@@ -148,6 +156,7 @@ services:
       - defectdojo
     image: defectdojo/defectdojo-nginx:latest
     container_name: defectdojo-nginx
+    restart: unless-stopped
     ports:
       - "8080:8080"
     depends_on:
@@ -157,6 +166,7 @@ services:
       - ./data/defectdojo/static:/app/static
     networks:
       - defectdojo-network
+      - proxy-network
     healthcheck:
       test: ["CMD-SHELL", "wget --no-verbose --tries=1 --spider http://localhost:8080/ || exit 1"]
       interval: 60s
@@ -179,6 +189,7 @@ services:
       DD_SECRET_KEY: defectdojo_secret_key_change_in_production
       DD_DEBUG: "True"
       DD_ALLOWED_HOSTS: "*"
+    restart: unless-stopped
     depends_on:
       - defectdojo-db
       - defectdojo-redis
@@ -203,6 +214,7 @@ services:
       DD_SECRET_KEY: defectdojo_secret_key_change_in_production
       DD_DEBUG: "True"
       DD_ALLOWED_HOSTS: "*"
+    restart: unless-stopped
     depends_on:
       - defectdojo-db
       - defectdojo-redis
@@ -215,4 +227,5 @@ services:
 networks:
   defectdojo-network:
     driver: bridge
-
+  proxy-network:
+    external: true

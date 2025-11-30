@@ -46,3 +46,4 @@ data/*_db_dump.sql
 
 # Archivo .env (se crea automáticamente desde docker-compose.env.example)
 .env
+nul
