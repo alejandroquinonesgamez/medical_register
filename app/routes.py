@@ -1,6 +1,15 @@
 """
 Blueprint para las rutas de API REST
-Maneja todas las operaciones de la API (usuarios, pesos, IMC, estadísticas)
+
+Este módulo maneja todas las operaciones de la API REST de la aplicación médica:
+- Gestión de usuarios (crear, obtener, actualizar)
+- Gestión de entradas de peso (crear, obtener, listar, eliminar)
+- Cálculo de IMC y estadísticas
+- Configuración (límites de validación)
+- Integración con DefectDojo (exportar/importar dumps, generar PDF del informe ASVS)
+
+Todas las rutas están prefijadas con /api y devuelven respuestas JSON.
+Las validaciones incluyen sanitización de nombres (CWE-20 resuelto) y validación de tipos numéricos.
 """
 from flask import request, jsonify, Blueprint, current_app
 from datetime import datetime, date
@@ -287,7 +296,17 @@ def get_config():
 
 @api.route('/defectdojo/export-dump', methods=['GET'])
 def export_defectdojo_dump():
-    """Exportar el dump de la base de datos de DefectDojo"""
+    """
+    Exportar el dump de la base de datos de DefectDojo
+    
+    Ejecuta el script export_defectdojo_db.sh para crear un dump SQL de la base de datos
+    de DefectDojo y lo devuelve como descarga. El dump incluye todos los datos:
+    - Usuarios, productos, engagements, tests
+    - Findings (vulnerabilidades) con su estado actual
+    - Configuraciones y metadatos
+    
+    El dump se genera con fecha en el nombre: defectdojo_db_dump_YYYYMMDD_HHMMSS.sql
+    """
     import subprocess
     import os
     from flask import send_file
@@ -335,7 +354,18 @@ def export_defectdojo_dump():
 
 @api.route('/defectdojo/import-dump', methods=['POST'])
 def import_defectdojo_dump():
-    """Importar un dump de la base de datos de DefectDojo"""
+    """
+    Importar un dump de la base de datos de DefectDojo
+    
+    Permite cargar un dump SQL previamente exportado en la base de datos de DefectDojo.
+    Esto es útil para:
+    - Restaurar backups
+    - Cargar datos de otro entorno
+    - Migrar findings y configuraciones
+    
+    Después de importar el dump, reinicia DefectDojo para aplicar los cambios.
+    El archivo debe tener extensión .sql y se valida antes de importar.
+    """
     import subprocess
     import os
     from werkzeug.utils import secure_filename
@@ -412,7 +442,17 @@ def import_defectdojo_dump():
 
 @api.route('/defectdojo/generate-pdf', methods=['GET'])
 def generate_pdf_report():
-    """Generar PDF del informe de seguridad ASVS"""
+    """
+    Generar PDF del informe de seguridad ASVS y descargarlo
+    
+    Ejecuta el script generate_pdf_report.py que convierte el archivo Markdown
+    docs/INFORME_SEGURIDAD_ASVS.md a formato PDF.
+    
+    El PDF se guarda en docs/informes/ con el formato: INFORME_SEGURIDAD_ASVS_YYYYMMDD.pdf
+    y se descarga automáticamente al usuario.
+    
+    Usado por el botón "Generar PDF Informe" en la interfaz de usuario.
+    """
     import subprocess
     import os
     from flask import send_file

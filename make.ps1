@@ -1,15 +1,73 @@
 # Script PowerShell equivalente al Makefile
+#
+# Este script replica la funcionalidad del Makefile para usuarios de Windows/PowerShell.
+# Gestiona el despliegue y operación de la aplicación médica y DefectDojo.
+#
+# Características principales:
+# - Configuración automática de Docker Compose (incluyendo .env)
+# - Gestión de contenedores de la aplicación principal
+# - Gestión de servicios de DefectDojo (perfil defectdojo)
+# - Soluciona problemas con caracteres especiales en rutas mediante COMPOSE_PROJECT_NAME
+#
 # Uso: .\make.ps1 [comando]
-# Ejemplo: .\make.ps1 update
+# Ejemplos:
+#   .\make.ps1 help          # Mostrar ayuda
+#   .\make.ps1 default       # Arrancar aplicación principal
+#   .\make.ps1 up            # Arrancar aplicación + DefectDojo vacío
+#   .\make.ps1 update        # Arrancar todo y actualizar findings
 
 param(
     [Parameter(Position=0)]
     [string]$Command = "help"
 )
 
-# Variables de entorno para Docker Compose
-$env:COMPOSE_DOCKER_CLI_BUILD = "0"
-$env:DOCKER_BUILDKIT = "0"
+# Configurar variables de entorno para Docker Compose
+# Esto soluciona problemas con caracteres especiales en rutas
+function Initialize-DockerComposeEnv {
+    $envFile = Join-Path $PSScriptRoot ".env"
+    
+    # Si no existe .env, crearlo
+    if (-not (Test-Path $envFile)) {
+        $envExample = Join-Path $PSScriptRoot "docker-compose.env.example"
+        if (Test-Path $envExample) {
+            Copy-Item $envExample $envFile
+        } else {
+            # Crear .env básico
+            @"
+COMPOSE_PROJECT_NAME=medical_register
+COMPOSE_DOCKER_CLI_BUILD=0
+DOCKER_BUILDKIT=0
+"@ | Out-File -FilePath $envFile -Encoding UTF8
+        }
+    }
+    
+    # Cargar variables de entorno desde .env
+    if (Test-Path $envFile) {
+        Get-Content $envFile | ForEach-Object {
+            if ($_ -match '^([^#][^=]+)=(.*)$') {
+                $key = $matches[1].Trim()
+                $value = $matches[2].Trim()
+                if ($key -and $value) {
+                    [Environment]::SetEnvironmentVariable($key, $value, "Process")
+                }
+            }
+        }
+    }
+    
+    # Valores por defecto si no están en .env
+    if (-not $env:COMPOSE_DOCKER_CLI_BUILD) {
+        $env:COMPOSE_DOCKER_CLI_BUILD = "0"
+    }
+    if (-not $env:DOCKER_BUILDKIT) {
+        $env:DOCKER_BUILDKIT = "0"
+    }
+    if (-not $env:COMPOSE_PROJECT_NAME) {
+        $env:COMPOSE_PROJECT_NAME = "medical_register"
+    }
+}
+
+# Inicializar entorno de Docker Compose al cargar el script
+Initialize-DockerComposeEnv
 
 function Test-Requirements {
     Write-Host "Verificando requisitos previos..." -ForegroundColor Cyan
@@ -85,8 +143,10 @@ function Show-Help {
     Write-Host ""
     Write-Host "  default          " -NoNewline -ForegroundColor Yellow
     Write-Host "Arrancar solo la aplicacion principal (por defecto)"
+    Write-Host "  up               " -NoNewline -ForegroundColor Yellow
+    Write-Host "Arrancar aplicacion principal y DefectDojo vacio (sin findings)"
     Write-Host "  initDefectDojo   " -NoNewline -ForegroundColor Yellow
-    Write-Host "Iniciar DefectDojo vacio (sin findings)"
+    Write-Host "Iniciar solo DefectDojo vacio (sin findings)"
     Write-Host "  update           " -NoNewline -ForegroundColor Yellow
     Write-Host "Levantar aplicacion y DefectDojo, y actualizar flujo de findings"
     Write-Host "  logs             " -NoNewline -ForegroundColor Yellow
@@ -99,6 +159,10 @@ function Show-Help {
     Write-Host "Detener todos los servicios"
     Write-Host "  pdf_ASVS         " -NoNewline -ForegroundColor Yellow
     Write-Host "Generar PDF del informe de seguridad ASVS con fecha"
+    Write-Host "  clean-temp       " -NoNewline -ForegroundColor Yellow
+    Write-Host "Limpiar archivos temporales del proyecto"
+    Write-Host "  clean-all        " -NoNewline -ForegroundColor Yellow
+    Write-Host "Limpiar TODO y volver al estado como recien clonado (DESTRUCTIVO)"
     Write-Host "  check            " -NoNewline -ForegroundColor Yellow
     Write-Host "Verificar requisitos previos (Docker, Docker Compose)"
     Write-Host "  help             " -NoNewline -ForegroundColor Yellow
@@ -108,6 +172,7 @@ function Show-Help {
     Write-Host "  .\make.ps1                # Muestra la ayuda"
     Write-Host "  .\make.ps1 check          # Verifica requisitos"
     Write-Host "  .\make.ps1 default        # Arranca la aplicacion principal"
+    Write-Host "  .\make.ps1 up             # Arranca aplicacion principal + DefectDojo vacio"
     Write-Host "  .\make.ps1 update         # Despliegue completo y actualizacion"
     Write-Host ""
 }
@@ -120,8 +185,54 @@ function Start-Default {
     Write-Host "Accede a la aplicacion en: http://localhost:5001" -ForegroundColor Cyan
 }
 
+function Start-Up {
+    Write-Host "Arrancando aplicacion principal y DefectDojo vacio..." -ForegroundColor Cyan
+    Write-Host ""
+    
+    # Paso 1: Arrancar aplicacion principal
+    Write-Host "Paso 1/3: Arrancando aplicacion principal..." -ForegroundColor Yellow
+    docker-compose up -d
+    Write-Host "   Aplicacion principal arrancada" -ForegroundColor Green
+    Write-Host ""
+    
+    # Paso 2: Arrancar DefectDojo vacio
+    Write-Host "Paso 2/3: Arrancando servicios de DefectDojo..." -ForegroundColor Yellow
+    $env:DD_SKIP_FINDINGS = "True"
+    docker-compose --profile defectdojo up -d
+    Write-Host ""
+    Write-Host "Esperando 60 segundos a que DefectDojo este listo..." -ForegroundColor Yellow
+    Write-Host "   (Esto puede tardar en la primera ejecucion...)" -ForegroundColor Gray
+    Start-Sleep -Seconds 60
+    Write-Host ""
+    
+    # Paso 3: Inicializar DefectDojo vacio
+    Write-Host "Paso 3/3: Inicializando DefectDojo sin crear findings..." -ForegroundColor Yellow
+    Write-Host "   (Solo migraciones, admin user y archivos estaticos)" -ForegroundColor Gray
+    
+    $scriptPath = Join-Path $PSScriptRoot "scripts\init_defectdojo_empty.py"
+    if (Test-Path $scriptPath) {
+        docker cp $scriptPath defectdojo:/tmp/init_defectdojo_empty.py 2>$null
+        if ($LASTEXITCODE -ne 0) {
+            Write-Host "   Reintentando..." -ForegroundColor Gray
+            Start-Sleep -Seconds 5
+            docker cp $scriptPath defectdojo:/tmp/init_defectdojo_empty.py
+        }
+        docker-compose --profile defectdojo exec -T defectdojo python3 /tmp/init_defectdojo_empty.py 2>&1
+    } else {
+        Write-Host "   DefectDojo puede estar ya inicializado (esto es normal)" -ForegroundColor Yellow
+    }
+    
+    Write-Host ""
+    Write-Host "Aplicacion principal y DefectDojo vacio arrancados" -ForegroundColor Green
+    Write-Host ""
+    Write-Host "Accede a:" -ForegroundColor Cyan
+    Write-Host "   Aplicacion: http://localhost:5001" -ForegroundColor White
+    Write-Host "   DefectDojo: http://localhost:8080" -ForegroundColor White
+    Write-Host "   Usuario: admin | Contrasena: admin" -ForegroundColor White
+}
+
 function Start-InitDefectDojo {
-    Write-Host "Iniciando DefectDojo vacio (sin findings)..." -ForegroundColor Cyan
+    Write-Host "Iniciando solo DefectDojo vacio (sin findings)..." -ForegroundColor Cyan
     Write-Host ""
     Write-Host "Nota: Se iniciara DefectDojo pero sin crear findings automaticamente" -ForegroundColor Yellow
     Write-Host ""
@@ -183,33 +294,26 @@ function Start-Update {
     Write-Host "   DefectDojo listo" -ForegroundColor Green
     Write-Host ""
     
-    # Paso 3: Actualizar flujo de findings
+    # Paso 3: Actualizar flujo de findings usando script consolidado
     Write-Host "Paso 3/3: Actualizando flujo de findings con fechas historicas..." -ForegroundColor Yellow
     
-    $bashPath = Get-Command bash -ErrorAction SilentlyContinue
-    if ($bashPath) {
-        & bash scripts/mark_findings_resolved_with_dates.sh
+    $defectdojoRunning = docker ps | Select-String "defectdojo"
+    if (-not $defectdojoRunning) {
+        Write-Host "   DefectDojo no esta corriendo. Reiniciando..." -ForegroundColor Yellow
+        docker-compose --profile defectdojo up -d defectdojo
+        Start-Sleep -Seconds 10
+    }
+    
+    $scriptPath = Join-Path $PSScriptRoot "scripts\manage_findings.py"
+    if (Test-Path $scriptPath) {
+        Write-Host "   Copiando script consolidado al contenedor..." -ForegroundColor Gray
+        docker cp $scriptPath defectdojo:/tmp/manage_findings.py
+        
+        Write-Host "   Ejecutando script consolidado en DefectDojo..." -ForegroundColor Gray
+        docker-compose --profile defectdojo exec -T defectdojo python3 /tmp/manage_findings.py
     } else {
-        Write-Host "   bash no esta disponible. Ejecutando comandos directamente..." -ForegroundColor Yellow
-        
-        $defectdojoRunning = docker ps | Select-String "defectdojo"
-        if (-not $defectdojoRunning) {
-            Write-Host "   DefectDojo no esta corriendo. Reiniciando..." -ForegroundColor Yellow
-            docker-compose --profile defectdojo up -d defectdojo
-            Start-Sleep -Seconds 10
-        }
-        
-        $scriptPath = Join-Path $PSScriptRoot "scripts\resolve_findings_with_dates.py"
-        if (Test-Path $scriptPath) {
-            Write-Host "   Copiando script al contenedor..." -ForegroundColor Gray
-            docker cp $scriptPath defectdojo:/tmp/resolve_findings_with_dates.py
-            
-            Write-Host "   Ejecutando script en DefectDojo..." -ForegroundColor Gray
-            docker-compose --profile defectdojo exec -T defectdojo python3 /tmp/resolve_findings_with_dates.py
-        } else {
-            Write-Host "   Error: No se encontro el script: $scriptPath" -ForegroundColor Red
-            exit 1
-        }
+        Write-Host "   Error: No se encontro el script: $scriptPath" -ForegroundColor Red
+        exit 1
     }
     
     Write-Host ""
@@ -275,10 +379,39 @@ function Generate-PDFReport {
     }
 }
 
+function Clean-Temp {
+    Write-Host "Limpiando archivos temporales..." -ForegroundColor Cyan
+    Write-Host ""
+    
+    $scriptPath = Join-Path $PSScriptRoot "scripts\clean_temp.ps1"
+    if (Test-Path $scriptPath) {
+        & $scriptPath
+    } else {
+        Write-Host "Error: No se encontro el script: $scriptPath" -ForegroundColor Red
+        exit 1
+    }
+}
+
+function Clean-All {
+    Write-Host "Ejecutando limpieza completa (DESTRUCTIVO)..." -ForegroundColor Yellow
+    Write-Host ""
+    
+    $scriptPath = Join-Path $PSScriptRoot "scripts\clean_all.ps1"
+    if (Test-Path $scriptPath) {
+        & $scriptPath
+    } else {
+        Write-Host "Error: No se encontro el script: $scriptPath" -ForegroundColor Red
+        exit 1
+    }
+}
+
 # Ejecutar el comando solicitado
 switch ($Command.ToLower()) {
     "default" {
         Start-Default
+    }
+    "up" {
+        Start-Up
     }
     "initdefectdojo" {
         Start-InitDefectDojo
@@ -306,6 +439,18 @@ switch ($Command.ToLower()) {
     }
     "pdf_ASVS" {
         Generate-PDFReport
+    }
+    "clean-temp" {
+        Clean-Temp
+    }
+    "cleantemp" {
+        Clean-Temp
+    }
+    "clean-all" {
+        Clean-All
+    }
+    "cleanall" {
+        Clean-All
     }
     "help" {
         Show-Help

@@ -1,3 +1,15 @@
+"""
+Funciones auxiliares para la aplicación médica
+
+Este módulo contiene funciones de utilidad para:
+- Cálculo de IMC (Índice de Masa Corporal)
+- Clasificación de IMC según categorías de la OMS
+- Validación y sanitización de nombres (resuelve CWE-20)
+  - Valida longitud (1-100 caracteres)
+  - Elimina caracteres peligrosos (< > " ')
+  - Normaliza espacios múltiples
+  - Valida caracteres permitidos (letras Unicode, espacios, guiones, apóstrofes)
+"""
 import re
 from .translations import get_bmi_complete_description
 

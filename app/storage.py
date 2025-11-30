@@ -1,5 +1,23 @@
 """
 Sistema de almacenamiento abstracto
+
+Este módulo define la interfaz abstracta y las clases de datos (DTOs) para el sistema
+de almacenamiento de la aplicación. Proporciona:
+
+1. Clases de datos (DTOs):
+   - UserData: Representa los datos de un usuario (nombre, apellidos, fecha de nacimiento, altura)
+   - WeightEntryData: Representa una entrada de peso con fecha y hora
+
+2. Interfaz abstracta StorageInterface:
+   - Define los métodos que debe implementar cualquier almacenamiento (memoria, base de datos, etc.)
+
+3. Implementación concreta MemoryStorage:
+   - Almacenamiento en memoria (diccionarios Python)
+   - Los datos se pierden al reiniciar el servidor
+   - Útil para desarrollo y pruebas
+
+El sistema está diseñado para ser extensible, permitiendo implementar almacenamiento
+persistente (base de datos, archivos, etc.) sin cambiar el código que lo usa.
 """
 from abc import ABC, abstractmethod
 from datetime import datetime, date

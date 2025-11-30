@@ -1,6 +1,19 @@
 #!/usr/bin/env python3
 """
-Script para generar el PDF del informe de seguridad con fecha en el nombre.
+Script para generar el PDF del informe de seguridad ASVS con fecha en el nombre.
+
+Lee el archivo docs/INFORME_SEGURIDAD_ASVS.md y lo convierte a PDF.
+El PDF se guarda en docs/informes/ con el formato: INFORME_SEGURIDAD_ASVS_YYYYMMDD.pdf
+
+Intenta usar múltiples métodos de conversión (en orden de preferencia):
+1. markdown2pdf
+2. markdown + weasyprint
+3. markdown + reportlab
+4. pandoc (si está instalado en el sistema)
+
+Usado por:
+- make pdf_ASVS / .\make.ps1 pdf_ASVS
+- Endpoint /api/defectdojo/generate-pdf
 """
 
 import os

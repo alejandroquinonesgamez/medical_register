@@ -1,7 +1,17 @@
 #!/usr/bin/env python3
 """
 Script para generar imágenes PNG desde archivos Mermaid (.mmd)
-Usa la API pública de mermaid.ink para convertir el diagrama a PNG
+
+Convierte diagramas Mermaid (.mmd) a imágenes PNG usando la API pública de mermaid.ink.
+No requiere instalación local de Node.js ni Mermaid CLI.
+
+Uso:
+    python scripts/generate_mermaid_image.py <archivo.mmd> [archivo.png]
+
+Ejemplo:
+    python scripts/generate_mermaid_image.py docs/mockups/user-manual.mmd
+
+Si no se especifica la ruta de salida, usa el mismo nombre del archivo con extensión .png.
 """
 
 import os

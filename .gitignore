@@ -43,3 +43,6 @@ data/defectdojo/
 data/*_db_dump.sql
 *.sql
 !data/defectdojo_db_initial.sql
+
+# Archivo .env (se crea automáticamente desde docker-compose.env.example)
+.env

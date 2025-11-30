@@ -1,6 +1,14 @@
 """
 Archivo de configuración de la aplicación
-Centraliza todos los valores de configuración y constantes
+
+Centraliza todos los valores de configuración y constantes de la aplicación:
+- Límites de validación para altura, peso, nombres y fechas
+- Configuración del servidor (host, puerto)
+- Configuración de idioma (actualmente solo español)
+- ID de usuario (aplicación monousuario, USER_ID = 1)
+
+Estos valores se sincronizan con el frontend mediante el endpoint /api/config
+y se usan para validaciones tanto en backend como frontend.
 """
 from datetime import datetime
 

@@ -31,8 +31,11 @@ cd medical_register
 
 Este script:
 - ✅ Crea los directorios necesarios (`data/`)
+- ✅ Configura automáticamente el archivo `.env` para Docker Compose (soluciona problemas con caracteres especiales)
 - ✅ Verifica que Docker esté instalado
 - ✅ Construye la imagen de la aplicación
+
+> **Nota**: Si no ejecutas el script de setup, el archivo `.env` se creará automáticamente la primera vez que uses `make` o `make.ps1`. Esto soluciona problemas con rutas que contienen caracteres especiales.
 
 ### 3. Arrancar los Servicios
 

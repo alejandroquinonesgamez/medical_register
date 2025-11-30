@@ -1,7 +1,17 @@
 #!/usr/bin/env python
 """
 Script de inicialización interna de DefectDojo
-Se ejecuta dentro del contenedor al arrancar
+
+Este script se ejecuta dentro del contenedor de DefectDojo al arrancar.
+Realiza las siguientes tareas:
+1. Espera a que la base de datos esté lista
+2. Ejecuta migraciones de Django
+3. Recolecta archivos estáticos
+4. Crea/verifica el usuario admin
+5. Gestiona findings usando el script consolidado manage_findings.py
+   (o salta la creación si DD_SKIP_FINDINGS está activado o la BD tiene datos)
+
+Se ejecuta automáticamente al iniciar el contenedor defectdojo mediante docker-compose.
 """
 import os
 import sys
@@ -38,7 +48,7 @@ def wait_for_db(max_retries=30, delay=2):
             if i < 3 or i % 5 == 0:
                 print(f"   Intento {i+1}/{max_retries}... ({str(e)[:50]})")
         time.sleep(delay)
-    print("❌ Error: No se pudo conectar a la base de datos después de {max_retries} intentos")
+    print(f"❌ Error: No se pudo conectar a la base de datos después de {max_retries} intentos")
     return False
 
 def check_migrations_needed():
@@ -146,8 +156,8 @@ def setup_test_and_engagement():
             name='CWE-699 Analysis',
             product=product,
             defaults={
-                'target_start': date(2024, 1, 1),
-                'target_end': date(2024, 12, 31),
+                'target_start': date(2025, 11, 1),  # 1 de noviembre de 2025
+                'target_end': date(2026, 6, 1),      # 1 de junio de 2026
                 'status': 'In Progress',
                 'lead': admin_user
             }
@@ -155,7 +165,7 @@ def setup_test_and_engagement():
         
         # Crear o obtener Test Type y Environment si no existen
         from dojo.models import Test_Type, Development_Environment
-        test_type, _ = Test_Type.objects.get_or_create(name='Static Analysis')
+        test_type, _ = Test_Type.objects.get_or_create(name='CWE-699')
         environment, _ = Development_Environment.objects.get_or_create(name='Development')
         
         # Crear o obtener Test (usar get_or_create para evitar duplicados)
@@ -164,8 +174,8 @@ def setup_test_and_engagement():
             engagement=engagement,
             test_type=test_type,
             defaults={
-                'target_start': date(2024, 1, 1),
-                'target_end': date(2024, 12, 31),
+                'target_start': date(2025, 11, 1),  # 1 de noviembre de 2025
+                'target_end': date(2026, 6, 1),     # 1 de junio de 2026
                 'environment': environment,
                 'lead': admin_user
             }
@@ -496,34 +506,42 @@ def main():
                 print("")
                 print("ℹ️  Variable DD_SKIP_FINDINGS activada - Saltando creación de findings")
             else:
-            print("")
-            print("ℹ️  La base de datos ya contiene datos (probablemente de un dump)")
-            print("   Saltando creación de findings para evitar duplicados")
+                print("")
+                print("ℹ️  La base de datos ya contiene datos (probablemente de un dump)")
+                print("   Saltando creación de findings para evitar duplicados")
             print("")
             print("✅ Inicialización completada")
             return 0
         
-        # Configurar Test y Engagement para findings
+        # Usar el script consolidado de gestión de findings
         print("")
-        test, engagement, admin_user = setup_test_and_engagement()
-        
-        if test and admin_user:
-            # Crear findings
-            print("")
-            findings = create_findings(test, admin_user)
-            
-            if findings:
-                # Actualizar findings con información detallada
-                print("")
-                update_findings(findings)
-                
-                # Marcar findings como resueltos
-                print("")
-                mark_findings_resolved(findings)
+        print("📋 Ejecutando script consolidado de gestión de findings...")
+        try:
+            import subprocess
+            result = subprocess.run(
+                ['python3', '/app/manage_findings.py'],
+                cwd='/app',
+                capture_output=True,
+                text=True,
+                timeout=300
+            )
+            if result.returncode == 0:
+                print(result.stdout)
+                print("✅ Findings gestionados correctamente")
             else:
-                print("⚠️  No se crearon findings")
-        else:
-            print("⚠️  No se pudo configurar Test/Engagement, saltando creación de findings")
+                print("⚠️  Error ejecutando script de findings:")
+                print(result.stderr)
+                print(result.stdout)
+        except Exception as e:
+            print(f"⚠️  Error ejecutando script consolidado: {e}")
+            # Fallback: usar el método antiguo
+            print("   Usando método de creación antiguo como fallback...")
+            test, engagement, admin_user = setup_test_and_engagement()
+            if test and admin_user:
+                findings = create_findings(test, admin_user)
+                if findings:
+                    update_findings(findings)
+                    mark_findings_resolved(findings)
         
         print("")
         print("✅ Inicialización completada")

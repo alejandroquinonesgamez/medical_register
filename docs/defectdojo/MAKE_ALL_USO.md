@@ -1,51 +1,43 @@
-# Uso de `make all` - Flujo Completo de DefectDojo
+# Uso de `make update` - Flujo Completo de DefectDojo
 
 ## 📋 Descripción
 
-El comando `make all` ejecuta el flujo completo para configurar DefectDojo con el historial de creación → resolución de findings.
+El comando `make update` (o `.\make.ps1 update` en PowerShell) ejecuta el flujo completo para configurar DefectDojo con el historial de creación → resolución de findings.
 
-## 🎯 ¿Qué hace `make all`?
+## 🎯 ¿Qué hace `make update`?
 
 El comando ejecuta automáticamente:
 
-1. **Paso 1**: Arranca DefectDojo (esto crea todos los findings como **activos/pendientes**)
-2. **Paso 2**: Espera 60 segundos para que DefectDojo esté completamente inicializado
-3. **Paso 3**: Marca los findings resueltos como **resueltos** con sus fechas históricas
+1. **Paso 1**: Verifica y arranca la aplicación principal si es necesario
+2. **Paso 2**: Verifica y arranca DefectDojo si es necesario (esto crea todos los findings como **activos/pendientes**)
+3. **Paso 3**: Ejecuta el script consolidado `manage_findings.py` que:
+   - Crea/actualiza todos los findings
+   - Marca los findings resueltos (CWE-20, CWE-1021) como **resueltos** con sus fechas históricas
 
 ## 🚀 Uso
 
 ### En Linux/Mac o Git Bash (Windows)
 
 ```bash
-make all
+make update
 ```
 
-### En PowerShell (Windows) - Alternativa
+### En PowerShell (Windows)
 
 Si `make` no está disponible, puedes usar el script PowerShell equivalente:
 
 ```powershell
-.\scripts\resolve_findings_all.ps1
+.\make.ps1 update
 ```
 
-O ejecutar los pasos manualmente:
-
-```powershell
-# Paso 1: Arrancar DefectDojo
-$env:COMPOSE_DOCKER_CLI_BUILD="0"
-$env:DOCKER_BUILDKIT="0"
-docker-compose --profile defectdojo up -d
-
-# Paso 2: Esperar (60 segundos)
-Start-Sleep -Seconds 60
-
-# Paso 3: Marcar findings como resueltos
-.\scripts\mark_findings_resolved_with_dates.sh
-```
+Este comando hace exactamente lo mismo que `make update`:
+1. Verifica y arranca la aplicación principal si es necesario
+2. Verifica y arranca DefectDojo si es necesario
+3. Ejecuta el script consolidado `manage_findings.py` para gestionar todos los findings
 
 ## 📅 Fechas que se Establecen
 
-Después de ejecutar `make all`, los findings tendrán:
+Después de ejecutar `make update`, los findings tendrán:
 
 ### CWE-20 (Validación de entrada)
 - **Fecha de creación**: 2025-11-10
@@ -61,7 +53,7 @@ Después de ejecutar `make all`, los findings tendrán:
 
 ## ✅ Resultado
 
-Después de ejecutar `make all`:
+Después de ejecutar `make update`:
 
 1. **Todos los findings están creados** como activos inicialmente
 2. **CWE-20 y CWE-1021 están marcados como resueltos** con:
@@ -94,17 +86,18 @@ En cada finding podrás ver:
 
 ### Si el script falla al marcar como resueltos
 
-Si después de ejecutar `make all` los findings no están marcados como resueltos:
+Si después de ejecutar `make update` los findings no están marcados como resueltos:
 
 ```bash
-# Esperar un poco más y ejecutar solo el paso de resolución
-make resolve-findings
+# Esperar un poco más y volver a ejecutar
+make update
 ```
 
-O manualmente:
+O ejecutar el script consolidado manualmente:
 
 ```bash
-bash scripts/mark_findings_resolved_with_dates.sh
+docker cp scripts/manage_findings.py defectdojo:/tmp/manage_findings.py
+docker-compose --profile defectdojo exec -T defectdojo python3 /tmp/manage_findings.py
 ```
 
 ### Si DefectDojo tarda mucho en iniciar
@@ -113,7 +106,7 @@ El script espera 60 segundos. Si DefectDojo tarda más:
 
 1. Verifica los logs: `make logs-defectdojo`
 2. Espera hasta que esté listo
-3. Ejecuta solo: `make resolve-findings`
+3. Vuelve a ejecutar: `make update`
 
 ### Verificar estado de los contenedores
 
@@ -136,7 +129,13 @@ docker-compose --profile defectdojo ps
 ## 🎉 Comando Completo
 
 ```bash
-make all
+make update
+```
+
+O en PowerShell:
+
+```powershell
+.\make.ps1 update
 ```
 
 ¡Y listo! El flujo completo se ejecutará automáticamente.

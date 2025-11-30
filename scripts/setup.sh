@@ -1,6 +1,14 @@
 #!/bin/bash
 # Script de configuración inicial del proyecto
-# Prepara el entorno para usar la aplicación
+#
+# Prepara el entorno para usar la aplicación médica. Realiza:
+# 1. Crea directorios de datos necesarios (data/postgres, data/redis, data/defectdojo)
+# 2. Configura el archivo .env para Docker Compose (soluciona problemas con caracteres especiales)
+# 3. Verifica que Docker y Docker Compose estén instalados
+# 4. Construye la imagen de la aplicación
+#
+# Este script se ejecuta automáticamente al clonar el repositorio
+# y debe ejecutarse antes de usar make o docker-compose.
 
 set -e
 
@@ -36,8 +44,43 @@ fi
 echo "✅ Docker y docker-compose detectados"
 echo ""
 
+# Configurar archivo .env para Docker Compose (soluciona problemas con caracteres especiales)
+echo "⚙️  Configurando Docker Compose..."
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+PROJECT_ROOT="$(cd "$SCRIPT_DIR/.." && pwd)"
+ENV_FILE="$PROJECT_ROOT/.env"
+ENV_EXAMPLE="$PROJECT_ROOT/docker-compose.env.example"
+
+if [ ! -f "$ENV_FILE" ]; then
+    if [ -f "$ENV_EXAMPLE" ]; then
+        cp "$ENV_EXAMPLE" "$ENV_FILE"
+        echo "  ✓ Archivo .env creado desde docker-compose.env.example"
+    else
+        # Crear .env básico
+        cat > "$ENV_FILE" <<EOF
+COMPOSE_PROJECT_NAME=medical_register
+COMPOSE_DOCKER_CLI_BUILD=0
+DOCKER_BUILDKIT=0
+EOF
+        echo "  ✓ Archivo .env creado con configuración básica"
+    fi
+else
+    echo "  ℹ️  Archivo .env ya existe"
+fi
+
+echo "✅ Docker Compose configurado"
+echo ""
+
 # Construir imagen de la aplicación principal
 echo "🔨 Construyendo imagen de la aplicación..."
+
+# Cargar variables de entorno desde .env si existe
+if [ -f "$ENV_FILE" ]; then
+    set -a
+    source "$ENV_FILE"
+    set +a
+fi
+
 docker-compose build web
 
 echo ""

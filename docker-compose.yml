@@ -1,3 +1,25 @@
+# Docker Compose - Aplicación Médica con DefectDojo
+#
+# Este archivo define todos los servicios Docker de la aplicación:
+#
+# SERVICIOS PRINCIPALES (sin perfil, se arrancan por defecto):
+# - web: Aplicación Flask principal (puerto 5001)
+#
+# SERVICIOS CON PERFIL "tests" (solo con --profile tests o docker-compose run):
+# - frontend-tests: Ejecución de tests del frontend
+#
+# SERVICIOS CON PERFIL "defectdojo" (solo con --profile defectdojo):
+# - defectdojo-db: Base de datos PostgreSQL para DefectDojo
+# - defectdojo-redis: Redis para cache y tareas asíncronas
+# - defectdojo: Servidor principal de DefectDojo (Django)
+# - defectdojo-nginx: Servidor web Nginx para servir archivos estáticos (puerto 8080)
+# - defectdojo-celeryworker: Worker de Celery para tareas asíncronas
+# - defectdojo-celerybeat: Scheduler de Celery para tareas programadas
+#
+# NOTA: El servicio defectdojo ejecuta automáticamente init_defectdojo_internal.py
+# al arrancar para inicializar la base de datos y crear findings si es necesario.
+# Usa la variable DD_SKIP_FINDINGS=True para saltar la creación de findings.
+
 services:
   web:
     build: .
@@ -16,7 +38,10 @@ services:
 
   # Servicio opcional para ejecutar tests del frontend
   # Uso: docker-compose run --rm frontend-tests
+  # Perfil: tests - Solo se arranca con --profile tests o explícitamente con run
   frontend-tests:
+    profiles:
+      - tests
     build:
       context: .
       dockerfile: Dockerfile.test
@@ -107,6 +132,7 @@ services:
       - ./data/defectdojo/media:/app/media
       - ./data/defectdojo/static:/app/static
       - ./scripts/init_defectdojo_internal.py:/app/init_defectdojo.py:ro
+      - ./scripts/manage_findings.py:/app/manage_findings.py:ro
     entrypoint: ["/bin/sh", "-c", "python /app/init_defectdojo.py && exec /entrypoint-uwsgi.sh"]
     healthcheck:
       test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8081/')"]

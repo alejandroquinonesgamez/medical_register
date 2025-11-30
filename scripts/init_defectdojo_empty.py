@@ -1,7 +1,21 @@
 #!/usr/bin/env python
 """
 Script de inicialización de DefectDojo SIN crear findings
-Se ejecuta dentro del contenedor para inicializar DefectDojo vacío
+
+Este script inicializa DefectDojo sin crear findings automáticamente.
+Realiza las siguientes tareas:
+1. Espera a que la base de datos esté lista
+2. Ejecuta migraciones de Django
+3. Recolecta archivos estáticos
+4. Crea/verifica el usuario admin
+
+NO crea findings. Útil para:
+- Iniciar DefectDojo vacío (usado por make initDefectDojo)
+- Permitir creación manual de findings
+- Evitar duplicados si ya se cargaron datos desde un dump
+
+Se ejecuta cuando se usa la variable de entorno DD_SKIP_FINDINGS=True
+o cuando se llama manualmente desde init_defectdojo_empty.py.
 """
 import os
 import sys
@@ -10,7 +24,16 @@ import time
 # Cambiar al directorio de la aplicación primero
 os.chdir('/app')
 
-# Configurar Django
+# Configurar Django antes de importarlo
+# Asegurar que el módulo dojo esté en el PYTHONPATH
+if '/app' not in sys.path:
+    sys.path.insert(0, '/app')
+
+# Configurar DJANGO_SETTINGS_MODULE antes de importar django
+if 'DJANGO_SETTINGS_MODULE' not in os.environ:
+    os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'dojo.settings.settings')
+
+# Importar Django después de configurar el entorno
 import django
 
 def wait_for_db(max_retries=30, delay=2):
