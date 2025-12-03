@@ -28,3 +28,34 @@ app.db
 # Node artifacts (if any)
 node_modules/
 
+# Docker volumes and persistent data (no needed in build context)
+data/
+*.sql
+*.db
+*.sqlite
+*.sqlite3
+
+# Documentation build artifacts
+docs/_build/
+docs/_static/
+
+# Test artifacts
+.coverage
+htmlcov/
+.pytest_cache/
+.coverage.*
+
+# CI/CD
+.github/
+
+# Temporary files
+*.tmp
+*.temp
+*.swp
+*.swo
+*~
+
+# OS files
+Thumbs.db
+.DS_Store
+

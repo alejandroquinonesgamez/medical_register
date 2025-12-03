@@ -13,7 +13,7 @@
 # Uso: make [comando]
 # Ejemplo: make help
 
-.PHONY: help initDefectDojo update up logs logs-defectdojo ps down pdf_ASVS setup-env clean-temp clean-all purge
+.PHONY: help initDefectDojo update up build build-defectdojo logs logs-defectdojo ps down pdf_ASVS setup-env clean-temp clean-all purge
 
 # Variables
 # Cargar .env si existe para configurar COMPOSE_PROJECT_NAME
@@ -64,7 +64,8 @@ setup-env:
 .DEFAULT_GOAL := default
 default: setup-env ## Arrancar solo la aplicación principal (por defecto)
 	@echo "🚀 Arrancando aplicación principal..."
-	$(COMPOSE) up -d
+	@echo "   (Construyendo imágenes si es necesario...)"
+	$(COMPOSE) up -d --build
 	@echo ""
 	@echo "✅ Aplicación principal arrancada"
 	@echo "📊 Accede a la aplicación en: http://localhost:5001"
@@ -76,10 +77,14 @@ help: ## Mostrar esta ayuda
 	@echo ""
 	@echo "Ejemplos:"
 	@echo "  make                # Muestra la ayuda"
-	@echo "  make check          # Verifica requisitos"
 	@echo "  make default        # Arranca la aplicación principal"
 	@echo "  make up             # Arranca aplicación principal + DefectDojo vacío"
+	@echo "  make initDefectDojo # Inicia solo DefectDojo vacío"
 	@echo "  make update         # Despliegue completo y actualización"
+	@echo "  make logs           # Ver logs de la aplicación"
+	@echo "  make logs-defectdojo # Ver logs de DefectDojo"
+	@echo "  make ps             # Ver estado de contenedores"
+	@echo "  make down           # Detener todos los servicios"
 	@echo "  make clean-temp     # Limpia archivos temporales"
 	@echo "  make clean-all      # Limpieza completa (DESTRUCTIVO)"
 	@echo "  make purge          # Detener servicios y limpiar TODO (DESTRUCTIVO)"
@@ -89,11 +94,12 @@ up: setup-env ## Levantar aplicación principal y DefectDojo vacío (sin finding
 	@echo "🚀 Arrancando aplicación principal y DefectDojo vacío..."
 	@echo ""
 	@echo "Paso 1/3: Arrancando aplicación principal..."
-	@$(COMPOSE) up -d
+	@echo "   (Construyendo imágenes si es necesario...)"
+	@$(COMPOSE) up -d --build
 	@echo "   ✓ Aplicación principal arrancada"
 	@echo ""
 	@echo "Paso 2/3: Arrancando servicios de DefectDojo..."
-	@DD_SKIP_FINDINGS=True $(COMPOSE) --profile defectdojo up -d
+	@DD_SKIP_FINDINGS=True $(COMPOSE) --profile defectdojo up -d --build
 	@echo ""
 	@echo "⏳ Esperando 60 segundos a que DefectDojo esté listo..."
 	@echo "   (Esto puede tardar en la primera ejecución...)"
@@ -119,7 +125,8 @@ initDefectDojo: setup-env ## Iniciar solo DefectDojo vacío (sin findings)
 	@echo "ℹ️  Nota: Se iniciará DefectDojo pero sin crear findings automáticamente"
 	@echo ""
 	@echo "Paso 1/2: Arrancando servicios de DefectDojo..."
-	@DD_SKIP_FINDINGS=True $(COMPOSE) --profile defectdojo up -d
+	@echo "   (Construyendo imágenes si es necesario...)"
+	@DD_SKIP_FINDINGS=True $(COMPOSE) --profile defectdojo up -d --build
 	@echo ""
 	@echo "⏳ Esperando 60 segundos a que DefectDojo esté listo..."
 	@echo "   (Esto puede tardar en la primera ejecución...)"
@@ -142,20 +149,18 @@ update: setup-env ## Levantar aplicación y DefectDojo, y actualizar flujo de fi
 	@echo ""
 	@echo "Paso 1/3: Verificando aplicación principal..."
 	@$(COMPOSE) ps web 2>nul | findstr /C:"Up" >nul 2>&1 || $(COMPOSE) ps web | grep -q "Up" || \
-		(echo "   Arrancando aplicación principal..." && $(COMPOSE) up -d web)
+		(echo "   Arrancando aplicación principal..." && echo "   (Construyendo imágenes si es necesario...)" && $(COMPOSE) up -d --build web)
 	@echo "   ✓ Aplicación principal lista"
 	@echo ""
 	@echo "Paso 2/3: Verificando DefectDojo..."
 	@$(COMPOSE) --profile defectdojo ps defectdojo 2>nul | findstr /C:"Up" >nul 2>&1 || $(COMPOSE) --profile defectdojo ps defectdojo | grep -q "Up" || \
-		(echo "   Arrancando DefectDojo..." && $(COMPOSE) --profile defectdojo up -d && \
+		(echo "   Arrancando DefectDojo..." && echo "   (Construyendo imágenes si es necesario...)" && $(COMPOSE) --profile defectdojo up -d --build && \
 		echo "   ⏳ Esperando 60 segundos..." && \
 		(powershell -Command "Start-Sleep -Seconds 60" 2>nul || sleep 60))
 	@echo "   ✓ DefectDojo listo"
 	@echo ""
 	@echo "Paso 3/3: Actualizando flujo de findings con fechas históricas..."
-	@docker cp scripts/manage_findings.py defectdojo:/tmp/manage_findings.py 2>/dev/null || \
-		(echo "   Reintentando..." && powershell -Command "Start-Sleep -Seconds 5" 2>nul || sleep 5 && docker cp scripts/manage_findings.py defectdojo:/tmp/manage_findings.py)
-	@$(COMPOSE) --profile defectdojo exec -T defectdojo python3 /tmp/manage_findings.py || \
+	@$(COMPOSE) --profile defectdojo exec -T defectdojo python3 /app/manage_findings.py || \
 		(echo "" && echo "⚠️  Si el script falla, espera unos segundos más y vuelve a ejecutar: make update")
 	@echo ""
 	@echo "✅ Actualización completada"
@@ -180,6 +185,18 @@ ps: setup-env ## Ver estado de todos los contenedores
 	@echo ""
 	@echo "=== DefectDojo ==="
 	@$(COMPOSE) --profile defectdojo ps
+
+build: setup-env ## Construir imágenes de la aplicación principal
+	@echo "🔨 Construyendo imágenes de la aplicación principal..."
+	@$(COMPOSE) build
+	@echo ""
+	@echo "✅ Imágenes construidas"
+
+build-defectdojo: setup-env ## Construir imágenes de DefectDojo
+	@echo "🔨 Construyendo imágenes de DefectDojo..."
+	@$(COMPOSE) --profile defectdojo build
+	@echo ""
+	@echo "✅ Imágenes de DefectDojo construidas"
 
 down: setup-env ## Detener todos los servicios
 	@echo "🛑 Deteniendo todos los servicios..."
@@ -206,3 +223,8 @@ clean-all: ## Limpiar TODO y volver al estado como recién clonado (DESTRUCTIVO)
 purge: down clean-all ## Detener todos los servicios y limpiar TODO (DESTRUCTIVO)
 	@echo ""
 	@echo "✅ Purge completado"
+
+
+
+
+
