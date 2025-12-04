@@ -128,7 +128,7 @@ Estos directorios se crean automáticamente y están en `.gitignore` (no se sube
 | `make default` / `.\make.ps1 default` | Arrancar solo la aplicación principal |
 | `make initDefectDojo` / `.\make.ps1 initDefectDojo` | Iniciar DefectDojo vacío (sin findings) |
 | `make update` / `.\make.ps1 update` | Levantar aplicación y DefectDojo, y actualizar flujo de findings |
-| `make pdf_ASVS` / `.\make.ps1 pdf_ASVS` | Generar PDF del informe de seguridad ASVS con fecha |
+| `make pdf_report` / `.\make.ps1 pdf_report` | Generar PDF del informe de seguridad (ASVS + WSTG) con fecha |
 
 #### Comandos de Gestión
 

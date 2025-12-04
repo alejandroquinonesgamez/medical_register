@@ -3,7 +3,7 @@
   <head><meta charset="utf-8">
     <meta name="viewport" content="width=device-width,initial-scale=1">
     <meta name="color-scheme" content="light dark"><meta name="viewport" content="width=device-width, initial-scale=1" />
-<link rel="index" title="Index" href="genindex.html"><link rel="search" title="Search" href="search.html"><link rel="next" title="Inicio Rápido" href="INICIO_RAPIDO.html"><link rel="prev" title="Requerimientos Funcionales" href="requeriments.html">
+<link rel="index" title="Index" href="genindex.html"><link rel="search" title="Search" href="search.html">
 
     <!-- Generated with Sphinx 8.1.3 and Furo 2025.09.25 -->
         <title>Informe de Análisis de Seguridad - Aplicación Médica - Medical Register 0.1.0 documentation</title>
@@ -192,10 +192,10 @@
 </form>
 <div id="searchbox"></div><div class="sidebar-scroll"><div class="sidebar-tree">
   <p class="caption" role="heading"><span class="caption-text">Contenido:</span></p>
-<ul class="current">
+<ul>
 <li class="toctree-l1"><a class="reference internal" href="manual.html">Manual de Usuario - Registro Personal de Peso e IMC</a></li>
 <li class="toctree-l1"><a class="reference internal" href="requeriments.html">Requerimientos Funcionales</a></li>
-<li class="toctree-l1 current current-page"><a class="current reference internal" href="#">Informe de Análisis de Seguridad - Aplicación Médica</a></li>
+<li class="toctree-l1"><a class="reference internal" href="INFORME_SEGURIDAD.html">Informe de Análisis de Seguridad - Aplicación Médica</a></li>
 <li class="toctree-l1"><a class="reference internal" href="INICIO_RAPIDO.html">Inicio Rápido</a></li>
 <li class="toctree-l1"><a class="reference internal" href="mockups/MOCKUPS.html">Mockups y Diagramas</a></li>
 </ul>
@@ -250,10 +250,13 @@
         <article role="main" id="furo-main-content">
           <section id="informe-de-analisis-de-seguridad-aplicacion-medica">
 <h1>Informe de Análisis de Seguridad - Aplicación Médica<a class="headerlink" href="#informe-de-analisis-de-seguridad-aplicacion-medica" title="Link to this heading">¶</a></h1>
-<p><strong>Fecha de análisis</strong>: 2025-11-29<br />
+<p><strong>Fecha de análisis</strong>: 2025-12-03<br />
 <strong>Versión analizada</strong>: Versión actual (post-implementación de mejoras de seguridad)<br />
-<strong>Estándar de referencia</strong>: OWASP Application Security Verification Standard (ASVS)
+<strong>Estándar de referencia</strong>: OWASP Application Security Verification Standard (ASVS) <strong>Versión 4.0.3</strong>
+<strong>Fuente oficial</strong>: <a class="reference external" href="https://github.com/OWASP/ASVS/tree/v4.0.3/4.0/">OWASP ASVS v4.0.3 en GitHub</a>
+<strong>Nota importante</strong>: Este informe utiliza la estructura de categorías de ASVS 4.0.3 (V1-V14). Si necesitas comparar con ASVS 5.0, las categorías han sido reorganizadas y renumeradas.
 <strong>Práctica</strong>: Análisis de seguridad y determinación de nivel ASVS</p>
+<p><strong>Nota</strong>: Este informe ha sido generado automáticamente mediante análisis de código.</p>
 <hr class="docutils" />
 <section id="descripcion-breve-de-la-aplicacion-analizada">
 <h2>1. Descripción Breve de la Aplicación Analizada<a class="headerlink" href="#descripcion-breve-de-la-aplicacion-analizada" title="Link to this heading">¶</a></h2>
@@ -301,365 +304,66 @@
 <li><p>Backend: Memoria (volátil, se pierde al reiniciar)</p></li>
 </ul>
 </section>
-<section id="datos-internos">
-<h4>1.4.2. <strong>Datos Internos</strong><a class="headerlink" href="#datos-internos" title="Link to this heading">¶</a></h4>
+</section>
+</section>
+<section id="analisis-de-seguridad-realizado">
+<h2>2. Análisis de Seguridad Realizado<a class="headerlink" href="#analisis-de-seguridad-realizado" title="Link to this heading">¶</a></h2>
+<section id="metodologia">
+<h3>2.1. Metodología<a class="headerlink" href="#metodologia" title="Link to this heading">¶</a></h3>
+<p>El análisis de seguridad se ha realizado mediante:</p>
 <ul class="simple">
-<li><p><strong>ID de usuario</strong>: Constante (USER_ID = 1) - Monousuario</p></li>
-<li><p><strong>Fecha y hora de registros de peso</strong>: Metadatos de los pesajes</p></li>
-<li><p><strong>Cálculos derivados</strong>: IMC, estadísticas (peso máximo, mínimo, número de pesajes)</p></li>
+<li><p><strong>Integración con DefectDojo</strong>: Obtención de benchmarks ASVS y findings reales</p></li>
+<li><p><strong>Análisis estático de código</strong>: Revisión del código fuente Python y JavaScript</p></li>
+<li><p><strong>Verificación de cumplimiento ASVS 4.0.3</strong>: Comparación con requisitos del estándar</p></li>
+<li><p><strong>Mapeo de findings</strong>: Relación de vulnerabilidades con requisitos ASVS</p></li>
+<li><p><strong>Análisis de arquitectura</strong>: Revisión de la estructura y diseño de la aplicación</p></li>
 </ul>
 </section>
-<section id="datos-publicos">
-<h4>1.4.3. <strong>Datos Públicos</strong><a class="headerlink" href="#datos-publicos" title="Link to this heading">¶</a></h4>
+<section id="herramientas-utilizadas">
+<h3>2.2. Herramientas Utilizadas<a class="headerlink" href="#herramientas-utilizadas" title="Link to this heading">¶</a></h3>
 <ul class="simple">
-<li><p><strong>Interfaz de usuario</strong>: Textos de la aplicación, mensajes, traducciones</p></li>
-<li><p><strong>Configuración de límites de validación</strong>: Límites de peso y altura permitidos</p></li>
-</ul>
-</section>
-</section>
-<section id="contexto-de-seguridad">
-<h3>1.5. Contexto de Seguridad<a class="headerlink" href="#contexto-de-seguridad" title="Link to this heading">¶</a></h3>
-<p>La aplicación maneja <strong>datos de salud personales</strong> (peso, altura, fecha de nacimiento), aunque en un contexto monousuario y sin autenticación compleja. No almacena datos médicos críticos ni información de identificación sensible como DNI o números de seguridad social, pero sí información personal que requiere protección adecuada según estándares de protección de datos.</p>
-</section>
-</section>
-<hr class="docutils" />
-<section id="identificacion-de-vectores-de-ataque-potenciales">
-<h2>2. Identificación de Vectores de Ataque Potenciales<a class="headerlink" href="#identificacion-de-vectores-de-ataque-potenciales" title="Link to this heading">¶</a></h2>
-<section id="funcionalidades-susceptibles-a-ataques">
-<h3>2.0. Funcionalidades Susceptibles a Ataques<a class="headerlink" href="#funcionalidades-susceptibles-a-ataques" title="Link to this heading">¶</a></h3>
-<p>La aplicación incluye las siguientes funcionalidades que pueden ser susceptibles a ataques:</p>
-<section id="formularios-de-registro-de-datos">
-<h4>2.0.1. <strong>Formularios de Registro de Datos</strong><a class="headerlink" href="#formularios-de-registro-de-datos" title="Link to this heading">¶</a></h4>
-<ul class="simple">
-<li><p><strong>Formulario de perfil de usuario</strong>: Captura nombre, apellidos, fecha de nacimiento y talla</p></li>
-<li><p><strong>Formulario de registro de peso</strong>: Captura peso actual con validación de variación diaria</p></li>
-<li><p><strong>Vector de ataque</strong>: Inyección de datos maliciosos, validación de tipos insuficiente</p></li>
-</ul>
-</section>
-<section id="api-rest-sin-autenticacion">
-<h4>2.0.2. <strong>API REST sin Autenticación</strong><a class="headerlink" href="#api-rest-sin-autenticacion" title="Link to this heading">¶</a></h4>
-<ul class="simple">
-<li><p><strong>Endpoints públicos</strong>: <code class="docutils literal notranslate"><span class="pre">/api/user</span></code>, <code class="docutils literal notranslate"><span class="pre">/api/weight</span></code>, <code class="docutils literal notranslate"><span class="pre">/api/imc</span></code>, <code class="docutils literal notranslate"><span class="pre">/api/stats</span></code></p></li>
-<li><p><strong>Métodos HTTP</strong>: GET, POST sin autenticación</p></li>
-<li><p><strong>Vector de ataque</strong>: Acceso no autorizado, manipulación de datos, CSRF</p></li>
-</ul>
-</section>
-<section id="almacenamiento-local-localstorage">
-<h4>2.0.3. <strong>Almacenamiento Local (localStorage)</strong><a class="headerlink" href="#almacenamiento-local-localstorage" title="Link to this heading">¶</a></h4>
-<ul class="simple">
-<li><p><strong>Datos en cliente</strong>: Todos los datos se almacenan en localStorage del navegador</p></li>
-<li><p><strong>Vector de ataque</strong>: Acceso a datos si el dispositivo es comprometido, XSS que puede leer/escribir localStorage</p></li>
-</ul>
-</section>
-<section id="calculos-matematicos-imc">
-<h4>2.0.4. <strong>Cálculos Matemáticos (IMC)</strong><a class="headerlink" href="#calculos-matematicos-imc" title="Link to this heading">¶</a></h4>
-<ul class="simple">
-<li><p><strong>Fórmula IMC</strong>: <code class="docutils literal notranslate"><span class="pre">peso</span> <span class="pre">/</span> <span class="pre">(altura²)</span></code></p></li>
-<li><p><strong>Vector de ataque</strong>: Valores NaN, Infinity que pueden causar errores o resultados incorrectos</p></li>
-</ul>
-</section>
-<section id="integracion-con-defectdojo">
-<h4>2.0.5. <strong>Integración con DefectDojo</strong><a class="headerlink" href="#integracion-con-defectdojo" title="Link to this heading">¶</a></h4>
-<ul class="simple">
-<li><p><strong>Endpoints de importación/exportación</strong>: <code class="docutils literal notranslate"><span class="pre">/api/defectdojo/export-dump</span></code>, <code class="docutils literal notranslate"><span class="pre">/api/defectdojo/import-dump</span></code></p></li>
-<li><p><strong>Vector de ataque</strong>: Ejecución de comandos del sistema, manipulación de base de datos</p></li>
-</ul>
-<p>Basado en el análisis CWE-699 (Software Development) realizado, se han identificado los siguientes vectores de ataque potenciales:</p>
-</section>
-</section>
-<section id="vectores-de-ataque-identificados">
-<h3>2.1. Vectores de Ataque Identificados<a class="headerlink" href="#vectores-de-ataque-identificados" title="Link to this heading">¶</a></h3>
-<section id="inyeccion-de-datos-maliciosos-type-confusion">
-<h4>2.1.1. <strong>Inyección de Datos Maliciosos (Type Confusion)</strong><a class="headerlink" href="#inyeccion-de-datos-maliciosos-type-confusion" title="Link to this heading">¶</a></h4>
-<p><strong>CWE-1287</strong>: Improper Validation of Specified Type of Input<br />
-<strong>CWE-843</strong>: Access of Resource Using Incompatible Type</p>
-<p><strong>Ubicación</strong>:</p>
-<ul class="simple">
-<li><p>Backend: <code class="docutils literal notranslate"><span class="pre">app/routes.py</span></code> (conversiones de <code class="docutils literal notranslate"><span class="pre">float()</span></code>)</p></li>
-<li><p>Frontend: <code class="docutils literal notranslate"><span class="pre">app/static/js/main.js</span></code>, <code class="docutils literal notranslate"><span class="pre">app/static/js/storage.js</span></code> (conversiones de <code class="docutils literal notranslate"><span class="pre">parseFloat()</span></code>)</p></li>
-</ul>
-<p><strong>Vector de ataque</strong>:</p>
-<ul class="simple">
-<li><p>Envío de valores no numéricos que se convierten a <code class="docutils literal notranslate"><span class="pre">NaN</span></code> o <code class="docutils literal notranslate"><span class="pre">Infinity</span></code></p></li>
-<li><p>Propagación de valores inválidos en cálculos matemáticos (IMC)</p></li>
-<li><p>Causa de errores en la aplicación o resultados incorrectos</p></li>
-</ul>
-<p><strong>Ejemplo de ataque</strong>:</p>
-<div class="highlight-javascript notranslate"><div class="highlight"><pre><span></span><span class="c1">// Atacante envía: { &quot;talla_m&quot;: &quot;NaN&quot; }</span>
-<span class="c1">// Resultado: parseFloat(&quot;NaN&quot;) = NaN</span>
-<span class="c1">// IMC calculado con NaN = NaN (resultado inválido)</span>
-</pre></div>
-</div>
-</section>
-<section id="clickjacking-ui-redressing">
-<h4>2.1.2. <strong>Clickjacking (UI Redressing)</strong><a class="headerlink" href="#clickjacking-ui-redressing" title="Link to this heading">¶</a></h4>
-<p><strong>CWE-1021</strong>: Improper Restriction of Rendered UI Layers or Frames</p>
-<p><strong>Estado</strong>: ✅ <strong>RESUELTO</strong> - Headers de seguridad implementados</p>
-<p><strong>Ubicación</strong>: <code class="docutils literal notranslate"><span class="pre">app/__init__.py</span></code> (líneas 28-36)</p>
-<p><strong>Vector de ataque original</strong>:</p>
-<ul class="simple">
-<li><p>Inclusión de la aplicación en un iframe malicioso</p></li>
-<li><p>Superposición de elementos invisibles sobre la interfaz</p></li>
-<li><p>Manipulación de acciones del usuario sin su conocimiento</p></li>
-</ul>
-<p><strong>Mitigación implementada</strong>:</p>
-<ul class="simple">
-<li><p>✅ <code class="docutils literal notranslate"><span class="pre">X-Frame-Options:</span> <span class="pre">DENY</span></code> - Previene que la aplicación se muestre en iframes</p></li>
-<li><p>✅ <code class="docutils literal notranslate"><span class="pre">Content-Security-Policy:</span> <span class="pre">frame-ancestors</span> <span class="pre">'none'</span></code> - Política adicional contra frames</p></li>
-<li><p>✅ <code class="docutils literal notranslate"><span class="pre">X-Content-Type-Options:</span> <span class="pre">nosniff</span></code> - Previene MIME type sniffing</p></li>
-<li><p>✅ <code class="docutils literal notranslate"><span class="pre">X-XSS-Protection:</span> <span class="pre">1;</span> <span class="pre">mode=block</span></code> - Protección adicional contra XSS</p></li>
-</ul>
-<p><strong>Ejemplo de ataque previo</strong>:</p>
-<div class="highlight-html notranslate"><div class="highlight"><pre><span></span><span class="cm">&lt;!-- Sitio malicioso --&gt;</span>
-<span class="p">&lt;</span><span class="nt">iframe</span> <span class="na">src</span><span class="o">=</span><span class="s">&quot;http://aplicacion-medica.com&quot;</span> <span class="na">style</span><span class="o">=</span><span class="s">&quot;opacity:0.1&quot;</span><span class="p">&gt;&lt;/</span><span class="nt">iframe</span><span class="p">&gt;</span>
-<span class="p">&lt;</span><span class="nt">button</span> <span class="na">style</span><span class="o">=</span><span class="s">&quot;position:absolute; top:100px; left:100px&quot;</span><span class="p">&gt;</span>Click aquí<span class="p">&lt;/</span><span class="nt">button</span><span class="p">&gt;</span>
-<span class="cm">&lt;!-- Usuario cree que hace clic en el botón, pero realmente interactúa con la app --&gt;</span>
-</pre></div>
-</div>
-<p><em>(Ahora bloqueado por los headers de seguridad)</em></p>
-</section>
-<section id="cross-origin-resource-sharing-cors-permisivo">
-<h4>2.1.3. <strong>Cross-Origin Resource Sharing (CORS) Permisivo</strong><a class="headerlink" href="#cross-origin-resource-sharing-cors-permisivo" title="Link to this heading">¶</a></h4>
-<p><strong>CWE-942</strong>: Overly Permissive Cross-domain Whitelist</p>
-<p><strong>Ubicación</strong>: <code class="docutils literal notranslate"><span class="pre">app/__init__.py</span></code> (configuración CORS con <code class="docutils literal notranslate"><span class="pre">origins:</span> <span class="pre">&quot;*&quot;</span></code>)</p>
-<p><strong>Vector de ataque</strong>:</p>
-<ul class="simple">
-<li><p>Cualquier sitio web puede realizar peticiones a la API</p></li>
-<li><p>Aumento de la superficie de ataque si el backend se expone fuera de <code class="docutils literal notranslate"><span class="pre">localhost</span></code></p></li>
-<li><p>Posibilidad de realizar ataques CSRF desde dominios externos</p></li>
-</ul>
-<p><strong>Ejemplo de ataque</strong>:</p>
-<div class="highlight-javascript notranslate"><div class="highlight"><pre><span></span><span class="c1">// Desde cualquier sitio web malicioso</span>
-<span class="nx">fetch</span><span class="p">(</span><span class="s1">&#39;http://aplicacion-medica.com/api/user&#39;</span><span class="p">,</span><span class="w"> </span><span class="p">{</span>
-<span class="w">    </span><span class="nx">method</span><span class="o">:</span><span class="w"> </span><span class="s1">&#39;POST&#39;</span><span class="p">,</span>
-<span class="w">    </span><span class="nx">headers</span><span class="o">:</span><span class="w"> </span><span class="p">{</span><span class="s1">&#39;Content-Type&#39;</span><span class="o">:</span><span class="w"> </span><span class="s1">&#39;application/json&#39;</span><span class="p">},</span>
-<span class="w">    </span><span class="nx">body</span><span class="o">:</span><span class="w"> </span><span class="nb">JSON</span><span class="p">.</span><span class="nx">stringify</span><span class="p">({</span><span class="nx">nombre</span><span class="o">:</span><span class="w"> </span><span class="s1">&#39;Ataque&#39;</span><span class="p">,</span><span class="w"> </span><span class="nx">talla_m</span><span class="o">:</span><span class="w"> </span><span class="s1">&#39;NaN&#39;</span><span class="p">})</span>
-<span class="p">});</span>
-</pre></div>
-</div>
-</section>
-<section id="manejo-inadecuado-de-excepciones">
-<h4>2.1.4. <strong>Manejo Inadecuado de Excepciones</strong><a class="headerlink" href="#manejo-inadecuado-de-excepciones" title="Link to this heading">¶</a></h4>
-<p><strong>CWE-703</strong>: Improper Check or Handling of Exceptional Conditions</p>
-<p><strong>Ubicación</strong>: <code class="docutils literal notranslate"><span class="pre">app/routes.py</span></code> (uso de <code class="docutils literal notranslate"><span class="pre">Exception</span></code> genérico)</p>
-<p><strong>Vector de ataque</strong>:</p>
-<ul class="simple">
-<li><p>Ocultación de errores inesperados que podrían indicar vulnerabilidades</p></li>
-<li><p>Dificultad para detectar y responder a ataques</p></li>
-<li><p>Información de error insuficiente para debugging y monitoreo</p></li>
-</ul>
-</section>
-<section id="validacion-de-entrada-insuficiente-resuelto">
-<h4>2.1.5. <strong>Validación de Entrada Insuficiente (Resuelto)</strong><a class="headerlink" href="#validacion-de-entrada-insuficiente-resuelto" title="Link to this heading">¶</a></h4>
-<p><strong>CWE-20</strong>: Improper Input Validation</p>
-<p><strong>Estado</strong>: ✅ <strong>RESUELTO</strong> - Se implementó validación robusta de nombres con sanitización</p>
-<p><strong>Ubicación</strong>: <code class="docutils literal notranslate"><span class="pre">app/helpers.py</span></code>, <code class="docutils literal notranslate"><span class="pre">app/routes.py</span></code>, <code class="docutils literal notranslate"><span class="pre">app/static/js/main.js</span></code></p>
-<p><strong>Vector de ataque original</strong>:</p>
-<ul class="simple">
-<li><p>Inyección de caracteres peligrosos (<code class="docutils literal notranslate"><span class="pre">&lt;</span> <span class="pre">&gt;</span> <span class="pre">&quot;</span> <span class="pre">'</span></code>)</p></li>
-<li><p>Ataques XSS potenciales</p></li>
-<li><p>Corrupción de datos almacenados</p></li>
+<li><p><strong>DefectDojo</strong>: Benchmarks ASVS y gestión de findings</p></li>
+<li><p>Análisis automático de código fuente</p></li>
+<li><p>Verificación de patrones de seguridad</p></li>
+<li><p>Comparación con estándares OWASP ASVS 4.0.3</p></li>
 </ul>
 </section>
 </section>
-</section>
-<hr class="docutils" />
-<section id="analisis-de-riesgos-asociados">
-<h2>3. Análisis de Riesgos Asociados<a class="headerlink" href="#analisis-de-riesgos-asociados" title="Link to this heading">¶</a></h2>
-<section id="matriz-de-riesgos">
-<h3>3.1. Matriz de Riesgos<a class="headerlink" href="#matriz-de-riesgos" title="Link to this heading">¶</a></h3>
-<div class="table-wrapper colwidths-auto docutils container">
-<table class="docutils align-default">
-<thead>
-<tr class="row-odd"><th class="head"><p>CWE</p></th>
-<th class="head"><p>Vector de Ataque</p></th>
-<th class="head"><p>Probabilidad</p></th>
-<th class="head"><p>Impacto</p></th>
-<th class="head"><p>Riesgo</p></th>
-<th class="head"><p>Estado</p></th>
-</tr>
-</thead>
-<tbody>
-<tr class="row-even"><td><p><strong>CWE-1287</strong></p></td>
-<td><p>Type Confusion (Backend)</p></td>
-<td><p>Media</p></td>
-<td><p>Medio</p></td>
-<td><p><strong>MEDIO</strong></p></td>
-<td><p>⚠️ Pendiente</p></td>
-</tr>
-<tr class="row-odd"><td><p><strong>CWE-843</strong></p></td>
-<td><p>Type Confusion (Frontend)</p></td>
-<td><p>Media</p></td>
-<td><p>Medio</p></td>
-<td><p><strong>MEDIO</strong></p></td>
-<td><p>⚠️ Pendiente</p></td>
-</tr>
-<tr class="row-even"><td><p><strong>CWE-1021</strong></p></td>
-<td><p>Clickjacking</p></td>
-<td><p>Baja</p></td>
-<td><p>Medio</p></td>
-<td><p><strong>MEDIO</strong></p></td>
-<td><p>✅ Resuelto</p></td>
-</tr>
-<tr class="row-odd"><td><p><strong>CWE-942</strong></p></td>
-<td><p>CORS Permisivo</p></td>
-<td><p>Baja*</p></td>
-<td><p>Alto*</p></td>
-<td><p><strong>MEDIO/ALTO</strong>*</p></td>
-<td><p>⏸️ Pendiente</p></td>
-</tr>
-<tr class="row-even"><td><p><strong>CWE-703</strong></p></td>
-<td><p>Manejo de Excepciones</p></td>
-<td><p>Baja</p></td>
-<td><p>Bajo</p></td>
-<td><p><strong>BAJO</strong></p></td>
-<td><p>⚠️ Mejorado parcialmente</p></td>
-</tr>
-<tr class="row-odd"><td><p><strong>CWE-20</strong></p></td>
-<td><p>Validación de Entrada</p></td>
-<td><p>Media</p></td>
-<td><p>Medio</p></td>
-<td><p><strong>MEDIO</strong></p></td>
-<td><p>✅ Resuelto</p></td>
-</tr>
-</tbody>
-</table>
-</div>
-<p>*<em>Riesgo aumenta significativamente si el backend se expone fuera de <code class="docutils literal notranslate"><span class="pre">localhost</span></code></em></p>
-</section>
-<section id="analisis-detallado-de-riesgos">
-<h3>3.2. Análisis Detallado de Riesgos<a class="headerlink" href="#analisis-detallado-de-riesgos" title="Link to this heading">¶</a></h3>
-<section id="riesgo-medio-type-confusion-cwe-1287-cwe-843">
-<h4>3.2.1. <strong>Riesgo MEDIO: Type Confusion (CWE-1287, CWE-843)</strong><a class="headerlink" href="#riesgo-medio-type-confusion-cwe-1287-cwe-843" title="Link to this heading">¶</a></h4>
-<p><strong>Descripción del riesgo</strong>:</p>
+<section id="debilidades-de-seguridad-identificadas">
+<h2>3. Debilidades de Seguridad Identificadas<a class="headerlink" href="#debilidades-de-seguridad-identificadas" title="Link to this heading">¶</a></h2>
+<section id="resumen">
+<h3>3.1. Resumen<a class="headerlink" href="#resumen" title="Link to this heading">¶</a></h3>
+<p>El análisis automático ha identificado áreas de mejora en la aplicación. Las debilidades principales están relacionadas con:</p>
 <ul class="simple">
-<li><p>Los valores <code class="docutils literal notranslate"><span class="pre">NaN</span></code> e <code class="docutils literal notranslate"><span class="pre">Infinity</span></code> pueden propagarse en cálculos matemáticos</p></li>
-<li><p>Resultados de IMC incorrectos o inválidos</p></li>
-<li><p>Posible corrupción de datos almacenados</p></li>
-</ul>
-<p><strong>Impacto en el negocio</strong>:</p>
-<ul class="simple">
-<li><p><strong>Integridad de datos</strong>: Los datos almacenados pueden volverse inválidos</p></li>
-<li><p><strong>Confiabilidad</strong>: Los usuarios pueden recibir información incorrecta sobre su IMC</p></li>
-<li><p><strong>Experiencia de usuario</strong>: Errores en la aplicación que afectan la usabilidad</p></li>
-</ul>
-<p><strong>Mitigación actual</strong>:</p>
-<ul class="simple">
-<li><p>✅ Validaciones defensivas antes de calcular IMC (backend y frontend)</p></li>
-<li><p>⚠️ Falta validación de <code class="docutils literal notranslate"><span class="pre">NaN</span></code> e <code class="docutils literal notranslate"><span class="pre">Infinity</span></code> después de conversiones</p></li>
-</ul>
-<p><strong>Recomendación</strong>:</p>
-<ul class="simple">
-<li><p>Implementar validación de tipos antes de conversión</p></li>
-<li><p>Verificar que los números sean finitos después de <code class="docutils literal notranslate"><span class="pre">float()</span></code> y <code class="docutils literal notranslate"><span class="pre">parseFloat()</span></code></p></li>
-</ul>
-</section>
-<section id="riesgo-medio-clickjacking-cwe-1021-resuelto">
-<h4>3.2.2. <strong>Riesgo MEDIO: Clickjacking (CWE-1021) - RESUELTO</strong><a class="headerlink" href="#riesgo-medio-clickjacking-cwe-1021-resuelto" title="Link to this heading">¶</a></h4>
-<p><strong>Descripción del riesgo</strong> (anterior):</p>
-<ul class="simple">
-<li><p>La aplicación puede ser embebida en iframes maliciosos</p></li>
-<li><p>Los usuarios pueden ser engañados para realizar acciones no deseadas</p></li>
-<li><p>Posible robo de datos personales mediante superposición de elementos</p></li>
-</ul>
-<p><strong>Impacto en el negocio</strong> (anterior):</p>
-<ul class="simple">
-<li><p><strong>Confidencialidad</strong>: Los datos personales pueden ser comprometidos</p></li>
-<li><p><strong>Integridad</strong>: Los datos pueden ser modificados sin consentimiento del usuario</p></li>
-<li><p><strong>Reputación</strong>: Pérdida de confianza si se explota esta vulnerabilidad</p></li>
-</ul>
-<p><strong>Mitigación implementada</strong>:</p>
-<ul class="simple">
-<li><p>✅ <code class="docutils literal notranslate"><span class="pre">X-Frame-Options:</span> <span class="pre">DENY</span></code> - Implementado en <code class="docutils literal notranslate"><span class="pre">app/__init__.py</span></code></p></li>
-<li><p>✅ <code class="docutils literal notranslate"><span class="pre">Content-Security-Policy:</span> <span class="pre">frame-ancestors</span> <span class="pre">'none'</span></code> - Implementado</p></li>
-<li><p>✅ <code class="docutils literal notranslate"><span class="pre">X-Content-Type-Options:</span> <span class="pre">nosniff</span></code> - Implementado</p></li>
-<li><p>✅ <code class="docutils literal notranslate"><span class="pre">X-XSS-Protection:</span> <span class="pre">1;</span> <span class="pre">mode=block</span></code> - Protección adicional</p></li>
-</ul>
-<p><strong>Estado</strong>: ✅ <strong>VULNERABILIDAD RESUELTA</strong> - Los headers de seguridad protegen contra clickjacking</p>
-</section>
-<section id="riesgo-medio-alto-cors-permisivo-cwe-942">
-<h4>3.2.3. <strong>Riesgo MEDIO/ALTO: CORS Permisivo (CWE-942)</strong><a class="headerlink" href="#riesgo-medio-alto-cors-permisivo-cwe-942" title="Link to this heading">¶</a></h4>
-<p><strong>Descripción del riesgo</strong>:</p>
-<ul class="simple">
-<li><p>Cualquier sitio web puede realizar peticiones a la API</p></li>
-<li><p>Aumento significativo de la superficie de ataque en producción</p></li>
-<li><p>Posibilidad de ataques CSRF desde dominios externos</p></li>
-</ul>
-<p><strong>Impacto en el negocio</strong>:</p>
-<ul class="simple">
-<li><p><strong>Confidencialidad</strong>: Datos pueden ser accedidos desde sitios maliciosos</p></li>
-<li><p><strong>Integridad</strong>: Datos pueden ser modificados mediante ataques CSRF</p></li>
-<li><p><strong>Disponibilidad</strong>: Posible denegación de servicio mediante peticiones masivas</p></li>
-</ul>
-<p><strong>Mitigación actual</strong>:</p>
-<ul class="simple">
-<li><p>⚠️ CORS configurado con <code class="docutils literal notranslate"><span class="pre">origins:</span> <span class="pre">&quot;*&quot;</span></code> (permite cualquier origen)</p></li>
-<li><p>✅ Actualmente solo accesible desde <code class="docutils literal notranslate"><span class="pre">localhost</span></code> (riesgo limitado)</p></li>
-</ul>
-<p><strong>Recomendación</strong>:</p>
-<ul class="simple">
-<li><p>Restringir CORS a dominios específicos cuando se exponga el backend</p></li>
-<li><p>Implementar validación de origen en producción</p></li>
-<li><p>Considerar implementar tokens CSRF para operaciones sensibles</p></li>
-</ul>
-</section>
-<section id="riesgo-bajo-manejo-de-excepciones-cwe-703">
-<h4>3.2.4. <strong>Riesgo BAJO: Manejo de Excepciones (CWE-703)</strong><a class="headerlink" href="#riesgo-bajo-manejo-de-excepciones-cwe-703" title="Link to this heading">¶</a></h4>
-<p><strong>Descripción del riesgo</strong>:</p>
-<ul class="simple">
-<li><p>Uso de <code class="docutils literal notranslate"><span class="pre">Exception</span></code> genérico puede ocultar errores inesperados</p></li>
-<li><p>Dificultad para detectar y responder a vulnerabilidades</p></li>
-<li><p>Información de error insuficiente para monitoreo</p></li>
-</ul>
-<p><strong>Impacto en el negocio</strong>:</p>
-<ul class="simple">
-<li><p><strong>Mantenibilidad</strong>: Dificultad para identificar y corregir problemas</p></li>
-<li><p><strong>Seguridad</strong>: Errores de seguridad pueden pasar desapercibidos</p></li>
-</ul>
-<p><strong>Mitigación actual</strong>:</p>
-<ul class="simple">
-<li><p>✅ Validación de nombres usa manejo estructurado de errores</p></li>
-<li><p>⚠️ Conversiones de <code class="docutils literal notranslate"><span class="pre">float()</span></code> aún usan <code class="docutils literal notranslate"><span class="pre">Exception</span></code> genérico</p></li>
-</ul>
-<p><strong>Recomendación</strong>:</p>
-<ul class="simple">
-<li><p>Especificar excepciones concretas (<code class="docutils literal notranslate"><span class="pre">ValueError</span></code>, <code class="docutils literal notranslate"><span class="pre">TypeError</span></code>, <code class="docutils literal notranslate"><span class="pre">KeyError</span></code>)</p></li>
-<li><p>Implementar logging detallado de errores</p></li>
+<li><p>Validación de tipos numéricos (NaN/Infinity)</p></li>
+<li><p>Configuración de CORS para producción</p></li>
+<li><p>Mejora del logging de errores</p></li>
 </ul>
 </section>
 </section>
-<section id="resumen-de-riesgos-por-categoria">
-<h3>3.3. Resumen de Riesgos por Categoría<a class="headerlink" href="#resumen-de-riesgos-por-categoria" title="Link to this heading">¶</a></h3>
-<p><strong>Riesgos Críticos</strong>: Ninguno identificado</p>
-<p><strong>Riesgos Altos</strong>:</p>
-<ul class="simple">
-<li><p>CWE-942 (CORS) - Solo si se expone fuera de <code class="docutils literal notranslate"><span class="pre">localhost</span></code></p></li>
-</ul>
-<p><strong>Riesgos Medios</strong>:</p>
-<ul class="simple">
-<li><p>CWE-1287 (Type Confusion Backend)</p></li>
-<li><p>CWE-843 (Type Confusion Frontend)</p></li>
-</ul>
-<p><strong>Riesgos Bajos</strong>:</p>
-<ul class="simple">
-<li><p>CWE-703 (Manejo de Excepciones)</p></li>
-</ul>
-<p><strong>Riesgos Resueltos</strong>:</p>
-<ul class="simple">
-<li><p>CWE-20 (Validación de Entrada) ✅</p></li>
-</ul>
-</section>
-</section>
-<hr class="docutils" />
 <section id="nivel-asvs-seleccionado-con-justificacion">
 <h2>4. Nivel ASVS Seleccionado, con Justificación<a class="headerlink" href="#nivel-asvs-seleccionado-con-justificacion" title="Link to this heading">¶</a></h2>
 <section id="owasp-application-security-verification-standard-asvs">
 <h3>4.1. OWASP Application Security Verification Standard (ASVS)<a class="headerlink" href="#owasp-application-security-verification-standard-asvs" title="Link to this heading">¶</a></h3>
-<p>El <strong>OWASP Application Security Verification Standard (ASVS)</strong> es un estándar de seguridad para aplicaciones web que define tres niveles de verificación:</p>
+<p><strong>Versión utilizada en este informe</strong>: <strong>ASVS 4.0.3</strong> (versión estable, lanzada el 28 de octubre de 2021)</p>
+<p><strong>Fuente oficial</strong>: <a class="reference external" href="https://github.com/OWASP/ASVS/tree/v4.0.3/4.0/">OWASP ASVS v4.0.3 en GitHub</a></p>
+<p>El <strong>OWASP Application Security Verification Standard (ASVS) versión 4.0.3</strong> es un estándar de seguridad para aplicaciones web que define tres niveles de verificación. Esta versión se centra en corregir errores ortográficos y clarificar requisitos sin introducir cambios significativos ni romper compatibilidad con versiones anteriores.</p>
+<p><strong>Estructura de categorías ASVS 4.0.3</strong>: 14 categorías de verificación (V1-V14):</p>
 <ul class="simple">
-<li><p><strong>Nivel 1 (Básico)</strong>: Para aplicaciones de bajo riesgo, con controles de seguridad básicos</p></li>
-<li><p><strong>Nivel 2 (Estándar)</strong>: Para aplicaciones de riesgo estándar, con controles de seguridad estándar</p></li>
-<li><p><strong>Nivel 3 (Avanzado)</strong>: Para aplicaciones de alto riesgo, con controles de seguridad avanzados</p></li>
+<li><p>V1: Architecture, Design and Threat Modeling</p></li>
+<li><p>V2: Authentication</p></li>
+<li><p>V3: Session Management</p></li>
+<li><p>V4: Access Control</p></li>
+<li><p>V5: Validation, Sanitization and Encoding</p></li>
+<li><p>V6: Stored Cryptographically Sensitive Data</p></li>
+<li><p>V7: Error Handling and Logging</p></li>
+<li><p>V8: Data Protection</p></li>
+<li><p>V9: Communications</p></li>
+<li><p>V10: Malicious Code</p></li>
+<li><p>V11: Business Logic</p></li>
+<li><p>V12: Files and Resources</p></li>
+<li><p>V13: API</p></li>
+<li><p>V14: Configuration</p></li>
 </ul>
 </section>
 <section id="nivel-seleccionado-nivel-2-estandar">
@@ -667,316 +371,110 @@
 </section>
 <section id="justificacion-de-la-seleccion">
 <h3>4.3. Justificación de la Selección<a class="headerlink" href="#justificacion-de-la-seleccion" title="Link to this heading">¶</a></h3>
-<section id="naturaleza-de-los-datos">
-<h4>4.3.1. <strong>Naturaleza de los Datos</strong><a class="headerlink" href="#naturaleza-de-los-datos" title="Link to this heading">¶</a></h4>
 <p>La aplicación maneja <strong>datos de salud personales</strong> (peso, altura, fecha de nacimiento), aunque no sean datos médicos críticos ni información de identificación sensible. Según el Reglamento General de Protección de Datos (RGPD), los datos de salud están categorizados como <strong>datos personales sensibles</strong>, lo que requiere un nivel de protección superior al básico.</p>
-<p><strong>Justificación</strong>: Aunque los datos no son críticos, el hecho de ser datos de salud justifica un nivel de seguridad estándar (Nivel 2) en lugar de básico (Nivel 1).</p>
-</section>
-<section id="contexto-de-uso">
-<h4>4.3.2. <strong>Contexto de Uso</strong><a class="headerlink" href="#contexto-de-uso" title="Link to this heading">¶</a></h4>
-<ul class="simple">
-<li><p><strong>Monousuario</strong>: La aplicación es monousuario, lo que reduce el riesgo de exposición de datos entre usuarios</p></li>
-<li><p><strong>Sin autenticación compleja</strong>: No requiere autenticación robusta, lo que limita algunos vectores de ataque</p></li>
-<li><p><strong>Almacenamiento local</strong>: Los datos se almacenan principalmente en localStorage, reduciendo el riesgo de exposición en el servidor</p></li>
-</ul>
-<p><strong>Justificación</strong>: El contexto monousuario y el almacenamiento local reducen algunos riesgos, pero no eliminan la necesidad de controles de seguridad estándar.</p>
-</section>
-<section id="id1">
-<h4>4.3.3. <strong>Vectores de Ataque Identificados</strong><a class="headerlink" href="#id1" title="Link to this heading">¶</a></h4>
-<p>El análisis CWE-699 identificó <strong>6 debilidades de seguridad</strong>, de las cuales:</p>
-<ul class="simple">
-<li><p>1 está resuelta (CWE-20)</p></li>
-<li><p>4 requieren atención (CWE-1287, CWE-843, CWE-1021, CWE-942)</p></li>
-<li><p>1 está mejorada parcialmente (CWE-703)</p></li>
-</ul>
-<p><strong>Justificación</strong>: La presencia de múltiples debilidades de seguridad de severidad media justifica la implementación de controles de seguridad estándar (Nivel 2) en lugar de básicos (Nivel 1).</p>
-</section>
-<section id="requisitos-de-cumplimiento">
-<h4>4.3.4. <strong>Requisitos de Cumplimiento</strong><a class="headerlink" href="#requisitos-de-cumplimiento" title="Link to this heading">¶</a></h4>
-<p>Aunque la aplicación no maneja datos médicos críticos, el manejo de datos de salud personales puede requerir cumplimiento con:</p>
-<ul class="simple">
-<li><p><strong>RGPD</strong>: Reglamento General de Protección de Datos</p></li>
-<li><p><strong>Estándares de seguridad de aplicaciones web</strong>: Buenas prácticas de la industria</p></li>
-</ul>
-<p><strong>Justificación</strong>: El cumplimiento con estándares de seguridad de la industria y protección de datos personales requiere al menos un nivel estándar de seguridad (Nivel 2).</p>
-</section>
-<section id="por-que-no-nivel-3-avanzado">
-<h4>4.3.5. <strong>Por qué NO Nivel 3 (Avanzado)</strong><a class="headerlink" href="#por-que-no-nivel-3-avanzado" title="Link to this heading">¶</a></h4>
-<ul class="simple">
-<li><p>No maneja datos médicos críticos</p></li>
-<li><p>No requiere autenticación multi-factor</p></li>
-<li><p>No tiene requisitos de alta disponibilidad</p></li>
-<li><p>No maneja transacciones financieras</p></li>
-<li><p>No es una aplicación crítica para la vida</p></li>
-</ul>
-<p><strong>Justificación</strong>: La aplicación no cumple con los criterios para requerir controles de seguridad avanzados (Nivel 3).</p>
-</section>
-<section id="por-que-no-nivel-1-basico">
-<h4>4.3.6. <strong>Por qué NO Nivel 1 (Básico)</strong><a class="headerlink" href="#por-que-no-nivel-1-basico" title="Link to this heading">¶</a></h4>
-<ul class="simple">
-<li><p>Maneja datos de salud personales (datos sensibles según RGPD)</p></li>
-<li><p>Identificadas múltiples debilidades de seguridad de severidad media</p></li>
-<li><p>Requiere protección contra vectores de ataque comunes (clickjacking, CORS, type confusion)</p></li>
-</ul>
-<p><strong>Justificación</strong>: La naturaleza de los datos y los vectores de ataque identificados requieren controles de seguridad más allá del nivel básico.</p>
-</section>
 </section>
 <section id="enumeracion-de-requerimientos-asvs-nivel-2">
 <h3>4.4. Enumeración de Requerimientos ASVS Nivel 2<a class="headerlink" href="#enumeracion-de-requerimientos-asvs-nivel-2" title="Link to this heading">¶</a></h3>
-<p>Basado en el análisis realizado, se enumeran los requerimientos ASVS Nivel 2 relevantes para esta aplicación. El estándar ASVS define 14 categorías de verificación (V1-V14). Se detallan las aplicables:</p>
+<p>Basado en el análisis automático realizado, se enumeran los requerimientos ASVS Nivel 2 relevantes para esta aplicación. El estándar ASVS 4.0.3 define 14 categorías de verificación (V1-V14). Se detallan las aplicables:</p>
 <section id="v1-architecture-design-and-threat-modeling">
 <h4>4.4.1. <strong>V1: Architecture, Design and Threat Modeling</strong><a class="headerlink" href="#v1-architecture-design-and-threat-modeling" title="Link to this heading">¶</a></h4>
-<p><strong>Requerimientos ASVS Nivel 2 aplicables</strong>:</p>
-<ul class="simple">
-<li><p><strong>V1.1</strong>: ✅ Arquitectura de seguridad definida y documentada</p></li>
-<li><p><strong>V1.2</strong>: ✅ Análisis de amenazas realizado (análisis CWE-699 completado)</p></li>
-<li><p><strong>V1.3</strong>: ✅ Principios de seguridad aplicados (defensa en profundidad)</p></li>
-<li><p><strong>V1.4</strong>: ✅ Separación de responsabilidades (frontend/backend/almacenamiento)</p></li>
-</ul>
-<p><strong>Estado de cumplimiento</strong>: ✅ <strong>CUMPLE</strong> - Arquitectura clara y análisis de amenazas documentado</p>
+<p><strong>Estado de cumplimiento</strong>: ✅ <strong>CUMPLE</strong></p>
 </section>
 <section id="v2-authentication">
 <h4>4.4.2. <strong>V2: Authentication</strong><a class="headerlink" href="#v2-authentication" title="Link to this heading">¶</a></h4>
 <p><strong>Requerimientos ASVS Nivel 2 aplicables</strong>:</p>
 <ul class="simple">
-<li><p>⚠️ <strong>No aplicable</strong> - Aplicación monousuario sin autenticación compleja</p></li>
+<li><p>⚠️ <strong>No aplicable</strong></p></li>
 </ul>
-<p><strong>Justificación</strong>: La aplicación está diseñada como herramienta personal monousuario, sin sistema de autenticación. El usuario único se identifica mediante USER_ID constante.</p>
+<p><strong>Justificación</strong>: Aplicación monousuario sin autenticación compleja</p>
 </section>
 <section id="v3-session-management">
 <h4>4.4.3. <strong>V3: Session Management</strong><a class="headerlink" href="#v3-session-management" title="Link to this heading">¶</a></h4>
 <p><strong>Requerimientos ASVS Nivel 2 aplicables</strong>:</p>
 <ul class="simple">
-<li><p>⚠️ <strong>No aplicable</strong> - La aplicación no utiliza sesiones en el servidor</p></li>
+<li><p>⚠️ <strong>No aplicable</strong></p></li>
 </ul>
-<p><strong>Justificación</strong>: Al ser monousuario y almacenar datos principalmente en localStorage del cliente, no se requieren sesiones del lado del servidor.</p>
+<p><strong>Justificación</strong>: No utiliza sesiones en el servidor</p>
 </section>
 <section id="v4-access-control">
 <h4>4.4.4. <strong>V4: Access Control</strong><a class="headerlink" href="#v4-access-control" title="Link to this heading">¶</a></h4>
 <p><strong>Requerimientos ASVS Nivel 2 aplicables</strong>:</p>
 <ul class="simple">
-<li><p>⚠️ <strong>No aplicable</strong> - Aplicación monousuario sin control de acceso entre usuarios</p></li>
+<li><p>⚠️ <strong>No aplicable</strong></p></li>
 </ul>
-<p><strong>Justificación</strong>: Al existir un único usuario (USER_ID = 1), no hay necesidad de control de acceso basado en roles o usuarios.</p>
+<p><strong>Justificación</strong>: Aplicación monousuario sin control de acceso entre usuarios</p>
 </section>
 <section id="v5-validation-sanitization-and-encoding">
 <h4>4.4.5. <strong>V5: Validation, Sanitization and Encoding</strong><a class="headerlink" href="#v5-validation-sanitization-and-encoding" title="Link to this heading">¶</a></h4>
-<p><strong>Requerimientos ASVS Nivel 2 aplicables</strong>:</p>
-<ul class="simple">
-<li><p><strong>V5.1</strong>: ✅ Validación de entrada en todas las fuentes de datos (frontend y backend)</p></li>
-<li><p><strong>V5.2</strong>: ✅ Validación de tipos de datos (nombres, números, fechas)</p></li>
-<li><p><strong>V5.3</strong>: ✅ Sanitización de entrada (función <code class="docutils literal notranslate"><span class="pre">validate_and_sanitize_name()</span></code> implementada)</p></li>
-<li><p><strong>V5.4</strong>: ⚠️ Validación de tipos numéricos mejorable (CWE-1287, CWE-843 pendientes)</p></li>
-<li><p><strong>V5.5</strong>: ✅ Validación de límites de rango (altura: 0.4-2.72m, peso: 2-650kg)</p></li>
-<li><p><strong>V5.6</strong>: ✅ Validación de formato (fechas en formato ISO)</p></li>
-</ul>
-<p><strong>Estado de cumplimiento</strong>: ⚠️ <strong>PARCIAL</strong> - Validación robusta implementada, pero falta validación de NaN/Infinity</p>
+<p><strong>Estado de cumplimiento</strong>: ✅ <strong>CUMPLE</strong></p>
 </section>
 <section id="v6-stored-cryptographically-sensitive-data">
 <h4>4.4.6. <strong>V6: Stored Cryptographically Sensitive Data</strong><a class="headerlink" href="#v6-stored-cryptographically-sensitive-data" title="Link to this heading">¶</a></h4>
 <p><strong>Requerimientos ASVS Nivel 2 aplicables</strong>:</p>
 <ul class="simple">
-<li><p>⚠️ <strong>No aplicable</strong> - Datos almacenados localmente en cliente, no en servidor</p></li>
+<li><p>⚠️ <strong>No aplicable</strong></p></li>
 </ul>
-<p><strong>Justificación</strong>: Los datos sensibles se almacenan en localStorage del navegador (cliente). El backend solo mantiene datos en memoria volátil.</p>
+<p><strong>Justificación</strong>: Datos almacenados localmente en cliente, no en servidor</p>
 </section>
 <section id="v7-error-handling-and-logging">
 <h4>4.4.7. <strong>V7: Error Handling and Logging</strong><a class="headerlink" href="#v7-error-handling-and-logging" title="Link to this heading">¶</a></h4>
-<p><strong>Requerimientos ASVS Nivel 2 aplicables</strong>:</p>
-<ul class="simple">
-<li><p><strong>V7.1</strong>: ⚠️ Manejo estructurado de errores (mejorado en validación de nombres, pendiente en conversiones)</p></li>
-<li><p><strong>V7.2</strong>: ✅ Códigos de error HTTP apropiados (400, 404, 500)</p></li>
-<li><p><strong>V7.3</strong>: ⚠️ Logging de errores mejorable (CWE-703 mejorado parcialmente)</p></li>
-<li><p><strong>V7.4</strong>: ✅ No se exponen detalles técnicos de errores al usuario final</p></li>
-</ul>
-<p><strong>Estado de cumplimiento</strong>: ⚠️ <strong>PARCIAL</strong> - Mejorado en validación de nombres, falta especificar excepciones en conversiones</p>
+<p><strong>Estado de cumplimiento</strong>: ⚠️ <strong>PARCIAL</strong></p>
 </section>
 <section id="v8-data-protection">
 <h4>4.4.8. <strong>V8: Data Protection</strong><a class="headerlink" href="#v8-data-protection" title="Link to this heading">¶</a></h4>
-<p><strong>Requerimientos ASVS Nivel 2 aplicables</strong>:</p>
-<ul class="simple">
-<li><p><strong>V8.1</strong>: ✅ Validaciones defensivas implementadas (antes de cálculos críticos)</p></li>
-<li><p><strong>V8.2</strong>: ✅ Headers de seguridad implementados (X-Frame-Options, CSP, etc.)</p></li>
-<li><p><strong>V8.3</strong>: ✅ Protección contra clickjacking (CWE-1021 resuelto)</p></li>
-<li><p><strong>V8.4</strong>: ⚠️ CORS demasiado permisivo (CWE-942 pendiente para producción)</p></li>
-</ul>
-<p><strong>Estado de cumplimiento</strong>: ✅ <strong>BUENO</strong> - Headers de seguridad implementados, CORS pendiente de restricción en producción</p>
+<p><strong>Estado de cumplimiento</strong>: ⚠️ <strong>PARCIAL</strong></p>
 </section>
 <section id="v9-communications">
 <h4>4.4.9. <strong>V9: Communications</strong><a class="headerlink" href="#v9-communications" title="Link to this heading">¶</a></h4>
-<p><strong>Requerimientos ASVS Nivel 2 aplicables</strong>:</p>
-<ul class="simple">
-<li><p><strong>V9.1</strong>: ✅ HTTPS recomendado para producción (actualmente HTTP en desarrollo)</p></li>
-<li><p><strong>V9.2</strong>: ⚠️ CORS configurado pero permisivo (<code class="docutils literal notranslate"><span class="pre">origins:</span> <span class="pre">&quot;*&quot;</span></code>)</p></li>
-<li><p><strong>V9.3</strong>: ⚠️ No se implementa validación de origen específico</p></li>
-</ul>
-<p><strong>Estado de cumplimiento</strong>: ⚠️ <strong>PARCIAL</strong> - CORS funciona pero es demasiado permisivo para producción</p>
+<p><strong>Estado de cumplimiento</strong>: ⚠️ <strong>PARCIAL</strong></p>
 </section>
 <section id="v10-malicious-code">
 <h4>4.4.10. <strong>V10: Malicious Code</strong><a class="headerlink" href="#v10-malicious-code" title="Link to this heading">¶</a></h4>
-<p><strong>Requerimientos ASVS Nivel 2 aplicables</strong>:</p>
-<ul class="simple">
-<li><p><strong>V10.1</strong>: ✅ Validación y sanitización de entrada implementada</p></li>
-<li><p><strong>V10.2</strong>: ✅ Protección contra XSS mediante sanitización de nombres</p></li>
-<li><p><strong>V10.3</strong>: ✅ Headers X-XSS-Protection implementados</p></li>
-<li><p><strong>V10.4</strong>: ✅ No se ejecuta código no confiable</p></li>
-</ul>
-<p><strong>Estado de cumplimiento</strong>: ✅ <strong>CUMPLE</strong> - Validación y sanitización robustas implementadas</p>
+<p><strong>Estado de cumplimiento</strong>: ⚠️ <strong>PARCIAL</strong></p>
 </section>
 <section id="v11-business-logic">
 <h4>4.4.11. <strong>V11: Business Logic</strong><a class="headerlink" href="#v11-business-logic" title="Link to this heading">¶</a></h4>
-<p><strong>Requerimientos ASVS Nivel 2 aplicables</strong>:</p>
-<ul class="simple">
-<li><p><strong>V11.1</strong>: ✅ Validación de reglas de negocio (variación de peso máximo por día)</p></li>
-<li><p><strong>V11.2</strong>: ✅ Validación de límites de negocio (peso, altura en rangos razonables)</p></li>
-</ul>
-<p><strong>Estado de cumplimiento</strong>: ✅ <strong>CUMPLE</strong> - Reglas de negocio validadas</p>
+<p><strong>Estado de cumplimiento</strong>: ✅ <strong>CUMPLE</strong></p>
 </section>
 <section id="v12-files-and-resources">
 <h4>4.4.12. <strong>V12: Files and Resources</strong><a class="headerlink" href="#v12-files-and-resources" title="Link to this heading">¶</a></h4>
-<p><strong>Requerimientos ASVS Nivel 2 aplicables</strong>:</p>
-<ul class="simple">
-<li><p>⚠️ <strong>Parcialmente aplicable</strong> - Endpoints de importación/exportación de DefectDojo</p></li>
-<li><p><strong>V12.1</strong>: ✅ Validación de tipo de archivo (solo <code class="docutils literal notranslate"><span class="pre">.sql</span></code> permitido)</p></li>
-<li><p><strong>V12.2</strong>: ✅ Uso de <code class="docutils literal notranslate"><span class="pre">secure_filename()</span></code> para nombres de archivo</p></li>
-</ul>
-<p><strong>Estado de cumplimiento</strong>: ✅ <strong>CUMPLE</strong> - Validaciones de archivo implementadas</p>
+<p><strong>Estado de cumplimiento</strong>: ⚠️ <strong>PARCIAL</strong></p>
 </section>
 <section id="v13-api">
 <h4>4.4.13. <strong>V13: API</strong><a class="headerlink" href="#v13-api" title="Link to this heading">¶</a></h4>
-<p><strong>Requerimientos ASVS Nivel 2 aplicables</strong>:</p>
-<ul class="simple">
-<li><p><strong>V13.1</strong>: ✅ API REST documentada mediante código</p></li>
-<li><p><strong>V13.2</strong>: ✅ Validación de entrada en todos los endpoints</p></li>
-<li><p><strong>V13.3</strong>: ⚠️ Sin autenticación/autorización (no aplicable por diseño monousuario)</p></li>
-<li><p><strong>V13.4</strong>: ✅ Manejo de errores con códigos HTTP apropiados</p></li>
-</ul>
-<p><strong>Estado de cumplimiento</strong>: ✅ <strong>BUENO</strong> - API bien estructurada con validación, sin autenticación por diseño</p>
+<p><strong>Estado de cumplimiento</strong>: ✅ <strong>CUMPLE</strong></p>
 </section>
 <section id="v14-configuration">
 <h4>4.4.14. <strong>V14: Configuration</strong><a class="headerlink" href="#v14-configuration" title="Link to this heading">¶</a></h4>
-<p><strong>Requerimientos ASVS Nivel 2 aplicables</strong>:</p>
-<ul class="simple">
-<li><p><strong>V14.1</strong>: ✅ Configuración centralizada (<code class="docutils literal notranslate"><span class="pre">app/config.py</span></code>)</p></li>
-<li><p><strong>V14.2</strong>: ✅ Headers de seguridad configurados</p></li>
-<li><p><strong>V14.3</strong>: ⚠️ CORS configurado pero permisivo en desarrollo</p></li>
-</ul>
-<p><strong>Estado de cumplimiento</strong>: ✅ <strong>CUMPLE</strong> - Configuración centralizada y bien estructurada</p>
+<p><strong>Estado de cumplimiento</strong>: ⚠️ <strong>PARCIAL</strong></p>
 </section>
 </section>
-<section id="conclusion-del-nivel-asvs">
-<h3>4.5. Conclusión del Nivel ASVS<a class="headerlink" href="#conclusion-del-nivel-asvs" title="Link to this heading">¶</a></h3>
-<p><strong>Nivel seleccionado</strong>: <strong>NIVEL 2 (ESTÁNDAR)</strong></p>
-<p><strong>Justificación resumida</strong>:</p>
+</section>
+<section id="recomendaciones-y-mejoras">
+<h2>5. Recomendaciones y Mejoras<a class="headerlink" href="#recomendaciones-y-mejoras" title="Link to this heading">¶</a></h2>
+<section id="resumen-del-estado-actual">
+<h3>5.1. Resumen del Estado Actual<a class="headerlink" href="#resumen-del-estado-actual" title="Link to this heading">¶</a></h3>
+<p>La aplicación implementa <strong>buenas prácticas de seguridad</strong> en validación de entrada, headers de seguridad y manejo defensivo de datos.</p>
+</section>
+<section id="mejoras-recomendadas">
+<h3>5.2. Mejoras Recomendadas<a class="headerlink" href="#mejoras-recomendadas" title="Link to this heading">¶</a></h3>
+<p>Para alcanzar el cumplimiento completo del <strong>ASVS Nivel 2</strong>, se recomienda implementar las siguientes mejoras:</p>
 <ol class="arabic simple">
-<li><p>Maneja datos de salud personales (datos sensibles según RGPD)</p></li>
-<li><p>Identificadas múltiples debilidades de seguridad de severidad media</p></li>
-<li><p>Requiere controles de seguridad estándar para proteger datos personales</p></li>
-<li><p>No requiere controles avanzados (Nivel 3) por no manejar datos críticos</p></li>
+<li><p><strong>Validación de tipos numéricos</strong>: Implementar validación explícita de NaN e Infinity</p></li>
+<li><p><strong>CORS en producción</strong>: Restringir CORS a orígenes específicos en producción</p></li>
+<li><p><strong>Logging mejorado</strong>: Implementar logging estructurado de errores</p></li>
 </ol>
-<p><strong>Estado de cumplimiento</strong>: ✅ <strong>BUENO - EN PROGRESO</strong> - Se han implementado mejoras significativas (headers de seguridad, validación robusta). Faltan mejoras menores en validación de tipos y CORS para alcanzar el cumplimiento completo del Nivel 2.</p>
 </section>
 </section>
 <hr class="docutils" />
-<section id="conclusion-final">
-<h2>5. Conclusión Final<a class="headerlink" href="#conclusion-final" title="Link to this heading">¶</a></h2>
-<section id="resumen-ejecutivo">
-<h3>5.1. Resumen Ejecutivo<a class="headerlink" href="#resumen-ejecutivo" title="Link to this heading">¶</a></h3>
-<p>La aplicación médica analizada es una herramienta web monousuario para el registro personal de peso e IMC. Aunque no maneja datos médicos críticos, sí procesa <strong>datos de salud personales</strong> que requieren protección adecuada según estándares de seguridad y protección de datos.</p>
-<p>El análisis de seguridad basado en <strong>CWE-699 (Software Development)</strong> identificó <strong>6 debilidades de seguridad</strong>, de las cuales:</p>
+<section id="referencias">
+<h2>Referencias<a class="headerlink" href="#referencias" title="Link to this heading">¶</a></h2>
 <ul class="simple">
-<li><p><strong>2 están completamente resueltas</strong> (CWE-20: Validación de entrada, CWE-1021: Clickjacking)</p></li>
-<li><p><strong>3 requieren atención</strong> (CWE-1287, CWE-843, CWE-942)</p></li>
-<li><p><strong>1 está mejorada parcialmente</strong> (CWE-703: Manejo de excepciones)</p></li>
+<li><p><a class="reference external" href="https://owasp.org/www-project-application-security-verification-standard/">OWASP ASVS (página principal)</a></p></li>
+<li><p><a class="reference external" href="https://github.com/OWASP/ASVS/tree/v4.0.3/4.0/">OWASP ASVS 4.0.3 en GitHub (versión utilizada en este informe)</a></p></li>
+<li><p><a class="reference external" href="https://github.com/OWASP/ASVS/tree/v4.0.3/4.0/">OWASP ASVS 4.0.3 - Categorías de verificación</a></p></li>
+<li><p><a class="reference external" href="https://owasp.org/www-project-application-security-verification-standard/">OWASP ASVS 5.0 (versión actual)</a></p></li>
 </ul>
-</section>
-<section id="vectores-de-ataque-principales">
-<h3>5.2. Vectores de Ataque Principales<a class="headerlink" href="#vectores-de-ataque-principales" title="Link to this heading">¶</a></h3>
-<p>Los principales vectores de ataque identificados son:</p>
-<ol class="arabic simple">
-<li><p><strong>Type Confusion</strong> (CWE-1287, CWE-843): Validación insuficiente de tipos numéricos que puede resultar en valores <code class="docutils literal notranslate"><span class="pre">NaN</span></code> o <code class="docutils literal notranslate"><span class="pre">Infinity</span></code> en cálculos</p></li>
-<li><p><strong>CORS Permisivo</strong> (CWE-942): Configuración que permite peticiones desde cualquier origen, aumentando la superficie de ataque</p></li>
-</ol>
-<p><strong>Vectores de ataque resueltos</strong>:</p>
-<ul class="simple">
-<li><p>✅ <strong>Clickjacking</strong> (CWE-1021): Headers de seguridad implementados (<code class="docutils literal notranslate"><span class="pre">X-Frame-Options</span></code>, <code class="docutils literal notranslate"><span class="pre">CSP</span></code>, etc.)</p></li>
-</ul>
-</section>
-<section id="nivel-de-riesgo-general">
-<h3>5.3. Nivel de Riesgo General<a class="headerlink" href="#nivel-de-riesgo-general" title="Link to this heading">¶</a></h3>
-<p>El <strong>riesgo general de la aplicación es MEDIO</strong>, con los siguientes factores:</p>
-<ul class="simple">
-<li><p><strong>Riesgos Críticos</strong>: Ninguno identificado</p></li>
-<li><p><strong>Riesgos Altos</strong>: CWE-942 (solo si se expone fuera de <code class="docutils literal notranslate"><span class="pre">localhost</span></code>)</p></li>
-<li><p><strong>Riesgos Medios</strong>: CWE-1287, CWE-843</p></li>
-<li><p><strong>Riesgos Bajos</strong>: CWE-703</p></li>
-<li><p><strong>Riesgos Resueltos</strong>: CWE-20 (Validación de entrada), CWE-1021 (Clickjacking)</p></li>
-</ul>
-</section>
-<section id="nivel-asvs-recomendado">
-<h3>5.4. Nivel ASVS Recomendado<a class="headerlink" href="#nivel-asvs-recomendado" title="Link to this heading">¶</a></h3>
-<p>Se recomienda implementar controles de seguridad según <strong>OWASP ASVS Nivel 2 (Estándar)</strong> debido a:</p>
-<ol class="arabic simple">
-<li><p><strong>Naturaleza de los datos</strong>: Datos de salud personales (datos sensibles según RGPD)</p></li>
-<li><p><strong>Vectores de ataque identificados</strong>: Múltiples debilidades de severidad media</p></li>
-<li><p><strong>Requisitos de cumplimiento</strong>: Estándares de seguridad de la industria y protección de datos</p></li>
-</ol>
-<p><strong>Estado de cumplimiento</strong>: ⚠️ <strong>PARCIAL</strong> - Se requiere implementar mejoras para alcanzar el cumplimiento completo.</p>
-</section>
-<section id="recomendaciones-prioritarias">
-<h3>5.5. Recomendaciones Prioritarias<a class="headerlink" href="#recomendaciones-prioritarias" title="Link to this heading">¶</a></h3>
-<p>Para alcanzar el cumplimiento del <strong>ASVS Nivel 2</strong>, se recomienda implementar las siguientes mejoras en orden de prioridad:</p>
-<section id="prioridad-alta">
-<h4>Prioridad Alta:<a class="headerlink" href="#prioridad-alta" title="Link to this heading">¶</a></h4>
-<ol class="arabic simple">
-<li><p><strong>Validar NaN e Infinity</strong> en frontend y backend (CWE-1287, CWE-843)</p>
-<ul class="simple">
-<li><p>Validar tipos antes de conversión</p></li>
-<li><p>Verificar que los números sean finitos después de <code class="docutils literal notranslate"><span class="pre">float()</span></code> y <code class="docutils literal notranslate"><span class="pre">parseFloat()</span></code></p></li>
-</ul>
-</li>
-</ol>
-</section>
-<section id="prioridad-media">
-<h4>Prioridad Media:<a class="headerlink" href="#prioridad-media" title="Link to this heading">¶</a></h4>
-<ol class="arabic simple" start="3">
-<li><p><strong>Restringir CORS en producción</strong> (CWE-942)</p>
-<ul class="simple">
-<li><p>Limitar orígenes permitidos cuando el backend se exponga fuera de <code class="docutils literal notranslate"><span class="pre">localhost</span></code></p></li>
-<li><p>Implementar validación de origen</p></li>
-</ul>
-</li>
-<li><p><strong>Mejorar manejo de excepciones</strong> (CWE-703)</p>
-<ul class="simple">
-<li><p>Especificar excepciones concretas en lugar de <code class="docutils literal notranslate"><span class="pre">Exception</span></code> genérico</p></li>
-<li><p>Implementar logging detallado de errores</p></li>
-</ul>
-</li>
-</ol>
-</section>
-</section>
-<section id="evaluacion-final">
-<h3>5.6. Evaluación Final<a class="headerlink" href="#evaluacion-final" title="Link to this heading">¶</a></h3>
-<p>La aplicación implementa <strong>buenas prácticas de seguridad</strong> en validación de entrada, headers de seguridad y manejo defensivo de datos. Las mejoras implementadas incluyen:</p>
-<ul class="simple">
-<li><p>✅ Validación robusta de nombres con sanitización</p></li>
-<li><p>✅ Headers de seguridad contra clickjacking</p></li>
-<li><p>✅ Validaciones defensivas antes de cálculos críticos</p></li>
-<li><p>✅ Arquitectura bien estructurada con análisis de amenazas</p></li>
-</ul>
-<p>Sin embargo, aún requiere <strong>mejoras en validación de tipos numéricos (NaN/Infinity) y restricción de CORS en producción</strong> para alcanzar el cumplimiento completo del <strong>ASVS Nivel 2</strong>.</p>
-<p><strong>Estado general</strong>: ✅ <strong>BUENO - EN PROGRESO HACIA CUMPLIMIENTO COMPLETO</strong></p>
-<p>Las debilidades restantes son de <strong>severidad media o baja</strong> y pueden corregirse <strong>sin cambios arquitectónicos significativos</strong>, lo que facilita su implementación y mejorará aún más la postura de seguridad de la aplicación. El progreso realizado muestra un compromiso con la seguridad y buenas prácticas de desarrollo.</p>
-<hr class="docutils" />
-<p><strong>Fecha de informe</strong>: 2025-11-29<br />
-<strong>Analista</strong>: Análisis de seguridad para práctica académica - Basado en CWE-699<br />
-<strong>Referencias</strong>:</p>
-<ul class="simple">
-<li><p><a class="reference external" href="https://cwe.mitre.org/data/definitions/699.html">CWE-699: Software Development</a></p></li>
-<li><p><a class="reference external" href="https://owasp.org/www-project-application-security-verification-standard/">OWASP ASVS</a></p></li>
-<li><p><a class="reference external" href="https://owasp.org/www-project-top-ten/">OWASP Top 10</a></p></li>
-</ul>
-</section>
 </section>
 </section>
 
@@ -985,26 +483,8 @@
       <footer>
         
         <div class="related-pages">
-          <a class="next-page" href="INICIO_RAPIDO.html">
-              <div class="page-info">
-                <div class="context">
-                  <span>Next</span>
-                </div>
-                <div class="title">Inicio Rápido</div>
-              </div>
-              <svg class="furo-related-icon"><use href="#svg-arrow-right"></use></svg>
-            </a>
-          <a class="prev-page" href="requeriments.html">
-              <svg class="furo-related-icon"><use href="#svg-arrow-right"></use></svg>
-              <div class="page-info">
-                <div class="context">
-                  <span>Previous</span>
-                </div>
-                
-                <div class="title">Requerimientos Funcionales</div>
-                
-              </div>
-            </a>
+          
+          
         </div>
         <div class="bottom-of-page">
           <div class="left-details">
@@ -1042,56 +522,23 @@
 <li><a class="reference internal" href="#arquitectura-tecnica">1.3. Arquitectura Técnica</a></li>
 <li><a class="reference internal" href="#analisis-de-datos-que-maneja-la-aplicacion">1.4. Análisis de Datos que Maneja la Aplicación</a><ul>
 <li><a class="reference internal" href="#datos-sensibles-personales-de-salud">1.4.1. <strong>Datos Sensibles (Personales de Salud)</strong></a></li>
-<li><a class="reference internal" href="#datos-internos">1.4.2. <strong>Datos Internos</strong></a></li>
-<li><a class="reference internal" href="#datos-publicos">1.4.3. <strong>Datos Públicos</strong></a></li>
-</ul>
-</li>
-<li><a class="reference internal" href="#contexto-de-seguridad">1.5. Contexto de Seguridad</a></li>
-</ul>
-</li>
-<li><a class="reference internal" href="#identificacion-de-vectores-de-ataque-potenciales">2. Identificación de Vectores de Ataque Potenciales</a><ul>
-<li><a class="reference internal" href="#funcionalidades-susceptibles-a-ataques">2.0. Funcionalidades Susceptibles a Ataques</a><ul>
-<li><a class="reference internal" href="#formularios-de-registro-de-datos">2.0.1. <strong>Formularios de Registro de Datos</strong></a></li>
-<li><a class="reference internal" href="#api-rest-sin-autenticacion">2.0.2. <strong>API REST sin Autenticación</strong></a></li>
-<li><a class="reference internal" href="#almacenamiento-local-localstorage">2.0.3. <strong>Almacenamiento Local (localStorage)</strong></a></li>
-<li><a class="reference internal" href="#calculos-matematicos-imc">2.0.4. <strong>Cálculos Matemáticos (IMC)</strong></a></li>
-<li><a class="reference internal" href="#integracion-con-defectdojo">2.0.5. <strong>Integración con DefectDojo</strong></a></li>
-</ul>
-</li>
-<li><a class="reference internal" href="#vectores-de-ataque-identificados">2.1. Vectores de Ataque Identificados</a><ul>
-<li><a class="reference internal" href="#inyeccion-de-datos-maliciosos-type-confusion">2.1.1. <strong>Inyección de Datos Maliciosos (Type Confusion)</strong></a></li>
-<li><a class="reference internal" href="#clickjacking-ui-redressing">2.1.2. <strong>Clickjacking (UI Redressing)</strong></a></li>
-<li><a class="reference internal" href="#cross-origin-resource-sharing-cors-permisivo">2.1.3. <strong>Cross-Origin Resource Sharing (CORS) Permisivo</strong></a></li>
-<li><a class="reference internal" href="#manejo-inadecuado-de-excepciones">2.1.4. <strong>Manejo Inadecuado de Excepciones</strong></a></li>
-<li><a class="reference internal" href="#validacion-de-entrada-insuficiente-resuelto">2.1.5. <strong>Validación de Entrada Insuficiente (Resuelto)</strong></a></li>
 </ul>
 </li>
 </ul>
 </li>
-<li><a class="reference internal" href="#analisis-de-riesgos-asociados">3. Análisis de Riesgos Asociados</a><ul>
-<li><a class="reference internal" href="#matriz-de-riesgos">3.1. Matriz de Riesgos</a></li>
-<li><a class="reference internal" href="#analisis-detallado-de-riesgos">3.2. Análisis Detallado de Riesgos</a><ul>
-<li><a class="reference internal" href="#riesgo-medio-type-confusion-cwe-1287-cwe-843">3.2.1. <strong>Riesgo MEDIO: Type Confusion (CWE-1287, CWE-843)</strong></a></li>
-<li><a class="reference internal" href="#riesgo-medio-clickjacking-cwe-1021-resuelto">3.2.2. <strong>Riesgo MEDIO: Clickjacking (CWE-1021) - RESUELTO</strong></a></li>
-<li><a class="reference internal" href="#riesgo-medio-alto-cors-permisivo-cwe-942">3.2.3. <strong>Riesgo MEDIO/ALTO: CORS Permisivo (CWE-942)</strong></a></li>
-<li><a class="reference internal" href="#riesgo-bajo-manejo-de-excepciones-cwe-703">3.2.4. <strong>Riesgo BAJO: Manejo de Excepciones (CWE-703)</strong></a></li>
+<li><a class="reference internal" href="#analisis-de-seguridad-realizado">2. Análisis de Seguridad Realizado</a><ul>
+<li><a class="reference internal" href="#metodologia">2.1. Metodología</a></li>
+<li><a class="reference internal" href="#herramientas-utilizadas">2.2. Herramientas Utilizadas</a></li>
 </ul>
 </li>
-<li><a class="reference internal" href="#resumen-de-riesgos-por-categoria">3.3. Resumen de Riesgos por Categoría</a></li>
+<li><a class="reference internal" href="#debilidades-de-seguridad-identificadas">3. Debilidades de Seguridad Identificadas</a><ul>
+<li><a class="reference internal" href="#resumen">3.1. Resumen</a></li>
 </ul>
 </li>
 <li><a class="reference internal" href="#nivel-asvs-seleccionado-con-justificacion">4. Nivel ASVS Seleccionado, con Justificación</a><ul>
 <li><a class="reference internal" href="#owasp-application-security-verification-standard-asvs">4.1. OWASP Application Security Verification Standard (ASVS)</a></li>
 <li><a class="reference internal" href="#nivel-seleccionado-nivel-2-estandar">4.2. Nivel Seleccionado: <strong>NIVEL 2 (ESTÁNDAR)</strong></a></li>
-<li><a class="reference internal" href="#justificacion-de-la-seleccion">4.3. Justificación de la Selección</a><ul>
-<li><a class="reference internal" href="#naturaleza-de-los-datos">4.3.1. <strong>Naturaleza de los Datos</strong></a></li>
-<li><a class="reference internal" href="#contexto-de-uso">4.3.2. <strong>Contexto de Uso</strong></a></li>
-<li><a class="reference internal" href="#id1">4.3.3. <strong>Vectores de Ataque Identificados</strong></a></li>
-<li><a class="reference internal" href="#requisitos-de-cumplimiento">4.3.4. <strong>Requisitos de Cumplimiento</strong></a></li>
-<li><a class="reference internal" href="#por-que-no-nivel-3-avanzado">4.3.5. <strong>Por qué NO Nivel 3 (Avanzado)</strong></a></li>
-<li><a class="reference internal" href="#por-que-no-nivel-1-basico">4.3.6. <strong>Por qué NO Nivel 1 (Básico)</strong></a></li>
-</ul>
-</li>
+<li><a class="reference internal" href="#justificacion-de-la-seleccion">4.3. Justificación de la Selección</a></li>
 <li><a class="reference internal" href="#enumeracion-de-requerimientos-asvs-nivel-2">4.4. Enumeración de Requerimientos ASVS Nivel 2</a><ul>
 <li><a class="reference internal" href="#v1-architecture-design-and-threat-modeling">4.4.1. <strong>V1: Architecture, Design and Threat Modeling</strong></a></li>
 <li><a class="reference internal" href="#v2-authentication">4.4.2. <strong>V2: Authentication</strong></a></li>
@@ -1109,22 +556,14 @@
 <li><a class="reference internal" href="#v14-configuration">4.4.14. <strong>V14: Configuration</strong></a></li>
 </ul>
 </li>
-<li><a class="reference internal" href="#conclusion-del-nivel-asvs">4.5. Conclusión del Nivel ASVS</a></li>
 </ul>
 </li>
-<li><a class="reference internal" href="#conclusion-final">5. Conclusión Final</a><ul>
-<li><a class="reference internal" href="#resumen-ejecutivo">5.1. Resumen Ejecutivo</a></li>
-<li><a class="reference internal" href="#vectores-de-ataque-principales">5.2. Vectores de Ataque Principales</a></li>
-<li><a class="reference internal" href="#nivel-de-riesgo-general">5.3. Nivel de Riesgo General</a></li>
-<li><a class="reference internal" href="#nivel-asvs-recomendado">5.4. Nivel ASVS Recomendado</a></li>
-<li><a class="reference internal" href="#recomendaciones-prioritarias">5.5. Recomendaciones Prioritarias</a><ul>
-<li><a class="reference internal" href="#prioridad-alta">Prioridad Alta:</a></li>
-<li><a class="reference internal" href="#prioridad-media">Prioridad Media:</a></li>
+<li><a class="reference internal" href="#recomendaciones-y-mejoras">5. Recomendaciones y Mejoras</a><ul>
+<li><a class="reference internal" href="#resumen-del-estado-actual">5.1. Resumen del Estado Actual</a></li>
+<li><a class="reference internal" href="#mejoras-recomendadas">5.2. Mejoras Recomendadas</a></li>
 </ul>
 </li>
-<li><a class="reference internal" href="#evaluacion-final">5.6. Evaluación Final</a></li>
-</ul>
-</li>
+<li><a class="reference internal" href="#referencias">Referencias</a></li>
 </ul>
 </li>
 </ul>

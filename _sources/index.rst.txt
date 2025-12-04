@@ -11,7 +11,7 @@ Documentación del proyecto Medical Register. Ahora mismo en desarrollo.
 
    manual
    requeriments
-   INFORME_SEGURIDAD_ASVS
+   INFORME_SEGURIDAD
    INICIO_RAPIDO
    mockups/MOCKUPS
 
