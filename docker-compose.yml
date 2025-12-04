@@ -31,6 +31,7 @@ services:
     restart: unless-stopped
     volumes:
       - .:/app
+      - /var/run/docker.sock:/var/run/docker.sock:ro  # Montar socket de Docker para ejecutar comandos docker
     environment:
       - FLASK_ENV=development
     healthcheck:
@@ -141,6 +142,13 @@ services:
       - ./data/defectdojo/static:/app/static
       - ./scripts/init_defectdojo_internal.py:/app/init_defectdojo.py:ro
       - ./scripts/manage_findings.py:/app/manage_findings.py:ro
+      - ./scripts/wstg_sync_service.py:/app/scripts/wstg_sync_service.py:ro
+      - ./scripts/wstg_sync_handler.py:/app/scripts/wstg_sync_handler.py:ro
+      - ./scripts/generate_asvs_report.py:/app/scripts/generate_asvs_report.py:ro
+      - ./scripts/generate_pdf_report.py:/app/scripts/generate_pdf_report.py:ro
+      - ./app/wstg_sync.py:/app/app/wstg_sync.py:ro
+      - ./data:/app/data
+      - ./docs:/app/docs
     entrypoint: ["/bin/sh", "-c", "python /app/init_defectdojo.py && exec /entrypoint-uwsgi.sh"]
     healthcheck:
       test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8081/')"]
@@ -223,6 +231,38 @@ services:
       - ./data/defectdojo/media:/app/media
     networks:
       - defectdojo-network
+
+  # Servicio de sincronización WSTG (Background)
+  wstg-sync:
+    profiles:
+      - defectdojo
+    image: defectdojo/defectdojo-django:latest
+    container_name: wstg-sync-service
+    restart: unless-stopped
+    entrypoint: ["python"]
+    depends_on:
+      defectdojo:
+        condition: service_healthy
+      defectdojo-db:
+        condition: service_healthy
+    volumes:
+      - ./scripts/wstg_sync_service.py:/app/wstg_sync_service.py:ro
+      - ./scripts/wstg_sync_handler.py:/app/scripts/wstg_sync_handler.py:ro
+      - ./app/wstg_sync.py:/app/app/wstg_sync.py:ro
+      - ./data:/app/data
+    environment:
+      DD_DATABASE_URL: postgresql://defectdojo:defectdojo_password@defectdojo-db:5432/defectdojo
+      DD_SECRET_KEY: defectdojo_secret_key_change_in_production
+      DD_DEBUG: "True"
+      WSTG_SYNC_INTERVAL: ${WSTG_SYNC_INTERVAL:-5}
+    command: ["/app/wstg_sync_service.py", "--interval", "${WSTG_SYNC_INTERVAL:-5}"]
+    networks:
+      - defectdojo-network
+    healthcheck:
+      test: ["CMD", "python", "-c", "import sys; sys.exit(0)"]
+      interval: 60s
+      timeout: 10s
+      retries: 3
 
 networks:
   defectdojo-network:

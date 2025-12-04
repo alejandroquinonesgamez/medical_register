@@ -50,7 +50,7 @@ Este directorio contiene todos los scripts de utilidad del proyecto.
 ### Generación de Documentación
 
 - **`generate_pdf_report.py`** - Genera PDF del informe de seguridad ASVS
-  - Usado por `make pdf_ASVS` y `.\make.ps1 pdf_ASVS`
+  - Usado por `make pdf_report` y `.\make.ps1 pdf_report`
   - Usado por el endpoint `/api/defectdojo/generate-pdf`
   - Genera PDF con fecha en `docs/informes/`
 
@@ -83,7 +83,7 @@ make initDefectDojo  # DefectDojo vacío sin findings
 ### Generación de Documentos
 ```bash
 # PDF del informe
-make pdf_ASVS
+make pdf_report
 
 # Regenerar imágenes Mermaid
 python scripts/generate_mermaid_image.py docs/mockups/user-manual.mmd

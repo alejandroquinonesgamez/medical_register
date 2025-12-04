@@ -157,7 +157,7 @@ function Show-Help {
     Write-Host "Ver estado de todos los contenedores"
     Write-Host "  down             " -NoNewline -ForegroundColor Yellow
     Write-Host "Detener todos los servicios"
-    Write-Host "  pdf_ASVS         " -NoNewline -ForegroundColor Yellow
+    Write-Host "  pdf_report       " -NoNewline -ForegroundColor Yellow
     Write-Host "Generar PDF del informe de seguridad ASVS con fecha"
     Write-Host "  clean-temp       " -NoNewline -ForegroundColor Yellow
     Write-Host "Limpiar archivos temporales del proyecto"
@@ -449,10 +449,10 @@ switch ($Command.ToLower()) {
     "check" {
         Test-Requirements
     }
-    "pdf_asvs" {
+    "pdf_report" {
         Generate-PDFReport
     }
-    "pdf_ASVS" {
+    "pdf_report" {
         Generate-PDFReport
     }
     "clean-temp" {

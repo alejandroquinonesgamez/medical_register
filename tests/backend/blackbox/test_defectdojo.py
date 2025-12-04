@@ -235,7 +235,7 @@ class TestDefectDojoGeneratePDF:
         mock_subprocess.return_value = mock_result
         
         # Mock de listdir para simular PDF generado
-        mock_listdir.return_value = ['INFORME_SEGURIDAD_ASVS_20250101.pdf']
+        mock_listdir.return_value = ['INFORME_SEGURIDAD_20250101.pdf']
         
         # Mock de getmtime para simular fecha de modificación
         mock_getmtime.return_value = 1609459200.0  # Fecha de ejemplo

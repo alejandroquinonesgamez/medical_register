@@ -10,6 +10,7 @@ Centraliza todos los valores de configuración y constantes de la aplicación:
 Estos valores se sincronizan con el frontend mediante el endpoint /api/config
 y se usan para validaciones tanto en backend como frontend.
 """
+import os
 from datetime import datetime
 
 # Configuración de usuario (monousuario)
@@ -38,4 +39,8 @@ ACTIVE_LANGUAGE = 'es'
 
 # Lista de idiomas disponibles (códigos de idioma)
 AVAILABLE_LANGUAGES = ['es']
+
+# Configuración WSTG Sync
+WSTG_WEBHOOK_KEY = os.environ.get('WSTG_WEBHOOK_KEY', 'change_me_in_production')
+WSTG_SYNC_API_URL = os.environ.get('WSTG_SYNC_API_URL', 'http://localhost:5001/api/wstg/sync')
 

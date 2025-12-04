@@ -393,7 +393,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                 
                 // Obtener el nombre del archivo del header Content-Disposition o usar un nombre por defecto
                 const contentDisposition = response.headers.get('Content-Disposition');
-                let filename = 'INFORME_SEGURIDAD_ASVS.pdf';
+                let filename = 'INFORME_SEGURIDAD.pdf';
                 if (contentDisposition) {
                     const filenameMatch = contentDisposition.match(/filename="?([^"]+)"?/);
                     if (filenameMatch) {

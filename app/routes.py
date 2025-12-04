@@ -14,11 +14,15 @@ Las validaciones incluyen sanitización de nombres (CWE-20 resuelto) y validaci�
 from flask import request, jsonify, Blueprint, current_app
 from datetime import datetime, date
 import math
+import os
 
 from .storage import UserData, WeightEntryData
 from .helpers import calculate_bmi, get_bmi_description, validate_and_sanitize_name
 from .translations import get_error, get_message, get_text, get_days_text, get_frontend_messages
 from .config import USER_ID, VALIDATION_LIMITS
+
+# Obtener COMPOSE_PROJECT_NAME del entorno o usar el valor por defecto
+COMPOSE_PROJECT_NAME = os.environ.get('COMPOSE_PROJECT_NAME', 'medical_register')
 
 
 api = Blueprint('api', __name__, url_prefix='/api')
@@ -445,10 +449,10 @@ def generate_pdf_report():
     """
     Generar PDF del informe de seguridad ASVS y descargarlo
     
-    Ejecuta el script generate_pdf_report.py que convierte el archivo Markdown
-    docs/INFORME_SEGURIDAD_ASVS.md a formato PDF.
+    Genera el PDF a partir del Markdown existente (docs/INFORME_SEGURIDAD.md)
+    sin regenerar el Markdown. Si el Markdown no existe, devuelve un error.
     
-    El PDF se guarda en docs/informes/ con el formato: INFORME_SEGURIDAD_ASVS_YYYYMMDD.pdf
+    El PDF se guarda en docs/informes/ con el formato: INFORME_SEGURIDAD_YYYYMMDD.pdf
     y se descarga automáticamente al usuario.
     
     Usado por el botón "Generar PDF Informe" en la interfaz de usuario.
@@ -461,24 +465,47 @@ def generate_pdf_report():
     try:
         # Obtener el directorio del proyecto
         project_root = os.path.dirname(os.path.dirname(__file__))
-        script_path = os.path.join(project_root, 'scripts', 'generate_pdf_report.py')
         
-        # Verificar que existe el script
-        if not os.path.exists(script_path):
+        # Verificar que el Markdown existe antes de generar el PDF
+        report_md = os.path.join(project_root, 'docs', 'INFORME_SEGURIDAD.md')
+        if not os.path.exists(report_md):
+            return jsonify({"error": "El archivo INFORME_SEGURIDAD.md no existe. Por favor, genera el informe Markdown primero."}), 500
+        
+        current_app.logger.info("Generando PDF a partir del Markdown existente...")
+        
+        # Generar el PDF a partir del Markdown existente
+        generate_pdf_script_path = os.path.join(project_root, 'scripts', 'generate_pdf_report.py')
+        if not os.path.exists(generate_pdf_script_path):
             return jsonify({"error": "Script de generación de PDF no encontrado"}), 500
         
-        # Ejecutar el script para generar el PDF
-        result = subprocess.run(
-            ['python', script_path],
-            capture_output=True,
-            text=True,
-            timeout=60,  # 1 minuto máximo
-            cwd=project_root
-        )
+        current_app.logger.info("Ejecutando generate_pdf_report.py para generar PDF...")
         
-        if result.returncode != 0:
-            current_app.logger.error(f"Error al generar PDF: {result.stderr}")
-            return jsonify({"error": f"Error al generar PDF: {result.stderr}"}), 500
+        # Intentar ejecutar desde contenedor de DefectDojo si está disponible
+        result_pdf = None
+        try:
+            # Intentar ejecutar desde contenedor de DefectDojo
+            result_pdf = subprocess.run(
+                ['docker-compose', '--profile', 'defectdojo', 'exec', '-T', 'defectdojo', 'python', '/app/scripts/generate_pdf_report.py'],
+                capture_output=True,
+                text=True,
+                timeout=120,
+                cwd=project_root
+            )
+        except (FileNotFoundError, subprocess.SubprocessError):
+            # Si docker-compose no está disponible o el contenedor no está corriendo, ejecutar localmente
+            current_app.logger.warning("No se pudo ejecutar desde contenedor, ejecutando localmente...")
+            result_pdf = subprocess.run(
+                ['python3', generate_pdf_script_path],
+                capture_output=True,
+                text=True,
+                timeout=120,
+                cwd=project_root
+            )
+        
+        if result_pdf.returncode != 0:
+            current_app.logger.error(f"Error al generar PDF: {result_pdf.stderr}")
+            return jsonify({"error": f"Error al generar PDF: {result_pdf.stderr}"}), 500
+        current_app.logger.info("PDF generado correctamente.")
         
         # Buscar el PDF más reciente generado
         informes_dir = os.path.join(project_root, 'docs', 'informes')
@@ -487,7 +514,7 @@ def generate_pdf_report():
         if not os.path.exists(informes_dir):
             os.makedirs(informes_dir, exist_ok=True)
         
-        pdf_files = [f for f in os.listdir(informes_dir) if f.startswith('INFORME_SEGURIDAD_ASVS_') and f.endswith('.pdf')]
+        pdf_files = [f for f in os.listdir(informes_dir) if f.startswith('INFORME_SEGURIDAD_') and f.endswith('.pdf')]
         
         if not pdf_files:
             return jsonify({"error": "No se encontró el PDF generado"}), 500
@@ -513,5 +540,195 @@ def generate_pdf_report():
     except Exception as e:
         current_app.logger.error(f"Error inesperado al generar PDF: {str(e)}")
         return jsonify({"error": f"Error al generar PDF: {str(e)}"}), 500
+
+
+@api.route('/wstg/sync', methods=['POST'])
+def wstg_sync():
+    """
+    Sincronizar estado desde WSTG Tracker hacia DefectDojo
+    Endpoint automático llamado por el tracker cuando cambia un estado
+    Guarda la solicitud en un archivo para que el servicio de sincronización la procese
+    """
+    import json as json_module
+    from pathlib import Path
+    
+    data = request.json
+    if not data:
+        return jsonify({"error": "No data provided"}), 400
+    
+    try:
+        # Guardar solicitud en archivo compartido para procesamiento asíncrono
+        sync_queue_dir = Path('/app/data/wstg_sync_queue')
+        sync_queue_dir.mkdir(parents=True, exist_ok=True)
+        
+        # Crear archivo con timestamp único
+        import time
+        filename = f"sync_{int(time.time() * 1000)}_{data.get('wstg_id', 'unknown')}.json"
+        filepath = sync_queue_dir / filename
+        
+        sync_request = {
+            'type': 'tracker->dd',
+            'data': data,
+            'timestamp': datetime.now().isoformat()
+        }
+        
+        with open(filepath, 'w') as f:
+            json_module.dump(sync_request, f)
+        
+        current_app.logger.info(f"Solicitud de sincronización guardada: {filename}")
+        
+        # Intentar procesar inmediatamente si DefectDojo está disponible
+        # (opcional, puede procesarse de forma asíncrona)
+        try:
+            import subprocess
+            # Ejecutar en contenedor de DefectDojo usando docker-compose desde el host
+            # Nota: Esto requiere que docker-compose esté disponible en el host
+            # Como alternativa, el servicio de sincronización procesará estos archivos
+            result = subprocess.run(
+                ['docker-compose', 'exec', '-T', 'defectdojo', 'python', '/app/scripts/wstg_sync_handler.py', 
+                 'sync_from_tracker', json_module.dumps(data)],
+                capture_output=True,
+                text=True,
+                timeout=10,
+                cwd='/app'  # Asegurar que estamos en el directorio correcto
+            )
+            
+            if result.returncode == 0:
+                try:
+                    result_data = json_module.loads(result.stdout.strip())
+                    # Eliminar archivo si se procesó correctamente
+                    if result_data.get('success') and filepath.exists():
+                        filepath.unlink()
+                    return jsonify(result_data), 200
+                except json_module.JSONDecodeError:
+                    # Si falla el procesamiento inmediato, el archivo quedará para procesamiento asíncrono
+                    pass
+        except (subprocess.TimeoutExpired, FileNotFoundError, Exception) as e:
+            # Si no se puede procesar inmediatamente, se procesará de forma asíncrona
+            current_app.logger.debug(f"No se pudo procesar inmediatamente, se procesará de forma asíncrona: {e}")
+        
+        # Retornar éxito - la sincronización se procesará de forma asíncrona
+        return jsonify({
+            "success": True,
+            "message": "Solicitud de sincronización recibida y en cola",
+            "queued": True
+        }), 202  # 202 Accepted - procesamiento asíncrono
+        
+    except Exception as e:
+        current_app.logger.error(f"Error en sincronización WSTG: {e}", exc_info=True)
+        return jsonify({"error": str(e)}), 500
+
+
+@api.route('/wstg/webhook', methods=['POST'])
+def wstg_webhook():
+    """
+    Recibir webhook de DefectDojo y sincronizar con tracker
+    Endpoint automático llamado por DefectDojo cuando se actualiza un finding
+    Guarda la solicitud para procesamiento asíncrono
+    """
+    import json as json_module
+    from pathlib import Path
+    from .config import WSTG_WEBHOOK_KEY
+    import os
+    
+    data = request.json
+    if not data:
+        return jsonify({"error": "No data provided"}), 400
+    
+    # Validar autenticación del webhook (API key)
+    api_key = request.headers.get('X-API-Key') or request.headers.get('Authorization', '').replace('Bearer ', '')
+    expected_key = os.environ.get('WSTG_WEBHOOK_KEY', WSTG_WEBHOOK_KEY)
+    
+    if expected_key and expected_key != 'change_me_in_production':
+        if not api_key or api_key != expected_key:
+            current_app.logger.warning(f"Intento de webhook no autorizado: {api_key}")
+            return jsonify({"error": "Unauthorized"}), 401
+    
+    try:
+        # Guardar solicitud en archivo compartido
+        sync_queue_dir = Path('/app/data/wstg_sync_queue')
+        sync_queue_dir.mkdir(parents=True, exist_ok=True)
+        
+        import time
+        filename = f"webhook_{int(time.time() * 1000)}.json"
+        filepath = sync_queue_dir / filename
+        
+        webhook_request = {
+            'type': 'dd->tracker',
+            'data': data,
+            'timestamp': datetime.now().isoformat()
+        }
+        
+        with open(filepath, 'w') as f:
+            json_module.dump(webhook_request, f)
+        
+        current_app.logger.info(f"Webhook guardado: {filename}")
+        
+        return jsonify({
+            "success": True,
+            "message": "Webhook recibido y en cola",
+            "queued": True
+        }), 202  # 202 Accepted
+        
+    except Exception as e:
+        current_app.logger.error(f"Error en webhook WSTG: {e}", exc_info=True)
+        return jsonify({"error": str(e)}), 500
+
+
+@api.route('/wstg/status', methods=['GET'])
+def wstg_status():
+    """
+    Obtener estado de sincronización WSTG
+    Útil para monitoreo y dashboard
+    Lee el estado desde el archivo JSON compartido
+    """
+    from pathlib import Path
+    import json as json_module
+    
+    try:
+        # Leer estado desde archivo compartido
+        state_file = Path('/app/data/wstg_sync_state.json')
+        if state_file.exists():
+            with open(state_file, 'r') as f:
+                state = json_module.load(f)
+            
+            items = state.get('items', {})
+            total_items = len(items)
+            synced_items = sum(1 for item in items.values() 
+                              if item.get('last_sync_timestamp'))
+            
+            conflicts = 0
+            for wstg_id, item_data in items.items():
+                wstg_status = item_data.get('wstg_status')
+                dd_status = item_data.get('defectdojo_status')
+                if wstg_status and dd_status:
+                    if (wstg_status == 'Done' and dd_status != 'verified') or \
+                       (wstg_status == 'In Progress' and dd_status != 'active'):
+                        conflicts += 1
+            
+            last_sync = None
+            if state.get('sync_log'):
+                last_sync = state['sync_log'][-1].get('timestamp')
+            
+            return jsonify({
+                "last_sync": last_sync or datetime.now().isoformat(),
+                "total_items": total_items,
+                "synced_items": synced_items,
+                "pending_items": total_items - synced_items,
+                "conflicts": conflicts
+            }), 200
+        else:
+            # Estado inicial si no existe archivo
+            return jsonify({
+                "last_sync": datetime.now().isoformat(),
+                "total_items": 0,
+                "synced_items": 0,
+                "pending_items": 0,
+                "conflicts": 0
+            }), 200
+            
+    except Exception as e:
+        current_app.logger.error(f"Error obteniendo estado WSTG: {e}", exc_info=True)
+        return jsonify({"error": str(e)}), 500
 
 

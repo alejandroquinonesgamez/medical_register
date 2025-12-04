@@ -1,0 +1,160 @@
+{
+  "sync_log": [
+    {
+      "timestamp": "2025-12-03T17:37:45.587000",
+      "wstg_id": "WSTG-INFO-01",
+      "direction": "tracker->dd",
+      "old_status": null,
+      "new_status": "Done",
+      "success": false,
+      "error_message": "Django no est\u00e1 disponible. Este m\u00f3dulo requiere acceso a DefectDojo."
+    },
+    {
+      "timestamp": "2025-12-03T17:42:51.078695",
+      "wstg_id": "WSTG-INFO-02",
+      "direction": "tracker->dd",
+      "old_status": null,
+      "new_status": "In Progress",
+      "success": false,
+      "error_message": "Django no est\u00e1 disponible. Este m\u00f3dulo requiere acceso a DefectDojo."
+    },
+    {
+      "timestamp": "2025-12-03T17:42:52.482828",
+      "wstg_id": "WSTG-INFO-03",
+      "direction": "tracker->dd",
+      "old_status": null,
+      "new_status": "Done",
+      "success": false,
+      "error_message": "Django no est\u00e1 disponible. Este m\u00f3dulo requiere acceso a DefectDojo."
+    },
+    {
+      "timestamp": "2025-12-03T17:42:52.484331",
+      "wstg_id": "WSTG-INFO-01",
+      "direction": "tracker->dd",
+      "old_status": null,
+      "new_status": "Done",
+      "success": false,
+      "error_message": "Django no est\u00e1 disponible. Este m\u00f3dulo requiere acceso a DefectDojo."
+    },
+    {
+      "timestamp": "2025-12-03T17:43:51.875201",
+      "wstg_id": "WSTG-INFO-02",
+      "direction": "tracker->dd",
+      "old_status": null,
+      "new_status": "In Progress",
+      "success": false,
+      "error_message": "'NoneType' object has no attribute 'objects'"
+    },
+    {
+      "timestamp": "2025-12-03T17:43:54.282454",
+      "wstg_id": "WSTG-INFO-03",
+      "direction": "tracker->dd",
+      "old_status": null,
+      "new_status": "Done",
+      "success": false,
+      "error_message": "'NoneType' object has no attribute 'objects'"
+    },
+    {
+      "timestamp": "2025-12-03T17:43:54.296211",
+      "wstg_id": "WSTG-INFO-01",
+      "direction": "tracker->dd",
+      "old_status": null,
+      "new_status": "Done",
+      "success": false,
+      "error_message": "'NoneType' object has no attribute 'objects'"
+    },
+    {
+      "timestamp": "2025-12-03T17:44:00.300001",
+      "wstg_id": "WSTG-INFO-03",
+      "direction": "tracker->dd",
+      "old_status": null,
+      "new_status": "Done",
+      "success": false,
+      "error_message": "'NoneType' object has no attribute 'objects'"
+    },
+    {
+      "timestamp": "2025-12-03T17:44:00.313614",
+      "wstg_id": "WSTG-INFO-04",
+      "direction": "tracker->dd",
+      "old_status": null,
+      "new_status": "Done",
+      "success": false,
+      "error_message": "'NoneType' object has no attribute 'objects'"
+    },
+    {
+      "timestamp": "2025-12-03T17:44:00.325844",
+      "wstg_id": "WSTG-INFO-01",
+      "direction": "tracker->dd",
+      "old_status": null,
+      "new_status": "Done",
+      "success": false,
+      "error_message": "'NoneType' object has no attribute 'objects'"
+    },
+    {
+      "timestamp": "2025-12-03T17:45:15.797766",
+      "wstg_id": "WSTG-INFO-05",
+      "direction": "tracker->dd",
+      "old_status": null,
+      "new_status": "Done",
+      "success": true,
+      "error_message": ""
+    },
+    {
+      "timestamp": "2025-12-03T17:45:18.344577",
+      "wstg_id": "WSTG-INFO-03",
+      "direction": "tracker->dd",
+      "old_status": null,
+      "new_status": "Done",
+      "success": true,
+      "error_message": ""
+    },
+    {
+      "timestamp": "2025-12-03T17:45:18.362583",
+      "wstg_id": "WSTG-INFO-04",
+      "direction": "tracker->dd",
+      "old_status": null,
+      "new_status": "Done",
+      "success": true,
+      "error_message": ""
+    },
+    {
+      "timestamp": "2025-12-03T17:45:18.378590",
+      "wstg_id": "WSTG-INFO-01",
+      "direction": "tracker->dd",
+      "old_status": null,
+      "new_status": "Done",
+      "success": true,
+      "error_message": ""
+    }
+  ],
+  "items": {
+    "WSTG-INFO-05": {
+      "finding_id": 13,
+      "wstg_status": "Done",
+      "defectdojo_status": "verified",
+      "last_sync_timestamp": "2025-12-03T17:45:18.383393",
+      "last_sync_direction": "dd->tracker"
+    },
+    "WSTG-INFO-03": {
+      "finding_id": 14,
+      "wstg_status": "Done",
+      "defectdojo_status": "verified",
+      "last_sync_timestamp": "2025-12-03T17:45:18.382694",
+      "last_sync_direction": "dd->tracker"
+    },
+    "WSTG-INFO-04": {
+      "finding_id": 15,
+      "wstg_status": "Done",
+      "defectdojo_status": "verified",
+      "last_sync_timestamp": "2025-12-03T17:45:18.383072",
+      "last_sync_direction": "dd->tracker"
+    },
+    "WSTG-INFO-01": {
+      "finding_id": 16,
+      "wstg_status": "Done",
+      "defectdojo_status": "verified",
+      "last_sync_timestamp": "2025-12-03T17:45:18.383719",
+      "last_sync_direction": "dd->tracker"
+    }
+  }
+}

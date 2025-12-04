@@ -13,7 +13,7 @@
 # Uso: make [comando]
 # Ejemplo: make help
 
-.PHONY: help initDefectDojo update up build build-defectdojo logs logs-defectdojo ps down pdf_ASVS setup-env clean-temp clean-all purge
+.PHONY: help initDefectDojo update up build build-defectdojo logs logs-defectdojo ps down pdf_report setup-env clean-temp clean-all purge
 
 # Variables
 # Cargar .env si existe para configurar COMPOSE_PROJECT_NAME
@@ -205,10 +205,20 @@ down: setup-env ## Detener todos los servicios
 	@echo ""
 	@echo "✅ Todos los servicios detenidos"
 
-pdf_ASVS: ## Generar PDF del informe de seguridad ASVS con fecha
-	@echo "📄 Generando PDF del informe de seguridad ASVS..."
+pdf_report: setup-env ## Generar PDF del informe de seguridad (ASVS + WSTG) con fecha
+	@echo "📄 Generando informe de seguridad (ASVS + WSTG) y PDF..."
 	@echo ""
-	@python scripts/generate_pdf_report.py
+	@echo "Paso 1/3: Generando informe Markdown desde DefectDojo + análisis de código..."
+	@if docker-compose ps defectdojo | grep -q "Up"; then \
+		echo "   ℹ️  Ejecutando desde contenedor de DefectDojo para acceso a benchmarks ASVS..."; \
+		docker-compose exec -T defectdojo python /app/scripts/generate_asvs_report.py; \
+	else \
+		echo "   ⚠️  DefectDojo no está corriendo, ejecutando localmente (sin datos de DefectDojo)..."; \
+		python3 scripts/generate_asvs_report.py; \
+	fi
+	@echo ""
+	@echo "Paso 2/3: Generando PDF desde Markdown..."
+	@python3 scripts/generate_pdf_report.py
 	@echo ""
 	@echo "✅ PDF generado exitosamente en: docs/informes/"
 
@@ -223,6 +233,22 @@ clean-all: ## Limpiar TODO y volver al estado como recién clonado (DESTRUCTIVO)
 purge: down clean-all ## Detener todos los servicios y limpiar TODO (DESTRUCTIVO)
 	@echo ""
 	@echo "✅ Purge completado"
+
+# Sincronización WSTG
+sync-wstg: setup-env ## Sincronizar todos los findings WSTG (una vez)
+	@echo "🔄 Sincronizando findings WSTG..."
+	@$(COMPOSE) --profile defectdojo exec wstg-sync python /app/wstg_sync_service.py --once || \
+	 $(COMPOSE) --profile defectdojo run --rm wstg-sync python /app/wstg_sync_service.py --once || \
+	 echo "⚠️  Servicio wstg-sync no está corriendo. Ejecuta 'make up' o 'make initDefectDojo' primero."
+	@echo "✅ Sincronización completada"
+
+wstg-status: setup-env ## Obtener estado de sincronización WSTG
+	@echo "📊 Estado de sincronización WSTG:"
+	@curl -s http://localhost:5001/api/wstg/status | python3 -m json.tool || echo "⚠️  Error obteniendo estado. Verifica que la aplicación esté corriendo."
+
+wstg-logs: setup-env ## Ver logs del servicio de sincronización WSTG
+	@echo "📋 Logs del servicio WSTG:"
+	@$(COMPOSE) --profile defectdojo logs --tail=50 wstg-sync || echo "⚠️  Servicio wstg-sync no está corriendo."
 
 
 

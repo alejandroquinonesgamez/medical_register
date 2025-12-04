@@ -1,9 +1,13 @@
 #!/usr/bin/env python3
+# -*- coding: utf-8 -*-
 """
 Script para generar el PDF del informe de seguridad ASVS con fecha en el nombre.
 
-Lee el archivo docs/INFORME_SEGURIDAD_ASVS.md y lo convierte a PDF.
-El PDF se guarda en docs/informes/ con el formato: INFORME_SEGURIDAD_ASVS_YYYYMMDD.pdf
+Lee el archivo docs/INFORME_SEGURIDAD.md y lo convierte a PDF.
+El PDF se guarda en docs/informes/ con el formato: INFORME_SEGURIDAD_YYYYMMDD.pdf
+
+El informe está basado en OWASP ASVS versión 4.0.3 y OWASP WSTG (Web Security Testing Guide).
+Fuente oficial: https://github.com/OWASP/ASVS/tree/v4.0.3/4.0/
 
 Intenta usar múltiples métodos de conversión (en orden de preferencia):
 1. markdown2pdf
@@ -12,14 +16,306 @@ Intenta usar múltiples métodos de conversión (en orden de preferencia):
 4. pandoc (si está instalado en el sistema)
 
 Usado por:
-- make pdf_ASVS / .\make.ps1 pdf_ASVS
+- make pdf_report / .\\make.ps1 pdf_report
 - Endpoint /api/defectdojo/generate-pdf
 """
 
 import os
 import sys
+import re
 from datetime import datetime
 from pathlib import Path
+
+def remove_emojis(text):
+    """Eliminar emojis del texto para el PDF"""
+    # Patrón para eliminar emojis Unicode comunes y variantes
+    emoji_pattern = re.compile(
+        "["
+        "\U0001F600-\U0001F64F"  # emoticons
+        "\U0001F300-\U0001F5FF"  # symbols & pictographs
+        "\U0001F680-\U0001F6FF"  # transport & map symbols
+        "\U0001F1E0-\U0001F1FF"  # flags (iOS)
+        "\U00002702-\U000027B0"  # dingbats
+        "\U000024C2-\U0001F251"  # enclosed characters
+        "\U0001F900-\U0001F9FF"  # supplemental symbols and pictographs
+        "\U0001FA00-\U0001FA6F"  # chess symbols
+        "\U0001FA70-\U0001FAFF"  # symbols and pictographs extended-A
+        "\U00002600-\U000026FF"  # miscellaneous symbols
+        "\U00002700-\U000027BF"  # dingbats
+        "\U0001F300-\U0001F5FF"  # symbols & pictographs
+        "\U0001F900-\U0001F9FF"  # supplemental symbols
+        "\U0001FA00-\U0001FA6F"  # chess symbols
+        "\U0001FA70-\U0001FAFF"  # symbols extended-A
+        "\U00002139"  # information source (ℹ)
+        "\U00002122"  # trade mark sign (™)
+        "\U000021A9"  # leftwards arrow with hook (↩)
+        "\U0000231A"  # watch (⌚)
+        "\U000023E9"  # fast-forward button (⏩)
+        "\U000023EC"  # fast down button (⏬)
+        "\U000023F0"  # alarm clock (⏰)
+        "\U000023F3"  # hourglass done (⏳)
+        "\U000025FD"  # white medium-small square (◽)
+        "\U00002614"  # umbrella with rain drops (☔)
+        "\U00002615"  # hot beverage (☕)
+        "\U00002648"  # aries (♈)
+        "\U00002649"  # taurus (♉)
+        "\U0000264A"  # gemini (♊)
+        "\U0000264B"  # cancer (♋)
+        "\U0000264C"  # leo (♌)
+        "\U0000264D"  # virgo (♍)
+        "\U0000264E"  # libra (♎)
+        "\U0000264F"  # scorpius (♏)
+        "\U00002650"  # sagittarius (♐)
+        "\U00002651"  # capricorn (♑)
+        "\U00002652"  # aquarius (♒)
+        "\U00002653"  # pisces (♓)
+        "\U0000267F"  # wheelchair symbol (♿)
+        "\U00002693"  # anchor (⚓)
+        "\U000026A1"  # high voltage (⚡)
+        "\U000026AA"  # white circle (⚪)
+        "\U000026AB"  # black circle (⚫)
+        "\U000026B0"  # coffin (⚰)
+        "\U000026B1"  # funeral urn (⚱)
+        "\U000026C4"  # snowman without snow (⛄)
+        "\U000026C5"  # sun behind cloud (⛅)
+        "\U000026CE"  # ophiuchus (⛎)
+        "\U000026D4"  # no entry (⛔)
+        "\U000026EA"  # church (⛪)
+        "\U000026F2"  # fountain (⛲)
+        "\U000026F3"  # flag in hole (⛳)
+        "\U000026F5"  # sailboat (⛵)
+        "\U000026FA"  # tent (⛺)
+        "\U000026FD"  # fuel pump (⛽)
+        "\U00002705"  # check mark (✅)
+        "\U0000270A"  # raised fist (✊)
+        "\U0000270B"  # raised hand (✋)
+        "\U0000270C"  # victory hand (✌)
+        "\U0000270D"  # writing hand (✍)
+        "\U0000270F"  # pencil (✏)
+        "\U00002712"  # black nib (✒)
+        "\U00002714"  # heavy check mark (✔)
+        "\U00002716"  # heavy multiplication x (✖)
+        "\U0000271D"  # latin cross (✝)
+        "\U00002721"  # star of david (✡)
+        "\U00002728"  # sparkles (✨)
+        "\U00002733"  # eight-spoked asterisk (✳)
+        "\U00002734"  # eight-pointed star (✴)
+        "\U00002744"  # snowflake (❄)
+        "\U00002747"  # sparkle (❇)
+        "\U0000274C"  # cross mark (❌)
+        "\U0000274E"  # negative squared cross mark (❎)
+        "\U00002753"  # question mark ornament (❓)
+        "\U00002754"  # white question mark ornament (❔)
+        "\U00002755"  # white exclamation mark ornament (❕)
+        "\U00002757"  # heavy exclamation mark symbol (❗)
+        "\U0000275B"  # heavy left-pointing angle quotation mark ornament (❛)
+        "\U0000275C"  # heavy right-pointing angle quotation mark ornament (❜)
+        "\U0000275D"  # heavy left-pointing angle quotation mark ornament (❝)
+        "\U0000275E"  # heavy right-pointing angle quotation mark ornament (❞)
+        "\U00002761"  # heavy heart exclamation mark ornament (❡)
+        "\U00002763"  # heavy black heart (❣)
+        "\U00002764"  # black heart suit (❤)
+        "\U00002765"  # rotated heavy black heart bullet (❥)
+        "\U00002766"  # floral heart (❦)
+        "\U00002767"  # rotated floral heart bullet (❧)
+        "\U00002796"  # heavy minus sign (➖)
+        "\U00002797"  # heavy division sign (➗)
+        "\U000027A1"  # black rightwards arrow (➡)
+        "\U000027B0"  # curly loop (➰)
+        "\U0001F300-\U0001F5FF"  # symbols & pictographs
+        "\U0001F900-\U0001F9FF"  # supplemental symbols
+        "\U0001FA00-\U0001FA6F"  # chess symbols
+        "\U0001FA70-\U0001FAFF"  # symbols extended-A
+        "\U0000203C"  # double exclamation mark (‼)
+        "\U00002049"  # exclamation question mark (⁉)
+        "\U0000204A"  # tironian sign et (⁊)
+        "\U00002122"  # trade mark sign (™)
+        "\U00002139"  # information source (ℹ)
+        "\U000021A9"  # leftwards arrow with hook (↩)
+        "\U000021AA"  # rightwards arrow with hook (↪)
+        "\U0000231A"  # watch (⌚)
+        "\U0000231B"  # hourglass (⌛)
+        "\U000023E9"  # fast-forward button (⏩)
+        "\U000023EA"  # fast reverse button (⏪)
+        "\U000023EB"  # fast up button (⏫)
+        "\U000023EC"  # fast down button (⏬)
+        "\U000023ED"  # next track button (⏭)
+        "\U000023EE"  # last track button (⏮)
+        "\U000023EF"  # play or pause button (⏯)
+        "\U000023F0"  # alarm clock (⏰)
+        "\U000023F1"  # stopwatch (⏱)
+        "\U000023F2"  # timer clock (⏲)
+        "\U000023F3"  # hourglass done (⏳)
+        "\U000023F8"  # pause button (⏸)
+        "\U000023F9"  # stop button (⏹)
+        "\U000023FA"  # record button (⏺)
+        "\U000025FD"  # white medium-small square (◽)
+        "\U000025FE"  # black medium-small square (◾)
+        "\U00002614"  # umbrella with rain drops (☔)
+        "\U00002615"  # hot beverage (☕)
+        "\U00002648"  # aries (♈)
+        "\U00002649"  # taurus (♉)
+        "\U0000264A"  # gemini (♊)
+        "\U0000264B"  # cancer (♋)
+        "\U0000264C"  # leo (♌)
+        "\U0000264D"  # virgo (♍)
+        "\U0000264E"  # libra (♎)
+        "\U0000264F"  # scorpius (♏)
+        "\U00002650"  # sagittarius (♐)
+        "\U00002651"  # capricorn (♑)
+        "\U00002652"  # aquarius (♒)
+        "\U00002653"  # pisces (♓)
+        "\U0000267F"  # wheelchair symbol (♿)
+        "\U00002693"  # anchor (⚓)
+        "\U000026A1"  # high voltage (⚡)
+        "\U000026AA"  # white circle (⚪)
+        "\U000026AB"  # black circle (⚫)
+        "\U000026B0"  # coffin (⚰)
+        "\U000026B1"  # funeral urn (⚱)
+        "\U000026C4"  # snowman without snow (⛄)
+        "\U000026C5"  # sun behind cloud (⛅)
+        "\U000026CE"  # ophiuchus (⛎)
+        "\U000026D4"  # no entry (⛔)
+        "\U000026EA"  # church (⛪)
+        "\U000026F2"  # fountain (⛲)
+        "\U000026F3"  # flag in hole (⛳)
+        "\U000026F5"  # sailboat (⛵)
+        "\U000026FA"  # tent (⛺)
+        "\U000026FD"  # fuel pump (⛽)
+        "\U00002705"  # check mark (✅)
+        "\U0000270A"  # raised fist (✊)
+        "\U0000270B"  # raised hand (✋)
+        "\U0000270C"  # victory hand (✌)
+        "\U0000270D"  # writing hand (✍)
+        "\U0000270F"  # pencil (✏)
+        "\U00002712"  # black nib (✒)
+        "\U00002714"  # heavy check mark (✔)
+        "\U00002716"  # heavy multiplication x (✖)
+        "\U0000271D"  # latin cross (✝)
+        "\U00002721"  # star of david (✡)
+        "\U00002728"  # sparkles (✨)
+        "\U00002733"  # eight-spoked asterisk (✳)
+        "\U00002734"  # eight-pointed star (✴)
+        "\U00002744"  # snowflake (❄)
+        "\U00002747"  # sparkle (❇)
+        "\U0000274C"  # cross mark (❌)
+        "\U0000274E"  # negative squared cross mark (❎)
+        "\U00002753"  # question mark ornament (❓)
+        "\U00002754"  # white question mark ornament (❔)
+        "\U00002755"  # white exclamation mark ornament (❕)
+        "\U00002757"  # heavy exclamation mark symbol (❗)
+        "\U0000275B"  # heavy left-pointing angle quotation mark ornament (❛)
+        "\U0000275C"  # heavy right-pointing angle quotation mark ornament (❜)
+        "\U0000275D"  # heavy left-pointing angle quotation mark ornament (❝)
+        "\U0000275E"  # heavy right-pointing angle quotation mark ornament (❞)
+        "\U00002761"  # heavy heart exclamation mark ornament (❡)
+        "\U00002763"  # heavy black heart (❣)
+        "\U00002764"  # black heart suit (❤)
+        "\U00002765"  # rotated heavy black heart bullet (❥)
+        "\U00002766"  # floral heart (❦)
+        "\U00002767"  # rotated floral heart bullet (❧)
+        "\U00002796"  # heavy minus sign (➖)
+        "\U00002797"  # heavy division sign (➗)
+        "\U000027A1"  # black rightwards arrow (➡)
+        "\U000027B0"  # curly loop (➰)
+        "\U0001F300-\U0001F5FF"  # symbols & pictographs
+        "\U0001F900-\U0001F9FF"  # supplemental symbols
+        "\U0001FA00-\U0001FA6F"  # chess symbols
+        "\U0001FA70-\U0001FAFF"  # symbols extended-A
+        "\U0000203C"  # double exclamation mark (‼)
+        "\U00002049"  # exclamation question mark (⁉)
+        "\U0000204A"  # tironian sign et (⁊)
+        "\U00002122"  # trade mark sign (™)
+        "\U00002139"  # information source (ℹ)
+        "\U000021A9"  # leftwards arrow with hook (↩)
+        "\U000021AA"  # rightwards arrow with hook (↪)
+        "\U0000231A"  # watch (⌚)
+        "\U0000231B"  # hourglass (⌛)
+        "\U000023E9"  # fast-forward button (⏩)
+        "\U000023EA"  # fast reverse button (⏪)
+        "\U000023EB"  # fast up button (⏫)
+        "\U000023EC"  # fast down button (⏬)
+        "\U000023ED"  # next track button (⏭)
+        "\U000023EE"  # last track button (⏮)
+        "\U000023EF"  # play or pause button (⏯)
+        "\U000023F0"  # alarm clock (⏰)
+        "\U000023F1"  # stopwatch (⏱)
+        "\U000023F2"  # timer clock (⏲)
+        "\U000023F3"  # hourglass done (⏳)
+        "\U000023F8"  # pause button (⏸)
+        "\U000023F9"  # stop button (⏹)
+        "\U000023FA"  # record button (⏺)
+        "\U000025FD"  # white medium-small square (◽)
+        "\U000025FE"  # black medium-small square (◾)
+        "\U00002614"  # umbrella with rain drops (☔)
+        "\U00002615"  # hot beverage (☕)
+        "\U00002648"  # aries (♈)
+        "\U00002649"  # taurus (♉)
+        "\U0000264A"  # gemini (♊)
+        "\U0000264B"  # cancer (♋)
+        "\U0000264C"  # leo (♌)
+        "\U0000264D"  # virgo (♍)
+        "\U0000264E"  # libra (♎)
+        "\U0000264F"  # scorpius (♏)
+        "\U00002650"  # sagittarius (♐)
+        "\U00002651"  # capricorn (♑)
+        "\U00002652"  # aquarius (♒)
+        "\U00002653"  # pisces (♓)
+        "\U0000267F"  # wheelchair symbol (♿)
+        "\U00002693"  # anchor (⚓)
+        "\U000026A1"  # high voltage (⚡)
+        "\U000026AA"  # white circle (⚪)
+        "\U000026AB"  # black circle (⚫)
+        "\U000026B0"  # coffin (⚰)
+        "\U000026B1"  # funeral urn (⚱)
+        "\U000026C4"  # snowman without snow (⛄)
+        "\U000026C5"  # sun behind cloud (⛅)
+        "\U000026CE"  # ophiuchus (⛎)
+        "\U000026D4"  # no entry (⛔)
+        "\U000026EA"  # church (⛪)
+        "\U000026F2"  # fountain (⛲)
+        "\U000026F3"  # flag in hole (⛳)
+        "\U000026F5"  # sailboat (⛵)
+        "\U000026FA"  # tent (⛺)
+        "\U000026FD"  # fuel pump (⛽)
+        "\U00002705"  # check mark (✅)
+        "\U0000270A"  # raised fist (✊)
+        "\U0000270B"  # raised hand (✋)
+        "\U0000270C"  # victory hand (✌)
+        "\U0000270D"  # writing hand (✍)
+        "\U0000270F"  # pencil (✏)
+        "\U00002712"  # black nib (✒)
+        "\U00002714"  # heavy check mark (✔)
+        "\U00002716"  # heavy multiplication x (✖)
+        "\U0000271D"  # latin cross (✝)
+        "\U00002721"  # star of david (✡)
+        "\U00002728"  # sparkles (✨)
+        "\U00002733"  # eight-spoked asterisk (✳)
+        "\U00002734"  # eight-pointed star (✴)
+        "\U00002744"  # snowflake (❄)
+        "\U00002747"  # sparkle (❇)
+        "\U0000274C"  # cross mark (❌)
+        "\U0000274E"  # negative squared cross mark (❎)
+        "\U00002753"  # question mark ornament (❓)
+        "\U00002754"  # white question mark ornament (❔)
+        "\U00002755"  # white exclamation mark ornament (❕)
+        "\U00002757"  # heavy exclamation mark symbol (❗)
+        "\U0000275B"  # heavy left-pointing angle quotation mark ornament (❛)
+        "\U0000275C"  # heavy right-pointing angle quotation mark ornament (❜)
+        "\U0000275D"  # heavy left-pointing angle quotation mark ornament (❝)
+        "\U0000275E"  # heavy right-pointing angle quotation mark ornament (❞)
+        "\U00002761"  # heavy heart exclamation mark ornament (❡)
+        "\U00002763"  # heavy black heart (❣)
+        "\U00002764"  # black heart suit (❤)
+        "\U00002765"  # rotated heavy black heart bullet (❥)
+        "\U00002766"  # floral heart (❦)
+        "\U00002767"  # rotated floral heart bullet (❧)
+        "\U00002796"  # heavy minus sign (➖)
+        "\U00002797"  # heavy division sign (➗)
+        "\U000027A1"  # black rightwards arrow (➡)
+        "\U000027B0"  # curly loop (➰)
+        "]+", flags=re.UNICODE)
+    return emoji_pattern.sub('', text)
 
 def generate_pdf_report():
     """Generar PDF del informe de seguridad con fecha"""
@@ -29,7 +325,7 @@ def generate_pdf_report():
     project_root = script_dir.parent
     docs_dir = project_root / "docs"
     informes_dir = docs_dir / "informes"
-    report_md = docs_dir / "INFORME_SEGURIDAD_ASVS.md"
+    report_md = docs_dir / "INFORME_SEGURIDAD.md"
     
     # Crear carpeta de informes si no existe
     informes_dir.mkdir(parents=True, exist_ok=True)
@@ -41,7 +337,7 @@ def generate_pdf_report():
     
     # Generar nombre del PDF con fecha
     fecha = datetime.now().strftime("%Y%m%d")
-    pdf_name = f"INFORME_SEGURIDAD_ASVS_{fecha}.pdf"
+    pdf_name = f"INFORME_SEGURIDAD_{fecha}.pdf"
     pdf_path = informes_dir / pdf_name
     
     print(f"📄 Generando PDF: {pdf_name}")
@@ -55,10 +351,29 @@ def generate_pdf_report():
     # Método 1: Usar markdown2pdf (si está disponible)
     try:
         from markdown2pdf import convert_md_to_pdf
+        import tempfile
+        
         print("   Método: markdown2pdf")
-        convert_md_to_pdf(str(report_md), str(pdf_path))
-        success = True
-        print("   ✅ PDF generado con markdown2pdf")
+        
+        # Leer el archivo Markdown y eliminar emojis
+        with open(report_md, 'r', encoding='utf-8') as f:
+            md_content = f.read()
+        
+        # Eliminar emojis del contenido para el PDF
+        md_content = remove_emojis(md_content)
+        
+        # Crear archivo temporal sin emojis
+        with tempfile.NamedTemporaryFile(mode='w', suffix='.md', delete=False, encoding='utf-8') as tmp_file:
+            tmp_file.write(md_content)
+            tmp_md_path = tmp_file.name
+        
+        try:
+            convert_md_to_pdf(tmp_md_path, str(pdf_path))
+            success = True
+            print("   ✅ PDF generado con markdown2pdf")
+        finally:
+            # Eliminar archivo temporal
+            os.unlink(tmp_md_path)
     except ImportError:
         print("   ⚠️  markdown2pdf no disponible")
     except Exception as e:
@@ -76,6 +391,9 @@ def generate_pdf_report():
             # Leer el archivo Markdown
             with open(report_md, 'r', encoding='utf-8') as f:
                 md_content = f.read()
+            
+            # Eliminar emojis del contenido para el PDF
+            md_content = remove_emojis(md_content)
             
             # Convertir Markdown a HTML
             md = markdown.Markdown(extensions=['extra', 'tables', 'codehilite'])
@@ -224,6 +542,9 @@ def generate_pdf_report():
             with open(report_md, 'r', encoding='utf-8') as f:
                 md_content = f.read()
             
+            # Eliminar emojis del contenido para el PDF
+            md_content = remove_emojis(md_content)
+            
             # Convertir Markdown a HTML
             md = markdown.Markdown(extensions=['extra', 'tables'])
             html_content = md.convert(md_content)
@@ -364,12 +685,30 @@ def generate_pdf_report():
             import subprocess
             
             print("   Método: pandoc (sistema)")
-            result = subprocess.run(
-                ['pandoc', str(report_md), '-o', str(pdf_path), '--pdf-engine=xelatex'],
-                capture_output=True,
-                text=True,
-                timeout=60
-            )
+            
+            # Leer el archivo Markdown y eliminar emojis
+            with open(report_md, 'r', encoding='utf-8') as f:
+                md_content = f.read()
+            
+            # Eliminar emojis del contenido para el PDF
+            md_content = remove_emojis(md_content)
+            
+            # Crear archivo temporal sin emojis
+            import tempfile
+            with tempfile.NamedTemporaryFile(mode='w', suffix='.md', delete=False, encoding='utf-8') as tmp_file:
+                tmp_file.write(md_content)
+                tmp_md_path = tmp_file.name
+            
+            try:
+                result = subprocess.run(
+                    ['pandoc', tmp_md_path, '-o', str(pdf_path), '--pdf-engine=xelatex'],
+                    capture_output=True,
+                    text=True,
+                    timeout=60
+                )
+            finally:
+                # Eliminar archivo temporal
+                os.unlink(tmp_md_path)
             
             if result.returncode == 0:
                 success = True
