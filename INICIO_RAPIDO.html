@@ -3,12 +3,12 @@
   <head><meta charset="utf-8">
     <meta name="viewport" content="width=device-width,initial-scale=1">
     <meta name="color-scheme" content="light dark"><meta name="viewport" content="width=device-width, initial-scale=1" />
-<link rel="index" title="Index" href="genindex.html"><link rel="search" title="Search" href="search.html"><link rel="next" title="Mockups y Diagramas" href="mockups/MOCKUPS.html"><link rel="prev" title="Informe de Análisis de Seguridad - Aplicación Médica" href="INFORME_SEGURIDAD.html">
+<link rel="index" title="Index" href="genindex.html"><link rel="search" title="Search" href="search.html"><link rel="next" title="Mockups y Diagramas" href="mockups/MOCKUPS.html"><link rel="prev" title="Requerimientos Funcionales" href="requeriments.html">
 
-    <!-- Generated with Sphinx 8.1.3 and Furo 2025.09.25 -->
+    <!-- Generated with Sphinx 8.1.3 and Furo 2025.12.19 -->
         <title>Inicio Rápido - Medical Register 0.1.0 documentation</title>
       <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=d111a655" />
-    <link rel="stylesheet" type="text/css" href="_static/styles/furo.css?v=580074bf" />
+    <link rel="stylesheet" type="text/css" href="_static/styles/furo.css?v=7bdb33bb" />
     <link rel="stylesheet" type="text/css" href="_static/styles/furo-extensions.css?v=8dab3a3b" />
     
     
@@ -195,21 +195,8 @@
 <ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="manual.html">Manual de Usuario - Registro Personal de Peso e IMC</a></li>
 <li class="toctree-l1"><a class="reference internal" href="requeriments.html">Requerimientos Funcionales</a></li>
-<li class="toctree-l1"><a class="reference internal" href="INFORME_SEGURIDAD.html">Informe de Análisis de Seguridad - Aplicación Médica</a></li>
 <li class="toctree-l1 current current-page"><a class="current reference internal" href="#">Inicio Rápido</a></li>
 <li class="toctree-l1"><a class="reference internal" href="mockups/MOCKUPS.html">Mockups y Diagramas</a></li>
-</ul>
-<p class="caption" role="heading"><span class="caption-text">DefectDojo:</span></p>
-<ul>
-<li class="toctree-l1"><a class="reference internal" href="defectdojo/ANALISIS_CWE_699.html">Análisis de Seguridad según CWE-699</a></li>
-<li class="toctree-l1"><a class="reference internal" href="defectdojo/ESTADO_ACTUAL_CWE_699.html">Estado Actual del Programa - Análisis CWE-699</a></li>
-<li class="toctree-l1"><a class="reference internal" href="defectdojo/DEFECTDOJO_CONFIGURACION.html">Configuración de DefectDojo</a></li>
-<li class="toctree-l1"><a class="reference internal" href="defectdojo/DEFECTDOJO_CREDENTIALS.html">Credenciales de DefectDojo</a></li>
-<li class="toctree-l1"><a class="reference internal" href="defectdojo/DEFECTDOJO_DATABASE.html">Gestión de Base de Datos de DefectDojo</a></li>
-<li class="toctree-l1"><a class="reference internal" href="defectdojo/DEFECTDOJO_INTEGRATION.html">Integración de DefectDojo</a></li>
-<li class="toctree-l1"><a class="reference internal" href="defectdojo/DEFECTDOJO_FLUJO_CREACION_RESOLUCION.html">Flujo de Creación y Resolución de Findings en DefectDojo</a></li>
-<li class="toctree-l1"><a class="reference internal" href="defectdojo/DEFECTDOJO_FLUJO_IMPLEMENTADO.html">Flujo de Creación → Resolución Implementado en DefectDojo</a></li>
-<li class="toctree-l1"><a class="reference internal" href="defectdojo/MAKE_ALL_USO.html">Uso de <code class="docutils literal notranslate"><span class="pre">make</span> <span class="pre">update</span></code> - Flujo Completo de DefectDojo</a></li>
 </ul>
 
 </div>
@@ -256,7 +243,6 @@
 <ul class="simple">
 <li><p>Docker y docker-compose instalados</p></li>
 <li><p>Git (para clonar el repositorio)</p></li>
-<li><p>~5GB de espacio en disco (para DefectDojo)</p></li>
 </ul>
 </section>
 <section id="instalacion-en-3-pasos">
@@ -289,257 +275,76 @@
 <div><p><strong>Nota</strong>: Si no ejecutas el script de setup, el archivo <code class="docutils literal notranslate"><span class="pre">.env</span></code> se creará automáticamente la primera vez que uses <code class="docutils literal notranslate"><span class="pre">make</span></code> o <code class="docutils literal notranslate"><span class="pre">make.ps1</span></code>. Esto soluciona problemas con rutas que contienen caracteres especiales.</p>
 </div></blockquote>
 </section>
-<section id="arrancar-los-servicios">
-<h3>3. Arrancar los Servicios<a class="headerlink" href="#arrancar-los-servicios" title="Link to this heading">¶</a></h3>
-<section id="opcion-a-usando-make-make-ps1-recomendado">
-<h4>Opción A: Usando Make/make.ps1 (Recomendado)<a class="headerlink" href="#opcion-a-usando-make-make-ps1-recomendado" title="Link to this heading">¶</a></h4>
-<p><strong>En Linux/Mac o Git Bash (Windows):</strong></p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="c1"># Solo la aplicación principal (por defecto)</span>
-make
-<span class="c1"># o explícitamente:</span>
-make<span class="w"> </span>default
-
-<span class="c1"># Iniciar DefectDojo vacío (sin findings)</span>
-make<span class="w"> </span>initDefectDojo
-
-<span class="c1"># Despliegue completo con actualización de findings</span>
-make<span class="w"> </span>update
-
-<span class="c1"># Ver ayuda con todos los comandos</span>
-make<span class="w"> </span><span class="nb">help</span>
-</pre></div>
-</div>
-<p><strong>En PowerShell (Windows):</strong></p>
-<div class="highlight-powershell notranslate"><div class="highlight"><pre><span></span><span class="c"># Solo la aplicación principal (por defecto)</span>
-<span class="p">.\</span><span class="n">make</span><span class="p">.</span><span class="n">ps1</span>
-<span class="c"># o explícitamente:</span>
-<span class="p">.\</span><span class="n">make</span><span class="p">.</span><span class="n">ps1</span> <span class="k">default</span>
-
-<span class="c"># Iniciar DefectDojo vacío (sin findings)</span>
-<span class="p">.\</span><span class="n">make</span><span class="p">.</span><span class="n">ps1</span> <span class="n">initDefectDojo</span>
-
-<span class="c"># Despliegue completo con actualización de findings</span>
-<span class="p">.\</span><span class="n">make</span><span class="p">.</span><span class="n">ps1</span> <span class="n">update</span>
-
-<span class="c"># Ver ayuda con todos los comandos</span>
-<span class="p">.\</span><span class="n">make</span><span class="p">.</span><span class="n">ps1</span> <span class="n">help</span>
-</pre></div>
-</div>
-</section>
-<section id="opcion-b-usando-docker-compose-directamente">
-<h4>Opción B: Usando docker-compose directamente<a class="headerlink" href="#opcion-b-usando-docker-compose-directamente" title="Link to this heading">¶</a></h4>
-<p><strong>Solo la Aplicación Principal:</strong></p>
+<section id="arrancar-la-aplicacion">
+<h3>3. Arrancar la Aplicación<a class="headerlink" href="#arrancar-la-aplicacion" title="Link to this heading">¶</a></h3>
+<p><strong>Usando docker-compose:</strong></p>
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>docker-compose<span class="w"> </span>up<span class="w"> </span>-d
 </pre></div>
 </div>
 <p>Accede a: <strong>http://localhost:5001</strong></p>
-<p><strong>Con DefectDojo (Gestión de Vulnerabilidades):</strong></p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="c1"># Arrancar DefectDojo y dependencias</span>
-docker-compose<span class="w"> </span>--profile<span class="w"> </span>defectdojo<span class="w"> </span>up<span class="w"> </span>-d
-</pre></div>
-</div>
-<p><strong>La inicialización es automática</strong>: Al arrancar, DefectDojo ejecuta automáticamente:</p>
-<ul class="simple">
-<li><p>✅ Migraciones de la base de datos</p></li>
-<li><p>✅ Recolección de archivos estáticos</p></li>
-<li><p>✅ Creación del usuario admin (admin/admin)</p></li>
-</ul>
-<p>Accede a:</p>
-<ul class="simple">
-<li><p><strong>Aplicación Flask</strong>: http://localhost:5001</p></li>
-<li><p><strong>DefectDojo</strong>: http://localhost:8080</p>
-<ul>
-<li><p>Usuario: <code class="docutils literal notranslate"><span class="pre">admin</span></code></p></li>
-<li><p>Contraseña: <code class="docutils literal notranslate"><span class="pre">admin</span></code></p></li>
-</ul>
-</li>
-</ul>
 </section>
-</section>
-</section>
-<section id="estructura-de-datos">
-<h2>📁 Estructura de Datos<a class="headerlink" href="#estructura-de-datos" title="Link to this heading">¶</a></h2>
-<p>Los datos persistentes se almacenan en directorios locales (no volúmenes Docker):</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>data/
-├── postgres/          # Base de datos PostgreSQL
-├── redis/             # Datos de Redis
-└── defectdojo/
-    ├── media/         # Archivos multimedia
-    └── static/        # Archivos estáticos
-</pre></div>
-</div>
-<p>Estos directorios se crean automáticamente y están en <code class="docutils literal notranslate"><span class="pre">.gitignore</span></code> (no se suben al repositorio).</p>
 </section>
 <section id="comandos-utiles">
 <h2>🔧 Comandos Útiles<a class="headerlink" href="#comandos-utiles" title="Link to this heading">¶</a></h2>
-<section id="comandos-disponibles-make-make-ps1">
-<h3>Comandos Disponibles (Make/make.ps1)<a class="headerlink" href="#comandos-disponibles-make-make-ps1" title="Link to this heading">¶</a></h3>
-<section id="comandos-principales">
-<h4>Comandos Principales<a class="headerlink" href="#comandos-principales" title="Link to this heading">¶</a></h4>
-<div class="table-wrapper colwidths-auto docutils container">
-<table class="docutils align-default">
-<thead>
-<tr class="row-odd"><th class="head"><p>Comando</p></th>
-<th class="head"><p>Descripción</p></th>
-</tr>
-</thead>
-<tbody>
-<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">make</span></code> / <code class="docutils literal notranslate"><span class="pre">.\make.ps1</span></code></p></td>
-<td><p>Arrancar solo la aplicación principal (por defecto)</p></td>
-</tr>
-<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">make</span> <span class="pre">default</span></code> / <code class="docutils literal notranslate"><span class="pre">.\make.ps1</span> <span class="pre">default</span></code></p></td>
-<td><p>Arrancar solo la aplicación principal</p></td>
-</tr>
-<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">make</span> <span class="pre">initDefectDojo</span></code> / <code class="docutils literal notranslate"><span class="pre">.\make.ps1</span> <span class="pre">initDefectDojo</span></code></p></td>
-<td><p>Iniciar DefectDojo vacío (sin findings)</p></td>
-</tr>
-<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">make</span> <span class="pre">update</span></code> / <code class="docutils literal notranslate"><span class="pre">.\make.ps1</span> <span class="pre">update</span></code></p></td>
-<td><p>Levantar aplicación y DefectDojo, y actualizar flujo de findings</p></td>
-</tr>
-<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">make</span> <span class="pre">pdf_report</span></code> / <code class="docutils literal notranslate"><span class="pre">.\make.ps1</span> <span class="pre">pdf_report</span></code></p></td>
-<td><p>Generar PDF del informe de seguridad (ASVS + WSTG) con fecha</p></td>
-</tr>
-</tbody>
-</table>
-</div>
-</section>
-<section id="comandos-de-gestion">
-<h4>Comandos de Gestión<a class="headerlink" href="#comandos-de-gestion" title="Link to this heading">¶</a></h4>
-<div class="table-wrapper colwidths-auto docutils container">
-<table class="docutils align-default">
-<thead>
-<tr class="row-odd"><th class="head"><p>Comando</p></th>
-<th class="head"><p>Descripción</p></th>
-</tr>
-</thead>
-<tbody>
-<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">make</span> <span class="pre">logs</span></code> / <code class="docutils literal notranslate"><span class="pre">.\make.ps1</span> <span class="pre">logs</span></code></p></td>
-<td><p>Ver logs de la aplicación principal</p></td>
-</tr>
-<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">make</span> <span class="pre">logs-defectdojo</span></code> / <code class="docutils literal notranslate"><span class="pre">.\make.ps1</span> <span class="pre">logs-defectdojo</span></code></p></td>
-<td><p>Ver logs de DefectDojo</p></td>
-</tr>
-<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">make</span> <span class="pre">ps</span></code> / <code class="docutils literal notranslate"><span class="pre">.\make.ps1</span> <span class="pre">ps</span></code></p></td>
-<td><p>Ver estado de todos los contenedores</p></td>
-</tr>
-<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">make</span> <span class="pre">down</span></code> / <code class="docutils literal notranslate"><span class="pre">.\make.ps1</span> <span class="pre">down</span></code></p></td>
-<td><p>Detener todos los servicios</p></td>
-</tr>
-<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">make</span> <span class="pre">check</span></code> / <code class="docutils literal notranslate"><span class="pre">.\make.ps1</span> <span class="pre">check</span></code></p></td>
-<td><p>Verificar requisitos previos (Docker, Docker Compose)</p></td>
-</tr>
-<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">make</span> <span class="pre">help</span></code> / <code class="docutils literal notranslate"><span class="pre">.\make.ps1</span> <span class="pre">help</span></code></p></td>
-<td><p>Mostrar ayuda con todos los comandos</p></td>
-</tr>
-</tbody>
-</table>
-</div>
-</section>
-</section>
-<section id="usando-docker-compose-directamente">
-<h3>Usando docker-compose directamente<a class="headerlink" href="#usando-docker-compose-directamente" title="Link to this heading">¶</a></h3>
 <section id="ver-estado-de-los-servicios">
-<h4>Ver Estado de los Servicios<a class="headerlink" href="#ver-estado-de-los-servicios" title="Link to this heading">¶</a></h4>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="c1"># Solo aplicación principal</span>
-docker-compose<span class="w"> </span>ps
-
-<span class="c1"># Con DefectDojo</span>
-docker-compose<span class="w"> </span>--profile<span class="w"> </span>defectdojo<span class="w"> </span>ps
+<h3>Ver Estado de los Servicios<a class="headerlink" href="#ver-estado-de-los-servicios" title="Link to this heading">¶</a></h3>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>docker-compose<span class="w"> </span>ps
 </pre></div>
 </div>
 </section>
 <section id="ver-logs">
-<h4>Ver Logs<a class="headerlink" href="#ver-logs" title="Link to this heading">¶</a></h4>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="c1"># Aplicación principal</span>
-docker-compose<span class="w"> </span>logs<span class="w"> </span>-f<span class="w"> </span>web
-
-<span class="c1"># DefectDojo</span>
-docker-compose<span class="w"> </span>--profile<span class="w"> </span>defectdojo<span class="w"> </span>logs<span class="w"> </span>-f<span class="w"> </span>defectdojo
+<h3>Ver Logs<a class="headerlink" href="#ver-logs" title="Link to this heading">¶</a></h3>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>docker-compose<span class="w"> </span>logs<span class="w"> </span>-f<span class="w"> </span>web
 </pre></div>
 </div>
 </section>
-<section id="detener-servicios">
-<h4>Detener Servicios<a class="headerlink" href="#detener-servicios" title="Link to this heading">¶</a></h4>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="c1"># Solo aplicación principal</span>
-docker-compose<span class="w"> </span>down
-
-<span class="c1"># Con DefectDojo</span>
-docker-compose<span class="w"> </span>--profile<span class="w"> </span>defectdojo<span class="w"> </span>down
+<section id="detener-la-aplicacion">
+<h3>Detener la Aplicación<a class="headerlink" href="#detener-la-aplicacion" title="Link to this heading">¶</a></h3>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>docker-compose<span class="w"> </span>down
 </pre></div>
 </div>
 </section>
-<section id="reinicializar-defectdojo">
-<h4>Reinicializar DefectDojo<a class="headerlink" href="#reinicializar-defectdojo" title="Link to this heading">¶</a></h4>
-<p>Si necesitas empezar de cero con DefectDojo:</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="c1"># Detener servicios</span>
-docker-compose<span class="w"> </span>--profile<span class="w"> </span>defectdojo<span class="w"> </span>down
-
-<span class="c1"># Eliminar datos (¡CUIDADO! Esto borra todo)</span>
-<span class="c1"># En Linux/Mac:</span>
-rm<span class="w"> </span>-rf<span class="w"> </span>data/postgres/*<span class="w"> </span>data/redis/*<span class="w"> </span>data/defectdojo/*
-<span class="c1"># En PowerShell (Windows):</span>
-Remove-Item<span class="w"> </span>-Path<span class="w"> </span><span class="s2">&quot;data\postgres\*&quot;</span>,<span class="w"> </span><span class="s2">&quot;data\redis\*&quot;</span>,<span class="w"> </span><span class="s2">&quot;data\defectdojo\*&quot;</span><span class="w"> </span>-Recurse<span class="w"> </span>-Force
-
-<span class="c1"># Arrancar de nuevo</span>
-docker-compose<span class="w"> </span>--profile<span class="w"> </span>defectdojo<span class="w"> </span>up<span class="w"> </span>-d
-./scripts/reset_defectdojo.sh
+<section id="reconstruir-la-aplicacion">
+<h3>Reconstruir la Aplicación<a class="headerlink" href="#reconstruir-la-aplicacion" title="Link to this heading">¶</a></h3>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>docker-compose<span class="w"> </span>up<span class="w"> </span>--build<span class="w"> </span>-d
 </pre></div>
 </div>
-</section>
 </section>
 </section>
 <section id="notas-importantes">
 <h2>⚠️ Notas Importantes<a class="headerlink" href="#notas-importantes" title="Link to this heading">¶</a></h2>
 <ol class="arabic simple">
-<li><p><strong>Inicialización automática</strong>: La inicialización de DefectDojo (migraciones, estáticos, usuario admin) se ejecuta automáticamente al arrancar el contenedor. No necesitas ejecutar scripts manualmente.</p></li>
-<li><p><strong>Tiempo de inicio</strong>: DefectDojo puede tardar varios minutos en iniciar la primera vez (descarga de imágenes, migraciones, etc.).</p></li>
-<li><p><strong>Credenciales</strong>: Las credenciales por defecto (<code class="docutils literal notranslate"><span class="pre">admin/admin</span></code>) son solo para desarrollo. <strong>Cambia las contraseñas en producción</strong>.</p></li>
-<li><p><strong>Raspberry Pi</strong>: Si estás usando Raspberry Pi, DefectDojo puede requerir emulación QEMU y será más lento. Consulta <code class="docutils literal notranslate"><span class="pre">docs/RASPBERRY_PI_SETUP.md</span></code> para más información.</p></li>
+<li><p><strong>Modo Producción</strong>: La aplicación está configurada para ejecutarse en modo producción (<code class="docutils literal notranslate"><span class="pre">FLASK_ENV=production</span></code>).</p></li>
+<li><p><strong>Datos</strong>: Los datos se almacenan en memoria (backend) y localStorage (frontend). No hay persistencia de base de datos.</p></li>
+<li><p><strong>Puerto</strong>: La aplicación corre en el puerto 5001 por defecto.</p></li>
 </ol>
 </section>
 <section id="solucion-de-problemas">
 <h2>🆘 Solución de Problemas<a class="headerlink" href="#solucion-de-problemas" title="Link to this heading">¶</a></h2>
-<section id="el-script-reset-defectdojo-sh-falla">
-<h3>El script <code class="docutils literal notranslate"><span class="pre">reset_defectdojo.sh</span></code> falla<a class="headerlink" href="#el-script-reset-defectdojo-sh-falla" title="Link to this heading">¶</a></h3>
-<p>Asegúrate de que los servicios estén arrancados:</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>docker-compose<span class="w"> </span>--profile<span class="w"> </span>defectdojo<span class="w"> </span>ps
-</pre></div>
-</div>
-<p>Si algún servicio no está “healthy”, espera unos minutos y vuelve a intentar.</p>
-</section>
-<section id="no-puedo-acceder-a-defectdojo">
-<h3>No puedo acceder a DefectDojo<a class="headerlink" href="#no-puedo-acceder-a-defectdojo" title="Link to this heading">¶</a></h3>
+<section id="no-puedo-acceder-a-la-aplicacion">
+<h3>No puedo acceder a la aplicación<a class="headerlink" href="#no-puedo-acceder-a-la-aplicacion" title="Link to this heading">¶</a></h3>
 <ol class="arabic">
 <li><p>Verifica que el servicio esté corriendo:</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>docker-compose<span class="w"> </span>--profile<span class="w"> </span>defectdojo<span class="w"> </span>ps<span class="w"> </span>defectdojo-nginx
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>docker-compose<span class="w"> </span>ps
 </pre></div>
 </div>
 </li>
 <li><p>Verifica los logs:</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>docker-compose<span class="w"> </span>--profile<span class="w"> </span>defectdojo<span class="w"> </span>logs<span class="w"> </span>defectdojo
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>docker-compose<span class="w"> </span>logs<span class="w"> </span>web
 </pre></div>
 </div>
 </li>
-<li><p>La inicialización es automática, pero puedes ejecutar <code class="docutils literal notranslate"><span class="pre">reset_defectdojo.sh</span></code> si hay problemas</p></li>
-</ol>
-</section>
-<section id="la-base-de-datos-esta-vacia">
-<h3>La base de datos está vacía<a class="headerlink" href="#la-base-de-datos-esta-vacia" title="Link to this heading">¶</a></h3>
-<p>Ejecuta las migraciones manualmente:</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>docker-compose<span class="w"> </span>--profile<span class="w"> </span>defectdojo<span class="w"> </span><span class="nb">exec</span><span class="w"> </span>defectdojo<span class="w"> </span>python<span class="w"> </span>manage.py<span class="w"> </span>migrate
+<li><p>Verifica que el puerto 5001 no esté en uso:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="c1"># En Linux/Mac</span>
+lsof<span class="w"> </span>-i<span class="w"> </span>:5001
+
+<span class="c1"># En Windows</span>
+netstat<span class="w"> </span>-ano<span class="w"> </span><span class="p">|</span><span class="w"> </span>findstr<span class="w"> </span>:5001
 </pre></div>
 </div>
+</li>
+</ol>
 </section>
-</section>
-<section id="mas-informacion">
-<h2>📚 Más Información<a class="headerlink" href="#mas-informacion" title="Link to this heading">¶</a></h2>
-<ul class="simple">
-<li><p><a class="reference internal" href="#DOCKER_COMPOSE_USO.md"><span class="xref myst">Uso de Docker Compose</span></a></p></li>
-<li><p><a class="reference internal" href="defectdojo/DEFECTDOJO_CONFIGURACION.html"><span class="std std-doc">Configuración de DefectDojo</span></a></p></li>
-<li><p><a class="reference internal" href="defectdojo/DEFECTDOJO_CREDENTIALS.html"><span class="std std-doc">Credenciales de DefectDojo</span></a></p></li>
-<li><p><a class="reference internal" href="defectdojo/DEFECTDOJO_INTEGRATION.html"><span class="std std-doc">Integración de DefectDojo</span></a></p></li>
-<li><p><a class="reference internal" href="#RASPBERRY_PI_SETUP.md"><span class="xref myst">Configuración para Raspberry Pi</span></a></p></li>
-</ul>
 </section>
 </section>
 
@@ -557,14 +362,14 @@ docker-compose<span class="w"> </span>--profile<span class="w"> </span>defectdoj
               </div>
               <svg class="furo-related-icon"><use href="#svg-arrow-right"></use></svg>
             </a>
-          <a class="prev-page" href="INFORME_SEGURIDAD.html">
+          <a class="prev-page" href="requeriments.html">
               <svg class="furo-related-icon"><use href="#svg-arrow-right"></use></svg>
               <div class="page-info">
                 <div class="context">
                   <span>Previous</span>
                 </div>
                 
-                <div class="title">Informe de Análisis de Seguridad - Aplicación Médica</div>
+                <div class="title">Requerimientos Funcionales</div>
                 
               </div>
             </a>
@@ -603,37 +408,21 @@ docker-compose<span class="w"> </span>--profile<span class="w"> </span>defectdoj
 <li><a class="reference internal" href="#instalacion-en-3-pasos">🚀 Instalación en 3 Pasos</a><ul>
 <li><a class="reference internal" href="#clonar-el-repositorio">1. Clonar el Repositorio</a></li>
 <li><a class="reference internal" href="#configurar-el-proyecto">2. Configurar el Proyecto</a></li>
-<li><a class="reference internal" href="#arrancar-los-servicios">3. Arrancar los Servicios</a><ul>
-<li><a class="reference internal" href="#opcion-a-usando-make-make-ps1-recomendado">Opción A: Usando Make/make.ps1 (Recomendado)</a></li>
-<li><a class="reference internal" href="#opcion-b-usando-docker-compose-directamente">Opción B: Usando docker-compose directamente</a></li>
+<li><a class="reference internal" href="#arrancar-la-aplicacion">3. Arrancar la Aplicación</a></li>
 </ul>
 </li>
-</ul>
-</li>
-<li><a class="reference internal" href="#estructura-de-datos">📁 Estructura de Datos</a></li>
 <li><a class="reference internal" href="#comandos-utiles">🔧 Comandos Útiles</a><ul>
-<li><a class="reference internal" href="#comandos-disponibles-make-make-ps1">Comandos Disponibles (Make/make.ps1)</a><ul>
-<li><a class="reference internal" href="#comandos-principales">Comandos Principales</a></li>
-<li><a class="reference internal" href="#comandos-de-gestion">Comandos de Gestión</a></li>
-</ul>
-</li>
-<li><a class="reference internal" href="#usando-docker-compose-directamente">Usando docker-compose directamente</a><ul>
 <li><a class="reference internal" href="#ver-estado-de-los-servicios">Ver Estado de los Servicios</a></li>
 <li><a class="reference internal" href="#ver-logs">Ver Logs</a></li>
-<li><a class="reference internal" href="#detener-servicios">Detener Servicios</a></li>
-<li><a class="reference internal" href="#reinicializar-defectdojo">Reinicializar DefectDojo</a></li>
-</ul>
-</li>
+<li><a class="reference internal" href="#detener-la-aplicacion">Detener la Aplicación</a></li>
+<li><a class="reference internal" href="#reconstruir-la-aplicacion">Reconstruir la Aplicación</a></li>
 </ul>
 </li>
 <li><a class="reference internal" href="#notas-importantes">⚠️ Notas Importantes</a></li>
 <li><a class="reference internal" href="#solucion-de-problemas">🆘 Solución de Problemas</a><ul>
-<li><a class="reference internal" href="#el-script-reset-defectdojo-sh-falla">El script <code class="docutils literal notranslate"><span class="pre">reset_defectdojo.sh</span></code> falla</a></li>
-<li><a class="reference internal" href="#no-puedo-acceder-a-defectdojo">No puedo acceder a DefectDojo</a></li>
-<li><a class="reference internal" href="#la-base-de-datos-esta-vacia">La base de datos está vacía</a></li>
+<li><a class="reference internal" href="#no-puedo-acceder-a-la-aplicacion">No puedo acceder a la aplicación</a></li>
 </ul>
 </li>
-<li><a class="reference internal" href="#mas-informacion">📚 Más Información</a></li>
 </ul>
 </li>
 </ul>
