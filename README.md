@@ -20,6 +20,22 @@ Aplicación web monousuario para el registro personal de peso, talla y cálculo 
 - **Almacenamiento**: Memoria (backend) + localStorage (frontend)
 - **Tests**: 86 tests backend (pytest) + ~66 tests frontend (Jest)
 
+## Ramas del Repositorio
+
+Este repositorio contiene dos ramas principales:
+
+- **`main`** - Versión de producción (recomendada)
+  - Sin herramientas de desarrollo
+  - Sin referencias a ASVS/OWASP/DefectDojo
+  - Configurada para producción (`FLASK_ENV=production`)
+  - Lista para despliegue en producción
+
+- **`dev`** - Versión de desarrollo
+  - Incluye herramientas de desarrollo
+  - Integración con DefectDojo y ASVS/OWASP
+  - Configurada para desarrollo (`FLASK_ENV=development`)
+  - Para desarrollo y testing
+
 ## Instalación Rápida
 
 ### Requisitos Previos
@@ -31,8 +47,22 @@ Aplicación web monousuario para el registro personal de peso, talla y cálculo 
 ### Pasos de Instalación
 
 1. **Clonar el repositorio**:
+
+**Para producción (recomendado - rama main):**
 ```bash
-git clone <url-del-repositorio>
+git clone https://github.com/alejandroquinonesgamez/medical_register.git
+cd medical_register
+```
+
+**Para desarrollo (rama dev):**
+```bash
+git clone -b dev https://github.com/alejandroquinonesgamez/medical_register.git
+cd medical_register
+```
+
+**Clonar solo la rama main (más rápido):**
+```bash
+git clone --single-branch --branch main https://github.com/alejandroquinonesgamez/medical_register.git
 cd medical_register
 ```
 
