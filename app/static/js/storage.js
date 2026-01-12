@@ -83,6 +83,9 @@ class LocalStorageManager {
                 return null;
             }
             
+            // Obtener fecha actual
+            const currentDate = new Date();
+            
             const newWeight = {
                 id: Date.now(), // ID único basado en timestamp
                 peso_kg: peso_kg_parsed,
