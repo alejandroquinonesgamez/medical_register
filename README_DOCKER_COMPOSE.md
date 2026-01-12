@@ -45,7 +45,7 @@ Para verificar que todo funciona correctamente:
 Test-Path .env
 
 # Verificar que Docker Compose funciona sin errores
-docker-compose --profile defectdojo ps
+docker-compose ps
 ```
 
 Si ves los contenedores listados correctamente, la configuración está funcionando.

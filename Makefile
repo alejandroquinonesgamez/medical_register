@@ -13,7 +13,7 @@
 # Uso: make [comando]
 # Ejemplo: make help
 
-.PHONY: help initDefectDojo update up build build-defectdojo logs logs-defectdojo ps down pdf_report setup-env clean-temp clean-all purge
+.PHONY: help initDefectDojo all up build build-defectdojo logs logs-defectdojo ps down pdf_report setup-env clean-temp clean-all purge fix-containers
 
 # Variables
 # Cargar .env si existe para configurar COMPOSE_PROJECT_NAME
@@ -80,7 +80,7 @@ help: ## Mostrar esta ayuda
 	@echo "  make default        # Arranca la aplicación principal"
 	@echo "  make up             # Arranca aplicación principal + DefectDojo vacío"
 	@echo "  make initDefectDojo # Inicia solo DefectDojo vacío"
-	@echo "  make update         # Despliegue completo y actualización"
+	@echo "  make all            # Despliegue completo y actualización"
 	@echo "  make logs           # Ver logs de la aplicación"
 	@echo "  make logs-defectdojo # Ver logs de DefectDojo"
 	@echo "  make ps             # Ver estado de contenedores"
@@ -144,7 +144,7 @@ initDefectDojo: setup-env ## Iniciar solo DefectDojo vacío (sin findings)
 	@echo "📊 Accede a DefectDojo en: http://localhost:8080"
 	@echo "   Usuario: admin | Contraseña: admin"
 
-update: setup-env ## Levantar aplicación y DefectDojo, y actualizar flujo de findings
+all: setup-env ## Levantar aplicación y DefectDojo, y actualizar flujo de findings
 	@echo "🔄 Actualizando aplicación y flujo de findings..."
 	@echo ""
 	@echo "Paso 1/3: Verificando aplicación principal..."
@@ -161,7 +161,7 @@ update: setup-env ## Levantar aplicación y DefectDojo, y actualizar flujo de fi
 	@echo ""
 	@echo "Paso 3/3: Actualizando flujo de findings con fechas históricas..."
 	@$(COMPOSE) --profile defectdojo exec -T defectdojo python3 /app/manage_findings.py || \
-		(echo "" && echo "⚠️  Si el script falla, espera unos segundos más y vuelve a ejecutar: make update")
+		(echo "" && echo "⚠️  Si el script falla, espera unos segundos más y vuelve a ejecutar: make all")
 	@echo ""
 	@echo "✅ Actualización completada"
 	@echo ""
@@ -225,6 +225,25 @@ pdf_report: setup-env ## Generar PDF del informe de seguridad (ASVS + WSTG) con 
 clean-temp: ## Limpiar archivos temporales del proyecto
 	@echo "🧹 Limpiando archivos temporales..."
 	@bash scripts/clean_temp.sh
+
+fix-containers: ## Solucionar problemas de contenedores (ContainerConfig error)
+	@echo "🔧 Solucionando problemas de contenedores..."
+	@echo ""
+	@echo "Paso 1/3: Deteniendo y eliminando contenedores..."
+	@$(COMPOSE) --profile defectdojo down -v 2>/dev/null || true
+	@$(COMPOSE) down -v 2>/dev/null || true
+	@echo "   ✓ Contenedores eliminados"
+	@echo ""
+	@echo "Paso 2/3: Limpiando contenedores huérfanos..."
+	@docker container prune -f 2>/dev/null || true
+	@echo "   ✓ Limpieza completada"
+	@echo ""
+	@echo "Paso 3/3: Reconstruyendo imágenes..."
+	@$(COMPOSE) --profile defectdojo build --no-cache web 2>/dev/null || \
+		$(COMPOSE) build --no-cache web
+	@echo "   ✓ Imágenes reconstruidas"
+	@echo ""
+	@echo "✅ Problema solucionado. Ahora ejecuta: make all"
 
 clean-all: ## Limpiar TODO y volver al estado como recién clonado (DESTRUCTIVO)
 	@echo "⚠️  Ejecutando limpieza completa (DESTRUCTIVO)..."

@@ -67,11 +67,8 @@ class LocalStorageManager {
     static addWeight(weight) {
         try {
             const weights = this.getWeights();
-            // Usar fecha simulada si está disponible (para testing)
-            const currentDate = window.DevTools && window.DevTools.getCurrentDate 
-                ? window.DevTools.getCurrentDate() 
-                : new Date();
-            const today = currentDate.toISOString().split('T')[0]; // YYYY-MM-DD
+            // Obtener fecha actual
+            const today = new Date().toISOString().split('T')[0]; // YYYY-MM-DD
             
             // Eliminar registros del mismo día
             const filteredWeights = weights.filter(w => {

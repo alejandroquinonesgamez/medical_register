@@ -17,10 +17,3 @@ def index():
                          active_language=ACTIVE_LANGUAGE,
                          available_languages=AVAILABLE_LANGUAGES)
 
-
-@views.route('/defectdojo')
-def defectdojo_redirect():
-    """Redirige a DefectDojo"""
-    from flask import redirect
-    return redirect('http://localhost:8080', code=302)
-

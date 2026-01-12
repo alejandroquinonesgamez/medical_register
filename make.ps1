@@ -14,7 +14,7 @@
 #   .\make.ps1 help          # Mostrar ayuda
 #   .\make.ps1 default       # Arrancar aplicación principal
 #   .\make.ps1 up            # Arrancar aplicación + DefectDojo vacío
-#   .\make.ps1 update        # Arrancar todo y actualizar findings
+#   .\make.ps1 all           # Arrancar todo y actualizar findings
 
 param(
     [Parameter(Position=0)]
@@ -147,7 +147,7 @@ function Show-Help {
     Write-Host "Arrancar aplicacion principal y DefectDojo vacio (sin findings)"
     Write-Host "  initDefectDojo   " -NoNewline -ForegroundColor Yellow
     Write-Host "Iniciar solo DefectDojo vacio (sin findings)"
-    Write-Host "  update           " -NoNewline -ForegroundColor Yellow
+    Write-Host "  all              " -NoNewline -ForegroundColor Yellow
     Write-Host "Levantar aplicacion y DefectDojo, y actualizar flujo de findings"
     Write-Host "  logs             " -NoNewline -ForegroundColor Yellow
     Write-Host "Ver logs de la aplicacion principal"
@@ -161,6 +161,8 @@ function Show-Help {
     Write-Host "Generar PDF del informe de seguridad ASVS con fecha"
     Write-Host "  clean-temp       " -NoNewline -ForegroundColor Yellow
     Write-Host "Limpiar archivos temporales del proyecto"
+    Write-Host "  fix-containers   " -NoNewline -ForegroundColor Yellow
+    Write-Host "Solucionar error ContainerConfig (Raspberry Pi)"
     Write-Host "  clean-all        " -NoNewline -ForegroundColor Yellow
     Write-Host "Limpiar TODO y volver al estado como recien clonado (DESTRUCTIVO)"
     Write-Host "  purge            " -NoNewline -ForegroundColor Yellow
@@ -175,7 +177,7 @@ function Show-Help {
     Write-Host "  .\make.ps1 check          # Verifica requisitos"
     Write-Host "  .\make.ps1 default        # Arranca la aplicacion principal"
     Write-Host "  .\make.ps1 up             # Arranca aplicacion principal + DefectDojo vacio"
-    Write-Host "  .\make.ps1 update         # Despliegue completo y actualizacion"
+    Write-Host "  .\make.ps1 all            # Despliegue completo y actualizacion"
     Write-Host ""
 }
 
@@ -269,7 +271,7 @@ function Start-InitDefectDojo {
     Write-Host "   Usuario: admin | Contrasena: admin" -ForegroundColor White
 }
 
-function Start-Update {
+function Start-All {
     Write-Host "Actualizando aplicacion y flujo de findings..." -ForegroundColor Cyan
     Write-Host ""
     
@@ -407,6 +409,31 @@ function Clean-All {
     }
 }
 
+function Fix-Containers {
+    Write-Host "Solucionando problemas de contenedores (ContainerConfig error)..." -ForegroundColor Cyan
+    Write-Host ""
+    
+    Write-Host "Paso 1/3: Deteniendo y eliminando contenedores..." -ForegroundColor Yellow
+    docker-compose --profile defectdojo down -v 2>$null
+    docker-compose down -v 2>$null
+    Write-Host "   ✓ Contenedores eliminados" -ForegroundColor Green
+    Write-Host ""
+    
+    Write-Host "Paso 2/3: Limpiando contenedores huérfanos..." -ForegroundColor Yellow
+    docker container prune -f 2>$null
+    Write-Host "   ✓ Limpieza completada" -ForegroundColor Green
+    Write-Host ""
+    
+    Write-Host "Paso 3/3: Reconstruyendo imágenes..." -ForegroundColor Yellow
+    docker-compose --profile defectdojo build --no-cache web 2>$null
+    if ($LASTEXITCODE -ne 0) {
+        docker-compose build --no-cache web
+    }
+    Write-Host "   ✓ Imágenes reconstruidas" -ForegroundColor Green
+    Write-Host ""
+    Write-Host "✅ Problema solucionado. Ahora ejecuta: .\make.ps1 all" -ForegroundColor Green
+}
+
 function Purge-All {
     Write-Host "Purgando proyecto (detener servicios + limpieza completa)..." -ForegroundColor Yellow
     Write-Host ""
@@ -431,8 +458,8 @@ switch ($Command.ToLower()) {
     "initdefectdojo" {
         Start-InitDefectDojo
     }
-    "update" {
-        Start-Update
+    "all" {
+        Start-All
     }
     "logs" {
         Show-Logs
@@ -463,6 +490,9 @@ switch ($Command.ToLower()) {
     }
     "clean-all" {
         Clean-All
+    }
+    "fix-containers" {
+        Fix-Containers
     }
     "cleanall" {
         Clean-All

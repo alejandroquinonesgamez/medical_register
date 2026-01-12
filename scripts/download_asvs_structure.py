@@ -80,3 +80,5 @@ if __name__ == '__main__':
         json.dump(structure, f, indent=2, ensure_ascii=False)
     
     print(f"\n✓ Estructura guardada en: {output_file}")
+
+

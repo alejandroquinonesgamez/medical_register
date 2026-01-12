@@ -12,34 +12,6 @@
     </header>
 
     <div class="main-layout">
-        <!-- Columna izquierda: OWASP ASVS -->
-        <aside class="sidebar sidebar-left" id="owasp-asvs-sidebar">
-            <div class="panel" id="owasp-asvs-frame">
-                <h2 style="margin-top: 0; margin-bottom: 12px; color: #e2e8f0; border-bottom: 2px solid #254F6D; padding-bottom: 8px;">
-                    🛡️ OWASP ASVS
-                </h2>
-            <nav class="security-nav">
-                <div class="defectdojo-menu">
-                        <a href="/defectdojo" target="_blank" class="defectdojo-link" title="Abrir DefectDojo en nueva pestaña" style="width: 100%; text-align: center; display: block; margin-bottom: 12px; font-size: 12px; padding: 6px 8px; box-sizing: border-box; white-space: normal; word-wrap: break-word;">
-                            🔒 DefectDojo
-                    </a>
-                    <div class="defectdojo-actions">
-                        <button id="export-dump-btn" class="defectdojo-action-btn" title="Descargar dump de la base de datos">
-                            📥 Exportar Dump
-                        </button>
-                        <label for="import-dump-input" class="defectdojo-action-btn" title="Cargar dump de la base de datos" style="cursor: pointer;">
-                            📤 Importar Dump
-                        </label>
-                        <input type="file" id="import-dump-input" accept=".sql" style="display: none;">
-                            <button id="generate-pdf-btn" class="defectdojo-action-btn" title="Generar PDF del informe de seguridad ASVS" style="flex: 1 1 100%; min-width: 100%;">
-                                📄 Generar PDF Informe
-                            </button>
-                        </div>
-                    </div>
-                </nav>
-                </div>
-        </aside>
-
         <!-- Columna central: Contenido principal -->
         <main class="container">
         <section class="panel">
@@ -73,11 +45,6 @@
             </ul>
         </section>
         </main>
-
-        <!-- Columna derecha: Herramientas de desarrollo -->
-        <aside class="sidebar sidebar-right" id="dev-tools-sidebar">
-            <!-- Las herramientas de desarrollo se insertarán aquí dinámicamente -->
-        </aside>
     </div>
 
     <div id="user-modal" class="modal-overlay">
@@ -120,8 +87,6 @@
     <script src="/static/js/messages.js"></script>
     <script src="/static/js/storage.js"></script>
     <script src="/static/js/sync.js"></script>
-    <!-- Herramientas de desarrollo (solo en modo desarrollo) -->
-    <script src="/static/js/dev-tools.js"></script>
     <script src="/static/js/main.js"></script>
 </body>
 </html>

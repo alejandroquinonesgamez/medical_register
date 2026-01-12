@@ -40,7 +40,3 @@ ACTIVE_LANGUAGE = 'es'
 # Lista de idiomas disponibles (códigos de idioma)
 AVAILABLE_LANGUAGES = ['es']
 
-# Configuración WSTG Sync
-WSTG_WEBHOOK_KEY = os.environ.get('WSTG_WEBHOOK_KEY', 'change_me_in_production')
-WSTG_SYNC_API_URL = os.environ.get('WSTG_SYNC_API_URL', 'http://localhost:5001/api/wstg/sync')
-
