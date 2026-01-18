@@ -48,7 +48,7 @@ class SyncManager {
         
         try {
             // Sincronizar usuario
-            const userResponse = await fetch('/api/user');
+            const userResponse = await fetch('/api/user', { credentials: 'same-origin' });
             if (userResponse.ok) {
                 const userData = await userResponse.json();
                 // Convertir formato del backend al formato del frontend
@@ -66,7 +66,7 @@ class SyncManager {
             }
 
             // Sincronizar pesos
-            const weightsResponse = await fetch('/api/weights');
+            const weightsResponse = await fetch('/api/weights', { credentials: 'same-origin' });
             if (weightsResponse.ok) {
                 const weightsData = await weightsResponse.json();
                 const backendWeights = weightsData.weights || [];
@@ -103,10 +103,10 @@ class SyncManager {
                 
                 // Guardar pesos fusionados
                 if (mergedWeights.length > 0) {
-                    localStorage.setItem('imc_app_weights', JSON.stringify(mergedWeights));
+                    LocalStorageManager.saveWeights(mergedWeights);
                 } else if (frontendWeights.length > 0) {
                     // Si no hay pesos locales pero sí del backend, usar solo los del backend
-                    localStorage.setItem('imc_app_weights', JSON.stringify(frontendWeights));
+                    LocalStorageManager.saveWeights(frontendWeights);
                 }
             } else if (weightsResponse.status === 404) {
                 // Si no hay usuario en el backend, mantener pesos locales
@@ -143,11 +143,14 @@ class SyncManager {
         }
 
         try {
+            const csrfToken = window.AuthManager ? AuthManager.getCsrfToken() : null;
             const response = await fetch('/api/user', {
                 method: 'POST',
                 headers: {
-                    'Content-Type': 'application/json'
+                    'Content-Type': 'application/json',
+                    ...(csrfToken ? { 'X-CSRF-Token': csrfToken } : {})
                 },
+                credentials: 'same-origin',
                 body: JSON.stringify({
                     nombre: user.nombre,
                     apellidos: user.apellidos,
@@ -181,11 +184,14 @@ class SyncManager {
         }
 
         try {
+            const csrfToken = window.AuthManager ? AuthManager.getCsrfToken() : null;
             const response = await fetch('/api/weight', {
                 method: 'POST',
                 headers: {
-                    'Content-Type': 'application/json'
+                    'Content-Type': 'application/json',
+                    ...(csrfToken ? { 'X-CSRF-Token': csrfToken } : {})
                 },
+                credentials: 'same-origin',
                 body: JSON.stringify({
                     peso_kg: weight.peso_kg
                 })

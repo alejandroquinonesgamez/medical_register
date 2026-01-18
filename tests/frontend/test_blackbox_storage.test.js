@@ -56,7 +56,9 @@ class LocalStorageManager {
     static addWeight(weight) {
         try {
             const weights = this.getWeights();
-            const today = new Date().toISOString().split('T')[0];
+            const providedDate = weight.fecha_registro ? new Date(weight.fecha_registro) : null;
+            const currentDate = providedDate || new Date();
+            const today = currentDate.toISOString().split('T')[0];
             const filteredWeights = weights.filter(w => {
                 const weightDate = new Date(w.fecha_registro).toISOString().split('T')[0];
                 return weightDate !== today;
@@ -64,7 +66,7 @@ class LocalStorageManager {
             const newWeight = {
                 id: Date.now(),
                 peso_kg: parseFloat(weight.peso_kg),
-                fecha_registro: new Date().toISOString()
+                fecha_registro: currentDate.toISOString()
             };
             filteredWeights.push(newWeight);
             localStorage.setItem(STORAGE_KEYS.WEIGHTS, JSON.stringify(filteredWeights));
@@ -318,19 +320,15 @@ describe('TestStatsStorageBlackBox', () => {
             { peso_kg: 73.0 }
         ];
 
-        for (const weight of weights_data) {
-            LocalStorageManager.addWeight(weight);
-            // Simular diferentes días
-            const weights = LocalStorageManager.getWeights();
-            if (weights.length > 1) {
-                const lastWeight = weights[weights.length - 1];
-                const lastDate = new Date(lastWeight.fecha_registro);
-                lastDate.setDate(lastDate.getDate() - 1);
-                lastWeight.fecha_registro = lastDate.toISOString();
-                weights[weights.length - 1] = lastWeight;
-                localStorage.setItem(STORAGE_KEYS.WEIGHTS, JSON.stringify(weights));
-            }
-        }
+        const baseDate = new Date();
+        weights_data.forEach((weight, index) => {
+            const date = new Date(baseDate);
+            date.setDate(baseDate.getDate() - index);
+            LocalStorageManager.addWeight({
+                ...weight,
+                fecha_registro: date.toISOString()
+            });
+        });
 
         const stats = LocalStorageManager.getStats();
         expect(stats.num_pesajes).toBe(4);

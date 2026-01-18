@@ -5,7 +5,15 @@ Contiene todos los mensajes de texto en español que se muestran al usuario
 
 # Mensajes de error y validación
 ERRORS = {
+    "auth_required": "Autenticación requerida",
     "user_not_found": "Usuario no encontrado",
+    "invalid_username": "El usuario no es válido",
+    "username_too_short": "El usuario es demasiado corto",
+    "username_too_long": "El usuario es demasiado largo",
+    "user_already_exists": "El usuario ya existe",
+    "invalid_password": "La contraseña no es válida",
+    "password_too_short": "La contraseña es demasiado corta",
+    "invalid_credentials": "Usuario o contraseña incorrectos",
     "invalid_height": "Altura no válida",
     "height_out_of_range": "Talla fuera de rango (0.4 - 2.72 m)",
     "invalid_birth_date": "Fecha de nacimiento no válida",
@@ -69,6 +77,10 @@ FRONTEND_MESSAGES = {
     "errors": {
         "save_weight": "Error al guardar el peso",
         "save_user": "Error al guardar usuario",
+        "invalid_username": "El usuario no es válido",
+        "invalid_password": "La contraseña no es válida",
+        "password_too_short": "La contraseña debe tener al menos 10 caracteres",
+        "invalid_credentials": "Usuario o contraseña incorrectos",
         "height_out_of_range": "La talla debe estar entre 0.4 y 2.72 metros",
         "weight_out_of_range": "El peso debe estar entre 2 y 650 kg",
         "user_must_be_configured": "Debes configurar tu perfil primero",
@@ -88,6 +100,7 @@ FRONTEND_MESSAGES = {
 # Textos de la interfaz HTML
 HTML_TEXTS = {
     "title": "Registro de IMC",
+    "subtitle": "Seguimiento de salud personal con sincronización segura",
     "welcome_header_loading": "Cargando...",
     "register_weight": "Registrar Peso",
     "current_weight": "Peso Actual (kg):",
@@ -98,6 +111,7 @@ HTML_TEXTS = {
     "total_weighings": "Pesajes Totales:",
     "max_weight": "Peso Máximo:",
     "min_weight": "Peso Mínimo:",
+    "recent_weights_title": "Últimos registros de peso",
     "welcome_modal_title": "Bienvenido",
     "welcome_modal_message": "Por favor, introduce tus datos para comenzar.",
     "name": "Nombre:",
@@ -105,5 +119,14 @@ HTML_TEXTS = {
     "birth_date": "Fecha de Nacimiento:",
     "height": "Talla (en metros):",
     "save_profile": "Guardar Perfil",
+    "current_user_label": "Hola,",
+    "login": "Iniciar sesión",
+    "register": "Registrarse",
+    "logout": "Cerrar sesión",
+    "username": "Usuario:",
+    "password": "Contraseña:",
+    "password_confirm": "Confirmar contraseña:",
+    "login_action": "Iniciar sesión",
+    "register_action": "Crear cuenta",
 }
 

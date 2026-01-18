@@ -2,6 +2,7 @@ Flask
 flask-cors
 gunicorn
 pytest
+argon2-cffi
 
 
 markdown>=3.4.0

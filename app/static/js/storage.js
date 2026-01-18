@@ -9,11 +9,28 @@ const STORAGE_KEYS = {
 };
 
 class LocalStorageManager {
+    static _userId = null;
+
+    static setUserId(userId) {
+        this._userId = userId ? String(userId) : null;
+    }
+
+    static clearUserContext() {
+        this._userId = null;
+    }
+
+    static _getScopedKey(baseKey) {
+        if (!this._userId) {
+            return baseKey;
+        }
+        return `${baseKey}_${this._userId}`;
+    }
+
     /**
      * Obtiene el usuario almacenado
      */
     static getUser() {
-        const userJson = localStorage.getItem(STORAGE_KEYS.USER);
+        const userJson = localStorage.getItem(this._getScopedKey(STORAGE_KEYS.USER));
         if (!userJson) return null;
         try {
             const user = JSON.parse(userJson);
@@ -33,7 +50,7 @@ class LocalStorageManager {
      */
     static saveUser(user) {
         try {
-            localStorage.setItem(STORAGE_KEYS.USER, JSON.stringify(user));
+            localStorage.setItem(this._getScopedKey(STORAGE_KEYS.USER), JSON.stringify(user));
             return true;
         } catch (error) {
             console.error('Error al guardar usuario en localStorage:', error);
@@ -45,7 +62,7 @@ class LocalStorageManager {
      * Obtiene todos los registros de peso
      */
     static getWeights() {
-        const weightsJson = localStorage.getItem(STORAGE_KEYS.WEIGHTS);
+        const weightsJson = localStorage.getItem(this._getScopedKey(STORAGE_KEYS.WEIGHTS));
         if (!weightsJson) return [];
         try {
             const weights = JSON.parse(weightsJson);
@@ -61,16 +78,30 @@ class LocalStorageManager {
     }
 
     /**
+     * Guarda todos los registros de peso
+     */
+    static saveWeights(weights) {
+        try {
+            localStorage.setItem(this._getScopedKey(STORAGE_KEYS.WEIGHTS), JSON.stringify(weights));
+            return true;
+        } catch (error) {
+            console.error('Error al guardar pesos en localStorage:', error);
+            return false;
+        }
+    }
+
+    /**
      * Añade un nuevo registro de peso
      * Si ya existe un registro del mismo día, lo reemplaza
      */
     static addWeight(weight) {
         try {
             const weights = this.getWeights();
-            // Usar fecha simulada si está disponible (para testing)
-            const currentDate = window.DevTools && window.DevTools.getCurrentDate 
-                ? window.DevTools.getCurrentDate() 
-                : new Date();
+            const providedDate = weight.fecha_registro ? new Date(weight.fecha_registro) : null;
+            const devtoolsDate = window.DevTools && window.DevTools.getCurrentDate
+                ? window.DevTools.getCurrentDate()
+                : null;
+            const currentDate = providedDate || devtoolsDate || new Date();
             const today = currentDate.toISOString().split('T')[0]; // YYYY-MM-DD
             
             // Eliminar registros del mismo día
@@ -92,7 +123,7 @@ class LocalStorageManager {
                 fecha_registro: currentDate.toISOString()
             };
             filteredWeights.push(newWeight);
-            localStorage.setItem(STORAGE_KEYS.WEIGHTS, JSON.stringify(filteredWeights));
+            this.saveWeights(filteredWeights);
             return newWeight;
         } catch (error) {
             console.error('Error al guardar peso en localStorage:', error);
@@ -160,8 +191,8 @@ class LocalStorageManager {
      * Limpia todos los datos (útil para testing o reset)
      */
     static clearAll() {
-        localStorage.removeItem(STORAGE_KEYS.USER);
-        localStorage.removeItem(STORAGE_KEYS.WEIGHTS);
+        localStorage.removeItem(this._getScopedKey(STORAGE_KEYS.USER));
+        localStorage.removeItem(this._getScopedKey(STORAGE_KEYS.WEIGHTS));
     }
 }
 

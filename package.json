@@ -12,11 +12,20 @@
     "jest-environment-jsdom": "^29.7.0"
   },
   "jest": {
+    "roots": [
+      "<rootDir>/tests/frontend"
+    ],
     "testEnvironment": "jsdom",
     "testMatch": [
       "**/tests/frontend/**/*.test.js"
     ],
     "setupFilesAfterEnv": ["<rootDir>/tests/frontend/setup.js"],
+    "modulePathIgnorePatterns": [
+      "<rootDir>/docs/",
+      "<rootDir>/assets/",
+      "<rootDir>/data/",
+      "<rootDir>/*.pdf"
+    ],
     "moduleNameMapper": {
       "^@/(.*)$": "<rootDir>/app/static/js/$1"
     }

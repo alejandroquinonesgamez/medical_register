@@ -13,8 +13,41 @@ y se usan para validaciones tanto en backend como frontend.
 import os
 from datetime import datetime
 
-# Configuración de usuario (monousuario)
+# Configuración de usuario (monousuario legado)
 USER_ID = 1
+
+# Configuración de autenticación
+AUTH_CONFIG = {
+    "username_min_length": 3,
+    "username_max_length": 30,
+    "password_min_length": 10,
+}
+
+# Configuración de hash de contraseñas (Argon2id)
+PASSWORD_HASH_CONFIG = {
+    "time_cost": 3,
+    "memory_cost": 65536,
+    "parallelism": 2,
+    "hash_len": 32,
+    "salt_len": 16,
+}
+
+# Pepper (solo servidor)
+PASSWORD_PEPPER = os.environ.get("PASSWORD_PEPPER", "")
+
+# Configuración de sesión
+SESSION_CONFIG = {
+    "cookie_samesite": "Lax",
+    "cookie_secure": os.environ.get("SESSION_COOKIE_SECURE", "false").lower() == "true",
+    "cookie_httponly": True,
+}
+
+# Configuración de almacenamiento (backend y SQLCipher)
+STORAGE_CONFIG = {
+    "backend": os.environ.get("STORAGE_BACKEND", "memory"),
+    "db_path": os.environ.get("SQLCIPHER_DB_PATH", os.path.join(os.getcwd(), "data", "app_secure.db")),
+    "db_key": os.environ.get("SQLCIPHER_KEY", ""),
+}
 
 # Límites de validación
 VALIDATION_LIMITS = {

@@ -91,12 +91,14 @@ class SyncManager {
             } else {
                 const errorData = await response.json();
                 if (response.status === 400) {
-                    throw new Error(errorData.error || 'Error de validación');
+                    const validationError = new Error(errorData.error || 'Error de validación');
+                    validationError.isValidationError = true;
+                    throw validationError;
                 }
                 return false;
             }
         } catch (error) {
-            if (error.message && error.message.includes('Error')) {
+            if (error.isValidationError) {
                 throw error;
             }
             console.warn('Error al sincronizar peso al backend (modo offline):', error);

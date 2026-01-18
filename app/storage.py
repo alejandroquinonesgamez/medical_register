@@ -22,6 +22,20 @@ persistente (base de datos, archivos, etc.) sin cambiar el código que lo usa.
 from abc import ABC, abstractmethod
 from datetime import datetime, date
 from typing import Optional
+import os
+try:
+    from .config import STORAGE_CONFIG
+except ImportError:
+    STORAGE_CONFIG = {
+        "backend": os.environ.get("STORAGE_BACKEND", "memory"),
+        "db_path": os.environ.get("SQLCIPHER_DB_PATH", os.path.join(os.getcwd(), "data", "app_secure.db")),
+        "db_key": os.environ.get("SQLCIPHER_KEY", ""),
+    }
+
+try:
+    from pysqlcipher3 import dbapi2 as sqlcipher
+except ImportError:
+    sqlcipher = None
 
 
 class UserData:
@@ -85,6 +99,15 @@ class WeightEntryData:
         )
 
 
+class AuthUserData:
+    """Clase de datos para autenticación de usuario"""
+    def __init__(self, user_id: int, username: str, password_hash: str, created_at: datetime):
+        self.user_id = user_id
+        self.username = username
+        self.password_hash = password_hash
+        self.created_at = created_at
+
+
 class StorageInterface(ABC):
     """Interfaz abstracta para el almacenamiento"""
     
@@ -96,6 +119,41 @@ class StorageInterface(ABC):
     @abstractmethod
     def save_user(self, user: UserData) -> None:
         """Guarda o actualiza un usuario"""
+        pass
+
+    @abstractmethod
+    def create_auth_user(self, username: str, password_hash: str) -> AuthUserData:
+        """Crea un usuario autenticable"""
+        pass
+
+    @abstractmethod
+    def get_auth_user_by_username(self, username: str) -> Optional[AuthUserData]:
+        """Obtiene usuario por username"""
+        pass
+
+    @abstractmethod
+    def get_auth_user_by_id(self, user_id: int) -> Optional[AuthUserData]:
+        """Obtiene usuario por ID (auth)"""
+        pass
+
+    @abstractmethod
+    def update_password_hash(self, user_id: int, password_hash: str) -> None:
+        """Actualiza el hash de contraseña"""
+        pass
+
+    @abstractmethod
+    def save_api_token(self, user_id: int, token_hash: str, expires_at: datetime) -> None:
+        """Guarda un token API"""
+        pass
+
+    @abstractmethod
+    def get_user_id_by_token_hash(self, token_hash: str) -> Optional[int]:
+        """Obtiene user_id por token hash"""
+        pass
+
+    @abstractmethod
+    def revoke_api_token(self, token_hash: str) -> None:
+        """Revoca un token API"""
         pass
     
     @abstractmethod
@@ -139,14 +197,57 @@ class MemoryStorage(StorageInterface):
     
     def __init__(self):
         self._users = {}  # {user_id: UserData}
+        self._auth_users = {}  # {user_id: AuthUserData}
+        self._auth_users_by_username = {}  # {username: AuthUserData}
+        self._api_tokens = {}  # {token_hash: (user_id, expires_at)}
         self._weight_entries = []  # List[WeightEntryData]
         self._next_entry_id = 1
+        self._next_user_id = 1
     
     def get_user(self, user_id: int) -> Optional[UserData]:
         return self._users.get(user_id)
     
     def save_user(self, user: UserData) -> None:
         self._users[user.user_id] = user
+
+    def create_auth_user(self, username: str, password_hash: str) -> AuthUserData:
+        user = AuthUserData(
+            user_id=self._next_user_id,
+            username=username,
+            password_hash=password_hash,
+            created_at=datetime.now()
+        )
+        self._next_user_id += 1
+        self._auth_users[user.user_id] = user
+        self._auth_users_by_username[username] = user
+        return user
+
+    def get_auth_user_by_username(self, username: str) -> Optional[AuthUserData]:
+        return self._auth_users_by_username.get(username)
+
+    def get_auth_user_by_id(self, user_id: int) -> Optional[AuthUserData]:
+        return self._auth_users.get(user_id)
+
+    def update_password_hash(self, user_id: int, password_hash: str) -> None:
+        user = self._auth_users.get(user_id)
+        if user:
+            user.password_hash = password_hash
+
+    def save_api_token(self, user_id: int, token_hash: str, expires_at: datetime) -> None:
+        self._api_tokens[token_hash] = (user_id, expires_at)
+
+    def get_user_id_by_token_hash(self, token_hash: str) -> Optional[int]:
+        token_data = self._api_tokens.get(token_hash)
+        if not token_data:
+            return None
+        user_id, expires_at = token_data
+        if expires_at < datetime.now():
+            self._api_tokens.pop(token_hash, None)
+            return None
+        return user_id
+
+    def revoke_api_token(self, token_hash: str) -> None:
+        self._api_tokens.pop(token_hash, None)
     
     def get_last_weight_entry(self, user_id: int) -> Optional[WeightEntryData]:
         user_entries = [e for e in self._weight_entries if e.user_id == user_id]
@@ -204,6 +305,274 @@ class MemoryStorage(StorageInterface):
         """Obtiene todas las entradas de peso de un usuario, ordenadas por fecha descendente"""
         user_entries = [e for e in self._weight_entries if e.user_id == user_id]
         return sorted(user_entries, key=lambda e: e.recorded_date, reverse=True)
+
+
+class SQLCipherStorage(StorageInterface):
+    """Almacenamiento persistente cifrado con SQLCipher"""
+
+    def __init__(self, db_path: Optional[str] = None, db_key: Optional[str] = None):
+        if sqlcipher is None:
+            raise RuntimeError("SQLCipher no está disponible. Instala pysqlcipher3.")
+        self._db_path = db_path or STORAGE_CONFIG["db_path"]
+        self._db_key = db_key or STORAGE_CONFIG["db_key"]
+        if not self._db_key:
+            raise RuntimeError("SQLCIPHER_KEY no configurada.")
+        os.makedirs(os.path.dirname(self._db_path), exist_ok=True)
+        self._init_db()
+
+    def _connect(self):
+        conn = sqlcipher.connect(self._db_path)
+        conn.execute("PRAGMA key = ?", (self._db_key,))
+        conn.execute("PRAGMA foreign_keys = ON;")
+        conn.execute("PRAGMA journal_mode = WAL;")
+        conn.execute("PRAGMA cipher_memory_security = ON;")
+        conn.row_factory = sqlcipher.Row
+        return conn
+
+    def _init_db(self):
+        with self._connect() as conn:
+            conn.execute(
+                """
+                CREATE TABLE IF NOT EXISTS users (
+                    id INTEGER PRIMARY KEY AUTOINCREMENT,
+                    username TEXT UNIQUE NOT NULL,
+                    password_hash TEXT NOT NULL,
+                    first_name TEXT,
+                    last_name TEXT,
+                    birth_date TEXT,
+                    height_m REAL,
+                    created_at TEXT NOT NULL
+                )
+                """
+            )
+            conn.execute(
+                """
+                CREATE TABLE IF NOT EXISTS weights (
+                    id INTEGER PRIMARY KEY AUTOINCREMENT,
+                    user_id INTEGER NOT NULL,
+                    weight_kg REAL NOT NULL,
+                    recorded_date TEXT NOT NULL,
+                    FOREIGN KEY(user_id) REFERENCES users(id) ON DELETE CASCADE
+                )
+                """
+            )
+            conn.execute(
+                """
+                CREATE TABLE IF NOT EXISTS api_tokens (
+                    id INTEGER PRIMARY KEY AUTOINCREMENT,
+                    user_id INTEGER NOT NULL,
+                    token_hash TEXT NOT NULL UNIQUE,
+                    expires_at TEXT NOT NULL,
+                    created_at TEXT NOT NULL,
+                    FOREIGN KEY(user_id) REFERENCES users(id) ON DELETE CASCADE
+                )
+                """
+            )
+
+    def get_user(self, user_id: int) -> Optional[UserData]:
+        with self._connect() as conn:
+            row = conn.execute(
+                "SELECT id, first_name, last_name, birth_date, height_m FROM users WHERE id = ?",
+                (user_id,),
+            ).fetchone()
+            if not row or row["birth_date"] is None:
+                return None
+            return UserData(
+                user_id=row["id"],
+                first_name=row["first_name"],
+                last_name=row["last_name"],
+                birth_date=date.fromisoformat(row["birth_date"]),
+                height_m=row["height_m"],
+            )
+
+    def save_user(self, user: UserData) -> None:
+        with self._connect() as conn:
+            conn.execute(
+                """
+                UPDATE users
+                SET first_name = ?, last_name = ?, birth_date = ?, height_m = ?
+                WHERE id = ?
+                """,
+                (
+                    user.first_name,
+                    user.last_name,
+                    user.birth_date.isoformat(),
+                    user.height_m,
+                    user.user_id,
+                ),
+            )
+
+    def create_auth_user(self, username: str, password_hash: str) -> AuthUserData:
+        now = datetime.now().isoformat()
+        with self._connect() as conn:
+            cursor = conn.execute(
+                "INSERT INTO users (username, password_hash, created_at) VALUES (?, ?, ?)",
+                (username, password_hash, now),
+            )
+            user_id = cursor.lastrowid
+        return AuthUserData(
+            user_id=user_id,
+            username=username,
+            password_hash=password_hash,
+            created_at=datetime.fromisoformat(now),
+        )
+
+    def get_auth_user_by_username(self, username: str) -> Optional[AuthUserData]:
+        with self._connect() as conn:
+            row = conn.execute(
+                "SELECT id, username, password_hash, created_at FROM users WHERE username = ?",
+                (username,),
+            ).fetchone()
+            if not row:
+                return None
+            return AuthUserData(
+                user_id=row["id"],
+                username=row["username"],
+                password_hash=row["password_hash"],
+                created_at=datetime.fromisoformat(row["created_at"]),
+            )
+
+    def get_auth_user_by_id(self, user_id: int) -> Optional[AuthUserData]:
+        with self._connect() as conn:
+            row = conn.execute(
+                "SELECT id, username, password_hash, created_at FROM users WHERE id = ?",
+                (user_id,),
+            ).fetchone()
+            if not row:
+                return None
+            return AuthUserData(
+                user_id=row["id"],
+                username=row["username"],
+                password_hash=row["password_hash"],
+                created_at=datetime.fromisoformat(row["created_at"]),
+            )
+
+    def update_password_hash(self, user_id: int, password_hash: str) -> None:
+        with self._connect() as conn:
+            conn.execute(
+                "UPDATE users SET password_hash = ? WHERE id = ?",
+                (password_hash, user_id),
+            )
+
+    def save_api_token(self, user_id: int, token_hash: str, expires_at: datetime) -> None:
+        with self._connect() as conn:
+            conn.execute(
+                """
+                INSERT INTO api_tokens (user_id, token_hash, expires_at, created_at)
+                VALUES (?, ?, ?, ?)
+                """,
+                (user_id, token_hash, expires_at.isoformat(), datetime.now().isoformat()),
+            )
+
+    def get_user_id_by_token_hash(self, token_hash: str) -> Optional[int]:
+        now = datetime.now().isoformat()
+        with self._connect() as conn:
+            row = conn.execute(
+                "SELECT user_id FROM api_tokens WHERE token_hash = ? AND expires_at > ?",
+                (token_hash, now),
+            ).fetchone()
+            if not row:
+                return None
+            return row["user_id"]
+
+    def revoke_api_token(self, token_hash: str) -> None:
+        with self._connect() as conn:
+            conn.execute("DELETE FROM api_tokens WHERE token_hash = ?", (token_hash,))
+
+    def get_last_weight_entry(self, user_id: int) -> Optional[WeightEntryData]:
+        with self._connect() as conn:
+            row = conn.execute(
+                """
+                SELECT id, user_id, weight_kg, recorded_date
+                FROM weights WHERE user_id = ?
+                ORDER BY recorded_date DESC LIMIT 1
+                """,
+                (user_id,),
+            ).fetchone()
+            if not row:
+                return None
+            return WeightEntryData(
+                entry_id=row["id"],
+                user_id=row["user_id"],
+                weight_kg=row["weight_kg"],
+                recorded_date=datetime.fromisoformat(row["recorded_date"]),
+            )
+
+    def get_last_weight_entry_from_different_date(self, user_id: int, reference_date: date) -> Optional[WeightEntryData]:
+        with self._connect() as conn:
+            row = conn.execute(
+                """
+                SELECT id, user_id, weight_kg, recorded_date
+                FROM weights
+                WHERE user_id = ? AND date(recorded_date) != date(?)
+                ORDER BY recorded_date DESC LIMIT 1
+                """,
+                (user_id, reference_date.isoformat()),
+            ).fetchone()
+            if not row:
+                return None
+            return WeightEntryData(
+                entry_id=row["id"],
+                user_id=row["user_id"],
+                weight_kg=row["weight_kg"],
+                recorded_date=datetime.fromisoformat(row["recorded_date"]),
+            )
+
+    def add_weight_entry(self, entry: WeightEntryData) -> None:
+        with self._connect() as conn:
+            conn.execute(
+                "DELETE FROM weights WHERE user_id = ? AND date(recorded_date) = date(?)",
+                (entry.user_id, entry.recorded_date.isoformat()),
+            )
+            cursor = conn.execute(
+                "INSERT INTO weights (user_id, weight_kg, recorded_date) VALUES (?, ?, ?)",
+                (entry.user_id, entry.weight_kg, entry.recorded_date.isoformat()),
+            )
+            entry.entry_id = cursor.lastrowid
+
+    def get_weight_count(self, user_id: int) -> int:
+        with self._connect() as conn:
+            row = conn.execute(
+                "SELECT COUNT(*) AS count FROM weights WHERE user_id = ?",
+                (user_id,),
+            ).fetchone()
+            return int(row["count"]) if row else 0
+
+    def get_max_weight(self, user_id: int) -> Optional[float]:
+        with self._connect() as conn:
+            row = conn.execute(
+                "SELECT MAX(weight_kg) AS max_weight FROM weights WHERE user_id = ?",
+                (user_id,),
+            ).fetchone()
+            return row["max_weight"] if row and row["max_weight"] is not None else None
+
+    def get_min_weight(self, user_id: int) -> Optional[float]:
+        with self._connect() as conn:
+            row = conn.execute(
+                "SELECT MIN(weight_kg) AS min_weight FROM weights WHERE user_id = ?",
+                (user_id,),
+            ).fetchone()
+            return row["min_weight"] if row and row["min_weight"] is not None else None
+
+    def get_all_weight_entries(self, user_id: int) -> list:
+        with self._connect() as conn:
+            rows = conn.execute(
+                """
+                SELECT id, user_id, weight_kg, recorded_date
+                FROM weights WHERE user_id = ?
+                ORDER BY recorded_date DESC
+                """,
+                (user_id,),
+            ).fetchall()
+            return [
+                WeightEntryData(
+                    entry_id=row["id"],
+                    user_id=row["user_id"],
+                    weight_kg=row["weight_kg"],
+                    recorded_date=datetime.fromisoformat(row["recorded_date"]),
+                )
+                for row in rows
+            ]
 
 
 

@@ -46,13 +46,14 @@ class DevTools {
                 delete window._mockDate;
                 
                 // Verificar que los datos se eliminaron correctamente
-                const userStillExists = localStorage.getItem('imc_app_user');
-                const weightsStillExist = localStorage.getItem('imc_app_weights');
-                
-                if (userStillExists || weightsStillExist) {
-                    console.warn('Algunos datos no se eliminaron correctamente. Forzando eliminación...');
-                    localStorage.removeItem('imc_app_user');
-                    localStorage.removeItem('imc_app_weights');
+                if (typeof LocalStorageManager === 'undefined') {
+                    const userStillExists = localStorage.getItem('imc_app_user');
+                    const weightsStillExist = localStorage.getItem('imc_app_weights');
+                    if (userStillExists || weightsStillExist) {
+                        console.warn('Algunos datos no se eliminaron correctamente. Forzando eliminación...');
+                        localStorage.removeItem('imc_app_user');
+                        localStorage.removeItem('imc_app_weights');
+                    }
                 }
                 
                 console.log('Datos eliminados correctamente. Recargando página...');
@@ -156,7 +157,11 @@ class DevTools {
                 fecha_registro: date.toISOString()
             };
             filteredWeights.push(newWeight);
-            localStorage.setItem('imc_app_weights', JSON.stringify(filteredWeights));
+            if (typeof LocalStorageManager !== 'undefined' && LocalStorageManager.saveWeights) {
+                LocalStorageManager.saveWeights(filteredWeights);
+            } else {
+                localStorage.setItem('imc_app_weights', JSON.stringify(filteredWeights));
+            }
             
             console.log('Peso añadido con fecha simulada:', newWeight);
             return newWeight;
