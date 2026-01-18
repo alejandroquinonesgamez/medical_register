@@ -42,6 +42,17 @@ document.addEventListener('DOMContentLoaded', async () => {
     const statCount = document.getElementById('stat-count');
     const statMax = document.getElementById('stat-max');
     const statMin = document.getElementById('stat-min');
+    const userGreetingText = document.getElementById('user-greeting-text');
+    const syncIndicator = document.getElementById('data-sync-indicator');
+
+    // Inicializar autenticación antes de continuar
+    if (window.AuthManager) {
+        await AuthManager.init();
+        AuthManager.onAuthChange = () => {
+            updateDashboard();
+        };
+        AuthManager.setupUI();
+    }
 
     // Cargar configuración compartida desde el backend
     await AppConfig.loadConfigFromBackend();
@@ -67,25 +78,44 @@ document.addEventListener('DOMContentLoaded', async () => {
         dateInput.setAttribute('min', limits.birth_date_min);
     }
     
-    // Sincronizar datos del backend al cargar la página
-    try {
-        await SyncManager.syncFromBackend();
-    } catch (error) {
-        console.warn('Error al sincronizar desde backend:', error);
-        // Continuar con datos locales si falla la sincronización
-    }
-
     function loadUser() {
+        if (AuthManager && !AuthManager.isAuthenticated()) {
+            if (welcomeHeader) {
+                welcomeHeader.textContent = '';
+            }
+            if (userGreetingText) {
+                userGreetingText.textContent = '';
+            }
+            userModal.style.display = 'none';
+            return;
+        }
         const user = LocalStorageManager.getUser();
         if (!user) {
+            if (userGreetingText && AuthManager) {
+                const authUser = AuthManager.getCurrentUser();
+                userGreetingText.textContent = authUser ? `Hola, ${authUser.username}` : '';
+            }
+            if (welcomeHeader) {
+                welcomeHeader.textContent = '';
+            }
             userModal.style.display = 'flex';
             return;
         }
-        welcomeHeader.textContent = MESSAGES.texts.greeting(user.nombre);
+        if (userGreetingText) {
+            userGreetingText.textContent = MESSAGES.texts.greeting(user.nombre);
+        }
+        if (welcomeHeader) {
+            welcomeHeader.textContent = '';
+        }
         userModal.style.display = 'none';
     }
 
     function loadIMC() {
+        if (AuthManager && !AuthManager.isAuthenticated()) {
+            imcValue.textContent = '--.-';
+            imcDescription.textContent = 'Inicia sesión para ver tu IMC';
+            return;
+        }
         const user = LocalStorageManager.getUser();
         const lastWeight = LocalStorageManager.getLastWeight();
         
@@ -121,6 +151,12 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
 
     function loadStats() {
+        if (AuthManager && !AuthManager.isAuthenticated()) {
+            statCount.textContent = '0';
+            statMax.textContent = '0 kg';
+            statMin.textContent = '0 kg';
+            return;
+        }
         const stats = LocalStorageManager.getStats();
         statCount.textContent = stats.num_pesajes;
         statMax.textContent = stats.peso_max + ' kg';
@@ -133,8 +169,31 @@ document.addEventListener('DOMContentLoaded', async () => {
         loadStats();
     }
 
+    function updateSyncIndicator() {
+        if (!syncIndicator) return;
+        const isLocal = typeof SyncManager !== 'undefined' && SyncManager.isSyncDisabled
+            ? SyncManager.isSyncDisabled()
+            : true;
+        if (isLocal) {
+            syncIndicator.textContent = '💻';
+            syncIndicator.title = 'Datos locales';
+            syncIndicator.classList.remove('sync-indicator--remote');
+            syncIndicator.classList.add('sync-indicator--local');
+        } else {
+            syncIndicator.textContent = '🌐';
+            syncIndicator.title = 'Datos sincronizados';
+            syncIndicator.classList.remove('sync-indicator--local');
+            syncIndicator.classList.add('sync-indicator--remote');
+        }
+    }
+
     userForm.addEventListener('submit', async (e) => {
         e.preventDefault();
+
+        if (AuthManager && !AuthManager.isAuthenticated()) {
+            alert('Debes iniciar sesión para guardar tu perfil');
+            return;
+        }
         
         const talla_m_raw = document.getElementById('talla_m').value;
         const talla_m = parseFloat(talla_m_raw);
@@ -204,6 +263,11 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     weightForm.addEventListener('submit', async (e) => {
         e.preventDefault();
+
+        if (AuthManager && !AuthManager.isAuthenticated()) {
+            alert('Debes iniciar sesión para guardar tu peso');
+            return;
+        }
         
         const user = LocalStorageManager.getUser();
         if (!user) {
@@ -274,6 +338,10 @@ document.addEventListener('DOMContentLoaded', async () => {
     async function loadRecentWeights() {
         const recentWeightsList = document.getElementById('recent-weights-list');
         if (!recentWeightsList) return;
+        if (AuthManager && !AuthManager.isAuthenticated()) {
+            recentWeightsList.innerHTML = '<li class="no-data">Inicia sesión para ver tus registros</li>';
+            return;
+        }
 
         let weights = [];
 
@@ -412,6 +480,8 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     // Cargar los últimos pesos al iniciar
     updateDashboard();
+    updateSyncIndicator();
+    setInterval(updateSyncIndicator, 2000);
 });
 
 

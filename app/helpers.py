@@ -11,7 +11,10 @@ Este módulo contiene funciones de utilidad para:
   - Valida caracteres permitidos (letras Unicode, espacios, guiones, apóstrofes)
 """
 import re
+from argon2 import PasswordHasher
+from argon2.exceptions import VerifyMismatchError
 from .translations import get_bmi_complete_description
+from .config import AUTH_CONFIG, PASSWORD_HASH_CONFIG, PASSWORD_PEPPER
 
 
 def calculate_bmi(weight_kg, height_m):
@@ -100,5 +103,57 @@ def validate_and_sanitize_name(name, min_length=1, max_length=100):
         return False, "", "invalid_name"
     
     return True, name, None
+
+
+def normalize_username(username):
+    if not isinstance(username, str):
+        return ""
+    return username.strip().lower()
+
+
+def validate_username(username):
+    normalized = normalize_username(username)
+    if not normalized:
+        return False, "invalid_username"
+    if len(normalized) < AUTH_CONFIG["username_min_length"]:
+        return False, "username_too_short"
+    if len(normalized) > AUTH_CONFIG["username_max_length"]:
+        return False, "username_too_long"
+    if not re.match(r"^[a-z0-9._-]+$", normalized):
+        return False, "invalid_username"
+    return True, None
+
+
+def validate_password_strength(password):
+    if not isinstance(password, str) or not password:
+        return False, "invalid_password"
+    if len(password) < AUTH_CONFIG["password_min_length"]:
+        return False, "password_too_short"
+    return True, None
+
+
+def _get_password_hasher():
+    return PasswordHasher(
+        time_cost=PASSWORD_HASH_CONFIG["time_cost"],
+        memory_cost=PASSWORD_HASH_CONFIG["memory_cost"],
+        parallelism=PASSWORD_HASH_CONFIG["parallelism"],
+        hash_len=PASSWORD_HASH_CONFIG["hash_len"],
+        salt_len=PASSWORD_HASH_CONFIG["salt_len"],
+    )
+
+
+def hash_password(password):
+    hasher = _get_password_hasher()
+    peppered = f"{password}{PASSWORD_PEPPER}"
+    return hasher.hash(peppered)
+
+
+def verify_password(password, password_hash):
+    hasher = _get_password_hasher()
+    peppered = f"{password}{PASSWORD_PEPPER}"
+    try:
+        return hasher.verify(password_hash, peppered)
+    except VerifyMismatchError:
+        return False
 
 

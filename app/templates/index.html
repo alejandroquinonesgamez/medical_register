@@ -7,8 +7,20 @@
     <link rel="stylesheet" href="/static/css/style.css">
 </head>
 <body>
-    <header>
-        <h1 id="welcome-header">{{ html_texts.welcome_header_loading }}</h1>
+    <header class="app-header">
+        <div class="app-header__spacer"></div>
+        <div class="app-header__titles">
+            <h1 id="app-title">{{ html_texts.title }}</h1>
+            <div class="app-header__auth">
+                <div class="user-greeting">
+                    <span id="user-greeting-text" class="user-greeting-text"></span>
+                    <span id="data-sync-indicator" class="sync-indicator" title="Estado de sincronización"></span>
+                    <button id="logout-btn" class="auth-btn auth-btn--danger">{{ html_texts.logout }}</button>
+                </div>
+                <button id="login-open-btn" class="auth-btn">{{ html_texts.login }}</button>
+                <button id="register-open-btn" class="auth-btn auth-btn--secondary">{{ html_texts.register }}</button>
+            </div>
+        </div>
     </header>
 
     <div class="main-layout">
@@ -39,12 +51,42 @@
         </section>
 
         <section class="panel">
-            <h2>Últimos Registros de Peso</h2>
+            <h2>{{ html_texts.recent_weights_title }}</h2>
             <ul id="recent-weights-list" class="recent-weights-list">
                 <li class="loading">Cargando...</li>
             </ul>
         </section>
         </main>
+    </div>
+
+    <div id="auth-modal" class="modal-overlay">
+        <div class="modal-content auth-modal">
+            <div class="auth-tabs">
+                <button type="button" class="auth-tab active" data-auth-tab="login">{{ html_texts.login }}</button>
+                <button type="button" class="auth-tab" data-auth-tab="register">{{ html_texts.register }}</button>
+            </div>
+            <p id="auth-error" class="auth-error" style="display: none;"></p>
+            <div class="auth-panel" data-auth-panel="login">
+                <form id="login-form">
+                    <label for="login-username">{{ html_texts.username }}</label>
+                    <input type="text" id="login-username" autocomplete="username" required>
+                    <label for="login-password">{{ html_texts.password }}</label>
+                    <input type="password" id="login-password" autocomplete="current-password" required>
+                    <button type="submit">{{ html_texts.login_action }}</button>
+                </form>
+            </div>
+            <div class="auth-panel" data-auth-panel="register" style="display: none;">
+                <form id="register-form">
+                    <label for="register-username">{{ html_texts.username }}</label>
+                    <input type="text" id="register-username" autocomplete="username" required>
+                    <label for="register-password">{{ html_texts.password }}</label>
+                    <input type="password" id="register-password" autocomplete="new-password" required>
+                    <label for="register-password-confirm">{{ html_texts.password_confirm }}</label>
+                    <input type="password" id="register-password-confirm" autocomplete="new-password" required>
+                    <button type="submit">{{ html_texts.register_action }}</button>
+                </form>
+            </div>
+        </div>
     </div>
 
     <div id="user-modal" class="modal-overlay">
@@ -87,6 +129,7 @@
     <script src="/static/js/messages.js"></script>
     <script src="/static/js/storage.js"></script>
     <script src="/static/js/sync.js"></script>
+    <script src="/static/js/auth.js"></script>
     <script src="/static/js/main.js"></script>
 </body>
 </html>

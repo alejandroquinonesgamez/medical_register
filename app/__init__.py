@@ -1,11 +1,27 @@
+import os
 from flask import Flask
 from flask_cors import CORS
-from .storage import MemoryStorage
+from .storage import MemoryStorage, SQLCipherStorage
+from .config import STORAGE_CONFIG, SESSION_CONFIG
 
 
 def create_app():
     app = Flask(__name__)
-    app.storage = MemoryStorage()
+
+    # Configurar secreto de sesión
+    app.secret_key = os.environ.get("FLASK_SECRET_KEY") or os.urandom(32)
+    app.config["SESSION_COOKIE_HTTPONLY"] = SESSION_CONFIG["cookie_httponly"]
+    app.config["SESSION_COOKIE_SECURE"] = SESSION_CONFIG["cookie_secure"]
+    app.config["SESSION_COOKIE_SAMESITE"] = SESSION_CONFIG["cookie_samesite"]
+
+    # Configurar almacenamiento
+    if STORAGE_CONFIG["backend"] == "sqlcipher":
+        app.storage = SQLCipherStorage(
+            db_path=STORAGE_CONFIG["db_path"],
+            db_key=STORAGE_CONFIG["db_key"],
+        )
+    else:
+        app.storage = MemoryStorage()
 
     # Configurar CORS para permitir llamadas desde el frontend
     # En desarrollo, permite cualquier origen
@@ -14,9 +30,9 @@ def create_app():
         r"/api/*": {
             "origins": "*",
             "methods": ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
-            "allow_headers": ["Content-Type"]
+            "allow_headers": ["Content-Type", "X-CSRF-Token"]
         }
-    })
+    }, supports_credentials=True)
 
     # Registrar blueprints
     from .views import views

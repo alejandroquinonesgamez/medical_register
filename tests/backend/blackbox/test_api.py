@@ -5,7 +5,7 @@ Prueban los endpoints sin conocer la implementación interna
 import pytest
 import json
 from datetime import datetime
-from tests.backend.conftest import assert_success, assert_created, assert_bad_request, assert_not_found
+from tests.backend.conftest import assert_success, assert_created, assert_bad_request, assert_not_found, assert_unauthorized, assert_forbidden
 
 
 
@@ -13,19 +13,20 @@ class TestAPIWeight:
     """Tests de caja negra para endpoints de peso"""
     
     
-    def test_add_weight_success(self, client, sample_user):
+    def test_add_weight_success(self, client, sample_user, auth_session):
         """Test POST /api/weight registro exitoso"""
         data = {'peso_kg': 70.5}
         response = client.post(
             '/api/weight',
             data=json.dumps(data),
+            headers={"X-CSRF-Token": auth_session["csrf_token"]},
             content_type='application/json'
         )
         assert_created(response)
         data_resp = json.loads(response.data)
         assert data_resp['message'] == 'Peso Registrado'
     
-    def test_add_weight_multiple(self, client, sample_user):
+    def test_add_weight_multiple(self, client, sample_user, auth_session):
         """Test múltiples registros de peso"""
         pesos = [70.0, 72.5, 75.0]
         for peso in pesos:
@@ -33,6 +34,7 @@ class TestAPIWeight:
             response = client.post(
                 '/api/weight',
                 data=json.dumps(data),
+                headers={"X-CSRF-Token": auth_session["csrf_token"]},
                 content_type='application/json'
             )
             assert_created(response)
@@ -41,7 +43,7 @@ class TestAPIWeight:
 class TestAPIErrorHandling:
     """Tests de caja negra para manejo de errores en la API"""
     
-    def test_create_user_invalid_height_type(self, client):
+    def test_create_user_invalid_height_type(self, client, auth_session):
         """Test error al convertir talla_m a float"""
         data = {
             'nombre': 'Test',
@@ -49,22 +51,22 @@ class TestAPIErrorHandling:
             'fecha_nacimiento': '1990-01-01',
             'talla_m': 'not_a_number'
         }
-        response = client.post('/api/user', data=json.dumps(data), content_type='application/json')
+        response = client.post('/api/user', data=json.dumps(data), headers={"X-CSRF-Token": auth_session["csrf_token"]}, content_type='application/json')
         assert_bad_request(response)
         error_msg = response.get_json()['error'].lower()
         assert 'altura' in error_msg or 'talla' in error_msg or 'inválid' in error_msg
     
-    def test_create_user_missing_talla(self, client):
+    def test_create_user_missing_talla(self, client, auth_session):
         """Test error cuando falta talla_m"""
         data = {
             'nombre': 'Test',
             'apellidos': 'User',
             'fecha_nacimiento': '1990-01-01'
         }
-        response = client.post('/api/user', data=json.dumps(data), content_type='application/json')
+        response = client.post('/api/user', data=json.dumps(data), headers={"X-CSRF-Token": auth_session["csrf_token"]}, content_type='application/json')
         assert_bad_request(response)
     
-    def test_create_user_invalid_birth_date_format(self, client):
+    def test_create_user_invalid_birth_date_format(self, client, auth_session):
         """Test error al parsear fecha de nacimiento"""
         data = {
             'nombre': 'Test',
@@ -72,40 +74,39 @@ class TestAPIErrorHandling:
             'fecha_nacimiento': 'invalid-date',
             'talla_m': 1.75
         }
-        response = client.post('/api/user', data=json.dumps(data), content_type='application/json')
+        response = client.post('/api/user', data=json.dumps(data), headers={"X-CSRF-Token": auth_session["csrf_token"]}, content_type='application/json')
         assert_bad_request(response)
         error_msg = response.get_json()['error'].lower()
         assert 'fecha' in error_msg or 'inválid' in error_msg
     
-    def test_create_user_missing_birth_date(self, client):
+    def test_create_user_missing_birth_date(self, client, auth_session):
         """Test error cuando falta fecha_nacimiento"""
         data = {
             'nombre': 'Test',
             'apellidos': 'User',
             'talla_m': 1.75
         }
-        response = client.post('/api/user', data=json.dumps(data), content_type='application/json')
+        response = client.post('/api/user', data=json.dumps(data), headers={"X-CSRF-Token": auth_session["csrf_token"]}, content_type='application/json')
         assert_bad_request(response)
     
-    def test_add_weight_invalid_weight_type(self, client, sample_user):
+    def test_add_weight_invalid_weight_type(self, client, sample_user, auth_session):
         """Test error al convertir peso_kg a float"""
         data = {'peso_kg': 'not_a_number'}
-        response = client.post('/api/weight', data=json.dumps(data), content_type='application/json')
+        response = client.post('/api/weight', data=json.dumps(data), headers={"X-CSRF-Token": auth_session["csrf_token"]}, content_type='application/json')
         assert_bad_request(response)
         error_msg = response.get_json()['error'].lower()
         assert 'peso' in error_msg or 'inválid' in error_msg
     
-    def test_add_weight_missing_weight(self, client, sample_user):
+    def test_add_weight_missing_weight(self, client, sample_user, auth_session):
         """Test error cuando falta peso_kg"""
         data = {}
-        response = client.post('/api/weight', data=json.dumps(data), content_type='application/json')
+        response = client.post('/api/weight', data=json.dumps(data), headers={"X-CSRF-Token": auth_session["csrf_token"]}, content_type='application/json')
         assert_bad_request(response)
     
-    def test_weight_variation_exceeded(self, client, sample_user):
+    def test_weight_variation_exceeded(self, client, sample_user, auth_session):
         """Test validación de variación de peso excedida"""
         from datetime import timedelta
         from app.storage import WeightEntryData
-        from app.config import USER_ID
         
         # Añadir un peso hace 2 días
         with client.application.app_context():
@@ -113,7 +114,7 @@ class TestAPIErrorHandling:
             two_days_ago = datetime.now() - timedelta(days=2)
             old_weight = WeightEntryData(
                 entry_id=0,
-                user_id=USER_ID,
+                user_id=auth_session["user_id"],
                 weight_kg=70.0,
                 recorded_date=two_days_ago
             )
@@ -121,7 +122,7 @@ class TestAPIErrorHandling:
         
         # Intentar añadir un peso con variación excesiva (más de 10kg en 2 días)
         data = {'peso_kg': 85.0}  # 15kg de diferencia, máximo permitido: 10kg (2 días x 5kg/día)
-        response = client.post('/api/weight', data=json.dumps(data), content_type='application/json')
+        response = client.post('/api/weight', data=json.dumps(data), headers={"X-CSRF-Token": auth_session["csrf_token"]}, content_type='application/json')
         assert_bad_request(response)
         error_msg = response.get_json()['error'].lower()
         assert 'variation' in error_msg or 'variación' in error_msg
@@ -131,7 +132,7 @@ class TestAPIIMC:
     """Tests de caja negra para endpoint de IMC"""
     
     
-    def test_get_imc_with_weights(self, client, sample_user, sample_weights):
+    def test_get_imc_with_weights(self, client, sample_user, sample_weights, auth_session):
         """Test GET /api/imc con registros de peso"""
         response = client.get('/api/imc')
         assert_success(response)
@@ -145,17 +146,17 @@ class TestAPIIMC:
         # Verificar que la descripción no está vacía (se devuelve algo)
         assert len(data['description']) > len('Peso Normal')
     
-    def test_get_imc_with_invalid_weight(self, client, sample_user):
+    def test_get_imc_with_invalid_weight(self, client, sample_user, auth_session):
         """Test GET /api/imc con peso fuera de rango (validación defensiva)"""
         from app.storage import WeightEntryData
-        from app.config import USER_ID, VALIDATION_LIMITS
+        from app.config import VALIDATION_LIMITS
         
         # Añadir un peso fuera de rango directamente al storage
         with client.application.app_context():
             storage = client.application.storage
             invalid_weight = WeightEntryData(
                 entry_id=0,
-                user_id=USER_ID,
+                user_id=auth_session["user_id"],
                 weight_kg=VALIDATION_LIMITS["weight_max"] + 100,  # Fuera de rango
                 recorded_date=datetime.now()
             )
@@ -168,16 +169,16 @@ class TestAPIIMC:
         error_msg = data['error'].lower()
         assert 'peso' in error_msg or 'weight' in error_msg or 'rango' in error_msg
     
-    def test_get_imc_with_invalid_height(self, client):
+    def test_get_imc_with_invalid_height(self, client, auth_session):
         """Test GET /api/imc con talla fuera de rango (validación defensiva)"""
         from app.storage import UserData, WeightEntryData
-        from app.config import USER_ID, VALIDATION_LIMITS
+        from app.config import VALIDATION_LIMITS
         
         # Crear usuario con talla fuera de rango
         with client.application.app_context():
             storage = client.application.storage
             invalid_user = UserData(
-                user_id=USER_ID,
+                user_id=auth_session["user_id"],
                 first_name='Test',
                 last_name='User',
                 birth_date=datetime(1990, 1, 1).date(),
@@ -188,7 +189,7 @@ class TestAPIIMC:
             # Añadir un peso válido
             valid_weight = WeightEntryData(
                 entry_id=0,
-                user_id=USER_ID,
+                user_id=auth_session["user_id"],
                 weight_kg=70.0,
                 recorded_date=datetime.now()
             )
@@ -205,7 +206,7 @@ class TestAPIIMC:
 class TestAPIWeights:
     """Tests de caja negra para endpoint GET /api/weights"""
     
-    def test_get_weights_success(self, client, sample_user, sample_weights):
+    def test_get_weights_success(self, client, sample_user, sample_weights, auth_session):
         """Test GET /api/weights retorna todos los pesos"""
         response = client.get('/api/weights')
         assert_success(response)
@@ -214,7 +215,7 @@ class TestAPIWeights:
         assert isinstance(data['weights'], list)
         assert len(data['weights']) == 3  # sample_weights tiene 3 pesos
     
-    def test_get_weights_empty(self, client, sample_user):
+    def test_get_weights_empty(self, client, sample_user, auth_session):
         """Test GET /api/weights retorna lista vacía cuando no hay pesos"""
         response = client.get('/api/weights')
         assert_success(response)
@@ -224,13 +225,13 @@ class TestAPIWeights:
         assert len(data['weights']) == 0
     
     def test_get_weights_no_user(self, client):
-        """Test GET /api/weights retorna 404 cuando no hay usuario"""
+        """Test GET /api/weights retorna 401 cuando no hay sesión"""
         response = client.get('/api/weights')
-        assert_not_found(response)
+        assert_unauthorized(response)
         data = json.loads(response.data)
         assert 'error' in data
     
-    def test_get_weights_format(self, client, sample_user, sample_weights):
+    def test_get_weights_format(self, client, sample_user, sample_weights, auth_session):
         """Test que los pesos tienen el formato correcto"""
         response = client.get('/api/weights')
         assert_success(response)
@@ -249,11 +250,10 @@ class TestAPIWeights:
             assert isinstance(weight['peso_kg'], (int, float))
             assert isinstance(weight['fecha_registro'], str)
     
-    def test_get_weights_ordered(self, client, sample_user):
+    def test_get_weights_ordered(self, client, sample_user, auth_session):
         """Test que los pesos están ordenados por fecha descendente"""
         from datetime import datetime, timedelta
         from app.storage import WeightEntryData
-        from app.config import USER_ID
         
         # Añadir pesos en orden no cronológico
         with client.application.app_context():
@@ -263,7 +263,7 @@ class TestAPIWeights:
             # Añadir peso más antiguo
             old_weight = WeightEntryData(
                 entry_id=0,
-                user_id=USER_ID,
+                user_id=auth_session["user_id"],
                 weight_kg=70.0,
                 recorded_date=base_date - timedelta(days=10)
             )
@@ -272,7 +272,7 @@ class TestAPIWeights:
             # Añadir peso más reciente
             new_weight = WeightEntryData(
                 entry_id=0,
-                user_id=USER_ID,
+                user_id=auth_session["user_id"],
                 weight_kg=75.0,
                 recorded_date=base_date
             )
@@ -281,7 +281,7 @@ class TestAPIWeights:
             # Añadir peso intermedio
             mid_weight = WeightEntryData(
                 entry_id=0,
-                user_id=USER_ID,
+                user_id=auth_session["user_id"],
                 weight_kg=72.5,
                 recorded_date=base_date - timedelta(days=5)
             )
