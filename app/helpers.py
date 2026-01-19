@@ -11,10 +11,21 @@ Este módulo contiene funciones de utilidad para:
   - Valida caracteres permitidos (letras Unicode, espacios, guiones, apóstrofes)
 """
 import re
+import hashlib
+import urllib.request
 from argon2 import PasswordHasher
 from argon2.exceptions import VerifyMismatchError
 from .translations import get_bmi_complete_description
-from .config import AUTH_CONFIG, PASSWORD_HASH_CONFIG, PASSWORD_PEPPER
+from .config import (
+    AUTH_CONFIG,
+    PASSWORD_HASH_CONFIG,
+    PASSWORD_PEPPER,
+    COMMON_PASSWORDS_PATH,
+    HIBP_API_URL,
+    HIBP_TIMEOUT_SECONDS,
+    HIBP_FAIL_CLOSED,
+    COMMON_PASSWORDS_FALLBACK_PATH,
+)
 
 
 def calculate_bmi(weight_kg, height_m):
@@ -129,7 +140,74 @@ def validate_password_strength(password):
         return False, "invalid_password"
     if len(password) < AUTH_CONFIG["password_min_length"]:
         return False, "password_too_short"
+    if is_pwned_password(password):
+        return False, "password_pwned"
     return True, None
+
+
+def is_common_password(password):
+    """Comprueba si la contraseña aparece en una lista común (RockYou)."""
+    if not isinstance(password, str) or not password:
+        return False
+    try:
+        with open(COMMON_PASSWORDS_PATH, "r", encoding="latin-1", errors="ignore") as f:
+            candidate = password.strip()
+            for line in f:
+                if candidate == line.strip():
+                    return True
+    except FileNotFoundError:
+        # Si no existe el archivo, no bloqueamos por este criterio
+        return False
+    except OSError:
+        return False
+    return False
+
+
+def is_common_password_fallback(password):
+    """Comprueba si la contraseña aparece en un fallback local."""
+    if not isinstance(password, str) or not password:
+        return False
+    try:
+        with open(COMMON_PASSWORDS_FALLBACK_PATH, "r", encoding="latin-1", errors="ignore") as f:
+            candidate = password.strip()
+            for line in f:
+                if candidate == line.strip():
+                    return True
+    except FileNotFoundError:
+        return False
+    except OSError:
+        return False
+    return False
+
+
+def _hibp_range_request(prefix):
+    url = f"{HIBP_API_URL}{prefix}"
+    req = urllib.request.Request(url, headers={"User-Agent": "PPS-Segura-App"})
+    with urllib.request.urlopen(req, timeout=HIBP_TIMEOUT_SECONDS) as response:
+        return response.read().decode("utf-8", errors="ignore")
+
+
+def is_pwned_password(password):
+    """Comprueba si la contraseña aparece en HIBP (k-anonymity)."""
+    if not isinstance(password, str) or not password:
+        return False
+    try:
+        sha1 = hashlib.sha1(password.encode("utf-8")).hexdigest().upper()
+        prefix, suffix = sha1[:5], sha1[5:]
+        body = _hibp_range_request(prefix)
+        for line in body.splitlines():
+            if ":" not in line:
+                continue
+            hash_suffix, _count = line.split(":", 1)
+            if hash_suffix.strip().upper() == suffix:
+                return True
+        return False
+    except Exception:
+        # Fallback local si existe
+        if is_common_password_fallback(password):
+            return True
+        # Si HIBP falla, opcionalmente cerramos el registro
+        return True if HIBP_FAIL_CLOSED else False
 
 
 def _get_password_hasher():
@@ -155,5 +233,4 @@ def verify_password(password, password_hash):
         return hasher.verify(password_hash, peppered)
     except VerifyMismatchError:
         return False
-
 

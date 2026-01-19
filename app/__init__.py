@@ -1,6 +1,8 @@
 import os
 from flask import Flask
 from flask_cors import CORS
+from flask_limiter import Limiter
+from flask_limiter.util import get_remote_address
 from .storage import MemoryStorage, SQLCipherStorage
 from .config import STORAGE_CONFIG, SESSION_CONFIG
 
@@ -22,6 +24,13 @@ def create_app():
         )
     else:
         app.storage = MemoryStorage()
+
+    # Rate limiting global: 3 intentos por IP por minuto
+    Limiter(
+        get_remote_address,
+        app=app,
+        default_limits=["3 per minute"],
+    )
 
     # Configurar CORS para permitir llamadas desde el frontend
     # En desarrollo, permite cualquier origen
