@@ -2,6 +2,7 @@
 Tests de caja blanca para helpers de autenticación
 """
 from app.helpers import validate_username, validate_password_strength, hash_password, verify_password, normalize_username
+import app.helpers as helpers
 
 
 def test_validate_username_rules():
@@ -20,6 +21,21 @@ def test_password_strength():
     assert validate_password_strength("")[0] is False
     assert validate_password_strength("123456789")[0] is False
     assert validate_password_strength("1234567890")[0] is True
+
+
+def test_common_password_blocking(monkeypatch):
+    monkeypatch.setattr(helpers, "is_common_password", lambda _: True)
+    assert validate_password_strength("password123")[0] is False
+
+
+def test_pwned_password_blocking(monkeypatch):
+    monkeypatch.setattr(helpers, "is_pwned_password", lambda _: True)
+    assert validate_password_strength("password123")[0] is False
+
+
+def test_top10k_fallback(monkeypatch):
+    monkeypatch.setattr(helpers, "is_common_password_fallback", lambda _: True)
+    assert validate_password_strength("password123")[0] is False
 
 
 def test_hash_and_verify_password():

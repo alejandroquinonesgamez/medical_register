@@ -8,9 +8,18 @@
 ### Autenticación y contraseñas
 - **Algoritmo**: `Argon2id` con parámetros configurables (`time_cost`, `memory_cost`, `parallelism`, `hash_len`, `salt_len`).
 - **Pepper**: valor opcional del servidor (`PASSWORD_PEPPER`) concatenado a la contraseña antes de hashear.
-- **Flujo**:
-  - Registro: valida usuario y contraseña, hashea con Argon2id y guarda el hash en backend.
-  - Login: compara con `verify_password` (Argon2id).
+- **Bloqueo de contraseñas filtradas (HIBP)**: se usa la API de Pwned Passwords con
+  k-anonymity (SHA-1 parcial). Si aparece en filtraciones conocidas, se rechaza.
+- **Fallback local**: lista de contraseñas comunes en
+  `data/common_passwords_fallback.txt` (configurable con
+  `COMMON_PASSWORDS_FALLBACK_PATH`).
+- **Flujo (registro)**:
+  - El usuario envía `username` y `password`.
+  - El backend consulta **HIBP** (k‑anonymity). Si HIBP falla, se usa el **fallback local**.
+  - Si la contraseña está filtrada, se rechaza y se solicita otra.
+  - Si es válida, se aplica **Argon2id + pepper** y se guarda el hash en backend.
+  - Se responde con registro OK y se crea sesión.
+- **Flujo (login)**: compara con `verify_password` (Argon2id) y crea sesión.
 - **No se guarda contraseña en el navegador**. El frontend solo usa la API segura.
 
 ### Sesiones seguras

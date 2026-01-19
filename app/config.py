@@ -23,6 +23,26 @@ AUTH_CONFIG = {
     "password_min_length": 10,
 }
 
+# Ruta a lista de contraseñas comunes (RockYou u otra)
+COMMON_PASSWORDS_PATH = os.environ.get(
+    "COMMON_PASSWORDS_PATH",
+    os.path.join(os.getcwd(), "data", "rockyou.txt"),
+)
+
+# HIBP (Pwned Passwords) - K-anonymity
+HIBP_API_URL = os.environ.get(
+    "HIBP_API_URL",
+    "https://api.pwnedpasswords.com/range/",
+)
+HIBP_TIMEOUT_SECONDS = float(os.environ.get("HIBP_TIMEOUT_SECONDS", "2.5"))
+HIBP_FAIL_CLOSED = os.environ.get("HIBP_FAIL_CLOSED", "true").lower() == "true"
+
+# Fallback local de contraseñas comunes (ruta local)
+COMMON_PASSWORDS_FALLBACK_PATH = os.environ.get(
+    "COMMON_PASSWORDS_FALLBACK_PATH",
+    os.path.join(os.getcwd(), "data", "common_passwords_fallback.txt"),
+)
+
 # Configuración de hash de contraseñas (Argon2id)
 PASSWORD_HASH_CONFIG = {
     "time_cost": 3,
@@ -76,4 +96,3 @@ AVAILABLE_LANGUAGES = ['es']
 # Configuración WSTG Sync
 WSTG_WEBHOOK_KEY = os.environ.get('WSTG_WEBHOOK_KEY', 'change_me_in_production')
 WSTG_SYNC_API_URL = os.environ.get('WSTG_SYNC_API_URL', 'http://localhost:5001/api/wstg/sync')
-
