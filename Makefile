@@ -13,7 +13,7 @@
 # Uso: make [comando]
 # Ejemplo: make help
 
-.PHONY: help initDefectDojo update up build build-defectdojo logs logs-defectdojo ps down pdf_report setup-env clean-temp clean-all purge
+.PHONY: help initDefectDojo update up build build-defectdojo logs logs-defectdojo ps down pdf_report setup-env ensure-proxy-network clean-temp clean-all purge
 
 # Variables
 # Cargar .env si existe para configurar COMPOSE_PROJECT_NAME
@@ -60,9 +60,20 @@ setup-env:
 		fi \
 	fi
 
+# Crear red externa proxy-network si no existe
+.PHONY: ensure-proxy-network
+ensure-proxy-network:
+	@if command -v docker >/dev/null 2>&1; then \
+		if ! docker network inspect proxy-network >/dev/null 2>&1; then \
+			echo "🔧 Creando red externa proxy-network..."; \
+			docker network create proxy-network >/dev/null; \
+			echo "   ✓ Red proxy-network creada"; \
+		fi; \
+	fi
+
 # Comando por defecto: arrancar solo la aplicación principal
 .DEFAULT_GOAL := default
-default: setup-env ## Arrancar solo la aplicación principal (por defecto)
+default: setup-env ensure-proxy-network ## Arrancar solo la aplicación principal (por defecto)
 	@echo "🚀 Arrancando aplicación principal..."
 	@echo "   (Construyendo imágenes si es necesario...)"
 	$(COMPOSE) up -d --build
@@ -90,7 +101,7 @@ help: ## Mostrar esta ayuda
 	@echo "  make purge          # Detener servicios y limpiar TODO (DESTRUCTIVO)"
 	@echo ""
 
-up: setup-env ## Levantar aplicación principal y DefectDojo vacío (sin findings)
+up: setup-env ensure-proxy-network ## Levantar aplicación principal y DefectDojo vacío (sin findings)
 	@echo "🚀 Arrancando aplicación principal y DefectDojo vacío..."
 	@echo ""
 	@echo "Paso 1/3: Arrancando aplicación principal..."
@@ -119,7 +130,7 @@ up: setup-env ## Levantar aplicación principal y DefectDojo vacío (sin finding
 	@echo "   DefectDojo: http://localhost:8080"
 	@echo "   Usuario: admin | Contraseña: admin"
 
-initDefectDojo: setup-env ## Iniciar solo DefectDojo vacío (sin findings)
+initDefectDojo: setup-env ensure-proxy-network ## Iniciar solo DefectDojo vacío (sin findings)
 	@echo "🔧 Iniciando DefectDojo vacío (sin findings)..."
 	@echo ""
 	@echo "ℹ️  Nota: Se iniciará DefectDojo pero sin crear findings automáticamente"
@@ -144,7 +155,7 @@ initDefectDojo: setup-env ## Iniciar solo DefectDojo vacío (sin findings)
 	@echo "📊 Accede a DefectDojo en: http://localhost:8080"
 	@echo "   Usuario: admin | Contraseña: admin"
 
-update: setup-env ## Levantar aplicación y DefectDojo, y actualizar flujo de findings
+update: setup-env ensure-proxy-network ## Levantar aplicación y DefectDojo, y actualizar flujo de findings
 	@echo "🔄 Actualizando aplicación y flujo de findings..."
 	@echo ""
 	@echo "Paso 1/3: Verificando aplicación principal..."
