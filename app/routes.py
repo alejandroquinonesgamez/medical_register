@@ -17,6 +17,7 @@ from functools import wraps
 from datetime import datetime, date
 import math
 import os
+import shutil
 
 from .storage import UserData, WeightEntryData
 from .helpers import (
@@ -37,6 +38,25 @@ COMPOSE_PROJECT_NAME = os.environ.get('COMPOSE_PROJECT_NAME', 'medical_register'
 
 
 api = Blueprint('api', __name__, url_prefix='/api')
+
+
+def _compose_cmd():
+    """Devuelve el comando de Docker Compose disponible."""
+    if shutil.which("docker"):
+        try:
+            import subprocess
+            subprocess.run(
+                ["docker", "compose", "version"],
+                check=True,
+                stdout=subprocess.DEVNULL,
+                stderr=subprocess.DEVNULL,
+            )
+            return ["docker", "compose"]
+        except Exception:
+            pass
+    if shutil.which("docker-compose"):
+        return ["docker-compose"]
+    return ["docker", "compose"]
 
 
 def _get_current_user_id():
@@ -460,9 +480,10 @@ def export_defectdojo_dump():
         os.makedirs(dump_dir, exist_ok=True)
         
         # Exportar la base de datos usando docker-compose
+        compose_cmd = _compose_cmd()
         result = subprocess.run(
-            ['docker-compose', '--profile', 'defectdojo', 'exec', '-T', 'defectdojo-db', 
-             'pg_dump', '-U', 'defectdojo', 'defectdojo'],
+            compose_cmd + ['--profile', 'defectdojo', 'exec', '-T', 'defectdojo-db',
+                           'pg_dump', '-U', 'defectdojo', 'defectdojo'],
             capture_output=True,
             text=True,
             timeout=300  # 5 minutos máximo
@@ -538,9 +559,10 @@ def import_defectdojo_dump():
                 dump_content = f.read()
             
             # Cargar el dump en PostgreSQL
+            compose_cmd = _compose_cmd()
             result = subprocess.run(
-                ['docker-compose', '--profile', 'defectdojo', 'exec', '-T', 'defectdojo-db',
-                 'psql', '-U', 'defectdojo', '-d', 'defectdojo'],
+                compose_cmd + ['--profile', 'defectdojo', 'exec', '-T', 'defectdojo-db',
+                               'psql', '-U', 'defectdojo', '-d', 'defectdojo'],
                 input=dump_content,
                 capture_output=True,
                 text=True,
@@ -553,7 +575,7 @@ def import_defectdojo_dump():
             
             # Reiniciar DefectDojo para aplicar cambios
             restart_result = subprocess.run(
-                ['docker-compose', '--profile', 'defectdojo', 'restart', 'defectdojo'],
+                compose_cmd + ['--profile', 'defectdojo', 'restart', 'defectdojo'],
                 capture_output=True,
                 text=True,
                 timeout=60
@@ -620,8 +642,9 @@ def generate_pdf_report():
         result_pdf = None
         try:
             # Intentar ejecutar desde contenedor de DefectDojo
+            compose_cmd = _compose_cmd()
             result_pdf = subprocess.run(
-                ['docker-compose', '--profile', 'defectdojo', 'exec', '-T', 'defectdojo', 'python', '/app/scripts/generate_pdf_report.py'],
+                compose_cmd + ['--profile', 'defectdojo', 'exec', '-T', 'defectdojo', 'python', '/app/scripts/generate_pdf_report.py'],
                 capture_output=True,
                 text=True,
                 timeout=120,
@@ -720,9 +743,10 @@ def wstg_sync():
             # Ejecutar en contenedor de DefectDojo usando docker-compose desde el host
             # Nota: Esto requiere que docker-compose esté disponible en el host
             # Como alternativa, el servicio de sincronización procesará estos archivos
+            compose_cmd = _compose_cmd()
             result = subprocess.run(
-                ['docker-compose', 'exec', '-T', 'defectdojo', 'python', '/app/scripts/wstg_sync_handler.py', 
-                 'sync_from_tracker', json_module.dumps(data)],
+                compose_cmd + ['exec', '-T', 'defectdojo', 'python', '/app/scripts/wstg_sync_handler.py',
+                               'sync_from_tracker', json_module.dumps(data)],
                 capture_output=True,
                 text=True,
                 timeout=10,
