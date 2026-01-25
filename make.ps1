@@ -17,7 +17,9 @@
 #   .\make.ps1 update        # Arrancar todo y actualizar findings
 #   .\make.ps1 memory        # Arrancar sin BD (memory)
 #   .\make.ps1 db            # Arrancar con BD (sqlite/sqlcipher)
-#   .\make.ps1 test          # Ejecutar tests (Python 3)
+#   .\make.ps1 test          # Ejecutar todos los tests
+#   .\make.ps1 test-backend  # Ejecutar tests backend en contenedor
+#   .\make.ps1 test-frontend # Ejecutar tests frontend en contenedor
 
 param(
     [Parameter(Position=0)]
@@ -157,7 +159,11 @@ function Show-Help {
     Write-Host "  db               " -NoNewline -ForegroundColor Yellow
     Write-Host "Arrancar con base de datos (sqlite/sqlcipher)"
     Write-Host "  test             " -NoNewline -ForegroundColor Yellow
-    Write-Host "Ejecutar tests (Python 3)"
+    Write-Host "Ejecutar todos los tests"
+    Write-Host "  test-backend     " -NoNewline -ForegroundColor Yellow
+    Write-Host "Ejecutar tests backend en contenedor"
+    Write-Host "  test-frontend    " -NoNewline -ForegroundColor Yellow
+    Write-Host "Ejecutar tests frontend en contenedor"
     Write-Host "  logs             " -NoNewline -ForegroundColor Yellow
     Write-Host "Ver logs de la aplicacion principal"
     Write-Host "  logs-defectdojo  " -NoNewline -ForegroundColor Yellow
@@ -187,7 +193,9 @@ function Show-Help {
     Write-Host "  .\make.ps1 update         # Despliegue completo y actualizacion"
     Write-Host "  .\make.ps1 memory         # Arranca sin BD (memory)"
     Write-Host "  .\make.ps1 db             # Arranca con BD (sqlite/sqlcipher)"
-    Write-Host "  .\make.ps1 test           # Ejecuta tests (Python 3)"
+    Write-Host "  .\make.ps1 test           # Ejecuta todos los tests"
+    Write-Host "  .\make.ps1 test-backend   # Ejecuta tests backend en contenedor"
+    Write-Host "  .\make.ps1 test-frontend  # Ejecuta tests frontend en contenedor"
     Write-Host ""
 }
 
@@ -217,7 +225,6 @@ function Start-Db {
     Write-Host "Accede a la aplicacion en: http://localhost:5001" -ForegroundColor Cyan
 }
 
-<<<<<<< HEAD
 function Start-Up {
     Write-Host "Arrancando aplicacion principal y DefectDojo vacio..." -ForegroundColor Cyan
     Write-Host ""
@@ -358,12 +365,21 @@ function Start-Update {
 }
 
 function Run-Tests {
-    Write-Host "Ejecutando tests (Python 3)..." -ForegroundColor Cyan
-    try {
-        python3 -m pytest
-    } catch {
-        python -m pytest
+    Write-Host "Ejecutando tests en contenedor (backend)..." -ForegroundColor Cyan
+    docker-compose run --rm web python -m pytest
+}
+
+function Run-FrontendTests {
+    Write-Host "Ejecutando tests en contenedor (frontend)..." -ForegroundColor Cyan
+    docker-compose run --rm frontend-tests
+}
+
+function Run-AllTests {
+    Run-Tests
+    if ($LASTEXITCODE -ne 0) {
+        exit $LASTEXITCODE
     }
+    Run-FrontendTests
 }
 
 function Show-Logs {
@@ -481,7 +497,13 @@ switch ($Command.ToLower()) {
         Start-Db
     }
     "test" {
+        Run-AllTests
+    }
+    "test-backend" {
         Run-Tests
+    }
+    "test-frontend" {
+        Run-FrontendTests
     }
     "logs" {
         Show-Logs

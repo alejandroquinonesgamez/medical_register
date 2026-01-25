@@ -13,7 +13,7 @@
 # Uso: make [comando]
 # Ejemplo: make help
 
-.PHONY: help initDefectDojo update up build build-defectdojo logs logs-defectdojo ps down pdf_report setup-env ensure-proxy-network clean-temp clean-all purge sync-wstg wstg-status wstg-logs fix-containers memory db test
+.PHONY: help initDefectDojo update up build build-defectdojo logs logs-defectdojo ps down pdf_report setup-env ensure-proxy-network clean-temp clean-all purge sync-wstg wstg-status wstg-logs fix-containers memory db test test-backend test-frontend
 
 # Variables
 # Cargar .env si existe para configurar COMPOSE_PROJECT_NAME
@@ -111,7 +111,9 @@ help: ## Mostrar esta ayuda
 	@echo "  make memory         # Arranca sin BD (memory)"
 	@echo "  make db             # Arranca con BD (sqlite/sqlcipher)"
 	@echo "  make build          # Construir imágenes de la aplicación"
-	@echo "  make test           # Ejecutar tests (Python 3)"
+	@echo "  make test           # Ejecutar todos los tests"
+	@echo "  make test-backend   # Ejecutar tests backend en contenedor"
+	@echo "  make test-frontend  # Ejecutar tests frontend en contenedor"
 	@echo "  make logs           # Ver logs de la aplicación"
 	@echo "  make logs-defectdojo # Ver logs de DefectDojo"
 	@echo "  make ps             # Ver estado de contenedores"
@@ -228,9 +230,15 @@ build-defectdojo: setup-env ## Construir imágenes de DefectDojo
 	@$(COMPOSE) --profile defectdojo build
 	@echo ""
 	@echo "✅ Imágenes de DefectDojo construidas"
-test: ## Ejecutar tests con Python 3
-	@echo "🧪 Ejecutando tests (Python 3)..."
-	@python3 -m pytest
+test: test-backend test-frontend ## Ejecutar todos los tests
+
+test-backend: ## Ejecutar tests backend dentro del contenedor
+	@echo "🧪 Ejecutando tests en contenedor (backend)..."
+	@$(COMPOSE) run --rm web python -m pytest
+
+test-frontend: ## Ejecutar tests frontend dentro del contenedor
+	@echo "🧪 Ejecutando tests en contenedor (frontend)..."
+	@$(COMPOSE) run --rm frontend-tests
 
 down: setup-env ## Detener todos los servicios
 	@echo "🛑 Deteniendo todos los servicios..."

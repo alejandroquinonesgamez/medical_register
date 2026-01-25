@@ -20,7 +20,7 @@ def test_normalize_username():
 def test_password_strength():
     assert validate_password_strength("")[0] is False
     assert validate_password_strength("123456789")[0] is False
-    assert validate_password_strength("1234567890")[0] is True
+    assert validate_password_strength("clave_segura_123")[0] is True
 
 
 def test_common_password_blocking(monkeypatch):

@@ -30,11 +30,12 @@ def create_app():
         app.storage = MemoryStorage()
 
     # Rate limiting global: 3 intentos por IP por minuto
-    Limiter(
-        get_remote_address,
-        app=app,
-        default_limits=["3 per minute"],
-    )
+    if os.environ.get("APP_TESTING") != "1":
+        Limiter(
+            get_remote_address,
+            app=app,
+            default_limits=["3 per minute"],
+        )
 
     # Configurar CORS para permitir llamadas desde el frontend
     # En desarrollo, permite cualquier origen
