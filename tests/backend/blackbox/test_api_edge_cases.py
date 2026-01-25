@@ -7,13 +7,12 @@ import json
 from datetime import datetime, timedelta
 from tests.backend.conftest import assert_success, assert_created, assert_bad_request, assert_not_found
 from app.storage import WeightEntryData
-from app.config import USER_ID
 
 
 class TestAPIWeightVariationEdgeCases:
     """Tests adicionales para casos edge de variación de peso"""
     
-    def test_weight_variation_exact_limit(self, client, sample_user):
+    def test_weight_variation_exact_limit(self, client, sample_user, auth_session):
         """Test que acepta variación exactamente en el límite permitido"""
         from datetime import timedelta
         
@@ -23,7 +22,7 @@ class TestAPIWeightVariationEdgeCases:
             two_days_ago = datetime.now() - timedelta(days=2)
             old_weight = WeightEntryData(
                 entry_id=0,
-                user_id=USER_ID,
+                user_id=auth_session["user_id"],
                 weight_kg=70.0,
                 recorded_date=two_days_ago
             )
@@ -31,10 +30,15 @@ class TestAPIWeightVariationEdgeCases:
         
         # Intentar añadir un peso con variación exactamente en el límite (2 días x 5kg/día = 10kg)
         data = {'peso_kg': 80.0}  # Exactamente 10kg de diferencia
-        response = client.post('/api/weight', data=json.dumps(data), content_type='application/json')
+        response = client.post(
+            '/api/weight',
+            data=json.dumps(data),
+            content_type='application/json',
+            headers={"X-CSRF-Token": auth_session["csrf_token"]},
+        )
         assert_created(response)
     
-    def test_weight_variation_same_day_no_validation(self, client, sample_user):
+    def test_weight_variation_same_day_no_validation(self, client, sample_user, auth_session):
         """Test que no valida variación si es el mismo día"""
         # Añadir un peso hoy
         with client.application.app_context():
@@ -42,7 +46,7 @@ class TestAPIWeightVariationEdgeCases:
             today = datetime.now()
             old_weight = WeightEntryData(
                 entry_id=0,
-                user_id=USER_ID,
+                user_id=auth_session["user_id"],
                 weight_kg=70.0,
                 recorded_date=today
             )
@@ -50,10 +54,15 @@ class TestAPIWeightVariationEdgeCases:
         
         # Intentar añadir un peso muy diferente el mismo día (debe reemplazar, no validar variación)
         data = {'peso_kg': 100.0}  # 30kg de diferencia, pero mismo día
-        response = client.post('/api/weight', data=json.dumps(data), content_type='application/json')
+        response = client.post(
+            '/api/weight',
+            data=json.dumps(data),
+            content_type='application/json',
+            headers={"X-CSRF-Token": auth_session["csrf_token"]},
+        )
         assert_created(response)
     
-    def test_weight_variation_one_day(self, client, sample_user):
+    def test_weight_variation_one_day(self, client, sample_user, auth_session):
         """Test variación de peso con 1 día de diferencia"""
         from datetime import timedelta
         
@@ -63,7 +72,7 @@ class TestAPIWeightVariationEdgeCases:
             one_day_ago = datetime.now() - timedelta(days=1)
             old_weight = WeightEntryData(
                 entry_id=0,
-                user_id=USER_ID,
+                user_id=auth_session["user_id"],
                 weight_kg=70.0,
                 recorded_date=one_day_ago
             )
@@ -71,10 +80,15 @@ class TestAPIWeightVariationEdgeCases:
         
         # Intentar añadir un peso con variación permitida (1 día x 5kg/día = 5kg)
         data = {'peso_kg': 75.0}  # Exactamente 5kg de diferencia
-        response = client.post('/api/weight', data=json.dumps(data), content_type='application/json')
+        response = client.post(
+            '/api/weight',
+            data=json.dumps(data),
+            content_type='application/json',
+            headers={"X-CSRF-Token": auth_session["csrf_token"]},
+        )
         assert_created(response)
     
-    def test_weight_variation_many_days(self, client, sample_user):
+    def test_weight_variation_many_days(self, client, sample_user, auth_session):
         """Test variación de peso con muchos días de diferencia"""
         from datetime import timedelta
         
@@ -84,7 +98,7 @@ class TestAPIWeightVariationEdgeCases:
             ten_days_ago = datetime.now() - timedelta(days=10)
             old_weight = WeightEntryData(
                 entry_id=0,
-                user_id=USER_ID,
+                user_id=auth_session["user_id"],
                 weight_kg=70.0,
                 recorded_date=ten_days_ago
             )
@@ -92,14 +106,19 @@ class TestAPIWeightVariationEdgeCases:
         
         # Intentar añadir un peso con variación permitida (10 días x 5kg/día = 50kg)
         data = {'peso_kg': 120.0}  # Exactamente 50kg de diferencia
-        response = client.post('/api/weight', data=json.dumps(data), content_type='application/json')
+        response = client.post(
+            '/api/weight',
+            data=json.dumps(data),
+            content_type='application/json',
+            headers={"X-CSRF-Token": auth_session["csrf_token"]},
+        )
         assert_created(response)
 
 
 class TestAPIUserValidationEdgeCases:
     """Tests adicionales para casos edge de validación de usuario"""
     
-    def test_create_user_name_min_length(self, client):
+    def test_create_user_name_min_length(self, client, auth_session):
         """Test nombre con longitud mínima (1 carácter)"""
         data = {
             'nombre': 'A',  # 1 carácter
@@ -107,10 +126,15 @@ class TestAPIUserValidationEdgeCases:
             'fecha_nacimiento': '1990-01-01',
             'talla_m': 1.75
         }
-        response = client.post('/api/user', data=json.dumps(data), content_type='application/json')
+        response = client.post(
+            '/api/user',
+            data=json.dumps(data),
+            content_type='application/json',
+            headers={"X-CSRF-Token": auth_session["csrf_token"]},
+        )
         assert_success(response)
     
-    def test_create_user_name_max_length(self, client):
+    def test_create_user_name_max_length(self, client, auth_session):
         """Test nombre con longitud máxima (100 caracteres)"""
         long_name = 'A' * 100
         data = {
@@ -119,10 +143,15 @@ class TestAPIUserValidationEdgeCases:
             'fecha_nacimiento': '1990-01-01',
             'talla_m': 1.75
         }
-        response = client.post('/api/user', data=json.dumps(data), content_type='application/json')
+        response = client.post(
+            '/api/user',
+            data=json.dumps(data),
+            content_type='application/json',
+            headers={"X-CSRF-Token": auth_session["csrf_token"]},
+        )
         assert_success(response)
     
-    def test_create_user_name_too_long(self, client):
+    def test_create_user_name_too_long(self, client, auth_session):
         """Test error cuando nombre excede longitud máxima"""
         long_name = 'A' * 101  # 101 caracteres
         data = {
@@ -131,10 +160,15 @@ class TestAPIUserValidationEdgeCases:
             'fecha_nacimiento': '1990-01-01',
             'talla_m': 1.75
         }
-        response = client.post('/api/user', data=json.dumps(data), content_type='application/json')
+        response = client.post(
+            '/api/user',
+            data=json.dumps(data),
+            content_type='application/json',
+            headers={"X-CSRF-Token": auth_session["csrf_token"]},
+        )
         assert_bad_request(response)
     
-    def test_create_user_name_empty(self, client):
+    def test_create_user_name_empty(self, client, auth_session):
         """Test error cuando nombre está vacío"""
         data = {
             'nombre': '',
@@ -142,10 +176,15 @@ class TestAPIUserValidationEdgeCases:
             'fecha_nacimiento': '1990-01-01',
             'talla_m': 1.75
         }
-        response = client.post('/api/user', data=json.dumps(data), content_type='application/json')
+        response = client.post(
+            '/api/user',
+            data=json.dumps(data),
+            content_type='application/json',
+            headers={"X-CSRF-Token": auth_session["csrf_token"]},
+        )
         assert_bad_request(response)
     
-    def test_create_user_last_name_empty(self, client):
+    def test_create_user_last_name_empty(self, client, auth_session):
         """Test error cuando apellidos están vacíos"""
         data = {
             'nombre': 'Test',
@@ -153,10 +192,15 @@ class TestAPIUserValidationEdgeCases:
             'fecha_nacimiento': '1990-01-01',
             'talla_m': 1.75
         }
-        response = client.post('/api/user', data=json.dumps(data), content_type='application/json')
+        response = client.post(
+            '/api/user',
+            data=json.dumps(data),
+            content_type='application/json',
+            headers={"X-CSRF-Token": auth_session["csrf_token"]},
+        )
         assert_bad_request(response)
     
-    def test_create_user_name_with_dangerous_chars(self, client):
+    def test_create_user_name_with_dangerous_chars(self, client, auth_session):
         """Test que se sanitizan caracteres peligrosos en nombre"""
         data = {
             'nombre': 'Test<>User',  # Caracteres peligrosos
@@ -164,7 +208,12 @@ class TestAPIUserValidationEdgeCases:
             'fecha_nacimiento': '1990-01-01',
             'talla_m': 1.75
         }
-        response = client.post('/api/user', data=json.dumps(data), content_type='application/json')
+        response = client.post(
+            '/api/user',
+            data=json.dumps(data),
+            content_type='application/json',
+            headers={"X-CSRF-Token": auth_session["csrf_token"]},
+        )
         # Debe aceptar pero sanitizar
         assert_success(response)
         # Verificar que se guardó sanitizado
@@ -173,7 +222,7 @@ class TestAPIUserValidationEdgeCases:
         assert '<' not in user_data['nombre']
         assert '>' not in user_data['nombre']
     
-    def test_create_user_birth_date_today(self, client):
+    def test_create_user_birth_date_today(self, client, auth_session):
         """Test fecha de nacimiento igual a hoy (límite superior)"""
         today = datetime.now().strftime('%Y-%m-%d')
         data = {
@@ -182,10 +231,15 @@ class TestAPIUserValidationEdgeCases:
             'fecha_nacimiento': today,
             'talla_m': 1.75
         }
-        response = client.post('/api/user', data=json.dumps(data), content_type='application/json')
+        response = client.post(
+            '/api/user',
+            data=json.dumps(data),
+            content_type='application/json',
+            headers={"X-CSRF-Token": auth_session["csrf_token"]},
+        )
         assert_success(response)
     
-    def test_create_user_birth_date_min(self, client):
+    def test_create_user_birth_date_min(self, client, auth_session):
         """Test fecha de nacimiento en el límite mínimo (1900-01-01)"""
         data = {
             'nombre': 'Test',
@@ -193,7 +247,12 @@ class TestAPIUserValidationEdgeCases:
             'fecha_nacimiento': '1900-01-01',
             'talla_m': 1.75
         }
-        response = client.post('/api/user', data=json.dumps(data), content_type='application/json')
+        response = client.post(
+            '/api/user',
+            data=json.dumps(data),
+            content_type='application/json',
+            headers={"X-CSRF-Token": auth_session["csrf_token"]},
+        )
         assert_success(response)
 
 
@@ -208,16 +267,15 @@ class TestAPIIMCEdgeCases:
         assert data['imc'] == 0
         assert 'Sin registros' in data['description'] or 'no_weight_records' in data.get('description', '')
     
-    def test_get_imc_with_zero_height(self, client):
+    def test_get_imc_with_zero_height(self, client, auth_session):
         """Test IMC con altura cero (caso edge)"""
         from app.storage import UserData, WeightEntryData
-        from app.config import USER_ID
         
         # Crear usuario con altura cero (aunque no debería pasar en producción)
         with client.application.app_context():
             storage = client.application.storage
             invalid_user = UserData(
-                user_id=USER_ID,
+                user_id=auth_session["user_id"],
                 first_name='Test',
                 last_name='User',
                 birth_date=datetime(1990, 1, 1).date(),
@@ -228,7 +286,7 @@ class TestAPIIMCEdgeCases:
             # Añadir un peso
             weight = WeightEntryData(
                 entry_id=0,
-                user_id=USER_ID,
+                user_id=auth_session["user_id"],
                 weight_kg=70.0,
                 recorded_date=datetime.now()
             )
@@ -244,7 +302,7 @@ class TestAPIIMCEdgeCases:
 class TestAPIStatsEdgeCases:
     """Tests adicionales para casos edge de estadísticas"""
     
-    def test_stats_no_user(self, client):
+    def test_stats_no_user(self, client, auth_session):
         """Test estadísticas sin usuario (debe funcionar)"""
         response = client.get('/api/stats')
         assert_success(response)
@@ -253,9 +311,13 @@ class TestAPIStatsEdgeCases:
         assert data['peso_max'] == 0
         assert data['peso_min'] == 0
     
-    def test_stats_single_entry(self, client, sample_user):
+    def test_stats_single_entry(self, client, sample_user, auth_session):
         """Test estadísticas con una sola entrada"""
-        client.post('/api/weight', json={'peso_kg': 75.0})
+        client.post(
+            '/api/weight',
+            json={'peso_kg': 75.0},
+            headers={"X-CSRF-Token": auth_session["csrf_token"]},
+        )
         
         response = client.get('/api/stats')
         assert_success(response)
