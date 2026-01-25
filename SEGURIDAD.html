@@ -1,0 +1,525 @@
+<!doctype html>
+<html class="no-js" lang="en" data-content_root="./">
+  <head><meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <meta name="color-scheme" content="light dark"><meta name="viewport" content="width=device-width, initial-scale=1" />
+<link rel="index" title="Index" href="genindex.html"><link rel="search" title="Search" href="search.html"><link rel="prev" title="Inicio Rápido" href="INICIO_RAPIDO.html">
+
+    <!-- Generated with Sphinx 8.1.3 and Furo 2025.12.19 -->
+        <title>Seguridad: entradas, contraseñas y sesiones - Medical Register 0.1.0 documentation</title>
+      <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=d111a655" />
+    <link rel="stylesheet" type="text/css" href="_static/styles/furo.css?v=7bdb33bb" />
+    <link rel="stylesheet" type="text/css" href="_static/styles/furo-extensions.css?v=8dab3a3b" />
+    
+    
+
+
+<style>
+  body {
+    --color-code-background: #f2f2f2;
+  --color-code-foreground: #1e1e1e;
+  --color-brand-primary: #254F6D;
+  --color-brand-content: #254F6D;
+  
+  }
+  @media not print {
+    body[data-theme="dark"] {
+      --color-code-background: #202020;
+  --color-code-foreground: #d0d0d0;
+  
+    }
+    @media (prefers-color-scheme: dark) {
+      body:not([data-theme="light"]) {
+        --color-code-background: #202020;
+  --color-code-foreground: #d0d0d0;
+  
+      }
+    }
+  }
+</style></head>
+  <body>
+    
+    <script>
+      document.body.dataset.theme = localStorage.getItem("theme") || "auto";
+    </script>
+    
+
+<svg xmlns="http://www.w3.org/2000/svg" style="display: none;">
+  <symbol id="svg-toc" viewBox="0 0 24 24">
+    <title>Contents</title>
+    <svg stroke="currentColor" fill="currentColor" stroke-width="0" viewBox="0 0 1024 1024">
+      <path d="M408 442h480c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8H408c-4.4 0-8 3.6-8 8v56c0 4.4 3.6 8 8 8zm-8 204c0 4.4 3.6 8 8 8h480c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8H408c-4.4 0-8 3.6-8 8v56zm504-486H120c-4.4 0-8 3.6-8 8v56c0 4.4 3.6 8 8 8h784c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8zm0 632H120c-4.4 0-8 3.6-8 8v56c0 4.4 3.6 8 8 8h784c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8zM115.4 518.9L271.7 642c5.8 4.6 14.4.5 14.4-6.9V388.9c0-7.4-8.5-11.5-14.4-6.9L115.4 505.1a8.74 8.74 0 0 0 0 13.8z"/>
+    </svg>
+  </symbol>
+  <symbol id="svg-menu" viewBox="0 0 24 24">
+    <title>Menu</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather-menu">
+      <line x1="3" y1="12" x2="21" y2="12"></line>
+      <line x1="3" y1="6" x2="21" y2="6"></line>
+      <line x1="3" y1="18" x2="21" y2="18"></line>
+    </svg>
+  </symbol>
+  <symbol id="svg-arrow-right" viewBox="0 0 24 24">
+    <title>Expand</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather-chevron-right">
+      <polyline points="9 18 15 12 9 6"></polyline>
+    </svg>
+  </symbol>
+  <symbol id="svg-sun" viewBox="0 0 24 24">
+    <title>Light mode</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round" class="feather-sun">
+      <circle cx="12" cy="12" r="5"></circle>
+      <line x1="12" y1="1" x2="12" y2="3"></line>
+      <line x1="12" y1="21" x2="12" y2="23"></line>
+      <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+      <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+      <line x1="1" y1="12" x2="3" y2="12"></line>
+      <line x1="21" y1="12" x2="23" y2="12"></line>
+      <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+      <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+    </svg>
+  </symbol>
+  <symbol id="svg-moon" viewBox="0 0 24 24">
+    <title>Dark mode</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round" class="icon-tabler-moon">
+      <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+      <path d="M12 3c.132 0 .263 0 .393 0a7.5 7.5 0 0 0 7.92 12.446a9 9 0 1 1 -8.313 -12.454z" />
+    </svg>
+  </symbol>
+  <symbol id="svg-sun-with-moon" viewBox="0 0 24 24">
+    <title>Auto light/dark, in light mode</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round"
+      class="icon-custom-derived-from-feather-sun-and-tabler-moon">
+      <path style="opacity: 50%" d="M 5.411 14.504 C 5.471 14.504 5.532 14.504 5.591 14.504 C 3.639 16.319 4.383 19.569 6.931 20.352 C 7.693 20.586 8.512 20.551 9.25 20.252 C 8.023 23.207 4.056 23.725 2.11 21.184 C 0.166 18.642 1.702 14.949 4.874 14.536 C 5.051 14.512 5.231 14.5 5.411 14.5 L 5.411 14.504 Z"/>
+      <line x1="14.5" y1="3.25" x2="14.5" y2="1.25"/>
+      <line x1="14.5" y1="15.85" x2="14.5" y2="17.85"/>
+      <line x1="10.044" y1="5.094" x2="8.63" y2="3.68"/>
+      <line x1="19" y1="14.05" x2="20.414" y2="15.464"/>
+      <line x1="8.2" y1="9.55" x2="6.2" y2="9.55"/>
+      <line x1="20.8" y1="9.55" x2="22.8" y2="9.55"/>
+      <line x1="10.044" y1="14.006" x2="8.63" y2="15.42"/>
+      <line x1="19" y1="5.05" x2="20.414" y2="3.636"/>
+      <circle cx="14.5" cy="9.55" r="3.6"/>
+    </svg>
+  </symbol>
+  <symbol id="svg-moon-with-sun" viewBox="0 0 24 24">
+    <title>Auto light/dark, in dark mode</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round"
+      class="icon-custom-derived-from-feather-sun-and-tabler-moon">
+      <path d="M 8.282 7.007 C 8.385 7.007 8.494 7.007 8.595 7.007 C 5.18 10.184 6.481 15.869 10.942 17.24 C 12.275 17.648 13.706 17.589 15 17.066 C 12.851 22.236 5.91 23.143 2.505 18.696 C -0.897 14.249 1.791 7.786 7.342 7.063 C 7.652 7.021 7.965 7 8.282 7 L 8.282 7.007 Z"/>
+      <line style="opacity: 50%" x1="18" y1="3.705" x2="18" y2="2.5"/>
+      <line style="opacity: 50%" x1="18" y1="11.295" x2="18" y2="12.5"/>
+      <line style="opacity: 50%" x1="15.316" y1="4.816" x2="14.464" y2="3.964"/>
+      <line style="opacity: 50%" x1="20.711" y1="10.212" x2="21.563" y2="11.063"/>
+      <line style="opacity: 50%" x1="14.205" y1="7.5" x2="13.001" y2="7.5"/>
+      <line style="opacity: 50%" x1="21.795" y1="7.5" x2="23" y2="7.5"/>
+      <line style="opacity: 50%" x1="15.316" y1="10.184" x2="14.464" y2="11.036"/>
+      <line style="opacity: 50%" x1="20.711" y1="4.789" x2="21.563" y2="3.937"/>
+      <circle style="opacity: 50%" cx="18" cy="7.5" r="2.169"/>
+    </svg>
+  </symbol>
+  <symbol id="svg-pencil" viewBox="0 0 24 24">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round" class="icon-tabler-pencil-code">
+      <path d="M4 20h4l10.5 -10.5a2.828 2.828 0 1 0 -4 -4l-10.5 10.5v4" />
+      <path d="M13.5 6.5l4 4" />
+      <path d="M20 21l2 -2l-2 -2" />
+      <path d="M17 17l-2 2l2 2" />
+    </svg>
+  </symbol>
+  <symbol id="svg-eye" viewBox="0 0 24 24">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round" class="icon-tabler-eye-code">
+      <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+      <path d="M10 12a2 2 0 1 0 4 0a2 2 0 0 0 -4 0" />
+      <path
+        d="M11.11 17.958c-3.209 -.307 -5.91 -2.293 -8.11 -5.958c2.4 -4 5.4 -6 9 -6c3.6 0 6.6 2 9 6c-.21 .352 -.427 .688 -.647 1.008" />
+      <path d="M20 21l2 -2l-2 -2" />
+      <path d="M17 17l-2 2l2 2" />
+    </svg>
+  </symbol>
+</svg>
+
+<input type="checkbox" class="sidebar-toggle" name="__navigation" id="__navigation" aria-label="Toggle site navigation sidebar">
+<input type="checkbox" class="sidebar-toggle" name="__toc" id="__toc" aria-label="Toggle table of contents sidebar">
+<label class="overlay sidebar-overlay" for="__navigation"></label>
+<label class="overlay toc-overlay" for="__toc"></label>
+
+<a class="skip-to-content muted-link" href="#furo-main-content">Skip to content</a>
+
+
+
+<div class="page">
+  <header class="mobile-header">
+    <div class="header-left">
+      <label class="nav-overlay-icon" for="__navigation">
+        <span class="icon"><svg><use href="#svg-menu"></use></svg></span>
+      </label>
+    </div>
+    <div class="header-center">
+      <a href="index.html"><div class="brand">Medical Register 0.1.0 documentation</div></a>
+    </div>
+    <div class="header-right">
+      <div class="theme-toggle-container theme-toggle-header">
+        <button class="theme-toggle" aria-label="Toggle Light / Dark / Auto color theme">
+          <svg class="theme-icon-when-auto-light"><use href="#svg-sun-with-moon"></use></svg>
+          <svg class="theme-icon-when-auto-dark"><use href="#svg-moon-with-sun"></use></svg>
+          <svg class="theme-icon-when-dark"><use href="#svg-moon"></use></svg>
+          <svg class="theme-icon-when-light"><use href="#svg-sun"></use></svg>
+        </button>
+      </div>
+      <label class="toc-overlay-icon toc-header-icon" for="__toc">
+        <span class="icon"><svg><use href="#svg-toc"></use></svg></span>
+      </label>
+    </div>
+  </header>
+  <aside class="sidebar-drawer">
+    <div class="sidebar-container">
+      
+      <div class="sidebar-sticky"><a class="sidebar-brand" href="index.html">
+  
+  
+</a><form class="sidebar-search-container" method="get" action="search.html" role="search">
+  <input class="sidebar-search" placeholder="Search" name="q" aria-label="Search">
+  <input type="hidden" name="check_keywords" value="yes">
+  <input type="hidden" name="area" value="default">
+</form>
+<div id="searchbox"></div><div class="sidebar-scroll"><div class="sidebar-tree">
+  <p class="caption" role="heading"><span class="caption-text">Contenido:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="manual.html">Manual de Usuario - Registro Personal de Peso e IMC</a></li>
+<li class="toctree-l1"><a class="reference internal" href="INICIO_RAPIDO.html">Inicio Rápido</a></li>
+<li class="toctree-l1 current current-page"><a class="current reference internal" href="#">Seguridad: entradas, contraseñas y sesiones</a></li>
+</ul>
+
+</div>
+</div>
+
+      </div>
+      
+    </div>
+  </aside>
+  <div class="main">
+    <div class="content">
+      <div class="article-container">
+        <a href="#" class="back-to-top muted-link">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+            <path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8v12z"></path>
+          </svg>
+          <span>Back to top</span>
+        </a>
+        <div class="content-icon-container">
+          <div class="view-this-page">
+  <a class="muted-link" href="_sources/SEGURIDAD.md.txt" title="View this page">
+    <svg><use href="#svg-eye"></use></svg>
+    <span class="visually-hidden">View this page</span>
+  </a>
+</div>
+<div class="theme-toggle-container theme-toggle-content">
+            <button class="theme-toggle" aria-label="Toggle Light / Dark / Auto color theme">
+              <svg class="theme-icon-when-auto-light"><use href="#svg-sun-with-moon"></use></svg>
+              <svg class="theme-icon-when-auto-dark"><use href="#svg-moon-with-sun"></use></svg>
+              <svg class="theme-icon-when-dark"><use href="#svg-moon"></use></svg>
+              <svg class="theme-icon-when-light"><use href="#svg-sun"></use></svg>
+            </button>
+          </div>
+          <label class="toc-overlay-icon toc-content-icon" for="__toc">
+            <span class="icon"><svg><use href="#svg-toc"></use></svg></span>
+          </label>
+        </div>
+        <article role="main" id="furo-main-content">
+          <section id="seguridad-entradas-contrasenas-y-sesiones">
+<h1>Seguridad: entradas, contraseñas y sesiones<a class="headerlink" href="#seguridad-entradas-contrasenas-y-sesiones" title="Link to this heading">¶</a></h1>
+<section id="validacion-y-sanitizacion-de-entradas">
+<h2>Validación y sanitización de entradas<a class="headerlink" href="#validacion-y-sanitizacion-de-entradas" title="Link to this heading">¶</a></h2>
+<ul class="simple">
+<li><p><strong>Nombres y apellidos</strong>: validación de longitud y caracteres permitidos (solo letras, espacios, guiones y apóstrofes). Se eliminan caracteres peligrosos y se normalizan espacios. Implementado en <code class="docutils literal notranslate"><span class="pre">app/helpers.py</span></code> (<code class="docutils literal notranslate"><span class="pre">validate_and_sanitize_name</span></code>).</p></li>
+<li><p><strong>Peso, altura y fecha de nacimiento</strong>: validación de tipo y rango en backend (<code class="docutils literal notranslate"><span class="pre">/api/user</span></code>, <code class="docutils literal notranslate"><span class="pre">/api/weight</span></code>) con límites centralizados en <code class="docutils literal notranslate"><span class="pre">app/config.py</span></code>.</p></li>
+<li><p><strong>Validación defensiva</strong>: cálculo de IMC solo si los datos están dentro de rango (backend y frontend).</p></li>
+</ul>
+</section>
+<section id="autenticacion-y-contrasenas-detalle-completo">
+<h2>Autenticación y contraseñas (detalle completo)<a class="headerlink" href="#autenticacion-y-contrasenas-detalle-completo" title="Link to this heading">¶</a></h2>
+<section id="algoritmo-de-hash-y-materiales-criptograficos">
+<h3>Algoritmo de hash y materiales criptográficos<a class="headerlink" href="#algoritmo-de-hash-y-materiales-criptograficos" title="Link to this heading">¶</a></h3>
+<ul class="simple">
+<li><p><strong>Algoritmo</strong>: <code class="docutils literal notranslate"><span class="pre">Argon2id</span></code> con parámetros configurables (<code class="docutils literal notranslate"><span class="pre">time_cost</span></code>, <code class="docutils literal notranslate"><span class="pre">memory_cost</span></code>, <code class="docutils literal notranslate"><span class="pre">parallelism</span></code>, <code class="docutils literal notranslate"><span class="pre">hash_len</span></code>, <code class="docutils literal notranslate"><span class="pre">salt_len</span></code>).</p></li>
+<li><p><strong>Salt</strong>: Argon2id genera un <strong>salt aleatorio único por usuario</strong> (incluido en el hash resultante).</p></li>
+<li><p><strong>Pepper</strong>: valor opcional del servidor (<code class="docutils literal notranslate"><span class="pre">PASSWORD_PEPPER</span></code>) concatenado a la contraseña antes de hashear. <strong>No se guarda en base de datos</strong>.</p></li>
+</ul>
+</section>
+<section id="generacion-y-transmision-de-credenciales-registro">
+<h3>Generación y transmisión de credenciales (registro)<a class="headerlink" href="#generacion-y-transmision-de-credenciales-registro" title="Link to this heading">¶</a></h3>
+<ol class="arabic simple">
+<li><p><strong>Entrada del usuario (cliente)</strong>: el usuario introduce <code class="docutils literal notranslate"><span class="pre">username</span></code> y <code class="docutils literal notranslate"><span class="pre">password</span></code> en el formulario de registro.</p></li>
+<li><p><strong>Validación cliente</strong>: se valida formato/longitud mínima en frontend para feedback rápido.</p></li>
+<li><p><strong>Envío al servidor</strong>: el cliente envía <code class="docutils literal notranslate"><span class="pre">POST</span> <span class="pre">/api/auth/register</span></code> con JSON:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">username</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">password</span></code></p></li>
+<li><p><strong>No se almacena la contraseña en <code class="docutils literal notranslate"><span class="pre">localStorage</span></code> ni en cookies.</strong></p></li>
+</ul>
+</li>
+<li><p><strong>Transporte</strong>:</p>
+<ul class="simple">
+<li><p>En producción debe usarse <strong>HTTPS</strong> para proteger la contraseña en tránsito.</p></li>
+<li><p>El contenido viaja en el cuerpo del POST y <strong>no se registra</strong> en el cliente.</p></li>
+</ul>
+</li>
+</ol>
+</section>
+<section id="verificacion-de-contrasenas-filtradas-hibp-fallback">
+<h3>Verificación de contraseñas filtradas (HIBP + fallback)<a class="headerlink" href="#verificacion-de-contrasenas-filtradas-hibp-fallback" title="Link to this heading">¶</a></h3>
+<ol class="arabic simple" start="5">
+<li><p><strong>Normalización</strong>: el servidor normaliza <code class="docutils literal notranslate"><span class="pre">username</span></code> y valida reglas de formato.</p></li>
+<li><p><strong>Comprobación HIBP</strong> (k‑anonymity):</p>
+<ul class="simple">
+<li><p>Se calcula SHA‑1 de la contraseña en el servidor.</p></li>
+<li><p>Se envía <strong>solo el prefijo</strong> del hash a HIBP (<code class="docutils literal notranslate"><span class="pre">/range/&lt;prefijo&gt;</span></code>).</p></li>
+<li><p>Si HIBP responde y la contraseña aparece, <strong>se rechaza</strong>.</p></li>
+</ul>
+</li>
+<li><p><strong>Fallback local</strong>:</p>
+<ul class="simple">
+<li><p>Si HIBP falla y <code class="docutils literal notranslate"><span class="pre">HIBP_FAIL_CLOSED=false</span></code>, se consulta <code class="docutils literal notranslate"><span class="pre">data/common_passwords_fallback.txt</span></code>.</p></li>
+<li><p>Si aparece, <strong>se rechaza</strong>.</p></li>
+<li><p>Si <code class="docutils literal notranslate"><span class="pre">HIBP_FAIL_CLOSED=true</span></code> y HIBP falla, <strong>se rechaza</strong> (fail‑closed).</p></li>
+</ul>
+</li>
+</ol>
+</section>
+<section id="hashing-y-almacenamiento-en-servidor">
+<h3>Hashing y almacenamiento en servidor<a class="headerlink" href="#hashing-y-almacenamiento-en-servidor" title="Link to this heading">¶</a></h3>
+<ol class="arabic simple" start="8">
+<li><p><strong>Hasheo</strong>:</p>
+<ul class="simple">
+<li><p>Se concatena el <code class="docutils literal notranslate"><span class="pre">pepper</span></code> en memoria (<code class="docutils literal notranslate"><span class="pre">password</span> <span class="pre">+</span> <span class="pre">PASSWORD_PEPPER</span></code>).</p></li>
+<li><p>Se aplica <strong>Argon2id</strong> con salt aleatorio.</p></li>
+</ul>
+</li>
+<li><p><strong>Persistencia</strong>:</p>
+<ul class="simple">
+<li><p>Solo se guarda <strong>el hash Argon2id</strong> (que ya incluye el salt).</p></li>
+<li><p><strong>Nunca</strong> se almacena la contraseña en texto plano.</p></li>
+</ul>
+</li>
+</ol>
+</section>
+<section id="respuesta-y-sesion-registro">
+<h3>Respuesta y sesión (registro)<a class="headerlink" href="#respuesta-y-sesion-registro" title="Link to this heading">¶</a></h3>
+<ol class="arabic simple" start="10">
+<li><p><strong>Sesión</strong>:</p></li>
+</ol>
+<ul class="simple">
+<li><p>Si el registro es correcto, se crea sesión de servidor.</p></li>
+<li><p>Se devuelve <code class="docutils literal notranslate"><span class="pre">csrf_token</span></code> y se setea cookie de sesión <code class="docutils literal notranslate"><span class="pre">HttpOnly</span></code>.</p></li>
+</ul>
+<ol class="arabic simple" start="11">
+<li><p><strong>Cliente</strong>:</p></li>
+</ol>
+<ul class="simple">
+<li><p>El cliente guarda <code class="docutils literal notranslate"><span class="pre">csrf_token</span></code> en memoria (no en <code class="docutils literal notranslate"><span class="pre">localStorage</span></code>).</p></li>
+<li><p>Se inicia flujo de perfil del usuario.</p></li>
+</ul>
+</section>
+<section id="inicio-de-sesion-login">
+<h3>Inicio de sesión (login)<a class="headerlink" href="#inicio-de-sesion-login" title="Link to this heading">¶</a></h3>
+<ol class="arabic simple">
+<li><p><strong>Entrada del usuario</strong>: <code class="docutils literal notranslate"><span class="pre">username</span></code> + <code class="docutils literal notranslate"><span class="pre">password</span></code>.</p></li>
+<li><p><strong>Envío</strong>: <code class="docutils literal notranslate"><span class="pre">POST</span> <span class="pre">/api/auth/login</span></code> con JSON.</p></li>
+<li><p><strong>Servidor</strong>:</p>
+<ul class="simple">
+<li><p>Busca el usuario por <code class="docutils literal notranslate"><span class="pre">username</span></code>.</p></li>
+<li><p>Hashea <code class="docutils literal notranslate"><span class="pre">password</span> <span class="pre">+</span> <span class="pre">pepper</span></code> y verifica con Argon2id (<code class="docutils literal notranslate"><span class="pre">verify_password</span></code>).</p></li>
+</ul>
+</li>
+<li><p><strong>Resultado</strong>:</p>
+<ul class="simple">
+<li><p>Si coincide, crea sesión y devuelve <code class="docutils literal notranslate"><span class="pre">csrf_token</span></code>.</p></li>
+<li><p>Si falla, devuelve error genérico de credenciales inválidas.</p></li>
+</ul>
+</li>
+</ol>
+</section>
+<section id="cierre-de-sesion-logout">
+<h3>Cierre de sesión (logout)<a class="headerlink" href="#cierre-de-sesion-logout" title="Link to this heading">¶</a></h3>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">POST</span> <span class="pre">/api/auth/logout</span></code> con <code class="docutils literal notranslate"><span class="pre">X-CSRF-Token</span></code>.</p></li>
+<li><p>El servidor elimina <code class="docutils literal notranslate"><span class="pre">user_id</span></code> de sesión.</p></li>
+</ul>
+</section>
+<section id="almacenamiento-en-el-cliente">
+<h3>Almacenamiento en el cliente<a class="headerlink" href="#almacenamiento-en-el-cliente" title="Link to this heading">¶</a></h3>
+<ul class="simple">
+<li><p><strong>Contraseña</strong>: <strong>no se almacena</strong> en localStorage, cookies ni memoria persistente.</p></li>
+<li><p><strong>Sesión</strong>:</p>
+<ul>
+<li><p>Se mantiene con cookie <code class="docutils literal notranslate"><span class="pre">HttpOnly</span></code> y <code class="docutils literal notranslate"><span class="pre">SameSite</span></code> en el navegador.</p></li>
+<li><p>El cliente solo conserva <code class="docutils literal notranslate"><span class="pre">csrf_token</span></code> en memoria mientras dure la sesión.</p></li>
+</ul>
+</li>
+<li><p><strong>Datos de usuario</strong>:</p>
+<ul>
+<li><p>Datos de perfil y pesos se almacenan en <code class="docutils literal notranslate"><span class="pre">localStorage</span></code> <strong>bajo clave por usuario</strong>.</p></li>
+<li><p>No se guarda ninguna credencial ni hash en el cliente.</p></li>
+</ul>
+</li>
+</ul>
+</section>
+<section id="almacenamiento-en-el-servidor">
+<h3>Almacenamiento en el servidor<a class="headerlink" href="#almacenamiento-en-el-servidor" title="Link to this heading">¶</a></h3>
+<ul class="simple">
+<li><p><strong>Hash Argon2id</strong> por usuario en almacenamiento backend.</p></li>
+<li><p><strong>Pepper</strong> solo en configuración del servidor (<code class="docutils literal notranslate"><span class="pre">PASSWORD_PEPPER</span></code>).</p></li>
+<li><p><strong>Sesión</strong>: en memoria/cookie de sesión con <code class="docutils literal notranslate"><span class="pre">HttpOnly</span></code> y <code class="docutils literal notranslate"><span class="pre">SameSite</span></code>.</p></li>
+</ul>
+</section>
+<section id="papel-de-la-api-en-la-transmision">
+<h3>Papel de la API en la transmisión<a class="headerlink" href="#papel-de-la-api-en-la-transmision" title="Link to this heading">¶</a></h3>
+<ul class="simple">
+<li><p><strong>Endpoints de autenticación</strong>:</p>
+<ul>
+<li><p><code class="docutils literal notranslate"><span class="pre">POST</span> <span class="pre">/api/auth/register</span></code> → creación de usuario + sesión.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">POST</span> <span class="pre">/api/auth/login</span></code> → verificación y sesión.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">POST</span> <span class="pre">/api/auth/logout</span></code> → cierre de sesión.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">GET</span> <span class="pre">/api/auth/me</span></code> → estado de sesión + <code class="docutils literal notranslate"><span class="pre">csrf_token</span></code>.</p></li>
+</ul>
+</li>
+<li><p><strong>Protección CSRF</strong>:</p>
+<ul>
+<li><p>Para operaciones de escritura, el cliente añade <code class="docutils literal notranslate"><span class="pre">X-CSRF-Token</span></code>.</p></li>
+</ul>
+</li>
+<li><p><strong>Contenido sensible</strong>:</p>
+<ul>
+<li><p>Solo la contraseña viaja en el cuerpo del POST durante registro/login.</p></li>
+<li><p>En el resto de operaciones, se usa la sesión (cookie) + CSRF token.</p></li>
+</ul>
+</li>
+</ul>
+</section>
+</section>
+<section id="sesiones-seguras">
+<h2>Sesiones seguras<a class="headerlink" href="#sesiones-seguras" title="Link to this heading">¶</a></h2>
+<ul class="simple">
+<li><p><strong>Sesión de servidor</strong> con cookie <code class="docutils literal notranslate"><span class="pre">HttpOnly</span></code>.</p></li>
+<li><p><strong>SameSite</strong>: <code class="docutils literal notranslate"><span class="pre">Lax</span></code> por defecto.</p></li>
+<li><p><strong>Secure</strong> opcional vía <code class="docutils literal notranslate"><span class="pre">SESSION_COOKIE_SECURE=true</span></code> en producción.</p></li>
+<li><p><strong>Clave de sesión</strong>: <code class="docutils literal notranslate"><span class="pre">FLASK_SECRET_KEY</span></code> (o se genera aleatoria si no existe).</p></li>
+</ul>
+</section>
+<section id="proteccion-csrf">
+<h2>Protección CSRF<a class="headerlink" href="#proteccion-csrf" title="Link to this heading">¶</a></h2>
+<ul class="simple">
+<li><p><strong>Token CSRF por sesión</strong>: se genera en backend y se devuelve en <code class="docutils literal notranslate"><span class="pre">/api/auth/me</span></code>, <code class="docutils literal notranslate"><span class="pre">/api/auth/login</span></code>, <code class="docutils literal notranslate"><span class="pre">/api/auth/register</span></code>.</p></li>
+<li><p><strong>Validación</strong>: todas las rutas <code class="docutils literal notranslate"><span class="pre">POST</span></code> sensibles requieren <code class="docutils literal notranslate"><span class="pre">X-CSRF-Token</span></code>.</p></li>
+<li><p><strong>Frontend</strong>: envía automáticamente el token en operaciones de escritura.</p></li>
+</ul>
+</section>
+<section id="datos-en-reposo-opcional">
+<h2>Datos en reposo (opcional)<a class="headerlink" href="#datos-en-reposo-opcional" title="Link to this heading">¶</a></h2>
+<ul class="simple">
+<li><p><strong>SQLCipher</strong>: almacenamiento cifrado en disco cuando <code class="docutils literal notranslate"><span class="pre">STORAGE_BACKEND=sqlcipher</span></code>.</p></li>
+<li><p><strong>Clave de cifrado</strong>: <code class="docutils literal notranslate"><span class="pre">SQLCIPHER_KEY</span></code> obligatoria.</p></li>
+</ul>
+</section>
+<section id="headers-de-seguridad">
+<h2>Headers de seguridad<a class="headerlink" href="#headers-de-seguridad" title="Link to this heading">¶</a></h2>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">X-Frame-Options:</span> <span class="pre">DENY</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">X-Content-Type-Options:</span> <span class="pre">nosniff</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">Content-Security-Policy:</span> <span class="pre">frame-ancestors</span> <span class="pre">'none'</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">X-XSS-Protection:</span> <span class="pre">1;</span> <span class="pre">mode=block</span></code></p></li>
+</ul>
+</section>
+</section>
+
+        </article>
+      </div>
+      <footer>
+        
+        <div class="related-pages">
+          
+          <a class="prev-page" href="INICIO_RAPIDO.html">
+              <svg class="furo-related-icon"><use href="#svg-arrow-right"></use></svg>
+              <div class="page-info">
+                <div class="context">
+                  <span>Previous</span>
+                </div>
+                
+                <div class="title">Inicio Rápido</div>
+                
+              </div>
+            </a>
+        </div>
+        <div class="bottom-of-page">
+          <div class="left-details">
+            <div class="copyright">
+                Copyright &#169; 2025, PumukyDev &amp; Alejandro Quiñones
+            </div>
+            Made with <a href="https://www.sphinx-doc.org/">Sphinx</a> and <a class="muted-link" href="https://pradyunsg.me">@pradyunsg</a>'s
+            
+            <a href="https://github.com/pradyunsg/furo">Furo</a>
+            
+          </div>
+          <div class="right-details">
+            
+          </div>
+        </div>
+        
+      </footer>
+    </div>
+    <aside class="toc-drawer">
+      
+      
+      <div class="toc-sticky toc-scroll">
+        <div class="toc-title-container">
+          <span class="toc-title">
+            On this page
+          </span>
+        </div>
+        <div class="toc-tree-container">
+          <div class="toc-tree">
+            <ul>
+<li><a class="reference internal" href="#">Seguridad: entradas, contraseñas y sesiones</a><ul>
+<li><a class="reference internal" href="#validacion-y-sanitizacion-de-entradas">Validación y sanitización de entradas</a></li>
+<li><a class="reference internal" href="#autenticacion-y-contrasenas-detalle-completo">Autenticación y contraseñas (detalle completo)</a><ul>
+<li><a class="reference internal" href="#algoritmo-de-hash-y-materiales-criptograficos">Algoritmo de hash y materiales criptográficos</a></li>
+<li><a class="reference internal" href="#generacion-y-transmision-de-credenciales-registro">Generación y transmisión de credenciales (registro)</a></li>
+<li><a class="reference internal" href="#verificacion-de-contrasenas-filtradas-hibp-fallback">Verificación de contraseñas filtradas (HIBP + fallback)</a></li>
+<li><a class="reference internal" href="#hashing-y-almacenamiento-en-servidor">Hashing y almacenamiento en servidor</a></li>
+<li><a class="reference internal" href="#respuesta-y-sesion-registro">Respuesta y sesión (registro)</a></li>
+<li><a class="reference internal" href="#inicio-de-sesion-login">Inicio de sesión (login)</a></li>
+<li><a class="reference internal" href="#cierre-de-sesion-logout">Cierre de sesión (logout)</a></li>
+<li><a class="reference internal" href="#almacenamiento-en-el-cliente">Almacenamiento en el cliente</a></li>
+<li><a class="reference internal" href="#almacenamiento-en-el-servidor">Almacenamiento en el servidor</a></li>
+<li><a class="reference internal" href="#papel-de-la-api-en-la-transmision">Papel de la API en la transmisión</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#sesiones-seguras">Sesiones seguras</a></li>
+<li><a class="reference internal" href="#proteccion-csrf">Protección CSRF</a></li>
+<li><a class="reference internal" href="#datos-en-reposo-opcional">Datos en reposo (opcional)</a></li>
+<li><a class="reference internal" href="#headers-de-seguridad">Headers de seguridad</a></li>
+</ul>
+</li>
+</ul>
+
+          </div>
+        </div>
+      </div>
+      
+      
+    </aside>
+  </div>
+</div><script src="_static/documentation_options.js?v=01f34227"></script>
+    <script src="_static/doctools.js?v=9bcbadda"></script>
+    <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="_static/scripts/furo.js?v=46bd48cc"></script>
+    </body>
+</html>
