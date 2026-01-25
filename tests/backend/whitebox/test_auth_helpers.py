@@ -44,3 +44,11 @@ def test_hash_and_verify_password():
     assert hashed != password
     assert verify_password(password, hashed) is True
     assert verify_password("otra_clave", hashed) is False
+
+
+def test_hash_uses_pepper(monkeypatch):
+    monkeypatch.setattr(helpers, "PASSWORD_PEPPER", "pepper_test")
+    hashed = helpers.hash_password("clave_segura_123")
+    assert helpers.verify_password("clave_segura_123", hashed) is True
+    monkeypatch.setattr(helpers, "PASSWORD_PEPPER", "pepper_diferente")
+    assert helpers.verify_password("clave_segura_123", hashed) is False
