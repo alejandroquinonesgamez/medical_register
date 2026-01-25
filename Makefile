@@ -13,7 +13,7 @@
 # Uso: make [comando]
 # Ejemplo: make help
 
-.PHONY: help initDefectDojo update up build build-defectdojo logs logs-defectdojo ps down pdf_report setup-env ensure-proxy-network clean-temp clean-all purge sync-wstg wstg-status wstg-logs fix-containers memory db local test test-backend test-frontend
+.PHONY: help initDefectDojo update up build build-defectdojo logs logs-defectdojo ps down pdf_report setup-env ensure-proxy-network clean-temp clean-all purge sync-wstg wstg-status wstg-logs fix-containers memory db local supervisor test test-backend test-frontend
 
 # Variables
 # Cargar .env si existe para configurar COMPOSE_PROJECT_NAME
@@ -106,6 +106,14 @@ local: setup-env ## Arrancar solo frontend en modo local (simula offline)
 	@echo "📊 Accede a la aplicación en: http://localhost:5001"
 	@echo "ℹ️  Modo local: la comunicación con el backend se simula como offline"
 
+supervisor: setup-env ensure-proxy-network ## Arrancar supervisor (dev)
+	@echo "🧭 Arrancando Supervisor (modo desarrollo)..."
+	@APP_SUPERVISOR=1 FLASK_ENV=development $(COMPOSE) up -d --build
+	@echo ""
+	@echo "✅ Supervisor activo"
+	@echo "📊 App: http://localhost:5001"
+	@echo "🧭 Supervisor: http://localhost:5001/supervisor"
+
 help: ## Mostrar esta ayuda
 	@echo "Comandos disponibles:"
 	@echo ""
@@ -120,6 +128,7 @@ help: ## Mostrar esta ayuda
 	@echo "  make memory         # Arranca sin BD (memory)"
 	@echo "  make db             # Arranca con BD (sqlite/sqlcipher)"
 	@echo "  make local          # Arranca solo frontend (simula offline)"
+	@echo "  make supervisor     # Arranca supervisor (dev)"
 	@echo "  make build          # Construir imágenes de la aplicación"
 	@echo "  make test           # Ejecutar todos los tests"
 	@echo "  make test-backend   # Ejecutar tests backend en contenedor"

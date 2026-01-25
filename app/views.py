@@ -2,7 +2,8 @@
 Blueprint para las rutas de vistas (frontend)
 Maneja las páginas HTML y la interfaz de usuario
 """
-from flask import render_template, Blueprint
+import os
+from flask import render_template, Blueprint, abort
 from .translations import HTML_TEXTS
 from .config import ACTIVE_LANGUAGE, AVAILABLE_LANGUAGES, STORAGE_CONFIG
 
@@ -19,6 +20,17 @@ def index():
         available_languages=AVAILABLE_LANGUAGES,
         storage_backend=STORAGE_CONFIG["backend"],
         sqlcipher_requires_pepper=(STORAGE_CONFIG["backend"] == "sqlcipher"),
+        supervisor_enabled=os.environ.get("APP_SUPERVISOR") == "1",
+    )
+
+
+@views.route('/supervisor')
+def supervisor():
+    if os.environ.get("APP_SUPERVISOR") != "1":
+        abort(404)
+    return render_template(
+        'supervisor.html',
+        active_language=ACTIVE_LANGUAGE,
     )
 
 

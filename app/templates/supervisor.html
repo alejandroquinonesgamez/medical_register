@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Supervisor</title>
+    <link rel="stylesheet" href="/static/css/style.css">
+    <style>
+        .supervisor-layout {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 16px;
+            padding: 24px;
+        }
+        .supervisor-card {
+            background: #0f172a;
+            border: 1px solid #1f2937;
+            border-radius: 12px;
+            padding: 16px;
+            color: #e2e8f0;
+            font-size: 12px;
+            max-height: 70vh;
+            overflow: auto;
+        }
+        .supervisor-card pre {
+            white-space: pre-wrap;
+            word-break: break-word;
+        }
+        .supervisor-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 8px;
+        }
+    </style>
+</head>
+<body>
+    <header class="app-header">
+        <div class="app-header__spacer"></div>
+        <div class="app-header__titles">
+            <h1 id="app-title">Supervisor</h1>
+            <div class="app-header__auth">
+                <a href="/" class="auth-btn" style="text-decoration: none;">Volver</a>
+            </div>
+        </div>
+    </header>
+
+    <div class="supervisor-layout">
+        <div class="supervisor-card">
+            <div class="supervisor-header">
+                <strong>Tráfico API</strong>
+                <span id="supervisor-last-update">-</span>
+            </div>
+            <pre id="supervisor-requests">Cargando...</pre>
+        </div>
+        <div class="supervisor-card">
+            <div class="supervisor-header">
+                <strong>Base de datos</strong>
+                <span>Últimos 50</span>
+            </div>
+            <pre id="supervisor-db">Cargando...</pre>
+        </div>
+    </div>
+
+    <script src="/static/js/supervisor.js"></script>
+</body>
+</html>

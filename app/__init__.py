@@ -55,6 +55,10 @@ def create_app():
     app.register_blueprint(views)
     app.register_blueprint(api)
 
+    if os.environ.get("APP_SUPERVISOR") == "1":
+        from .supervisor import init_supervisor
+        init_supervisor(app)
+
     # Agregar headers de seguridad para prevenir clickjacking y otros ataques
     @app.after_request
     def set_security_headers(response):
