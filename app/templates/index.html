@@ -159,6 +159,12 @@
             availableLanguages: {{ available_languages|tojson }}
         };
     </script>
+    {% if offline_mode %}
+    <script>
+        window.__FORCE_API_OFFLINE__ = true;
+    </script>
+    {% endif %}
+    <script src="/static/js/offline.js"></script>
     <!-- Configuración compartida (debe cargarse antes de main.js) -->
     <script src="/static/js/config.js"></script>
     <!-- Gestor de traducciones -->

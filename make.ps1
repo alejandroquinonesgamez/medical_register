@@ -17,6 +17,7 @@
 #   .\make.ps1 update        # Arrancar todo y actualizar findings
 #   .\make.ps1 memory        # Arrancar sin BD (memory)
 #   .\make.ps1 db            # Arrancar con BD (sqlite/sqlcipher)
+#   .\make.ps1 local         # Arrancar solo frontend (simula offline)
 #   .\make.ps1 test          # Ejecutar todos los tests
 #   .\make.ps1 test-backend  # Ejecutar tests backend en contenedor
 #   .\make.ps1 test-frontend # Ejecutar tests frontend en contenedor
@@ -158,6 +159,8 @@ function Show-Help {
     Write-Host "Arrancar sin base de datos (memory)"
     Write-Host "  db               " -NoNewline -ForegroundColor Yellow
     Write-Host "Arrancar con base de datos (sqlite/sqlcipher)"
+    Write-Host "  local            " -NoNewline -ForegroundColor Yellow
+    Write-Host "Arrancar solo frontend (simula offline)"
     Write-Host "  test             " -NoNewline -ForegroundColor Yellow
     Write-Host "Ejecutar todos los tests"
     Write-Host "  test-backend     " -NoNewline -ForegroundColor Yellow
@@ -193,6 +196,7 @@ function Show-Help {
     Write-Host "  .\make.ps1 update         # Despliegue completo y actualizacion"
     Write-Host "  .\make.ps1 memory         # Arranca sin BD (memory)"
     Write-Host "  .\make.ps1 db             # Arranca con BD (sqlite/sqlcipher)"
+    Write-Host "  .\make.ps1 local          # Arranca solo frontend (simula offline)"
     Write-Host "  .\make.ps1 test           # Ejecuta todos los tests"
     Write-Host "  .\make.ps1 test-backend   # Ejecuta tests backend en contenedor"
     Write-Host "  .\make.ps1 test-frontend  # Ejecuta tests frontend en contenedor"
@@ -223,6 +227,16 @@ function Start-Db {
     Write-Host ""
     Write-Host "Aplicacion principal arrancada (db)" -ForegroundColor Green
     Write-Host "Accede a la aplicacion en: http://localhost:5001" -ForegroundColor Cyan
+}
+
+function Start-Local {
+    Write-Host "Arrancando frontend en modo local (sin backend)..." -ForegroundColor Cyan
+    Write-Host "Asegurate de que el puerto 5001 este libre" -ForegroundColor Gray
+    docker-compose --profile local up -d --build frontend-local
+    Write-Host ""
+    Write-Host "Frontend local arrancado" -ForegroundColor Green
+    Write-Host "Accede a la aplicacion en: http://localhost:5001" -ForegroundColor Cyan
+    Write-Host "Modo local: la comunicacion con el backend se simula como offline" -ForegroundColor Yellow
 }
 
 function Start-Up {
@@ -495,6 +509,9 @@ switch ($Command.ToLower()) {
     }
     "db" {
         Start-Db
+    }
+    "local" {
+        Start-Local
     }
     "test" {
         Run-AllTests

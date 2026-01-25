@@ -60,6 +60,21 @@ services:
       - .:/app
     command: npm test
 
+  # Servicio opcional: frontend-only en modo local (simula offline)
+  # Perfil: local - Solo se arranca con --profile local
+  frontend-local:
+    profiles:
+      - local
+    build: .
+    container_name: frontend_local_medical_register
+    ports:
+      - "5001:5001"
+    volumes:
+      - .:/app
+    environment:
+      - FLASK_ENV=development
+    command: ["python", "/app/scripts/local_frontend_app.py"]
+
   # Base de datos PostgreSQL para DefectDojo
   # Perfil: defectdojo - Solo se arranca con --profile defectdojo
   defectdojo-db:

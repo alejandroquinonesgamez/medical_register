@@ -13,7 +13,7 @@
 # Uso: make [comando]
 # Ejemplo: make help
 
-.PHONY: help initDefectDojo update up build build-defectdojo logs logs-defectdojo ps down pdf_report setup-env ensure-proxy-network clean-temp clean-all purge sync-wstg wstg-status wstg-logs fix-containers memory db test test-backend test-frontend
+.PHONY: help initDefectDojo update up build build-defectdojo logs logs-defectdojo ps down pdf_report setup-env ensure-proxy-network clean-temp clean-all purge sync-wstg wstg-status wstg-logs fix-containers memory db local test test-backend test-frontend
 
 # Variables
 # Cargar .env si existe para configurar COMPOSE_PROJECT_NAME
@@ -97,6 +97,15 @@ db: setup-env ensure-proxy-network ## Arrancar con base de datos (sqlite/sqlciph
 	@echo "✅ Aplicación principal arrancada (db)"
 	@echo "📊 Accede a la aplicación en: http://localhost:5001"
 
+local: setup-env ## Arrancar solo frontend en modo local (simula offline)
+	@echo "🧪 Arrancando frontend en modo local (sin backend)..."
+	@echo "   (Asegúrate de que el puerto 5001 esté libre)"
+	@$(COMPOSE) --profile local up -d --build frontend-local
+	@echo ""
+	@echo "✅ Frontend local arrancado"
+	@echo "📊 Accede a la aplicación en: http://localhost:5001"
+	@echo "ℹ️  Modo local: la comunicación con el backend se simula como offline"
+
 help: ## Mostrar esta ayuda
 	@echo "Comandos disponibles:"
 	@echo ""
@@ -110,6 +119,7 @@ help: ## Mostrar esta ayuda
 	@echo "  make update         # Despliegue completo y actualización"
 	@echo "  make memory         # Arranca sin BD (memory)"
 	@echo "  make db             # Arranca con BD (sqlite/sqlcipher)"
+	@echo "  make local          # Arranca solo frontend (simula offline)"
 	@echo "  make build          # Construir imágenes de la aplicación"
 	@echo "  make test           # Ejecutar todos los tests"
 	@echo "  make test-backend   # Ejecutar tests backend en contenedor"

@@ -5,6 +5,29 @@
 
 class SyncManager {
     /**
+     * Indica si se debe forzar modo offline en frontend
+     * @returns {boolean}
+     */
+    static shouldForceOffline() {
+        return typeof window !== 'undefined' && window.__FORCE_API_OFFLINE__ === true;
+    }
+
+    /**
+     * Marca el estado de sincronización
+     * @param {boolean} synced
+     */
+    static setSyncStatus(synced) {
+        this._lastSyncOk = synced === true;
+    }
+
+    /**
+     * Indica si el último intento de sync fue exitoso
+     * @returns {boolean}
+     */
+    static isSynced() {
+        return this._lastSyncOk === true;
+    }
+    /**
      * Verifica si la sincronización está desactivada
      * @returns {boolean}
      */
@@ -19,9 +42,11 @@ class SyncManager {
     static setSyncDisabled(disabled) {
         if (disabled) {
             localStorage.setItem('_sync_disabled', 'true');
+            this.setSyncStatus(false);
             console.log('Sincronización con backend DESACTIVADA');
         } else {
             localStorage.removeItem('_sync_disabled');
+            this.setSyncStatus(false);
             console.log('Sincronización con backend ACTIVADA');
         }
     }
@@ -31,9 +56,15 @@ class SyncManager {
      * @returns {Promise<boolean>} true si la sincronización fue exitosa
      */
     static async syncFromBackend() {
+        if (this.shouldForceOffline()) {
+            this.setSyncStatus(false);
+            console.warn('Modo local: simulando error de comunicación con el servidor');
+            return false;
+        }
         // Verificar si la sincronización está desactivada manualmente
         if (this.isSyncDisabled()) {
             console.log('Sincronización omitida: desactivada manualmente');
+            this.setSyncStatus(false);
             return false;
         }
 
@@ -43,10 +74,12 @@ class SyncManager {
             console.log('Sincronización omitida: se acaban de eliminar datos localmente');
             // Eliminar la bandera después de usarla
             sessionStorage.removeItem('_skip_backend_sync');
+            this.setSyncStatus(false);
             return false;
         }
         
         try {
+            let syncOk = true;
             // Sincronizar usuario
             const userResponse = await fetch('/api/user', { credentials: 'same-origin' });
             if (userResponse.ok) {
@@ -63,6 +96,7 @@ class SyncManager {
                 // Si es 404, simplemente no hay usuario (normal)
                 // Otros errores se registran
                 console.warn('Error al sincronizar usuario desde backend:', userResponse.status);
+                syncOk = false;
             }
 
             // Sincronizar pesos
@@ -113,10 +147,13 @@ class SyncManager {
                 // Esto es normal si el usuario aún no se ha sincronizado
             } else {
                 console.warn('Error al sincronizar pesos desde backend:', weightsResponse.status);
+                syncOk = false;
             }
 
-            return true;
+            this.setSyncStatus(syncOk);
+            return syncOk;
         } catch (error) {
+            this.setSyncStatus(false);
             // Diferenciar tipos de errores para mejor debugging
             if (error instanceof TypeError) {
                 console.warn('Error de tipo al sincronizar desde backend:', error.message);
@@ -137,8 +174,14 @@ class SyncManager {
      * @returns {Promise<boolean>} true si la sincronización fue exitosa
      */
     static async syncUserToBackend(user) {
+        if (this.shouldForceOffline()) {
+            this.setSyncStatus(false);
+            console.warn('Modo local: simulando error de comunicación con el servidor');
+            return false;
+        }
         if (this.isSyncDisabled()) {
             console.log('Sincronización omitida: desactivada manualmente');
+            this.setSyncStatus(false);
             return true; // Retornar true para que el frontend continúe normalmente
         }
 
@@ -160,13 +203,16 @@ class SyncManager {
             });
 
             if (response.ok) {
+                this.setSyncStatus(true);
                 return true;
             } else {
                 const errorData = await response.json();
                 console.error('Error al sincronizar usuario al backend:', errorData.error);
+                this.setSyncStatus(false);
                 return false;
             }
         } catch (error) {
+            this.setSyncStatus(false);
             console.warn('Error al sincronizar usuario al backend (modo offline):', error);
             return false;
         }
@@ -178,8 +224,14 @@ class SyncManager {
      * @returns {Promise<boolean>} true si la sincronización fue exitosa
      */
     static async syncWeightToBackend(weight) {
+        if (this.shouldForceOffline()) {
+            this.setSyncStatus(false);
+            console.warn('Modo local: simulando error de comunicación con el servidor');
+            return false;
+        }
         if (this.isSyncDisabled()) {
             console.log('Sincronización omitida: desactivada manualmente');
+            this.setSyncStatus(false);
             return true; // Retornar true para que el frontend continúe normalmente
         }
 
@@ -198,21 +250,26 @@ class SyncManager {
             });
 
             if (response.ok) {
+                this.setSyncStatus(true);
                 return true;
             } else {
                 const errorData = await response.json();
                 console.error('Error al sincronizar peso al backend:', errorData.error);
                 // Si el error es de validación, lanzamos el error para que el frontend lo maneje
                 if (response.status === 400) {
+                    this.setSyncStatus(false);
                     throw new Error(errorData.error || 'Error de validación');
                 }
+                this.setSyncStatus(false);
                 return false;
             }
         } catch (error) {
             // Si es un error de validación, lo relanzamos
             if (error.message && error.message.includes('Error')) {
+                this.setSyncStatus(false);
                 throw error;
             }
+            this.setSyncStatus(false);
             console.warn('Error al sincronizar peso al backend (modo offline):', error);
             return false;
         }
@@ -224,8 +281,14 @@ class SyncManager {
      * @returns {Promise<number>} Número de pesos sincronizados exitosamente
      */
     static async syncAllWeightsToBackend() {
+        if (this.shouldForceOffline()) {
+            this.setSyncStatus(false);
+            console.warn('Modo local: simulando error de comunicación con el servidor');
+            return 0;
+        }
         if (this.isSyncDisabled()) {
             console.log('Sincronización omitida: desactivada manualmente');
+            this.setSyncStatus(false);
             return 0;
         }
 
@@ -252,4 +315,5 @@ class SyncManager {
 
 // Exportar para uso global
 window.SyncManager = SyncManager;
+SyncManager._lastSyncOk = false;
 
