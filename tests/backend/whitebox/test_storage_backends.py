@@ -75,3 +75,19 @@ def test_sqlcipher_storage_crud(tmp_path):
     fetched = storage.get_auth_user_by_id(auth_user.user_id)
     assert fetched is not None
     assert fetched.username == "usuario_db"
+
+
+def test_sqlcipher_storage_with_simulated_pepper(tmp_path):
+    if storage_mod.sqlcipher is None:
+        pytest.skip("SQLCipher no está disponible")
+    db_path = tmp_path / "secure_pepper.db"
+    storage = SQLCipherStorage(db_path=str(db_path), db_key="pepper_simulado_test")
+    auth_user, entries = _seed_storage(storage)
+
+    fetched = storage.get_auth_user_by_username("usuario_db")
+    assert fetched is not None
+    assert fetched.user_id == auth_user.user_id
+
+    last = storage.get_last_weight_entry(auth_user.user_id)
+    assert last is not None
+    assert last.weight_kg == entries[-1].weight_kg

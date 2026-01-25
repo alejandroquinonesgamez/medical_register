@@ -25,9 +25,9 @@ Ver [tests/backend/README.md](backend/README.md) para más detalles.
 
 **Total**: 86 tests
 
-### Ejecutar
+### Ejecutar (contenedor)
 ```bash
-pytest tests/backend/ -v
+docker-compose exec web pytest tests/backend/ -v
 ```
 
 ## Tests del Frontend
@@ -36,27 +36,27 @@ Ver [tests/frontend/README.md](frontend/README.md) para más detalles.
 
 **Total**: ~66 tests
 
-### Ejecutar
+### Ejecutar (contenedor)
 ```bash
-npm test
+docker-compose run --rm frontend-tests
 ```
 
 ## Ejecutar todos los tests
 
 ```bash
 # Backend
-pytest tests/backend/ -v
+docker-compose exec web pytest tests/backend/ -v
 
 # Frontend
-npm test
+docker-compose run --rm frontend-tests
 
-# Ambos (si tienes ambos instalados)
-pytest tests/backend/ -v && npm test
+# Ambos
+docker-compose exec web pytest tests/backend/ -v && docker-compose run --rm frontend-tests
 ```
 
 ## Ejecutar tests en Docker
 
-### Backend (ya incluido en el contenedor principal)
+### Backend (contenedor principal)
 
 ```bash
 docker-compose exec web pytest tests/backend/ -v
@@ -65,18 +65,13 @@ docker-compose exec web pytest tests/backend/ -v
 ### Frontend (contenedor separado)
 
 ```bash
-# Ejecutar tests del frontend en Docker
 docker-compose run --rm frontend-tests
-
-# O construir y ejecutar manualmente
-docker build -f Dockerfile.test -t frontend-tests .
-docker run --rm frontend-tests
 ```
 
 ## Notas
 
-- Los tests del backend **no requieren** Node.js
-- Los tests del frontend **requieren** Node.js y npm
+- Los tests del backend se ejecutan dentro del contenedor `web`
+- Los tests del frontend se ejecutan con el servicio `frontend-tests`
 - El Dockerfile principal solo incluye Python (para el backend)
-- Para tests del frontend en Docker, usa `Dockerfile.test` o el servicio `frontend-tests` en docker-compose
+- Para frontend en Docker, usa el servicio `frontend-tests` en `docker-compose`
 

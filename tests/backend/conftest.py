@@ -1,9 +1,12 @@
 """
 Configuración de pytest y fixtures compartidas
 """
+import os
+os.environ.setdefault("STORAGE_BACKEND", "memory")
+os.environ.setdefault("APP_TESTING", "1")
+
 import pytest
 from datetime import datetime, date
-from app.storage import UserData, WeightEntryData
 
 
 # Helpers para hacer los tests más legibles
@@ -38,11 +41,13 @@ def assert_forbidden(response):
 @pytest.fixture
 def app():
     """Crea una aplicación Flask para testing con almacenamiento en memoria"""
-    import os
-    from app import create_app
-    
-    os.environ["STORAGE_BACKEND"] = "memory"
-    app = create_app()
+    import app as app_module
+
+    app_module.STORAGE_CONFIG["backend"] = "memory"
+    app_module.STORAGE_CONFIG["db_path"] = ":memory:"
+    app_module.STORAGE_CONFIG["db_key"] = ""
+
+    app = app_module.create_app()
     app.config['TESTING'] = True
     app.config['WTF_CSRF_ENABLED'] = False
     
@@ -75,6 +80,7 @@ def auth_session(client):
 @pytest.fixture
 def sample_user(app, auth_session):
     """Crea un usuario de prueba usando el storage"""
+    from app.storage import UserData
     with app.app_context():
         user = UserData(
             user_id=auth_session["user_id"],
@@ -90,6 +96,7 @@ def sample_user(app, auth_session):
 @pytest.fixture
 def sample_weights(app, sample_user, auth_session):
     """Crea varios registros de peso de prueba usando el storage"""
+    from app.storage import WeightEntryData
     with app.app_context():
         weights = [
             WeightEntryData(entry_id=0, user_id=auth_session["user_id"], weight_kg=70.0, recorded_date=datetime(2024, 1, 1, 10, 0)),

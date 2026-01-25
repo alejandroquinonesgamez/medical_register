@@ -12,7 +12,7 @@
 # Uso: make [comando]
 # Ejemplo: make help
 
-.PHONY: help build logs ps down setup-env clean-temp clean-all purge fix-containers memory db test
+.PHONY: help build logs ps down setup-env clean-temp clean-all purge fix-containers memory db test test-backend test-frontend
 
 # Variables
 # Cargar .env si existe para configurar COMPOSE_PROJECT_NAME
@@ -96,7 +96,9 @@ help: ## Mostrar esta ayuda
 	@echo "  make memory         # Arranca sin BD (memory)"
 	@echo "  make db             # Arranca con BD (sqlite/sqlcipher)"
 	@echo "  make build          # Construir imágenes de la aplicación"
-	@echo "  make test           # Ejecutar tests (Python 3)"
+	@echo "  make test           # Ejecutar todos los tests"
+	@echo "  make test-backend   # Ejecutar tests backend en contenedor"
+	@echo "  make test-frontend  # Ejecutar tests frontend en contenedor"
 	@echo "  make logs           # Ver logs de la aplicación"
 	@echo "  make ps             # Ver estado de contenedores"
 	@echo "  make down           # Detener todos los servicios"
@@ -119,9 +121,15 @@ build: setup-env ## Construir imágenes de la aplicación principal
 	@echo ""
 	@echo "✅ Imágenes construidas"
 
-test: ## Ejecutar tests con Python 3
-	@echo "🧪 Ejecutando tests (Python 3)..."
-	@python3 -m pytest
+test: test-backend test-frontend ## Ejecutar todos los tests
+
+test-backend: ## Ejecutar tests backend dentro del contenedor
+	@echo "🧪 Ejecutando tests en contenedor (backend)..."
+	@$(COMPOSE) run --rm web python -m pytest
+
+test-frontend: ## Ejecutar tests frontend dentro del contenedor
+	@echo "🧪 Ejecutando tests en contenedor (frontend)..."
+	@$(COMPOSE) run --rm frontend-tests
 
 down: setup-env ## Detener todos los servicios
 	@echo "🛑 Deteniendo todos los servicios..."
