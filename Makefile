@@ -13,7 +13,7 @@
 # Uso: make [comando]
 # Ejemplo: make help
 
-.PHONY: help initDefectDojo update up build build-defectdojo logs logs-defectdojo ps down pdf_report setup-env ensure-proxy-network clean-temp clean-all purge
+.PHONY: help initDefectDojo update up build build-defectdojo logs logs-defectdojo ps down pdf_report setup-env ensure-proxy-network clean-temp clean-all purge sync-wstg wstg-status wstg-logs fix-containers memory db
 
 # Variables
 # Cargar .env si existe para configurar COMPOSE_PROJECT_NAME
@@ -81,6 +81,38 @@ default: setup-env ensure-proxy-network ## Arrancar solo la aplicación principa
 	@echo "✅ Aplicación principal arrancada"
 	@echo "📊 Accede a la aplicación en: http://localhost:5001"
 
+memory: setup-env ensure-proxy-network ## Arrancar con almacenamiento en memoria
+	@echo "🚀 Arrancando aplicación (modo memoria)..."
+	@echo "   (Construyendo imágenes si es necesario...)"
+	@STORAGE_BACKEND=memory $(COMPOSE) up -d --build
+	@echo ""
+	@echo "✅ Aplicación principal arrancada (memory)"
+	@echo "📊 Accede a la aplicación en: http://localhost:5001"
+
+db: setup-env ensure-proxy-network ## Arrancar con base de datos (sqlite/sqlcipher)
+	@echo "🚀 Arrancando aplicación (modo BD)..."
+	@echo "   (Construyendo imágenes si es necesario...)"
+	@STORAGE_BACKEND=sqlite $(COMPOSE) up -d --build
+	@echo ""
+	@echo "✅ Aplicación principal arrancada (db)"
+	@echo "📊 Accede a la aplicación en: http://localhost:5001"
+
+memory: setup-env ## Arrancar con almacenamiento en memoria
+	@echo "🚀 Arrancando aplicación (modo memoria)..."
+	@echo "   (Construyendo imágenes si es necesario...)"
+	@STORAGE_BACKEND=memory $(COMPOSE) up -d --build
+	@echo ""
+	@echo "✅ Aplicación principal arrancada (memory)"
+	@echo "📊 Accede a la aplicación en: http://localhost:5001"
+
+db: setup-env ## Arrancar con base de datos (sqlite/sqlcipher)
+	@echo "🚀 Arrancando aplicación (modo BD)..."
+	@echo "   (Construyendo imágenes si es necesario...)"
+	@STORAGE_BACKEND=sqlite $(COMPOSE) up -d --build
+	@echo ""
+	@echo "✅ Aplicación principal arrancada (db)"
+	@echo "📊 Accede a la aplicación en: http://localhost:5001"
+
 help: ## Mostrar esta ayuda
 	@echo "Comandos disponibles:"
 	@echo ""
@@ -92,6 +124,9 @@ help: ## Mostrar esta ayuda
 	@echo "  make up             # Arranca aplicación principal + DefectDojo vacío"
 	@echo "  make initDefectDojo # Inicia solo DefectDojo vacío"
 	@echo "  make update         # Despliegue completo y actualización"
+	@echo "  make memory         # Arranca sin BD (memory)"
+	@echo "  make db             # Arranca con BD (sqlite/sqlcipher)"
+	@echo "  make build          # Construir imágenes de la aplicación"
 	@echo "  make logs           # Ver logs de la aplicación"
 	@echo "  make logs-defectdojo # Ver logs de DefectDojo"
 	@echo "  make ps             # Ver estado de contenedores"
@@ -237,6 +272,22 @@ clean-temp: ## Limpiar archivos temporales del proyecto
 	@echo "🧹 Limpiando archivos temporales..."
 	@bash scripts/clean_temp.sh
 
+fix-containers: ## Solucionar problemas de contenedores (ContainerConfig error)
+	@echo "🔧 Solucionando problemas de contenedores..."
+	@echo ""
+	@echo "Paso 1/3: Deteniendo y eliminando contenedores..."
+	@$(COMPOSE) down -v 2>/dev/null || true
+	@echo "   ✓ Contenedores eliminados"
+	@echo ""
+	@echo "Paso 2/3: Limpiando contenedores huérfanos..."
+	@docker container prune -f 2>/dev/null || true
+	@echo "   ✓ Limpieza completada"
+	@echo ""
+	@echo "Paso 3/3: Reconstruyendo imágenes..."
+	@$(COMPOSE) build --no-cache web
+	@echo "   ✓ Imágenes reconstruidas"
+	@echo ""
+	@echo "✅ Problema solucionado. Ahora ejecuta: make up"
 clean-all: ## Limpiar TODO y volver al estado como recién clonado (DESTRUCTIVO)
 	@echo "⚠️  Ejecutando limpieza completa (DESTRUCTIVO)..."
 	@bash scripts/clean_all.sh

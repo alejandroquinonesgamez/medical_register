@@ -15,6 +15,8 @@
 #   .\make.ps1 default       # Arrancar aplicación principal
 #   .\make.ps1 up            # Arrancar aplicación + DefectDojo vacío
 #   .\make.ps1 update        # Arrancar todo y actualizar findings
+#   .\make.ps1 memory        # Arrancar sin BD (memory)
+#   .\make.ps1 db            # Arrancar con BD (sqlite/sqlcipher)
 
 param(
     [Parameter(Position=0)]
@@ -149,6 +151,10 @@ function Show-Help {
     Write-Host "Iniciar solo DefectDojo vacio (sin findings)"
     Write-Host "  update           " -NoNewline -ForegroundColor Yellow
     Write-Host "Levantar aplicacion y DefectDojo, y actualizar flujo de findings"
+    Write-Host "  memory           " -NoNewline -ForegroundColor Yellow
+    Write-Host "Arrancar sin base de datos (memory)"
+    Write-Host "  db               " -NoNewline -ForegroundColor Yellow
+    Write-Host "Arrancar con base de datos (sqlite/sqlcipher)"
     Write-Host "  logs             " -NoNewline -ForegroundColor Yellow
     Write-Host "Ver logs de la aplicacion principal"
     Write-Host "  logs-defectdojo  " -NoNewline -ForegroundColor Yellow
@@ -176,14 +182,34 @@ function Show-Help {
     Write-Host "  .\make.ps1 default        # Arranca la aplicacion principal"
     Write-Host "  .\make.ps1 up             # Arranca aplicacion principal + DefectDojo vacio"
     Write-Host "  .\make.ps1 update         # Despliegue completo y actualizacion"
+    Write-Host "  .\make.ps1 memory         # Arranca sin BD (memory)"
+    Write-Host "  .\make.ps1 db             # Arranca con BD (sqlite/sqlcipher)"
     Write-Host ""
 }
 
 function Start-Default {
     Write-Host "Arrancando aplicacion principal..." -ForegroundColor Cyan
-    docker-compose up -d
+    docker-compose up -d --build
     Write-Host ""
     Write-Host "Aplicacion principal arrancada" -ForegroundColor Green
+    Write-Host "Accede a la aplicacion en: http://localhost:5001" -ForegroundColor Cyan
+}
+
+function Start-Memory {
+    Write-Host "Arrancando aplicacion (modo memoria)..." -ForegroundColor Cyan
+    $env:STORAGE_BACKEND = "memory"
+    docker-compose up -d --build
+    Write-Host ""
+    Write-Host "Aplicacion principal arrancada (memory)" -ForegroundColor Green
+    Write-Host "Accede a la aplicacion en: http://localhost:5001" -ForegroundColor Cyan
+}
+
+function Start-Db {
+    Write-Host "Arrancando aplicacion (modo BD)..." -ForegroundColor Cyan
+    $env:STORAGE_BACKEND = "sqlite"
+    docker-compose up -d --build
+    Write-Host ""
+    Write-Host "Aplicacion principal arrancada (db)" -ForegroundColor Green
     Write-Host "Accede a la aplicacion en: http://localhost:5001" -ForegroundColor Cyan
 }
 
@@ -433,6 +459,11 @@ switch ($Command.ToLower()) {
     }
     "update" {
         Start-Update
+    "memory" {
+        Start-Memory
+    }
+    "db" {
+        Start-Db
     }
     "logs" {
         Show-Logs

@@ -30,5 +30,5 @@ COPY . .
 
 EXPOSE 5001
 
-CMD ["gunicorn", "--bind", "0.0.0.0:5001", "--workers", "1", "--timeout", "120", "run:app"]
+CMD ["sh", "-c", "python /app/scripts/init_storage.py && gunicorn --bind 0.0.0.0:5001 --workers 1 --timeout 120 run:app"]
 

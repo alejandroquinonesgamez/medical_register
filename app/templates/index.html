@@ -24,6 +24,11 @@
     </header>
 
     <div class="main-layout">
+        {% if storage_backend == 'sqlcipher' %}
+        <div class="storage-warning">
+            Base de datos cifrada con el pepper del servidor. Sin ese pepper no se podrán recuperar los datos.
+        </div>
+        {% endif %}
         <!-- Columna izquierda: OWASP ASVS -->
         <aside class="sidebar sidebar-left" id="owasp-asvs-sidebar">
             <div class="panel" id="owasp-asvs-frame">
@@ -51,7 +56,6 @@
                 </nav>
                 </div>
         </aside>
-
         <!-- Columna central: Contenido principal -->
         <main class="container">
         <section class="panel">

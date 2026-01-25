@@ -38,8 +38,10 @@ def assert_forbidden(response):
 @pytest.fixture
 def app():
     """Crea una aplicación Flask para testing con almacenamiento en memoria"""
+    import os
     from app import create_app
     
+    os.environ["STORAGE_BACKEND"] = "memory"
     app = create_app()
     app.config['TESTING'] = True
     app.config['WTF_CSRF_ENABLED'] = False

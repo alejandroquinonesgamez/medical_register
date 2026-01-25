@@ -3,7 +3,7 @@ from flask import Flask
 from flask_cors import CORS
 from flask_limiter import Limiter
 from flask_limiter.util import get_remote_address
-from .storage import MemoryStorage, SQLCipherStorage
+from .storage import MemoryStorage, SQLCipherStorage, SQLiteStorage
 from .config import STORAGE_CONFIG, SESSION_CONFIG
 
 
@@ -21,6 +21,10 @@ def create_app():
         app.storage = SQLCipherStorage(
             db_path=STORAGE_CONFIG["db_path"],
             db_key=STORAGE_CONFIG["db_key"],
+        )
+    elif STORAGE_CONFIG["backend"] == "sqlite":
+        app.storage = SQLiteStorage(
+            db_path=STORAGE_CONFIG["db_path"],
         )
     else:
         app.storage = MemoryStorage()
