@@ -14,6 +14,7 @@
 #   .\make.ps1 default       # Arrancar aplicación principal
 #   .\make.ps1 memory        # Arrancar sin BD (memory)
 #   .\make.ps1 db            # Arrancar con BD (sqlite/sqlcipher)
+#   .\make.ps1 test          # Ejecutar tests (Python 3)
 #   .\make.ps1 default       # Arrancar aplicación principal
 
 param(
@@ -147,6 +148,8 @@ function Show-Help {
     Write-Host "Arrancar sin base de datos (memory)"
     Write-Host "  db               " -NoNewline -ForegroundColor Yellow
     Write-Host "Arrancar con base de datos (sqlite/sqlcipher)"
+    Write-Host "  test             " -NoNewline -ForegroundColor Yellow
+    Write-Host "Ejecutar tests (Python 3)"
     Write-Host "  logs             " -NoNewline -ForegroundColor Yellow
     Write-Host "Ver logs de la aplicacion principal"
     Write-Host "  ps               " -NoNewline -ForegroundColor Yellow
@@ -172,6 +175,7 @@ function Show-Help {
     Write-Host "  .\make.ps1 default        # Arranca la aplicacion principal"
     Write-Host "  .\make.ps1 memory         # Arranca sin BD (memory)"
     Write-Host "  .\make.ps1 db             # Arranca con BD (sqlite/sqlcipher)"
+    Write-Host "  .\make.ps1 test           # Ejecuta tests (Python 3)"
     Write-Host ""
 }
 
@@ -199,6 +203,15 @@ function Start-Db {
     Write-Host ""
     Write-Host "Aplicacion principal arrancada (db)" -ForegroundColor Green
     Write-Host "Accede a la aplicacion en: http://localhost:5001" -ForegroundColor Cyan
+}
+
+function Run-Tests {
+    Write-Host "Ejecutando tests (Python 3)..." -ForegroundColor Cyan
+    try {
+        python3 -m pytest
+    } catch {
+        python -m pytest
+    }
 }
 
 
@@ -289,6 +302,9 @@ switch ($Command.ToLower()) {
     }
     "db" {
         Start-Db
+    }
+    "test" {
+        Run-Tests
     }
     "logs" {
         Show-Logs

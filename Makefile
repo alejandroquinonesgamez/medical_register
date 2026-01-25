@@ -12,7 +12,7 @@
 # Uso: make [comando]
 # Ejemplo: make help
 
-.PHONY: help build logs ps down setup-env clean-temp clean-all purge fix-containers memory db
+.PHONY: help build logs ps down setup-env clean-temp clean-all purge fix-containers memory db test
 
 # Variables
 # Cargar .env si existe para configurar COMPOSE_PROJECT_NAME
@@ -96,6 +96,7 @@ help: ## Mostrar esta ayuda
 	@echo "  make memory         # Arranca sin BD (memory)"
 	@echo "  make db             # Arranca con BD (sqlite/sqlcipher)"
 	@echo "  make build          # Construir imágenes de la aplicación"
+	@echo "  make test           # Ejecutar tests (Python 3)"
 	@echo "  make logs           # Ver logs de la aplicación"
 	@echo "  make ps             # Ver estado de contenedores"
 	@echo "  make down           # Detener todos los servicios"
@@ -117,6 +118,10 @@ build: setup-env ## Construir imágenes de la aplicación principal
 	@$(COMPOSE) build
 	@echo ""
 	@echo "✅ Imágenes construidas"
+
+test: ## Ejecutar tests con Python 3
+	@echo "🧪 Ejecutando tests (Python 3)..."
+	@python3 -m pytest
 
 down: setup-env ## Detener todos los servicios
 	@echo "🛑 Deteniendo todos los servicios..."
