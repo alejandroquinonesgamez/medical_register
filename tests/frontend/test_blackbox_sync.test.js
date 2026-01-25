@@ -7,6 +7,10 @@
 class SyncManager {
     static async syncFromBackend() {
         try {
+            if (window.__FORCE_API_OFFLINE__ === true) {
+                console.warn('Modo local: simulando error de comunicación con el servidor');
+                return false;
+            }
             const userResponse = await fetch('/api/user');
             if (userResponse.ok) {
                 const userData = await userResponse.json();
@@ -48,6 +52,10 @@ class SyncManager {
 
     static async syncUserToBackend(user) {
         try {
+            if (window.__FORCE_API_OFFLINE__ === true) {
+                console.warn('Modo local: simulando error de comunicación con el servidor');
+                return false;
+            }
             const response = await fetch('/api/user', {
                 method: 'POST',
                 headers: {
@@ -76,6 +84,10 @@ class SyncManager {
 
     static async syncWeightToBackend(weight) {
         try {
+            if (window.__FORCE_API_OFFLINE__ === true) {
+                console.warn('Modo local: simulando error de comunicación con el servidor');
+                return false;
+            }
             const response = await fetch('/api/weight', {
                 method: 'POST',
                 headers: {
@@ -111,6 +123,7 @@ describe('TestSyncManager', () => {
     beforeEach(() => {
         localStorage.clear();
         fetch.mockClear();
+        delete window.__FORCE_API_OFFLINE__;
     });
 
     describe('syncFromBackend', () => {
@@ -172,6 +185,14 @@ describe('TestSyncManager', () => {
             const result = await SyncManager.syncFromBackend();
             expect(result).toBe(false);
         });
+
+        test('test_sync_from_backend_force_offline - Modo local forzado', async () => {
+            window.__FORCE_API_OFFLINE__ = true;
+
+            const result = await SyncManager.syncFromBackend();
+            expect(result).toBe(false);
+            expect(fetch).not.toHaveBeenCalled();
+        });
     });
 
     describe('syncUserToBackend', () => {
@@ -230,6 +251,20 @@ describe('TestSyncManager', () => {
             const result = await SyncManager.syncUserToBackend(user);
             expect(result).toBe(false);
         });
+
+        test('test_sync_user_to_backend_force_offline - Modo local forzado', async () => {
+            const user = {
+                nombre: 'Juan',
+                apellidos: 'Pérez',
+                fecha_nacimiento: '1990-05-15',
+                talla_m: 1.75
+            };
+
+            window.__FORCE_API_OFFLINE__ = true;
+            const result = await SyncManager.syncUserToBackend(user);
+            expect(result).toBe(false);
+            expect(fetch).not.toHaveBeenCalled();
+        });
     });
 
     describe('syncWeightToBackend', () => {
@@ -271,6 +306,13 @@ describe('TestSyncManager', () => {
 
             const result = await SyncManager.syncWeightToBackend(weight);
             expect(result).toBe(false);
+        });
+
+        test('test_sync_weight_to_backend_force_offline - Modo local forzado', async () => {
+            window.__FORCE_API_OFFLINE__ = true;
+            const result = await SyncManager.syncWeightToBackend({ peso_kg: 70.5 });
+            expect(result).toBe(false);
+            expect(fetch).not.toHaveBeenCalled();
         });
     });
 });

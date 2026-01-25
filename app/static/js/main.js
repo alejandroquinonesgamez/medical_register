@@ -171,12 +171,12 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     function updateSyncIndicator() {
         if (!syncIndicator) return;
-        const isLocal = typeof SyncManager !== 'undefined' && SyncManager.isSyncDisabled
-            ? SyncManager.isSyncDisabled()
-            : true;
-        if (isLocal) {
+        const isSynced = typeof SyncManager !== 'undefined' && SyncManager.isSynced
+            ? SyncManager.isSynced()
+            : false;
+        if (!isSynced) {
             syncIndicator.textContent = '💻';
-            syncIndicator.title = 'Datos locales';
+            syncIndicator.title = 'Datos no sincronizados';
             syncIndicator.classList.remove('sync-indicator--remote');
             syncIndicator.classList.add('sync-indicator--local');
         } else {
