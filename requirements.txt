@@ -4,5 +4,6 @@ Flask-Limiter
 gunicorn
 pytest
 argon2-cffi
+pysqlcipher3
 
 
