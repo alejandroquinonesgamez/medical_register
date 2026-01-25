@@ -12,7 +12,7 @@
 # Uso: make [comando]
 # Ejemplo: make help
 
-.PHONY: help up build logs ps down setup-env clean-temp clean-all purge fix-containers
+.PHONY: help build logs ps down setup-env clean-temp clean-all purge fix-containers
 
 # Variables
 # Cargar .env si existe para configurar COMPOSE_PROJECT_NAME
@@ -77,7 +77,7 @@ help: ## Mostrar esta ayuda
 	@echo "Ejemplos:"
 	@echo "  make                # Muestra la ayuda"
 	@echo "  make default        # Arranca la aplicación principal"
-	@echo "  make up             # Arranca la aplicación principal"
+	@echo "  make default        # Arranca la aplicación principal"
 	@echo "  make build          # Construir imágenes de la aplicación"
 	@echo "  make logs           # Ver logs de la aplicación"
 	@echo "  make ps             # Ver estado de contenedores"
@@ -86,14 +86,6 @@ help: ## Mostrar esta ayuda
 	@echo "  make clean-all      # Limpieza completa (DESTRUCTIVO)"
 	@echo "  make purge          # Detener servicios y limpiar TODO (DESTRUCTIVO)"
 	@echo ""
-
-up: setup-env ## Levantar aplicación principal
-	@echo "🚀 Arrancando aplicación principal..."
-	@echo "   (Construyendo imágenes si es necesario...)"
-	@$(COMPOSE) up -d --build
-	@echo ""
-	@echo "✅ Aplicación principal arrancada"
-	@echo "📊 Accede a la aplicación en: http://localhost:5001"
 
 logs: setup-env ## Ver logs de la aplicación principal
 	@echo "📋 Logs de la aplicación principal (Ctrl+C para salir)..."

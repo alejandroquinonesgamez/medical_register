@@ -6,6 +6,3 @@ pytest
 argon2-cffi
 
 
-markdown>=3.4.0
-weasyprint>=60.0
-reportlab>=4.0.0

@@ -7,8 +7,7 @@ Write-Host "Este comando eliminara:" -ForegroundColor Yellow
 Write-Host "  - Todos los contenedores Docker del proyecto"
 Write-Host "  - Todas las imagenes Docker del proyecto"
 Write-Host "  - Todos los volumenes Docker del proyecto"
-Write-Host "  - Todos los datos de PostgreSQL, Redis y DefectDojo"
-Write-Host "  - Todos los dumps SQL generados"
+Write-Host "  - Todos los datos persistentes"
 Write-Host "  - El entorno virtual (venv/)"
 Write-Host "  - Archivos temporales de desarrollo"
 Write-Host ""
@@ -30,7 +29,7 @@ Write-Host ""
 $count = 0
 
 # Paso 1: Detener y eliminar contenedores Docker
-Write-Host "Paso 1/8: Deteniendo y eliminando contenedores Docker..." -ForegroundColor Yellow
+Write-Host "Paso 1/5: Deteniendo y eliminando contenedores Docker..." -ForegroundColor Yellow
 if (Get-Command docker-compose -ErrorAction SilentlyContinue) {
     $env:COMPOSE_PROJECT_NAME = if ($env:COMPOSE_PROJECT_NAME) { $env:COMPOSE_PROJECT_NAME } else { "medical_register" }
     $env:COMPOSE_DOCKER_CLI_BUILD = if ($env:COMPOSE_DOCKER_CLI_BUILD) { $env:COMPOSE_DOCKER_CLI_BUILD } else { "0" }
@@ -38,7 +37,6 @@ if (Get-Command docker-compose -ErrorAction SilentlyContinue) {
     
     # Detener y eliminar contenedores
     docker-compose down --volumes --remove-orphans 2>$null
-    docker-compose --profile defectdojo down --volumes --remove-orphans 2>$null
     
     Write-Host "  [OK] Contenedores detenidos y eliminados" -ForegroundColor Gray
     $count++
@@ -47,7 +45,7 @@ if (Get-Command docker-compose -ErrorAction SilentlyContinue) {
     Write-Host ""
     Write-Host "   Eliminando redes huerfanas..." -ForegroundColor Gray
     $projectName = if ($env:COMPOSE_PROJECT_NAME) { $env:COMPOSE_PROJECT_NAME } else { "medical_register" }
-    $networks = docker network ls --format "{{.Name}}" | Select-String -Pattern "$projectName|defectdojo"
+    $networks = docker network ls --format "{{.Name}}" | Select-String -Pattern "$projectName"
     
     if ($networks) {
         $networks | ForEach-Object {
@@ -59,7 +57,7 @@ if (Get-Command docker-compose -ErrorAction SilentlyContinue) {
 
 # Paso 2: Eliminar imagenes del proyecto
 Write-Host ""
-Write-Host "Paso 2/8: Eliminando imagenes Docker del proyecto..." -ForegroundColor Yellow
+Write-Host "Paso 2/5: Eliminando imagenes Docker del proyecto..." -ForegroundColor Yellow
 if (Get-Command docker -ErrorAction SilentlyContinue) {
     $projectName = if ($env:COMPOSE_PROJECT_NAME) { $env:COMPOSE_PROJECT_NAME } else { "medical_register" }
     
@@ -79,60 +77,25 @@ if (Get-Command docker -ErrorAction SilentlyContinue) {
 
 # Paso 3: Eliminar datos de PostgreSQL
 Write-Host ""
-Write-Host "Paso 3/8: Eliminando datos de PostgreSQL..." -ForegroundColor Yellow
-if (Test-Path "data\postgres") {
-    Remove-Item "data\postgres" -Recurse -Force -ErrorAction SilentlyContinue
-    Write-Host "  [OK] Directorio data/postgres/ eliminado" -ForegroundColor Gray
+Write-Host "Paso 3/5: Eliminando datos persistentes..." -ForegroundColor Yellow
+if (Test-Path "data\temp") {
+    Remove-Item "data\temp" -Recurse -Force -ErrorAction SilentlyContinue
+    Write-Host "  [OK] Directorio data/temp/ eliminado" -ForegroundColor Gray
     $count++
 }
 
-# Paso 4: Eliminar datos de Redis
+# Paso 4: Eliminar entorno virtual
 Write-Host ""
-Write-Host "Paso 4/8: Eliminando datos de Redis..." -ForegroundColor Yellow
-if (Test-Path "data\redis") {
-    Remove-Item "data\redis" -Recurse -Force -ErrorAction SilentlyContinue
-    Write-Host "  [OK] Directorio data/redis/ eliminado" -ForegroundColor Gray
-    $count++
-}
-
-# Paso 5: Eliminar datos de DefectDojo
-Write-Host ""
-Write-Host "Paso 5/8: Eliminando datos de DefectDojo..." -ForegroundColor Yellow
-if (Test-Path "data\defectdojo") {
-    Remove-Item "data\defectdojo" -Recurse -Force -ErrorAction SilentlyContinue
-    Write-Host "  [OK] Directorio data/defectdojo/ eliminado" -ForegroundColor Gray
-    $count++
-}
-
-# Paso 6: Eliminar dumps SQL generados (excepto el inicial)
-Write-Host ""
-Write-Host "Paso 6/8: Eliminando dumps SQL generados..." -ForegroundColor Yellow
-if (Test-Path "data") {
-    $dumpFiles = Get-ChildItem -Path "data" -Recurse -Filter "*_db_dump.sql" -ErrorAction SilentlyContinue | 
-        Where-Object { $_.Name -ne "defectdojo_db_initial.sql" }
-    
-    if ($dumpFiles) {
-        $dumpFiles | Remove-Item -Force -ErrorAction SilentlyContinue
-        $dumpCount = ($dumpFiles | Measure-Object).Count
-        Write-Host "  [OK] $dumpCount dumps SQL eliminados" -ForegroundColor Gray
-        $count++
-    } else {
-        Write-Host "  [INFO] No se encontraron dumps SQL para eliminar" -ForegroundColor Gray
-    }
-}
-
-# Paso 7: Eliminar entorno virtual
-Write-Host ""
-Write-Host "Paso 7/8: Eliminando entorno virtual..." -ForegroundColor Yellow
+Write-Host "Paso 4/5: Eliminando entorno virtual..." -ForegroundColor Yellow
 if (Test-Path "venv") {
     Remove-Item "venv" -Recurse -Force -ErrorAction SilentlyContinue
     Write-Host "  [OK] Directorio venv/ eliminado" -ForegroundColor Gray
     $count++
 }
 
-# Paso 8: Eliminar .env (se recreara automaticamente)
+# Paso 5: Eliminar .env (se recreara automaticamente)
 Write-Host ""
-Write-Host "Paso 8/8: Limpiando archivo .env..." -ForegroundColor Yellow
+Write-Host "Paso 5/5: Limpiando archivo .env..." -ForegroundColor Yellow
 if (Test-Path ".env") {
     Remove-Item ".env" -Force -ErrorAction SilentlyContinue
     Write-Host "  [OK] Archivo .env eliminado (se recreara automaticamente)" -ForegroundColor Gray

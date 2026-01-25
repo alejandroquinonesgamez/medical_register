@@ -11,7 +11,6 @@ echo "  - Todos los contenedores Docker del proyecto"
 echo "  - Todas las imágenes Docker del proyecto"
 echo "  - Todos los volúmenes Docker del proyecto"
 echo "  - Todos los datos persistentes"
-echo "  - Todos los dumps SQL generados"
 echo "  - El entorno virtual (venv/)"
 echo "  - Archivos temporales de desarrollo"
 echo ""
@@ -33,7 +32,7 @@ echo ""
 COUNT=0
 
 # Paso 1: Detener y eliminar contenedores Docker
-echo "Paso 1/6: Deteniendo y eliminando contenedores Docker..."
+echo "Paso 1/5: Deteniendo y eliminando contenedores Docker..."
 if command -v docker-compose &> /dev/null; then
     COMPOSE_PROJECT_NAME="${COMPOSE_PROJECT_NAME:-medical_register}"
     COMPOSE_DOCKER_CLI_BUILD="${COMPOSE_DOCKER_CLI_BUILD:-0}"
@@ -61,7 +60,7 @@ fi
 
 # Paso 2: Eliminar imágenes del proyecto
 echo ""
-echo "Paso 2/6: Eliminando imágenes Docker del proyecto..."
+echo "Paso 2/5: Eliminando imágenes Docker del proyecto..."
 if command -v docker &> /dev/null; then
     # Buscar imágenes relacionadas con el proyecto
     PROJECT_NAME="${COMPOSE_PROJECT_NAME:-medical_register}"
@@ -78,44 +77,25 @@ fi
 
 # Paso 3: Eliminar datos persistentes
 echo ""
-echo "Paso 3/6: Eliminando datos persistentes..."
+echo "Paso 3/5: Eliminando datos persistentes..."
 if [ -d "data" ]; then
     # Eliminar directorios de datos si existen
-    [ -d "data/postgres" ] && rm -rf data/postgres && echo "  ✓ Directorio data/postgres/ eliminado"
-    [ -d "data/redis" ] && rm -rf data/redis && echo "  ✓ Directorio data/redis/ eliminado"
-    [ -d "data/defectdojo" ] && rm -rf data/defectdojo && echo "  ✓ Directorio data/defectdojo/ eliminado"
     [ -d "data/temp" ] && rm -rf data/temp && echo "  ✓ Directorio data/temp/ eliminado"
-    [ -d "data/wstg_sync_queue" ] && rm -rf data/wstg_sync_queue && echo "  ✓ Directorio data/wstg_sync_queue/ eliminado"
     COUNT=$((COUNT + 1))
 fi
 
-# Paso 4: Eliminar dumps SQL generados
+# Paso 4: Eliminar entorno virtual
 echo ""
-echo "Paso 4/6: Eliminando dumps SQL generados..."
-if [ -d "data" ]; then
-    DUMP_FILES=$(find data -name "*_db_dump.sql" 2>/dev/null || true)
-    if [ -n "$DUMP_FILES" ]; then
-        echo "$DUMP_FILES" | xargs rm -f 2>/dev/null || true
-        DUMP_COUNT=$(echo "$DUMP_FILES" | wc -l | tr -d ' ')
-        echo "  ✓ $DUMP_COUNT dumps SQL eliminados"
-        COUNT=$((COUNT + 1))
-    else
-        echo "  ℹ️  No se encontraron dumps SQL para eliminar"
-    fi
-fi
-
-# Paso 5: Eliminar entorno virtual
-echo ""
-echo "Paso 5/6: Eliminando entorno virtual..."
+echo "Paso 4/5: Eliminando entorno virtual..."
 if [ -d "venv" ]; then
     rm -rf venv
     echo "  ✓ Directorio venv/ eliminado"
     COUNT=$((COUNT + 1))
 fi
 
-# Paso 6: Eliminar .env (se recreará automáticamente)
+# Paso 5: Eliminar .env (se recreará automáticamente)
 echo ""
-echo "Paso 6/6: Limpiando archivo .env..."
+echo "Paso 5/5: Limpiando archivo .env..."
 if [ -f ".env" ]; then
     rm -f .env
     echo "  ✓ Archivo .env eliminado (se recreará automáticamente)"

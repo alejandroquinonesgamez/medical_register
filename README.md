@@ -26,13 +26,11 @@ Este repositorio contiene dos ramas principales:
 
 - **`main`** - Versión de producción (recomendada)
   - Sin herramientas de desarrollo
-  - Sin referencias a ASVS/OWASP/DefectDojo
   - Configurada para producción (`FLASK_ENV=production`)
   - Lista para despliegue en producción
 
 - **`dev`** - Versión de desarrollo
   - Incluye herramientas de desarrollo
-  - Integración con DefectDojo y ASVS/OWASP
   - Configurada para desarrollo (`FLASK_ENV=development`)
   - Para desarrollo y testing
 

@@ -1,20 +1,18 @@
 # Script PowerShell equivalente al Makefile
 #
 # Este script replica la funcionalidad del Makefile para usuarios de Windows/PowerShell.
-# Gestiona el despliegue y operación de la aplicación médica y DefectDojo.
+# Gestiona el despliegue y operación de la aplicación médica en producción.
 #
 # Características principales:
 # - Configuración automática de Docker Compose (incluyendo .env)
 # - Gestión de contenedores de la aplicación principal
-# - Gestión de servicios de DefectDojo (perfil defectdojo)
 # - Soluciona problemas con caracteres especiales en rutas mediante COMPOSE_PROJECT_NAME
 #
 # Uso: .\make.ps1 [comando]
 # Ejemplos:
 #   .\make.ps1 help          # Mostrar ayuda
 #   .\make.ps1 default       # Arrancar aplicación principal
-#   .\make.ps1 up            # Arrancar aplicación + DefectDojo vacío
-#   .\make.ps1 all           # Arrancar todo y actualizar findings
+#   .\make.ps1 default       # Arrancar aplicación principal
 
 param(
     [Parameter(Position=0)]
@@ -143,22 +141,12 @@ function Show-Help {
     Write-Host ""
     Write-Host "  default          " -NoNewline -ForegroundColor Yellow
     Write-Host "Arrancar solo la aplicacion principal (por defecto)"
-    Write-Host "  up               " -NoNewline -ForegroundColor Yellow
-    Write-Host "Arrancar aplicacion principal y DefectDojo vacio (sin findings)"
-    Write-Host "  initDefectDojo   " -NoNewline -ForegroundColor Yellow
-    Write-Host "Iniciar solo DefectDojo vacio (sin findings)"
-    Write-Host "  all              " -NoNewline -ForegroundColor Yellow
-    Write-Host "Levantar aplicacion y DefectDojo, y actualizar flujo de findings"
     Write-Host "  logs             " -NoNewline -ForegroundColor Yellow
     Write-Host "Ver logs de la aplicacion principal"
-    Write-Host "  logs-defectdojo  " -NoNewline -ForegroundColor Yellow
-    Write-Host "Ver logs de DefectDojo"
     Write-Host "  ps               " -NoNewline -ForegroundColor Yellow
     Write-Host "Ver estado de todos los contenedores"
     Write-Host "  down             " -NoNewline -ForegroundColor Yellow
     Write-Host "Detener todos los servicios"
-    Write-Host "  pdf_report       " -NoNewline -ForegroundColor Yellow
-    Write-Host "Generar PDF del informe de seguridad ASVS con fecha"
     Write-Host "  clean-temp       " -NoNewline -ForegroundColor Yellow
     Write-Host "Limpiar archivos temporales del proyecto"
     Write-Host "  fix-containers   " -NoNewline -ForegroundColor Yellow
@@ -176,211 +164,34 @@ function Show-Help {
     Write-Host "  .\make.ps1                # Muestra la ayuda"
     Write-Host "  .\make.ps1 check          # Verifica requisitos"
     Write-Host "  .\make.ps1 default        # Arranca la aplicacion principal"
-    Write-Host "  .\make.ps1 up             # Arranca aplicacion principal + DefectDojo vacio"
-    Write-Host "  .\make.ps1 all            # Despliegue completo y actualizacion"
+    Write-Host "  .\make.ps1 default        # Arranca aplicacion principal"
     Write-Host ""
 }
 
 function Start-Default {
     Write-Host "Arrancando aplicacion principal..." -ForegroundColor Cyan
-    docker-compose up -d
+    docker-compose up -d --build
     Write-Host ""
     Write-Host "Aplicacion principal arrancada" -ForegroundColor Green
     Write-Host "Accede a la aplicacion en: http://localhost:5001" -ForegroundColor Cyan
 }
 
-function Start-Up {
-    Write-Host "Arrancando aplicacion principal y DefectDojo vacio..." -ForegroundColor Cyan
-    Write-Host ""
-    
-    # Paso 1: Arrancar aplicacion principal
-    Write-Host "Paso 1/3: Arrancando aplicacion principal..." -ForegroundColor Yellow
-    docker-compose up -d
-    Write-Host "   Aplicacion principal arrancada" -ForegroundColor Green
-    Write-Host ""
-    
-    # Paso 2: Arrancar DefectDojo vacio
-    Write-Host "Paso 2/3: Arrancando servicios de DefectDojo..." -ForegroundColor Yellow
-    $env:DD_SKIP_FINDINGS = "True"
-    docker-compose --profile defectdojo up -d
-    Write-Host ""
-    Write-Host "Esperando 60 segundos a que DefectDojo este listo..." -ForegroundColor Yellow
-    Write-Host "   (Esto puede tardar en la primera ejecucion...)" -ForegroundColor Gray
-    Start-Sleep -Seconds 60
-    Write-Host ""
-    
-    # Paso 3: Inicializar DefectDojo vacio
-    Write-Host "Paso 3/3: Inicializando DefectDojo sin crear findings..." -ForegroundColor Yellow
-    Write-Host "   (Solo migraciones, admin user y archivos estaticos)" -ForegroundColor Gray
-    
-    $scriptPath = Join-Path $PSScriptRoot "scripts\init_defectdojo_empty.py"
-    if (Test-Path $scriptPath) {
-        docker cp $scriptPath defectdojo:/tmp/init_defectdojo_empty.py 2>$null
-        if ($LASTEXITCODE -ne 0) {
-            Write-Host "   Reintentando..." -ForegroundColor Gray
-            Start-Sleep -Seconds 5
-            docker cp $scriptPath defectdojo:/tmp/init_defectdojo_empty.py
-        }
-        docker-compose --profile defectdojo exec -T defectdojo python3 /tmp/init_defectdojo_empty.py 2>&1
-    } else {
-        Write-Host "   DefectDojo puede estar ya inicializado (esto es normal)" -ForegroundColor Yellow
-    }
-    
-    Write-Host ""
-    Write-Host "Aplicacion principal y DefectDojo vacio arrancados" -ForegroundColor Green
-    Write-Host ""
-    Write-Host "Accede a:" -ForegroundColor Cyan
-    Write-Host "   Aplicacion: http://localhost:5001" -ForegroundColor White
-    Write-Host "   DefectDojo: http://localhost:8080" -ForegroundColor White
-    Write-Host "   Usuario: admin | Contrasena: admin" -ForegroundColor White
-}
-
-function Start-InitDefectDojo {
-    Write-Host "Iniciando solo DefectDojo vacio (sin findings)..." -ForegroundColor Cyan
-    Write-Host ""
-    Write-Host "Nota: Se iniciara DefectDojo pero sin crear findings automaticamente" -ForegroundColor Yellow
-    Write-Host ""
-    Write-Host "Paso 1/2: Arrancando servicios de DefectDojo..." -ForegroundColor Yellow
-    $env:DD_SKIP_FINDINGS = "True"
-    docker-compose --profile defectdojo up -d
-    Write-Host ""
-    Write-Host "Esperando 60 segundos a que DefectDojo este listo..." -ForegroundColor Yellow
-    Write-Host "   (Esto puede tardar en la primera ejecucion...)" -ForegroundColor Gray
-    Start-Sleep -Seconds 60
-    Write-Host ""
-    Write-Host "Paso 2/2: Inicializando DefectDojo sin crear findings..." -ForegroundColor Yellow
-    Write-Host "   (Solo migraciones, admin user y archivos estaticos)" -ForegroundColor Gray
-    
-    $scriptPath = Join-Path $PSScriptRoot "scripts\init_defectdojo_empty.py"
-    if (Test-Path $scriptPath) {
-        docker cp $scriptPath defectdojo:/tmp/init_defectdojo_empty.py 2>$null
-        if ($LASTEXITCODE -ne 0) {
-            Write-Host "   Reintentando..." -ForegroundColor Gray
-            Start-Sleep -Seconds 5
-            docker cp $scriptPath defectdojo:/tmp/init_defectdojo_empty.py
-        }
-        docker-compose --profile defectdojo exec -T defectdojo python3 /tmp/init_defectdojo_empty.py 2>&1
-    } else {
-        Write-Host "   DefectDojo puede estar ya inicializado (esto es normal)" -ForegroundColor Yellow
-    }
-    
-    Write-Host ""
-    Write-Host "DefectDojo vacio iniciado (sin findings creados)" -ForegroundColor Green
-    Write-Host ""
-    Write-Host "Accede a DefectDojo en: http://localhost:8080" -ForegroundColor Cyan
-    Write-Host "   Usuario: admin | Contrasena: admin" -ForegroundColor White
-}
-
-function Start-All {
-    Write-Host "Actualizando aplicacion y flujo de findings..." -ForegroundColor Cyan
-    Write-Host ""
-    
-    # Paso 1: Verificar aplicacion principal
-    Write-Host "Paso 1/3: Verificando aplicacion principal..." -ForegroundColor Yellow
-    $webStatus = docker-compose ps web 2>$null | Select-String "Up"
-    if (-not $webStatus) {
-        Write-Host "   Arrancando aplicacion principal..." -ForegroundColor Gray
-        docker-compose up -d web
-        Start-Sleep -Seconds 5
-    }
-    Write-Host "   Aplicacion principal lista" -ForegroundColor Green
-    Write-Host ""
-    
-    # Paso 2: Verificar DefectDojo
-    Write-Host "Paso 2/3: Verificando DefectDojo..." -ForegroundColor Yellow
-    $defectdojoStatus = docker-compose --profile defectdojo ps defectdojo 2>$null | Select-String "Up"
-    if (-not $defectdojoStatus) {
-        Write-Host "   Arrancando DefectDojo..." -ForegroundColor Gray
-        docker-compose --profile defectdojo up -d
-        Write-Host "   Esperando 60 segundos..." -ForegroundColor Gray
-        Start-Sleep -Seconds 60
-    }
-    Write-Host "   DefectDojo listo" -ForegroundColor Green
-    Write-Host ""
-    
-    # Paso 3: Actualizar flujo de findings usando script consolidado
-    Write-Host "Paso 3/3: Actualizando flujo de findings con fechas historicas..." -ForegroundColor Yellow
-    
-    $defectdojoRunning = docker ps | Select-String "defectdojo"
-    if (-not $defectdojoRunning) {
-        Write-Host "   DefectDojo no esta corriendo. Reiniciando..." -ForegroundColor Yellow
-        docker-compose --profile defectdojo up -d defectdojo
-        Start-Sleep -Seconds 10
-    }
-    
-    $scriptPath = Join-Path $PSScriptRoot "scripts\manage_findings.py"
-    if (Test-Path $scriptPath) {
-        Write-Host "   Copiando script consolidado al contenedor..." -ForegroundColor Gray
-        docker cp $scriptPath defectdojo:/tmp/manage_findings.py
-        
-        Write-Host "   Ejecutando script consolidado en DefectDojo..." -ForegroundColor Gray
-        docker-compose --profile defectdojo exec -T defectdojo python3 /tmp/manage_findings.py
-    } else {
-        Write-Host "   Error: No se encontro el script: $scriptPath" -ForegroundColor Red
-        exit 1
-    }
-    
-    Write-Host ""
-    Write-Host "Actualizacion completada" -ForegroundColor Green
-    Write-Host ""
-    Write-Host "Accede a:" -ForegroundColor Cyan
-    Write-Host "   Aplicacion: http://localhost:5001" -ForegroundColor White
-    Write-Host "   DefectDojo: http://localhost:8080/engagement/1/" -ForegroundColor White
-}
 
 function Show-Logs {
     Write-Host "Logs de la aplicacion principal (Ctrl+C para salir)..." -ForegroundColor Cyan
     docker-compose logs -f web
 }
 
-function Show-LogsDefectDojo {
-    Write-Host "Logs de DefectDojo (Ctrl+C para salir)..." -ForegroundColor Cyan
-    docker-compose --profile defectdojo logs -f defectdojo
-}
-
 function Show-Status {
     Write-Host "Estado de los contenedores:" -ForegroundColor Cyan
-    Write-Host ""
-    Write-Host "=== Aplicacion Principal ===" -ForegroundColor Yellow
     docker-compose ps
-    Write-Host ""
-    Write-Host "=== DefectDojo ===" -ForegroundColor Yellow
-    docker-compose --profile defectdojo ps
 }
 
 function Stop-All {
     Write-Host "Deteniendo todos los servicios..." -ForegroundColor Cyan
     docker-compose down 2>$null
-    docker-compose --profile defectdojo down 2>$null
     Write-Host ""
     Write-Host "Todos los servicios detenidos" -ForegroundColor Green
-}
-
-function Generate-PDFReport {
-    Write-Host "Generando PDF del informe de seguridad ASVS..." -ForegroundColor Cyan
-    Write-Host ""
-    
-    # Obtener el directorio del proyecto (donde está make.ps1)
-    $projectRoot = Split-Path -Parent $MyInvocation.PSCommandPath
-    if (-not $projectRoot) {
-        $projectRoot = $PSScriptRoot
-    }
-    
-    $scriptPath = Join-Path $projectRoot "scripts\generate_pdf_report.py"
-    if (Test-Path $scriptPath) {
-        python $scriptPath
-        if ($LASTEXITCODE -eq 0) {
-            Write-Host ""
-            Write-Host "PDF generado exitosamente en: docs/informes/" -ForegroundColor Green
-        } else {
-            Write-Host ""
-            Write-Host "Error al generar el PDF" -ForegroundColor Red
-            exit 1
-        }
-    } else {
-        Write-Host "Error: No se encontro el script: $scriptPath" -ForegroundColor Red
-        exit 1
-    }
 }
 
 function Clean-Temp {
@@ -414,7 +225,6 @@ function Fix-Containers {
     Write-Host ""
     
     Write-Host "Paso 1/3: Deteniendo y eliminando contenedores..." -ForegroundColor Yellow
-    docker-compose --profile defectdojo down -v 2>$null
     docker-compose down -v 2>$null
     Write-Host "   ✓ Contenedores eliminados" -ForegroundColor Green
     Write-Host ""
@@ -425,13 +235,10 @@ function Fix-Containers {
     Write-Host ""
     
     Write-Host "Paso 3/3: Reconstruyendo imágenes..." -ForegroundColor Yellow
-    docker-compose --profile defectdojo build --no-cache web 2>$null
-    if ($LASTEXITCODE -ne 0) {
-        docker-compose build --no-cache web
-    }
+    docker-compose build --no-cache web
     Write-Host "   ✓ Imágenes reconstruidas" -ForegroundColor Green
     Write-Host ""
-    Write-Host "✅ Problema solucionado. Ahora ejecuta: .\make.ps1 all" -ForegroundColor Green
+    Write-Host "✅ Problema solucionado. Ahora ejecuta: .\make.ps1 default" -ForegroundColor Green
 }
 
 function Purge-All {
@@ -452,20 +259,8 @@ switch ($Command.ToLower()) {
     "default" {
         Start-Default
     }
-    "up" {
-        Start-Up
-    }
-    "initdefectdojo" {
-        Start-InitDefectDojo
-    }
-    "all" {
-        Start-All
-    }
     "logs" {
         Show-Logs
-    }
-    "logs-defectdojo" {
-        Show-LogsDefectDojo
     }
     "ps" {
         Show-Status
@@ -475,12 +270,6 @@ switch ($Command.ToLower()) {
     }
     "check" {
         Test-Requirements
-    }
-    "pdf_report" {
-        Generate-PDFReport
-    }
-    "pdf_report" {
-        Generate-PDFReport
     }
     "clean-temp" {
         Clean-Temp
