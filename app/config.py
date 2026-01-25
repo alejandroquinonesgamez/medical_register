@@ -62,11 +62,27 @@ SESSION_CONFIG = {
     "cookie_httponly": True,
 }
 
-# Configuración de almacenamiento (backend y SQLCipher)
+# Configuración de almacenamiento (memory / sqlite / sqlcipher)
+_storage_backend = os.environ.get("STORAGE_BACKEND", "sqlite").strip().lower()
+if _storage_backend not in {"memory", "sqlite", "sqlcipher"}:
+    _storage_backend = "sqlite"
+
+_sqlite_db_path = os.environ.get(
+    "SQLITE_DB_PATH",
+    os.path.join(os.getcwd(), "data", "app.db"),
+)
+_sqlcipher_db_path = os.environ.get(
+    "SQLCIPHER_DB_PATH",
+    os.path.join(os.getcwd(), "data", "app_secure.db"),
+)
+_sqlcipher_key = os.environ.get("SQLCIPHER_KEY", "")
+if _storage_backend == "sqlcipher" and not _sqlcipher_key:
+    _sqlcipher_key = PASSWORD_PEPPER
+
 STORAGE_CONFIG = {
-    "backend": os.environ.get("STORAGE_BACKEND", "memory"),
-    "db_path": os.environ.get("SQLCIPHER_DB_PATH", os.path.join(os.getcwd(), "data", "app_secure.db")),
-    "db_key": os.environ.get("SQLCIPHER_KEY", ""),
+    "backend": _storage_backend,
+    "db_path": _sqlcipher_db_path if _storage_backend == "sqlcipher" else _sqlite_db_path,
+    "db_key": _sqlcipher_key,
 }
 
 # Límites de validación

@@ -19,6 +19,11 @@ services:
       - .:/app
     environment:
       - FLASK_ENV=production
+      - STORAGE_BACKEND=${STORAGE_BACKEND:-sqlite}
+      - SQLITE_DB_PATH=${SQLITE_DB_PATH:-/app/data/app.db}
+      - SQLCIPHER_DB_PATH=${SQLCIPHER_DB_PATH:-/app/data/app_secure.db}
+      - SQLCIPHER_KEY=${SQLCIPHER_KEY:-}
+      - PASSWORD_PEPPER=${PASSWORD_PEPPER:-}
     healthcheck:
       test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:5001')"]
       interval: 30s

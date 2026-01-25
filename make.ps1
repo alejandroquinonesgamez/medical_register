@@ -12,6 +12,8 @@
 # Ejemplos:
 #   .\make.ps1 help          # Mostrar ayuda
 #   .\make.ps1 default       # Arrancar aplicación principal
+#   .\make.ps1 memory        # Arrancar sin BD (memory)
+#   .\make.ps1 db            # Arrancar con BD (sqlite/sqlcipher)
 #   .\make.ps1 default       # Arrancar aplicación principal
 
 param(
@@ -141,6 +143,10 @@ function Show-Help {
     Write-Host ""
     Write-Host "  default          " -NoNewline -ForegroundColor Yellow
     Write-Host "Arrancar solo la aplicacion principal (por defecto)"
+    Write-Host "  memory           " -NoNewline -ForegroundColor Yellow
+    Write-Host "Arrancar sin base de datos (memory)"
+    Write-Host "  db               " -NoNewline -ForegroundColor Yellow
+    Write-Host "Arrancar con base de datos (sqlite/sqlcipher)"
     Write-Host "  logs             " -NoNewline -ForegroundColor Yellow
     Write-Host "Ver logs de la aplicacion principal"
     Write-Host "  ps               " -NoNewline -ForegroundColor Yellow
@@ -164,7 +170,8 @@ function Show-Help {
     Write-Host "  .\make.ps1                # Muestra la ayuda"
     Write-Host "  .\make.ps1 check          # Verifica requisitos"
     Write-Host "  .\make.ps1 default        # Arranca la aplicacion principal"
-    Write-Host "  .\make.ps1 default        # Arranca aplicacion principal"
+    Write-Host "  .\make.ps1 memory         # Arranca sin BD (memory)"
+    Write-Host "  .\make.ps1 db             # Arranca con BD (sqlite/sqlcipher)"
     Write-Host ""
 }
 
@@ -173,6 +180,24 @@ function Start-Default {
     docker-compose up -d --build
     Write-Host ""
     Write-Host "Aplicacion principal arrancada" -ForegroundColor Green
+    Write-Host "Accede a la aplicacion en: http://localhost:5001" -ForegroundColor Cyan
+}
+
+function Start-Memory {
+    Write-Host "Arrancando aplicacion (modo memoria)..." -ForegroundColor Cyan
+    $env:STORAGE_BACKEND = "memory"
+    docker-compose up -d --build
+    Write-Host ""
+    Write-Host "Aplicacion principal arrancada (memory)" -ForegroundColor Green
+    Write-Host "Accede a la aplicacion en: http://localhost:5001" -ForegroundColor Cyan
+}
+
+function Start-Db {
+    Write-Host "Arrancando aplicacion (modo BD)..." -ForegroundColor Cyan
+    $env:STORAGE_BACKEND = "sqlite"
+    docker-compose up -d --build
+    Write-Host ""
+    Write-Host "Aplicacion principal arrancada (db)" -ForegroundColor Green
     Write-Host "Accede a la aplicacion en: http://localhost:5001" -ForegroundColor Cyan
 }
 
@@ -258,6 +283,12 @@ function Purge-All {
 switch ($Command.ToLower()) {
     "default" {
         Start-Default
+    }
+    "memory" {
+        Start-Memory
+    }
+    "db" {
+        Start-Db
     }
     "logs" {
         Show-Logs

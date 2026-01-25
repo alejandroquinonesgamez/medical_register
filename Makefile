@@ -12,7 +12,7 @@
 # Uso: make [comando]
 # Ejemplo: make help
 
-.PHONY: help build logs ps down setup-env clean-temp clean-all purge fix-containers
+.PHONY: help build logs ps down setup-env clean-temp clean-all purge fix-containers memory db
 
 # Variables
 # Cargar .env si existe para configurar COMPOSE_PROJECT_NAME
@@ -69,6 +69,22 @@ default: setup-env ## Arrancar solo la aplicación principal (por defecto)
 	@echo "✅ Aplicación principal arrancada"
 	@echo "📊 Accede a la aplicación en: http://localhost:5001"
 
+memory: setup-env ## Arrancar con almacenamiento en memoria
+	@echo "🚀 Arrancando aplicación (modo memoria)..."
+	@echo "   (Construyendo imágenes si es necesario...)"
+	@STORAGE_BACKEND=memory $(COMPOSE) up -d --build
+	@echo ""
+	@echo "✅ Aplicación principal arrancada (memory)"
+	@echo "📊 Accede a la aplicación en: http://localhost:5001"
+
+db: setup-env ## Arrancar con base de datos (sqlite/sqlcipher)
+	@echo "🚀 Arrancando aplicación (modo BD)..."
+	@echo "   (Construyendo imágenes si es necesario...)"
+	@STORAGE_BACKEND=sqlite $(COMPOSE) up -d --build
+	@echo ""
+	@echo "✅ Aplicación principal arrancada (db)"
+	@echo "📊 Accede a la aplicación en: http://localhost:5001"
+
 help: ## Mostrar esta ayuda
 	@echo "Comandos disponibles:"
 	@echo ""
@@ -77,7 +93,8 @@ help: ## Mostrar esta ayuda
 	@echo "Ejemplos:"
 	@echo "  make                # Muestra la ayuda"
 	@echo "  make default        # Arranca la aplicación principal"
-	@echo "  make default        # Arranca la aplicación principal"
+	@echo "  make memory         # Arranca sin BD (memory)"
+	@echo "  make db             # Arranca con BD (sqlite/sqlcipher)"
 	@echo "  make build          # Construir imágenes de la aplicación"
 	@echo "  make logs           # Ver logs de la aplicación"
 	@echo "  make ps             # Ver estado de contenedores"
@@ -126,7 +143,7 @@ fix-containers: ## Solucionar problemas de contenedores (ContainerConfig error)
 	@$(COMPOSE) build --no-cache web
 	@echo "   ✓ Imágenes reconstruidas"
 	@echo ""
-	@echo "✅ Problema solucionado. Ahora ejecuta: make up"
+	@echo "✅ Problema solucionado. Ahora ejecuta: make default"
 
 clean-all: ## Limpiar TODO y volver al estado como recién clonado (DESTRUCTIVO)
 	@echo "⚠️  Ejecutando limpieza completa (DESTRUCTIVO)..."

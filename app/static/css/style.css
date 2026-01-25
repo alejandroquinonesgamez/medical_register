@@ -219,6 +219,18 @@ header h1 {
     order: 2;
 }
 
+.storage-warning {
+    background: #1f2937;
+    color: #fbbf24;
+    border: 1px solid #f59e0b;
+    border-radius: 8px;
+    padding: 10px 14px;
+    margin: 12px auto 0;
+    max-width: 900px;
+    text-align: center;
+    font-size: 13px;
+}
+
 .panel {
     background: #121b36;
     border: 1px solid #1e293b;

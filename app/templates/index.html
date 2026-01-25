@@ -24,6 +24,11 @@
     </header>
 
     <div class="main-layout">
+        {% if storage_backend == 'sqlcipher' %}
+        <div class="storage-warning">
+            Base de datos cifrada con el pepper del servidor. Sin ese pepper no se podrán recuperar los datos.
+        </div>
+        {% endif %}
         <!-- Columna central: Contenido principal -->
         <main class="container">
         <section class="panel">
