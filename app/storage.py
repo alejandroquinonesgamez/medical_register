@@ -323,7 +323,8 @@ class SQLCipherStorage(StorageInterface):
 
     def _connect(self):
         conn = sqlcipher.connect(self._db_path)
-        conn.execute("PRAGMA key = ?", (self._db_key,))
+        escaped_key = self._db_key.replace("'", "''")
+        conn.execute(f"PRAGMA key = '{escaped_key}'")
         conn.execute("PRAGMA foreign_keys = ON;")
         conn.execute("PRAGMA journal_mode = WAL;")
         conn.execute("PRAGMA cipher_memory_security = ON;")

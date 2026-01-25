@@ -20,6 +20,13 @@ RUN apt-get update && \
     apt-get install -y --no-install-recommends docker-ce-cli docker-compose-plugin && \
     rm -rf /var/lib/apt/lists/*
 
+# Dependencias para SQLCipher (pysqlcipher3)
+RUN apt-get update && \
+    apt-get install -y --no-install-recommends \
+    gcc \
+    libsqlcipher-dev && \
+    rm -rf /var/lib/apt/lists/*
+
 # Copiar e instalar dependencias primero (optimización de capas)
 COPY requirements.txt .
 RUN pip install --no-cache-dir --upgrade pip && \
