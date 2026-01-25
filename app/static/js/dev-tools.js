@@ -200,6 +200,11 @@ class DevTools {
             <h2 style="margin-top: 0; margin-bottom: 12px; color: #e2e8f0;">
                 🛠️ Herramientas de Desarrollo
             </h2>
+            <a href="/supervisor" target="_blank" rel="noopener" style="display: block; text-decoration: none; margin-bottom: 16px;">
+                <button style="width: 100%;">
+                    🧭 Abrir Supervisor
+                </button>
+            </a>
             <div style="margin-bottom: 16px; padding-bottom: 16px; border-bottom: 1px solid #1e293b;">
                 <label style="display: flex; align-items: center; gap: 8px; cursor: pointer; color: #e2e8f0;">
                     <input type="checkbox" id="dev-toggle-owasp-asvs" checked style="cursor: pointer;">

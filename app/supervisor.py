@@ -71,11 +71,16 @@ def _extract_headers(headers):
 
 def _extract_response_body(response):
     try:
-        content_type = response.mimetype or ""
-        if content_type == "application/json":
-            return _truncate(response.get_data(as_text=True), 2048)
+        # No intentar leer el body de la respuesta si ya fue consumido
+        # o si es una respuesta de streaming
+        if hasattr(response, "get_data"):
+            content_type = response.mimetype or ""
+            if content_type == "application/json":
+                data = response.get_data(as_text=True)
+                if data:
+                    return _truncate(data, 2048)
     except Exception:
-        return ""
+        pass
     return ""
 
 
@@ -105,54 +110,108 @@ def _after_request(response):
 
 
 def _db_snapshot(storage):
-    snapshot = {"users": [], "weights": [], "api_tokens": []}
+    snapshot = {"users": [], "weights": [], "api_tokens": [], "error": None}
     if storage is None:
+        snapshot["error"] = "Storage no disponible"
         return snapshot
 
-    if hasattr(storage, "_connect"):
-        with storage._connect() as conn:
-            snapshot["users"] = [
-                dict(row) for row in conn.execute(
-                    "SELECT id, username, created_at FROM users ORDER BY id DESC LIMIT 50"
-                ).fetchall()
-            ]
-            snapshot["weights"] = [
-                dict(row) for row in conn.execute(
-                    "SELECT id, user_id, weight_kg, recorded_date FROM weights ORDER BY id DESC LIMIT 50"
-                ).fetchall()
-            ]
-            snapshot["api_tokens"] = [
-                dict(row) for row in conn.execute(
-                    "SELECT id, user_id, expires_at, created_at FROM api_tokens ORDER BY id DESC LIMIT 50"
-                ).fetchall()
-            ]
-        return snapshot
+    try:
+        # Intentar con storage que tiene _connect (SQLite, SQLCipher)
+        if hasattr(storage, "_connect"):
+            with storage._connect() as conn:
+                try:
+                    users_rows = conn.execute(
+                        "SELECT id, username, created_at FROM users ORDER BY id DESC LIMIT 50"
+                    ).fetchall()
+                    snapshot["users"] = [
+                        {
+                            "id": row["id"],
+                            "username": row["username"],
+                            "created_at": row["created_at"],
+                        }
+                        for row in users_rows
+                    ]
+                except Exception as e:
+                    snapshot["error"] = f"Error leyendo users: {str(e)}"
 
-    if hasattr(storage, "_auth_users") and hasattr(storage, "_weight_entries"):
-        snapshot["users"] = [
-            {
-                "id": user.user_id,
-                "username": user.username,
-                "created_at": user.created_at.isoformat(),
-            }
-            for user in storage._auth_users.values()
-        ]
-        snapshot["weights"] = [
-            {
-                "id": entry.entry_id,
-                "user_id": entry.user_id,
-                "weight_kg": entry.weight_kg,
-                "recorded_date": entry.recorded_date.isoformat(),
-            }
-            for entry in storage._weight_entries
-        ]
-        snapshot["api_tokens"] = [
-            {
-                "user_id": token_data[0],
-                "expires_at": token_data[1].isoformat(),
-            }
-            for token_data in storage._api_tokens.values()
-        ]
+                try:
+                    weights_rows = conn.execute(
+                        "SELECT id, user_id, weight_kg, recorded_date FROM weights ORDER BY id DESC LIMIT 50"
+                    ).fetchall()
+                    snapshot["weights"] = [
+                        {
+                            "id": row["id"],
+                            "user_id": row["user_id"],
+                            "weight_kg": row["weight_kg"],
+                            "recorded_date": row["recorded_date"],
+                        }
+                        for row in weights_rows
+                    ]
+                except Exception as e:
+                    if not snapshot["error"]:
+                        snapshot["error"] = f"Error leyendo weights: {str(e)}"
+
+                try:
+                    tokens_rows = conn.execute(
+                        "SELECT id, user_id, expires_at, created_at FROM api_tokens ORDER BY id DESC LIMIT 50"
+                    ).fetchall()
+                    snapshot["api_tokens"] = [
+                        {
+                            "id": row["id"],
+                            "user_id": row["user_id"],
+                            "expires_at": row["expires_at"],
+                            "created_at": row["created_at"],
+                        }
+                        for row in tokens_rows
+                    ]
+                except Exception as e:
+                    if not snapshot["error"]:
+                        snapshot["error"] = f"Error leyendo api_tokens: {str(e)}"
+            
+            return snapshot
+
+        # Intentar con MemoryStorage
+        if hasattr(storage, "_auth_users") and hasattr(storage, "_weight_entries"):
+            try:
+                snapshot["users"] = [
+                    {
+                        "id": user.user_id,
+                        "username": user.username,
+                        "created_at": user.created_at.isoformat(),
+                    }
+                    for user in storage._auth_users.values()
+                ]
+            except Exception as e:
+                snapshot["error"] = f"Error leyendo users (memory): {str(e)}"
+
+            try:
+                snapshot["weights"] = [
+                    {
+                        "id": entry.entry_id,
+                        "user_id": entry.user_id,
+                        "weight_kg": entry.weight_kg,
+                        "recorded_date": entry.recorded_date.isoformat(),
+                    }
+                    for entry in storage._weight_entries
+                ]
+            except Exception as e:
+                if not snapshot["error"]:
+                    snapshot["error"] = f"Error leyendo weights (memory): {str(e)}"
+
+            try:
+                snapshot["api_tokens"] = [
+                    {
+                        "user_id": token_data[0],
+                        "expires_at": token_data[1].isoformat() if hasattr(token_data[1], "isoformat") else str(token_data[1]),
+                    }
+                    for token_data in storage._api_tokens.values()
+                ]
+            except Exception as e:
+                if not snapshot["error"]:
+                    snapshot["error"] = f"Error leyendo api_tokens (memory): {str(e)}"
+    except Exception as e:
+        snapshot["error"] = f"Error general en snapshot: {str(e)}"
+    
     return snapshot
 
 
