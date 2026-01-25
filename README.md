@@ -17,9 +17,14 @@ Aplicación web monousuario para el registro personal de peso, talla y cálculo 
 
 - **Backend**: Flask (Python) con API REST
 - **Frontend**: JavaScript vanilla con localStorage
-- **Almacenamiento**: Memoria (backend) + localStorage (frontend)
+- **Almacenamiento Backend**: Configurable entre:
+  - Memoria (volátil, para pruebas)
+  - SQLite (persistente, por defecto)
+  - SQLCipher (persistente y cifrado)
+- **Almacenamiento Frontend**: localStorage (persistente en el navegador)
 - **Tests**: 86 tests backend (pytest) + ~66 tests frontend (Jest)
 - **DefectDojo**: Integrado para gestión de vulnerabilidades de seguridad
+- **Supervisor**: Dashboard de desarrollo para monitoreo de tráfico API y base de datos
 
 ## Instalación Rápida
 
@@ -47,16 +52,69 @@ Este script:
 - Verifica que Docker esté instalado
 - Construye la imagen de la aplicación
 
-3. **Arrancar la aplicación principal**:
+3. **Arrancar la aplicación**:
 
-**Opción A - Usando Make (recomendado)**:
+El proyecto ofrece múltiples opciones de arranque según tus necesidades:
+
+#### Opciones de Arranque Básicas
+
+**Aplicación principal (por defecto)**:
+```bash
+make default
+# o simplemente
+make
+```
+Arranca la aplicación principal con el backend de almacenamiento configurado por defecto (SQLite).
+
+**Aplicación con almacenamiento en memoria**:
+```bash
+make memory
+```
+Arranca la aplicación sin base de datos persistente. Los datos se pierden al detener el contenedor. Útil para pruebas rápidas.
+
+**Aplicación con base de datos persistente**:
+```bash
+make db
+```
+Arranca la aplicación con base de datos SQLite (o SQLCipher si está configurado). Los datos persisten entre reinicios.
+
+**Aplicación + DefectDojo**:
 ```bash
 make up
 ```
+Arranca la aplicación principal junto con DefectDojo (sin findings iniciales).
 
-**Opción B - Usando docker-compose directamente**:
+#### Opciones de Desarrollo
+
+**Modo supervisor (desarrollo)**:
 ```bash
+make supervisor
+```
+Arranca la aplicación con el dashboard de supervisor activo. Permite monitorear el tráfico API y el estado de la base de datos en tiempo real.
+- Aplicación: http://localhost:5001
+- Supervisor: http://localhost:5001/supervisor
+
+**Frontend local (simula offline)**:
+```bash
+make local
+```
+Arranca solo el frontend en modo local, simulando errores de comunicación con el servidor. Útil para probar el comportamiento offline del frontend.
+
+#### Opciones con Docker Compose
+
+Si prefieres usar `docker-compose` directamente:
+```bash
+# Aplicación principal (por defecto)
 COMPOSE_DOCKER_CLI_BUILD=0 DOCKER_BUILDKIT=0 docker-compose up -d
+
+# Con almacenamiento en memoria
+STORAGE_BACKEND=memory COMPOSE_DOCKER_CLI_BUILD=0 DOCKER_BUILDKIT=0 docker-compose up -d
+
+# Con base de datos
+STORAGE_BACKEND=sqlite COMPOSE_DOCKER_CLI_BUILD=0 DOCKER_BUILDKIT=0 docker-compose up -d
+
+# Con supervisor (desarrollo)
+APP_SUPERVISOR=1 FLASK_ENV=development COMPOSE_DOCKER_CLI_BUILD=0 DOCKER_BUILDKIT=0 docker-compose up -d
 ```
 
 > **Nota**: El proyecto incluye un `Makefile` que desactiva automáticamente BuildKit para evitar errores de gRPC. Se recomienda usar `make` para mayor compatibilidad.
@@ -65,12 +123,11 @@ COMPOSE_DOCKER_CLI_BUILD=0 DOCKER_BUILDKIT=0 docker-compose up -d
 
 **Opción A - Usando Make (recomendado)**:
 ```bash
-make up-defectdojo
-```
+# Arrancar solo DefectDojo (vacío, sin findings)
+make initDefectDojo
 
-O para arrancar todo de una vez:
-```bash
-make up-all
+# O arrancar aplicación + DefectDojo de una vez
+make up
 ```
 
 **Opción B - Usando docker-compose directamente**:
@@ -127,11 +184,11 @@ La aplicación incluye **DefectDojo** integrado, una plataforma open source para
 
 **Usando Make (recomendado)**:
 ```bash
-# Iniciar DefectDojo y sus dependencias
-make up-defectdojo
+# Iniciar solo DefectDojo (vacío, sin findings)
+make initDefectDojo
 
-# O arrancar todo de una vez (aplicación + DefectDojo)
-make up-all
+# O arrancar aplicación + DefectDojo de una vez
+make up
 
 # Ver logs de DefectDojo
 make logs-defectdojo
@@ -154,6 +211,21 @@ COMPOSE_DOCKER_CLI_BUILD=0 DOCKER_BUILDKIT=0 docker-compose --profile defectdojo
 
 > **Nota**: El script `reset_defectdojo.sh` está disponible para hacer un reset manual de DefectDojo si es necesario. La inicialización automática se ejecuta al arrancar el contenedor.
 
+### Backends de Almacenamiento
+
+La aplicación soporta tres backends de almacenamiento configurable mediante la variable de entorno `STORAGE_BACKEND`:
+
+- **`memory`**: Almacenamiento en memoria (por defecto en tests). Los datos se pierden al reiniciar.
+- **`sqlite`**: Base de datos SQLite persistente (por defecto en producción). Los datos se guardan en `data/app.db`.
+- **`sqlcipher`**: Base de datos SQLite cifrada con SQLCipher. Requiere configurar `SQLCIPHER_KEY` o usar `PASSWORD_PEPPER` como clave.
+
+Para cambiar el backend, usa la variable de entorno:
+```bash
+STORAGE_BACKEND=sqlite make db
+STORAGE_BACKEND=sqlcipher make db
+STORAGE_BACKEND=memory make memory
+```
+
 ### Comandos Make Disponibles
 
 El proyecto incluye un `Makefile` con comandos útiles. Para ver todos los comandos disponibles:
@@ -162,16 +234,37 @@ El proyecto incluye un `Makefile` con comandos útiles. Para ver todos los coman
 make help
 ```
 
-Comandos principales:
-- `make up` - Arrancar la aplicación principal
-- `make up-defectdojo` - Arrancar solo DefectDojo
-- `make up-all` - Arrancar todo (aplicación + DefectDojo)
+#### Comandos de Arranque
+- `make` o `make default` - Arrancar la aplicación principal (por defecto)
+- `make memory` - Arrancar sin BD (almacenamiento en memoria)
+- `make db` - Arrancar con BD (sqlite/sqlcipher)
+- `make local` - Arrancar solo frontend (simula offline)
+- `make supervisor` - Arrancar supervisor (modo desarrollo)
+- `make up` - Arrancar aplicación principal + DefectDojo vacío
+- `make initDefectDojo` - Iniciar solo DefectDojo vacío
+- `make update` - Despliegue completo y actualización
+
+#### Comandos de Gestión
 - `make down` - Detener todos los contenedores
 - `make logs` - Ver logs de la aplicación
 - `make logs-defectdojo` - Ver logs de DefectDojo
 - `make ps` - Ver estado de los contenedores
-- `make test` - Ejecutar tests
-- `make clean` - Limpiar contenedores, imágenes y volúmenes no utilizados
+- `make build` - Construir imágenes de la aplicación
+
+#### Comandos de Testing
+- `make test` - Ejecutar todos los tests
+- `make test-backend` - Ejecutar tests backend en contenedor
+- `make test-frontend` - Ejecutar tests frontend en contenedor
+
+#### Comandos de Limpieza
+- `make clean-temp` - Limpiar archivos temporales
+- `make clean-all` - Limpiar TODO (DESTRUCTIVO)
+- `make purge` - Detener servicios y limpiar TODO (DESTRUCTIVO)
+
+#### Comandos WSTG (solo en dev)
+- `make sync-wstg` - Sincronizar findings WSTG
+- `make wstg-status` - Estado de sincronización WSTG
+- `make wstg-logs` - Ver logs del servicio WSTG
 
 Para ver todos los comandos disponibles: `make help`
 
