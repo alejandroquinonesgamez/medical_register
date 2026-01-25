@@ -13,7 +13,7 @@
 # Uso: make [comando]
 # Ejemplo: make help
 
-.PHONY: help initDefectDojo update up build build-defectdojo logs logs-defectdojo ps down pdf_report setup-env ensure-proxy-network clean-temp clean-all purge sync-wstg wstg-status wstg-logs fix-containers memory db
+.PHONY: help initDefectDojo update up build build-defectdojo logs logs-defectdojo ps down pdf_report setup-env ensure-proxy-network clean-temp clean-all purge sync-wstg wstg-status wstg-logs fix-containers memory db test
 
 # Variables
 # Cargar .env si existe para configurar COMPOSE_PROJECT_NAME
@@ -97,22 +97,6 @@ db: setup-env ensure-proxy-network ## Arrancar con base de datos (sqlite/sqlciph
 	@echo "✅ Aplicación principal arrancada (db)"
 	@echo "📊 Accede a la aplicación en: http://localhost:5001"
 
-memory: setup-env ## Arrancar con almacenamiento en memoria
-	@echo "🚀 Arrancando aplicación (modo memoria)..."
-	@echo "   (Construyendo imágenes si es necesario...)"
-	@STORAGE_BACKEND=memory $(COMPOSE) up -d --build
-	@echo ""
-	@echo "✅ Aplicación principal arrancada (memory)"
-	@echo "📊 Accede a la aplicación en: http://localhost:5001"
-
-db: setup-env ## Arrancar con base de datos (sqlite/sqlcipher)
-	@echo "🚀 Arrancando aplicación (modo BD)..."
-	@echo "   (Construyendo imágenes si es necesario...)"
-	@STORAGE_BACKEND=sqlite $(COMPOSE) up -d --build
-	@echo ""
-	@echo "✅ Aplicación principal arrancada (db)"
-	@echo "📊 Accede a la aplicación en: http://localhost:5001"
-
 help: ## Mostrar esta ayuda
 	@echo "Comandos disponibles:"
 	@echo ""
@@ -127,6 +111,7 @@ help: ## Mostrar esta ayuda
 	@echo "  make memory         # Arranca sin BD (memory)"
 	@echo "  make db             # Arranca con BD (sqlite/sqlcipher)"
 	@echo "  make build          # Construir imágenes de la aplicación"
+	@echo "  make test           # Ejecutar tests (Python 3)"
 	@echo "  make logs           # Ver logs de la aplicación"
 	@echo "  make logs-defectdojo # Ver logs de DefectDojo"
 	@echo "  make ps             # Ver estado de contenedores"
@@ -243,6 +228,9 @@ build-defectdojo: setup-env ## Construir imágenes de DefectDojo
 	@$(COMPOSE) --profile defectdojo build
 	@echo ""
 	@echo "✅ Imágenes de DefectDojo construidas"
+test: ## Ejecutar tests con Python 3
+	@echo "🧪 Ejecutando tests (Python 3)..."
+	@python3 -m pytest
 
 down: setup-env ## Detener todos los servicios
 	@echo "🛑 Deteniendo todos los servicios..."
