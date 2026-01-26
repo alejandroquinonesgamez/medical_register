@@ -268,8 +268,10 @@
 </li>
 <li><p><strong>Transporte</strong>:</p>
 <ul class="simple">
-<li><p>En producción debe usarse <strong>HTTPS</strong> para proteger la contraseña en tránsito.</p></li>
-<li><p>El contenido viaja en el cuerpo del POST y <strong>no se registra</strong> en el cliente.</p></li>
+<li><p><strong>HTTPS obligatorio en producción</strong>: La aplicación está preparada para usar HTTPS mediante la configuración <code class="docutils literal notranslate"><span class="pre">SESSION_COOKIE_SECURE=true</span></code>.</p></li>
+<li><p><strong>HSTS (HTTP Strict Transport Security)</strong>: Cuando HTTPS está activo, se envía el header <code class="docutils literal notranslate"><span class="pre">Strict-Transport-Security</span></code> con <code class="docutils literal notranslate"><span class="pre">max-age=31536000</span></code> (1 año) para forzar conexiones seguras.</p></li>
+<li><p>El contenido viaja en el cuerpo del POST cifrado por HTTPS y <strong>no se registra</strong> en el cliente.</p></li>
+<li><p><strong>Rate limiting</strong>: Protección contra fuerza bruta con límite de 3 intentos por IP por minuto (configurado en <code class="docutils literal notranslate"><span class="pre">app/__init__.py</span></code>).</p></li>
 </ul>
 </li>
 </ol>
@@ -408,10 +410,11 @@
 <section id="sesiones-seguras">
 <h2>Sesiones seguras<a class="headerlink" href="#sesiones-seguras" title="Link to this heading">¶</a></h2>
 <ul class="simple">
-<li><p><strong>Sesión de servidor</strong> con cookie <code class="docutils literal notranslate"><span class="pre">HttpOnly</span></code>.</p></li>
-<li><p><strong>SameSite</strong>: <code class="docutils literal notranslate"><span class="pre">Lax</span></code> por defecto.</p></li>
-<li><p><strong>Secure</strong> opcional vía <code class="docutils literal notranslate"><span class="pre">SESSION_COOKIE_SECURE=true</span></code> en producción.</p></li>
+<li><p><strong>Sesión de servidor</strong> con cookie <code class="docutils literal notranslate"><span class="pre">HttpOnly</span></code> (previene acceso desde JavaScript).</p></li>
+<li><p><strong>SameSite</strong>: <code class="docutils literal notranslate"><span class="pre">Lax</span></code> por defecto (protección CSRF adicional).</p></li>
+<li><p><strong>Secure</strong>: Configurable vía <code class="docutils literal notranslate"><span class="pre">SESSION_COOKIE_SECURE=true</span></code> en producción (solo se envía por HTTPS).</p></li>
 <li><p><strong>Clave de sesión</strong>: <code class="docutils literal notranslate"><span class="pre">FLASK_SECRET_KEY</span></code> (o se genera aleatoria si no existe).</p></li>
+<li><p><strong>Configuración centralizada</strong>: Todas las opciones de sesión están en <code class="docutils literal notranslate"><span class="pre">app/config.py</span></code> (<code class="docutils literal notranslate"><span class="pre">SESSION_CONFIG</span></code>).</p></li>
 </ul>
 </section>
 <section id="proteccion-csrf">
@@ -431,25 +434,66 @@
 </section>
 <section id="headers-de-seguridad">
 <h2>Headers de seguridad<a class="headerlink" href="#headers-de-seguridad" title="Link to this heading">¶</a></h2>
+<p>La aplicación implementa múltiples headers de seguridad HTTP para proteger contra diversos tipos de ataques. Todos los headers se configuran en <code class="docutils literal notranslate"><span class="pre">app/__init__.py</span></code> y se envían en todas las respuestas.</p>
+<section id="headers-implementados">
+<h3>Headers implementados<a class="headerlink" href="#headers-implementados" title="Link to this heading">¶</a></h3>
 <ul class="simple">
-<li><p><code class="docutils literal notranslate"><span class="pre">X-Frame-Options:</span> <span class="pre">DENY</span></code> - Previene clickjacking</p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">X-Content-Type-Options:</span> <span class="pre">nosniff</span></code> - Previene MIME type sniffing</p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">Content-Security-Policy:</span> <span class="pre">frame-ancestors</span> <span class="pre">'none'</span></code> - Previene embedding en iframes</p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">X-XSS-Protection:</span> <span class="pre">1;</span> <span class="pre">mode=block</span></code> - Protección XSS (legacy)</p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">Strict-Transport-Security</span></code> (HSTS) - Solo cuando <code class="docutils literal notranslate"><span class="pre">SESSION_COOKIE_SECURE=true</span></code> o conexión HTTPS:</p>
+<li><p><strong><code class="docutils literal notranslate"><span class="pre">X-Frame-Options:</span> <span class="pre">DENY</span></code></strong> - Previene clickjacking al impedir que la página se cargue en iframes.</p></li>
+<li><p><strong><code class="docutils literal notranslate"><span class="pre">X-Content-Type-Options:</span> <span class="pre">nosniff</span></code></strong> - Previene MIME type sniffing, forzando al navegador a respetar el Content-Type declarado.</p></li>
+<li><p><strong><code class="docutils literal notranslate"><span class="pre">Content-Security-Policy:</span> <span class="pre">frame-ancestors</span> <span class="pre">'none'</span></code></strong> - Complementa X-Frame-Options, previene embedding en iframes (CSP nivel 2).</p></li>
+<li><p><strong><code class="docutils literal notranslate"><span class="pre">X-XSS-Protection:</span> <span class="pre">1;</span> <span class="pre">mode=block</span></code></strong> - Protección XSS legacy para navegadores antiguos (Chrome/Edge ya no lo usan, pero es compatible).</p></li>
+</ul>
+</section>
+<section id="strict-transport-security-hsts">
+<h3>Strict-Transport-Security (HSTS)<a class="headerlink" href="#strict-transport-security-hsts" title="Link to this heading">¶</a></h3>
+<p><strong>HSTS</strong> (HTTP Strict Transport Security) fuerza al navegador a usar solo conexiones HTTPS durante un período determinado.</p>
+<p><strong>Configuración:</strong></p>
+<ul class="simple">
+<li><p><strong>Ubicación</strong>: <code class="docutils literal notranslate"><span class="pre">app/config.py</span></code> → <code class="docutils literal notranslate"><span class="pre">HSTS_CONFIG</span></code></p></li>
+<li><p><strong>Activación condicional</strong>: Solo se envía cuando:</p>
 <ul>
-<li><p><code class="docutils literal notranslate"><span class="pre">max-age=31536000</span></code> (1 año por defecto, configurable vía <code class="docutils literal notranslate"><span class="pre">HSTS_MAX_AGE</span></code>)</p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">includeSubDomains</span></code> (por defecto, configurable vía <code class="docutils literal notranslate"><span class="pre">HSTS_INCLUDE_SUBDOMAINS</span></code>)</p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">preload</span></code> (opcional, configurable vía <code class="docutils literal notranslate"><span class="pre">HSTS_PRELOAD</span></code>)</p></li>
-</ul>
-</li>
-</ul>
-<p><strong>Nota sobre HSTS</strong>: El header <code class="docutils literal notranslate"><span class="pre">Strict-Transport-Security</span></code> solo se envía cuando:</p>
-<ul class="simple">
 <li><p><code class="docutils literal notranslate"><span class="pre">SESSION_COOKIE_SECURE=true</span></code> está configurado, o</p></li>
 <li><p>La petición viene por HTTPS (<code class="docutils literal notranslate"><span class="pre">request.is_secure</span></code>)</p></li>
 </ul>
-<p>Esto asegura que HSTS solo se active cuando realmente se está usando HTTPS.</p>
+</li>
+</ul>
+<p><strong>Parámetros configurables</strong> (variables de entorno):</p>
+<ul class="simple">
+<li><p><strong><code class="docutils literal notranslate"><span class="pre">HSTS_MAX_AGE</span></code></strong> (default: <code class="docutils literal notranslate"><span class="pre">31536000</span></code>): Tiempo en segundos que el navegador recordará usar HTTPS (1 año por defecto).</p></li>
+<li><p><strong><code class="docutils literal notranslate"><span class="pre">HSTS_INCLUDE_SUBDOMAINS</span></code></strong> (default: <code class="docutils literal notranslate"><span class="pre">true</span></code>): Extiende la política a todos los subdominios.</p></li>
+<li><p><strong><code class="docutils literal notranslate"><span class="pre">HSTS_PRELOAD</span></code></strong> (default: <code class="docutils literal notranslate"><span class="pre">false</span></code>): Permite inclusión en listas de preload de navegadores (requiere registro manual).</p></li>
+</ul>
+<p><strong>Ejemplo de header enviado:</strong></p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">Strict</span><span class="o">-</span><span class="n">Transport</span><span class="o">-</span><span class="n">Security</span><span class="p">:</span> <span class="nb">max</span><span class="o">-</span><span class="n">age</span><span class="o">=</span><span class="mi">31536000</span><span class="p">;</span> <span class="n">includeSubDomains</span>
+</pre></div>
+</div>
+<p><strong>Importante</strong>:</p>
+<ul class="simple">
+<li><p>HSTS solo debe activarse cuando HTTPS está correctamente configurado.</p></li>
+<li><p>Una vez que un navegador recibe HSTS, recordará usar HTTPS incluso si el usuario escribe HTTP.</p></li>
+<li><p>En desarrollo local (HTTP), HSTS no se activa automáticamente.</p></li>
+</ul>
+</section>
+</section>
+<section id="proteccion-contra-fuerza-bruta">
+<h2>Protección contra fuerza bruta<a class="headerlink" href="#proteccion-contra-fuerza-bruta" title="Link to this heading">¶</a></h2>
+<ul class="simple">
+<li><p><strong>Rate limiting</strong>: Implementado con Flask-Limiter.</p></li>
+<li><p><strong>Límite</strong>: 3 intentos por IP por minuto para todas las rutas de API.</p></li>
+<li><p><strong>Configuración</strong>: <code class="docutils literal notranslate"><span class="pre">app/__init__.py</span></code> (deshabilitado en tests con <code class="docutils literal notranslate"><span class="pre">APP_TESTING=1</span></code>).</p></li>
+<li><p><strong>Alcance</strong>: Aplica a todos los endpoints <code class="docutils literal notranslate"><span class="pre">/api/*</span></code>, incluyendo registro y login.</p></li>
+</ul>
+</section>
+<section id="configuracion-de-seguridad-centralizada">
+<h2>Configuración de seguridad centralizada<a class="headerlink" href="#configuracion-de-seguridad-centralizada" title="Link to this heading">¶</a></h2>
+<p>Todas las configuraciones de seguridad están centralizadas en <code class="docutils literal notranslate"><span class="pre">app/config.py</span></code>:</p>
+<ul class="simple">
+<li><p><strong><code class="docutils literal notranslate"><span class="pre">SESSION_CONFIG</span></code></strong>: Configuración de cookies de sesión (HttpOnly, Secure, SameSite).</p></li>
+<li><p><strong><code class="docutils literal notranslate"><span class="pre">HSTS_CONFIG</span></code></strong>: Configuración de HSTS (max-age, includeSubDomains, preload).</p></li>
+<li><p><strong><code class="docutils literal notranslate"><span class="pre">PASSWORD_HASH_CONFIG</span></code></strong>: Parámetros de Argon2id (time_cost, memory_cost, parallelism).</p></li>
+<li><p><strong><code class="docutils literal notranslate"><span class="pre">AUTH_CONFIG</span></code></strong>: Límites de longitud de username y password.</p></li>
+</ul>
+<p>Esto facilita la gestión y auditoría de las políticas de seguridad.</p>
 </section>
 </section>
 
@@ -518,7 +562,13 @@
 <li><a class="reference internal" href="#sesiones-seguras">Sesiones seguras</a></li>
 <li><a class="reference internal" href="#proteccion-csrf">Protección CSRF</a></li>
 <li><a class="reference internal" href="#datos-en-reposo-opcional">Datos en reposo (opcional)</a></li>
-<li><a class="reference internal" href="#headers-de-seguridad">Headers de seguridad</a></li>
+<li><a class="reference internal" href="#headers-de-seguridad">Headers de seguridad</a><ul>
+<li><a class="reference internal" href="#headers-implementados">Headers implementados</a></li>
+<li><a class="reference internal" href="#strict-transport-security-hsts">Strict-Transport-Security (HSTS)</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#proteccion-contra-fuerza-bruta">Protección contra fuerza bruta</a></li>
+<li><a class="reference internal" href="#configuracion-de-seguridad-centralizada">Configuración de seguridad centralizada</a></li>
 </ul>
 </li>
 </ul>
