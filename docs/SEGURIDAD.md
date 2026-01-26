@@ -19,8 +19,10 @@
    - `password`
    - **No se almacena la contraseña en `localStorage` ni en cookies.**
 4. **Transporte**:
-   - En producción debe usarse **HTTPS** para proteger la contraseña en tránsito.
-   - El contenido viaja en el cuerpo del POST y **no se registra** en el cliente.
+   - **HTTPS obligatorio en producción**: La aplicación está preparada para usar HTTPS mediante la configuración `SESSION_COOKIE_SECURE=true`.
+   - **HSTS (HTTP Strict Transport Security)**: Cuando HTTPS está activo, se envía el header `Strict-Transport-Security` con `max-age=31536000` (1 año) para forzar conexiones seguras.
+   - El contenido viaja en el cuerpo del POST cifrado por HTTPS y **no se registra** en el cliente.
+   - **Rate limiting**: Protección contra fuerza bruta con límite de 3 intentos por IP por minuto (configurado en `app/__init__.py`).
 
 #### Verificación de contraseñas filtradas (HIBP + fallback)
 5. **Normalización**: el servidor normaliza `username` y valida reglas de formato.
@@ -90,10 +92,11 @@
   - En el resto de operaciones, se usa la sesión (cookie) + CSRF token.
 
 ### Sesiones seguras
-- **Sesión de servidor** con cookie `HttpOnly`.
-- **SameSite**: `Lax` por defecto.
-- **Secure** opcional vía `SESSION_COOKIE_SECURE=true` en producción.
+- **Sesión de servidor** con cookie `HttpOnly` (previene acceso desde JavaScript).
+- **SameSite**: `Lax` por defecto (protección CSRF adicional).
+- **Secure**: Configurable vía `SESSION_COOKIE_SECURE=true` en producción (solo se envía por HTTPS).
 - **Clave de sesión**: `FLASK_SECRET_KEY` (o se genera aleatoria si no existe).
+- **Configuración centralizada**: Todas las opciones de sesión están en `app/config.py` (`SESSION_CONFIG`).
 
 ### Protección CSRF
 - **Token CSRF por sesión**: se genera en backend y se devuelve en `/api/auth/me`, `/api/auth/login`, `/api/auth/register`.
@@ -105,18 +108,56 @@
 - **Clave de cifrado**: `SQLCIPHER_KEY` obligatoria.
 
 ### Headers de seguridad
-- `X-Frame-Options: DENY` - Previene clickjacking
-- `X-Content-Type-Options: nosniff` - Previene MIME type sniffing
-- `Content-Security-Policy: frame-ancestors 'none'` - Previene embedding en iframes
-- `X-XSS-Protection: 1; mode=block` - Protección XSS (legacy)
-- `Strict-Transport-Security` (HSTS) - Solo cuando `SESSION_COOKIE_SECURE=true` o conexión HTTPS:
-  - `max-age=31536000` (1 año por defecto, configurable vía `HSTS_MAX_AGE`)
-  - `includeSubDomains` (por defecto, configurable vía `HSTS_INCLUDE_SUBDOMAINS`)
-  - `preload` (opcional, configurable vía `HSTS_PRELOAD`)
 
-**Nota sobre HSTS**: El header `Strict-Transport-Security` solo se envía cuando:
-- `SESSION_COOKIE_SECURE=true` está configurado, o
-- La petición viene por HTTPS (`request.is_secure`)
+La aplicación implementa múltiples headers de seguridad HTTP para proteger contra diversos tipos de ataques. Todos los headers se configuran en `app/__init__.py` y se envían en todas las respuestas.
 
-Esto asegura que HSTS solo se active cuando realmente se está usando HTTPS.
+#### Headers implementados
+
+- **`X-Frame-Options: DENY`** - Previene clickjacking al impedir que la página se cargue en iframes.
+- **`X-Content-Type-Options: nosniff`** - Previene MIME type sniffing, forzando al navegador a respetar el Content-Type declarado.
+- **`Content-Security-Policy: frame-ancestors 'none'`** - Complementa X-Frame-Options, previene embedding en iframes (CSP nivel 2).
+- **`X-XSS-Protection: 1; mode=block`** - Protección XSS legacy para navegadores antiguos (Chrome/Edge ya no lo usan, pero es compatible).
+
+#### Strict-Transport-Security (HSTS)
+
+**HSTS** (HTTP Strict Transport Security) fuerza al navegador a usar solo conexiones HTTPS durante un período determinado.
+
+**Configuración:**
+- **Ubicación**: `app/config.py` → `HSTS_CONFIG`
+- **Activación condicional**: Solo se envía cuando:
+  - `SESSION_COOKIE_SECURE=true` está configurado, o
+  - La petición viene por HTTPS (`request.is_secure`)
+  
+**Parámetros configurables** (variables de entorno):
+- **`HSTS_MAX_AGE`** (default: `31536000`): Tiempo en segundos que el navegador recordará usar HTTPS (1 año por defecto).
+- **`HSTS_INCLUDE_SUBDOMAINS`** (default: `true`): Extiende la política a todos los subdominios.
+- **`HSTS_PRELOAD`** (default: `false`): Permite inclusión en listas de preload de navegadores (requiere registro manual).
+
+**Ejemplo de header enviado:**
+```
+Strict-Transport-Security: max-age=31536000; includeSubDomains
+```
+
+**Importante**: 
+- HSTS solo debe activarse cuando HTTPS está correctamente configurado.
+- Una vez que un navegador recibe HSTS, recordará usar HTTPS incluso si el usuario escribe HTTP.
+- En desarrollo local (HTTP), HSTS no se activa automáticamente.
+
+### Protección contra fuerza bruta
+
+- **Rate limiting**: Implementado con Flask-Limiter.
+- **Límite**: 3 intentos por IP por minuto para todas las rutas de API.
+- **Configuración**: `app/__init__.py` (deshabilitado en tests con `APP_TESTING=1`).
+- **Alcance**: Aplica a todos los endpoints `/api/*`, incluyendo registro y login.
+
+### Configuración de seguridad centralizada
+
+Todas las configuraciones de seguridad están centralizadas en `app/config.py`:
+
+- **`SESSION_CONFIG`**: Configuración de cookies de sesión (HttpOnly, Secure, SameSite).
+- **`HSTS_CONFIG`**: Configuración de HSTS (max-age, includeSubDomains, preload).
+- **`PASSWORD_HASH_CONFIG`**: Parámetros de Argon2id (time_cost, memory_cost, parallelism).
+- **`AUTH_CONFIG`**: Límites de longitud de username y password.
+
+Esto facilita la gestión y auditoría de las políticas de seguridad.
 
