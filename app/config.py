@@ -62,6 +62,13 @@ SESSION_CONFIG = {
     "cookie_httponly": True,
 }
 
+# Configuración de HSTS (Strict-Transport-Security)
+HSTS_CONFIG = {
+    "max_age": int(os.environ.get("HSTS_MAX_AGE", "31536000")),  # 1 año por defecto
+    "include_subdomains": os.environ.get("HSTS_INCLUDE_SUBDOMAINS", "true").lower() == "true",
+    "preload": os.environ.get("HSTS_PRELOAD", "false").lower() == "true",
+}
+
 # Configuración de almacenamiento (memory / sqlite / sqlcipher)
 _storage_backend = os.environ.get("STORAGE_BACKEND", "sqlite").strip().lower()
 if _storage_backend not in {"memory", "sqlite", "sqlcipher"}:
