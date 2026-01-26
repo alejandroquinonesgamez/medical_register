@@ -185,6 +185,8 @@ def _hibp_range_request(prefix):
     req = urllib.request.Request(url, headers={"User-Agent": "PPS-Segura-App"})
     with urllib.request.urlopen(req, timeout=HIBP_TIMEOUT_SECONDS) as response:
         return response.read().decode("utf-8", errors="ignore")
+
+
 def is_pwned_password(password):
     """Comprueba si la contraseña aparece en HIBP (k-anonymity)."""
     if not isinstance(password, str) or not password:
@@ -231,3 +233,4 @@ def verify_password(password, password_hash):
         return hasher.verify(password_hash, peppered)
     except VerifyMismatchError:
         return False
+

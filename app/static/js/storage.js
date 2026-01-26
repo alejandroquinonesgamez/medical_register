@@ -97,12 +97,8 @@ class LocalStorageManager {
     static addWeight(weight) {
         try {
             const weights = this.getWeights();
-            const providedDate = weight.fecha_registro ? new Date(weight.fecha_registro) : null;
-            const devtoolsDate = window.DevTools && window.DevTools.getCurrentDate
-                ? window.DevTools.getCurrentDate()
-                : null;
-            const currentDate = providedDate || devtoolsDate || new Date();
-            const today = currentDate.toISOString().split('T')[0]; // YYYY-MM-DD
+            // Obtener fecha actual
+            const today = new Date().toISOString().split('T')[0]; // YYYY-MM-DD
             
             // Eliminar registros del mismo día
             const filteredWeights = weights.filter(w => {
@@ -116,6 +112,9 @@ class LocalStorageManager {
                 console.error('Error: peso_kg no es un número válido:', weight.peso_kg);
                 return null;
             }
+            
+            // Obtener fecha actual
+            const currentDate = new Date();
             
             const newWeight = {
                 id: Date.now(), // ID único basado en timestamp

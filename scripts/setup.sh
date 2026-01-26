@@ -2,7 +2,7 @@
 # Script de configuración inicial del proyecto
 #
 # Prepara el entorno para usar la aplicación médica. Realiza:
-# 1. Crea directorios de datos necesarios (data/postgres, data/redis, data/defectdojo)
+# 1. Crea el directorio de datos necesario
 # 2. Configura el archivo .env para Docker Compose (soluciona problemas con caracteres especiales)
 # 3. Verifica que Docker y Docker Compose estén instalados
 # 4. Construye la imagen de la aplicación
@@ -17,10 +17,7 @@ echo ""
 
 # Crear directorios de datos si no existen
 echo "📁 Creando directorios de datos..."
-mkdir -p data/postgres
-mkdir -p data/redis
-mkdir -p data/defectdojo/media
-mkdir -p data/defectdojo/static
+mkdir -p data
 
 # Asegurar que los directorios tienen permisos correctos
 chmod -R 755 data/
@@ -91,12 +88,7 @@ echo ""
 echo "1. Arrancar la aplicación principal:"
 echo "   docker-compose up -d"
 echo ""
-echo "2. Arrancar DefectDojo (opcional):"
-echo "   docker-compose --profile defectdojo up -d"
-echo "   ./scripts/reset_defectdojo.sh  # Solo si necesitas hacer un reset"
-echo ""
-echo "3. Acceder a las aplicaciones:"
+echo "2. Acceder a la aplicación:"
 echo "   - Aplicación Flask: http://localhost:5001"
-echo "   - DefectDojo: http://localhost:8080 (usuario: admin, contraseña: admin)"
 echo ""
 

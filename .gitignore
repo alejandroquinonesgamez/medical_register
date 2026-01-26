@@ -33,19 +33,11 @@ htmlcov/
 .DS_Store
 Thumbs.db
 
-# PDFs locales
-u03.deteccion.correccion.vulnerabilidades.web.pdf
-
-# Docker data directories (datos persistentes)
-data/postgres/
-data/redis/
-data/defectdojo/
+# Datos persistentes locales
+data/*.db
+data/temp/
 !data/.gitkeep
-
-# Database dumps (excepto el dump inicial que está en el repositorio)
-data/*_db_dump.sql
-*.sql
-!data/defectdojo_db_initial.sql
+!data/common_passwords_fallback.txt
 
 # Archivo .env (se crea automáticamente desde docker-compose.env.example)
 .env

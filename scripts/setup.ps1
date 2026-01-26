@@ -1,7 +1,7 @@
 # Script de configuración inicial del proyecto para Windows/PowerShell
 #
 # Prepara el entorno para usar la aplicación médica. Realiza:
-# 1. Crea directorios de datos necesarios (data/postgres, data/redis, data/defectdojo)
+# 1. Crea el directorio de datos necesario
 # 2. Configura el archivo .env para Docker Compose (soluciona problemas con caracteres especiales)
 # 3. Verifica que Docker y Docker Compose estén instalados
 # 4. Construye la imagen de la aplicación
@@ -21,10 +21,7 @@ $projectRoot = Split-Path -Parent $scriptDir
 # Crear directorios de datos si no existen
 Write-Host "📁 Creando directorios de datos..." -ForegroundColor Yellow
 $dataDirs = @(
-    "data\postgres",
-    "data\redis",
-    "data\defectdojo\media",
-    "data\defectdojo\static"
+    "data"
 )
 
 foreach ($dir in $dataDirs) {
@@ -138,12 +135,7 @@ Write-Host "1. Arrancar la aplicación principal:" -ForegroundColor White
 Write-Host "   .\make.ps1 default" -ForegroundColor Gray
 Write-Host "   # o: docker-compose up -d" -ForegroundColor DarkGray
 Write-Host ""
-Write-Host "2. Arrancar DefectDojo (opcional):" -ForegroundColor White
-Write-Host "   .\make.ps1 initDefectDojo  # DefectDojo vacío" -ForegroundColor Gray
-Write-Host "   .\make.ps1 update          # DefectDojo con findings" -ForegroundColor Gray
-Write-Host ""
-Write-Host "3. Acceder a las aplicaciones:" -ForegroundColor White
+Write-Host "2. Acceder a la aplicación:" -ForegroundColor White
 Write-Host "   - Aplicación Flask: http://localhost:5001" -ForegroundColor Gray
-Write-Host "   - DefectDojo: http://localhost:8080 (usuario: admin, contraseña: admin)" -ForegroundColor Gray
 Write-Host ""
 

@@ -7,6 +7,3 @@ argon2-cffi
 pysqlcipher3
 
 
-markdown>=3.4.0
-weasyprint>=60.0
-reportlab>=4.0.0

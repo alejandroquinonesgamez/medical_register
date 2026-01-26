@@ -23,8 +23,20 @@ Aplicación web monousuario para el registro personal de peso, talla y cálculo 
   - SQLCipher (persistente y cifrado)
 - **Almacenamiento Frontend**: localStorage (persistente en el navegador)
 - **Tests**: 86 tests backend (pytest) + ~66 tests frontend (Jest)
-- **DefectDojo**: Integrado para gestión de vulnerabilidades de seguridad
-- **Supervisor**: Dashboard de desarrollo para monitoreo de tráfico API y base de datos
+
+## Ramas del Repositorio
+
+Este repositorio contiene dos ramas principales:
+
+- **`main`** - Versión de producción (recomendada)
+  - Sin herramientas de desarrollo
+  - Configurada para producción (`FLASK_ENV=production`)
+  - Lista para despliegue en producción
+
+- **`dev`** - Versión de desarrollo
+  - Incluye herramientas de desarrollo
+  - Configurada para desarrollo (`FLASK_ENV=development`)
+  - Para desarrollo y testing
 
 ## Instalación Rápida
 
@@ -37,8 +49,22 @@ Aplicación web monousuario para el registro personal de peso, talla y cálculo 
 ### Pasos de Instalación
 
 1. **Clonar el repositorio**:
+
+**Para producción (recomendado - rama main):**
 ```bash
-git clone <url-del-repositorio>
+git clone https://github.com/alejandroquinonesgamez/medical_register.git
+cd medical_register
+```
+
+**Para desarrollo (rama dev):**
+```bash
+git clone -b dev https://github.com/alejandroquinonesgamez/medical_register.git
+cd medical_register
+```
+
+**Clonar solo la rama main (más rápido):**
+```bash
+git clone --single-branch --branch main https://github.com/alejandroquinonesgamez/medical_register.git
 cd medical_register
 ```
 
@@ -78,75 +104,24 @@ make db
 ```
 Arranca la aplicación con base de datos SQLite (o SQLCipher si está configurado). Los datos persisten entre reinicios.
 
-**Aplicación + DefectDojo**:
-```bash
-make up
-```
-Arranca la aplicación principal junto con DefectDojo (sin findings iniciales).
-
-#### Opciones de Desarrollo
-
-**Modo supervisor (desarrollo)**:
-```bash
-make supervisor
-```
-Arranca la aplicación con el dashboard de supervisor activo. Permite monitorear el tráfico API y el estado de la base de datos en tiempo real.
-- Aplicación: http://localhost:5001
-- Supervisor: http://localhost:5001/supervisor
-
-**Frontend local (simula offline)**:
-```bash
-make local
-```
-Arranca solo el frontend en modo local, simulando errores de comunicación con el servidor. Útil para probar el comportamiento offline del frontend.
-
 #### Opciones con Docker Compose
 
 Si prefieres usar `docker-compose` directamente:
 ```bash
 # Aplicación principal (por defecto)
-COMPOSE_DOCKER_CLI_BUILD=0 DOCKER_BUILDKIT=0 docker-compose up -d
+docker-compose up -d
 
 # Con almacenamiento en memoria
-STORAGE_BACKEND=memory COMPOSE_DOCKER_CLI_BUILD=0 DOCKER_BUILDKIT=0 docker-compose up -d
+STORAGE_BACKEND=memory docker-compose up -d
 
 # Con base de datos
-STORAGE_BACKEND=sqlite COMPOSE_DOCKER_CLI_BUILD=0 DOCKER_BUILDKIT=0 docker-compose up -d
-
-# Con supervisor (desarrollo)
-APP_SUPERVISOR=1 FLASK_ENV=development COMPOSE_DOCKER_CLI_BUILD=0 DOCKER_BUILDKIT=0 docker-compose up -d
+STORAGE_BACKEND=sqlite docker-compose up -d
 ```
 
 > **Nota**: El proyecto incluye un `Makefile` que desactiva automáticamente BuildKit para evitar errores de gRPC. Se recomienda usar `make` para mayor compatibilidad.
 
-4. **Arrancar DefectDojo (opcional)**:
-
-**Opción A - Usando Make (recomendado)**:
-```bash
-# Arrancar solo DefectDojo (vacío, sin findings)
-make initDefectDojo
-
-# O arrancar aplicación + DefectDojo de una vez
-make up
-```
-
-**Opción B - Usando docker-compose directamente**:
-```bash
-COMPOSE_DOCKER_CLI_BUILD=0 DOCKER_BUILDKIT=0 docker-compose --profile defectdojo up -d
-```
-
-**La inicialización es automática** al arrancar DefectDojo. El contenedor ejecuta:
-- Migraciones de la base de datos (si son necesarias)
-- Recolección de archivos estáticos
-- Creación/verificación del usuario admin (admin/admin)
-
-> **Nota**: El script `reset_defectdojo.sh` está disponible para hacer un reset manual si es necesario.
-
-5. **Acceder a las aplicaciones**:
+4. **Acceder a la aplicación**:
 - **Aplicación Flask**: http://localhost:5001
-- **DefectDojo**: http://localhost:8080
-  - Usuario: `admin`
-  - Contraseña: `admin`
 
 ## Validaciones Defensivas
 
@@ -161,55 +136,6 @@ La aplicación implementa validaciones defensivas en múltiples capas para garan
 - Validación en formularios antes de enviar datos
 - **Validación defensiva antes de calcular IMC**: Verifica que los datos locales estén dentro de los límites antes de calcular
 - Validación de variación de peso en tiempo real
-
-## DefectDojo - Gestión de Vulnerabilidades
-
-La aplicación incluye **DefectDojo** integrado, una plataforma open source para la gestión centralizada de vulnerabilidades de seguridad.
-
-### Características de DefectDojo
-
-- ✅ Gestión centralizada de vulnerabilidades
-- ✅ Integración con más de 180 herramientas de seguridad (SAST, DAST, SCA)
-- ✅ Priorización basada en riesgos
-- ✅ Automatización de flujos de trabajo de seguridad
-- ✅ Reportes y dashboards de seguridad
-
-### Acceso a DefectDojo
-
-1. **Desde la interfaz web**: Haz clic en el enlace "🔒 DefectDojo" en el header de la aplicación
-2. **Acceso directo**: http://localhost:8080 (cuando los servicios estén ejecutándose)
-3. **Aplicación Flask**: http://localhost:5001
-
-### Iniciar DefectDojo
-
-**Usando Make (recomendado)**:
-```bash
-# Iniciar solo DefectDojo (vacío, sin findings)
-make initDefectDojo
-
-# O arrancar aplicación + DefectDojo de una vez
-make up
-
-# Ver logs de DefectDojo
-make logs-defectdojo
-
-# Verificar estado de los servicios
-make ps
-```
-
-**Usando docker-compose directamente**:
-```bash
-# Iniciar DefectDojo y sus dependencias
-COMPOSE_DOCKER_CLI_BUILD=0 DOCKER_BUILDKIT=0 docker-compose --profile defectdojo up -d
-
-# Ver logs de DefectDojo
-COMPOSE_DOCKER_CLI_BUILD=0 DOCKER_BUILDKIT=0 docker-compose --profile defectdojo logs -f defectdojo
-
-# Verificar estado de los servicios
-COMPOSE_DOCKER_CLI_BUILD=0 DOCKER_BUILDKIT=0 docker-compose --profile defectdojo ps
-```
-
-> **Nota**: El script `reset_defectdojo.sh` está disponible para hacer un reset manual de DefectDojo si es necesario. La inicialización automática se ejecuta al arrancar el contenedor.
 
 ### Backends de Almacenamiento
 
@@ -226,7 +152,7 @@ STORAGE_BACKEND=sqlcipher make db
 STORAGE_BACKEND=memory make memory
 ```
 
-### Comandos Make Disponibles
+## Comandos Disponibles
 
 El proyecto incluye un `Makefile` con comandos útiles. Para ver todos los comandos disponibles:
 
@@ -238,16 +164,10 @@ make help
 - `make` o `make default` - Arrancar la aplicación principal (por defecto)
 - `make memory` - Arrancar sin BD (almacenamiento en memoria)
 - `make db` - Arrancar con BD (sqlite/sqlcipher)
-- `make local` - Arrancar solo frontend (simula offline)
-- `make supervisor` - Arrancar supervisor (modo desarrollo)
-- `make up` - Arrancar aplicación principal + DefectDojo vacío
-- `make initDefectDojo` - Iniciar solo DefectDojo vacío
-- `make update` - Despliegue completo y actualización
 
 #### Comandos de Gestión
 - `make down` - Detener todos los contenedores
 - `make logs` - Ver logs de la aplicación
-- `make logs-defectdojo` - Ver logs de DefectDojo
 - `make ps` - Ver estado de los contenedores
 - `make build` - Construir imágenes de la aplicación
 
@@ -261,26 +181,14 @@ make help
 - `make clean-all` - Limpiar TODO (DESTRUCTIVO)
 - `make purge` - Detener servicios y limpiar TODO (DESTRUCTIVO)
 
-#### Comandos WSTG (solo en dev)
-- `make sync-wstg` - Sincronizar findings WSTG
-- `make wstg-status` - Estado de sincronización WSTG
-- `make wstg-logs` - Ver logs del servicio WSTG
-
 Para ver todos los comandos disponibles: `make help`
 
 ### Configuración
 
-- **Puerto**: 8080 (DefectDojo), 5001 (Aplicación Flask)
-- **Base de datos**: PostgreSQL 15 (puerto 5432)
-- **Redis**: Puerto 6379 (cache y tareas asíncronas)
+- **Puerto**: 5001 (Aplicación Flask)
+- **Modo**: Producción (`FLASK_ENV=production`)
+- **Backend de almacenamiento**: Configurable mediante `STORAGE_BACKEND` (memory, sqlite, sqlcipher)
 - **Datos persistentes**: Almacenados en `./data/` (directorios locales, no volúmenes Docker)
-- **Credenciales DefectDojo por defecto**: 
-  - Usuario: `admin`
-  - Contraseña: `admin`
-  - ⚠️ **Cambiar en producción**
-- **Credenciales base de datos**: Ver `docker-compose.yml` (cambiar en producción)
-
-Para más información, consulta la [documentación de integración de DefectDojo](docs/DEFECTDOJO_INTEGRATION.md).
 
 ## Coverage
 
