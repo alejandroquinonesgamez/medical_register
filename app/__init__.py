@@ -1,5 +1,5 @@
 import os
-from flask import Flask
+from flask import Flask, request
 from flask_cors import CORS
 from flask_limiter import Limiter
 from flask_limiter.util import get_remote_address
@@ -63,6 +63,26 @@ def create_app():
         response.headers['X-Content-Type-Options'] = 'nosniff'
         response.headers['Content-Security-Policy'] = "frame-ancestors 'none'"
         response.headers['X-XSS-Protection'] = '1; mode=block'
+        
+        # Strict-Transport-Security (HSTS)
+        # Solo se envía si SESSION_COOKIE_SECURE está activo (indica uso de HTTPS)
+        # o si se detecta que la petición viene por HTTPS
+        if SESSION_CONFIG["cookie_secure"] or request.is_secure:
+            # max-age: 31536000 = 1 año (recomendado para producción)
+            # includeSubDomains: incluir subdominios
+            # preload: permitir inclusión en listas de preload de navegadores
+            hsts_max_age = int(os.environ.get("HSTS_MAX_AGE", "31536000"))
+            hsts_include_subdomains = os.environ.get("HSTS_INCLUDE_SUBDOMAINS", "true").lower() == "true"
+            hsts_preload = os.environ.get("HSTS_PRELOAD", "false").lower() == "true"
+            
+            hsts_value = f"max-age={hsts_max_age}"
+            if hsts_include_subdomains:
+                hsts_value += "; includeSubDomains"
+            if hsts_preload:
+                hsts_value += "; preload"
+            
+            response.headers['Strict-Transport-Security'] = hsts_value
+        
         return response
 
     return app
