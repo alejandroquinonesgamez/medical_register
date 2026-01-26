@@ -20,23 +20,5 @@ def index():
         available_languages=AVAILABLE_LANGUAGES,
         storage_backend=STORAGE_CONFIG["backend"],
         sqlcipher_requires_pepper=(STORAGE_CONFIG["backend"] == "sqlcipher"),
-        supervisor_enabled=os.environ.get("APP_SUPERVISOR") == "1",
     )
-
-
-@views.route('/supervisor')
-def supervisor():
-    if os.environ.get("APP_SUPERVISOR") != "1":
-        abort(404)
-    return render_template(
-        'supervisor.html',
-        active_language=ACTIVE_LANGUAGE,
-    )
-
-
-@views.route('/defectdojo')
-def defectdojo_redirect():
-    """Redirige a DefectDojo"""
-    from flask import redirect
-    return redirect('http://localhost:8080', code=302)
 

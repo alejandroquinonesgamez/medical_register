@@ -1,10 +1,10 @@
 import os
-from flask import Flask, request
+from flask import Flask
 from flask_cors import CORS
 from flask_limiter import Limiter
 from flask_limiter.util import get_remote_address
 from .storage import MemoryStorage, SQLCipherStorage, SQLiteStorage
-from .config import STORAGE_CONFIG, SESSION_CONFIG, HSTS_CONFIG
+from .config import STORAGE_CONFIG, SESSION_CONFIG
 
 
 def create_app():
@@ -63,26 +63,7 @@ def create_app():
         response.headers['X-Content-Type-Options'] = 'nosniff'
         response.headers['Content-Security-Policy'] = "frame-ancestors 'none'"
         response.headers['X-XSS-Protection'] = '1; mode=block'
-        
-        # Strict-Transport-Security (HSTS)
-        # Solo se envía si SESSION_COOKIE_SECURE está activo (indica uso de HTTPS)
-        # o si se detecta que la petición viene por HTTPS
-        if SESSION_CONFIG["cookie_secure"] or request.is_secure:
-            hsts_value = f"max-age={HSTS_CONFIG['max_age']}"
-            if HSTS_CONFIG["include_subdomains"]:
-                hsts_value += "; includeSubDomains"
-            if HSTS_CONFIG["preload"]:
-                hsts_value += "; preload"
-            
-            response.headers['Strict-Transport-Security'] = hsts_value
-        
         return response
-
-    # Inicializar supervisor después de todos los blueprints y hooks
-    # para que capture todas las peticiones
-    if os.environ.get("APP_SUPERVISOR") == "1":
-        from .supervisor import init_supervisor
-        init_supervisor(app)
 
     return app
 
