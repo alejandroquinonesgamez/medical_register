@@ -432,11 +432,24 @@
 <section id="headers-de-seguridad">
 <h2>Headers de seguridad<a class="headerlink" href="#headers-de-seguridad" title="Link to this heading">¶</a></h2>
 <ul class="simple">
-<li><p><code class="docutils literal notranslate"><span class="pre">X-Frame-Options:</span> <span class="pre">DENY</span></code></p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">X-Content-Type-Options:</span> <span class="pre">nosniff</span></code></p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">Content-Security-Policy:</span> <span class="pre">frame-ancestors</span> <span class="pre">'none'</span></code></p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">X-XSS-Protection:</span> <span class="pre">1;</span> <span class="pre">mode=block</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">X-Frame-Options:</span> <span class="pre">DENY</span></code> - Previene clickjacking</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">X-Content-Type-Options:</span> <span class="pre">nosniff</span></code> - Previene MIME type sniffing</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">Content-Security-Policy:</span> <span class="pre">frame-ancestors</span> <span class="pre">'none'</span></code> - Previene embedding en iframes</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">X-XSS-Protection:</span> <span class="pre">1;</span> <span class="pre">mode=block</span></code> - Protección XSS (legacy)</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">Strict-Transport-Security</span></code> (HSTS) - Solo cuando <code class="docutils literal notranslate"><span class="pre">SESSION_COOKIE_SECURE=true</span></code> o conexión HTTPS:</p>
+<ul>
+<li><p><code class="docutils literal notranslate"><span class="pre">max-age=31536000</span></code> (1 año por defecto, configurable vía <code class="docutils literal notranslate"><span class="pre">HSTS_MAX_AGE</span></code>)</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">includeSubDomains</span></code> (por defecto, configurable vía <code class="docutils literal notranslate"><span class="pre">HSTS_INCLUDE_SUBDOMAINS</span></code>)</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">preload</span></code> (opcional, configurable vía <code class="docutils literal notranslate"><span class="pre">HSTS_PRELOAD</span></code>)</p></li>
 </ul>
+</li>
+</ul>
+<p><strong>Nota sobre HSTS</strong>: El header <code class="docutils literal notranslate"><span class="pre">Strict-Transport-Security</span></code> solo se envía cuando:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">SESSION_COOKIE_SECURE=true</span></code> está configurado, o</p></li>
+<li><p>La petición viene por HTTPS (<code class="docutils literal notranslate"><span class="pre">request.is_secure</span></code>)</p></li>
+</ul>
+<p>Esto asegura que HSTS solo se active cuando realmente se está usando HTTPS.</p>
 </section>
 </section>
 

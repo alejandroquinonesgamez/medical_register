@@ -105,8 +105,18 @@
 - **Clave de cifrado**: `SQLCIPHER_KEY` obligatoria.
 
 ### Headers de seguridad
-- `X-Frame-Options: DENY`
-- `X-Content-Type-Options: nosniff`
-- `Content-Security-Policy: frame-ancestors 'none'`
-- `X-XSS-Protection: 1; mode=block`
+- `X-Frame-Options: DENY` - Previene clickjacking
+- `X-Content-Type-Options: nosniff` - Previene MIME type sniffing
+- `Content-Security-Policy: frame-ancestors 'none'` - Previene embedding en iframes
+- `X-XSS-Protection: 1; mode=block` - Protección XSS (legacy)
+- `Strict-Transport-Security` (HSTS) - Solo cuando `SESSION_COOKIE_SECURE=true` o conexión HTTPS:
+  - `max-age=31536000` (1 año por defecto, configurable vía `HSTS_MAX_AGE`)
+  - `includeSubDomains` (por defecto, configurable vía `HSTS_INCLUDE_SUBDOMAINS`)
+  - `preload` (opcional, configurable vía `HSTS_PRELOAD`)
+
+**Nota sobre HSTS**: El header `Strict-Transport-Security` solo se envía cuando:
+- `SESSION_COOKIE_SECURE=true` está configurado, o
+- La petición viene por HTTPS (`request.is_secure`)
+
+Esto asegura que HSTS solo se active cuando realmente se está usando HTTPS.
 
