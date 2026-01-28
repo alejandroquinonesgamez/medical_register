@@ -280,7 +280,7 @@ Los mismos parámetros están documentados como comentarios en <code class="docu
 <li><p><strong>HTTPS obligatorio en producción</strong>: La aplicación está preparada para usar HTTPS mediante la configuración <code class="docutils literal notranslate"><span class="pre">SESSION_COOKIE_SECURE=true</span></code>.</p></li>
 <li><p><strong>HSTS (HTTP Strict Transport Security)</strong>: Cuando HTTPS está activo, se envía el header <code class="docutils literal notranslate"><span class="pre">Strict-Transport-Security</span></code> con <code class="docutils literal notranslate"><span class="pre">max-age=31536000</span></code> (1 año) para forzar conexiones seguras.</p></li>
 <li><p>El contenido viaja en el cuerpo del POST cifrado por HTTPS y <strong>no se registra</strong> en el cliente.</p></li>
-<li><p><strong>Rate limiting</strong>: Protección contra fuerza bruta con límite de 3 intentos por IP por minuto (configurado en <code class="docutils literal notranslate"><span class="pre">app/__init__.py</span></code>).</p></li>
+<li><p><strong>Rate limiting</strong>: Protección contra fuerza bruta con límite de 3 intentos por IP por minuto solo en <code class="docutils literal notranslate"><span class="pre">POST</span> <span class="pre">/api/auth/login</span></code> y <code class="docutils literal notranslate"><span class="pre">POST</span> <span class="pre">/api/auth/register</span></code> (configurado en <code class="docutils literal notranslate"><span class="pre">app/__init__.py</span></code> y <code class="docutils literal notranslate"><span class="pre">app/routes.py</span></code>).</p></li>
 </ul>
 </li>
 </ol>
@@ -489,9 +489,8 @@ Los mismos parámetros están documentados como comentarios en <code class="docu
 <h2>Protección contra fuerza bruta<a class="headerlink" href="#proteccion-contra-fuerza-bruta" title="Link to this heading">¶</a></h2>
 <ul class="simple">
 <li><p><strong>Rate limiting</strong>: Implementado con Flask-Limiter.</p></li>
-<li><p><strong>Límite</strong>: 3 intentos por IP por minuto para todas las rutas de API.</p></li>
-<li><p><strong>Configuración</strong>: <code class="docutils literal notranslate"><span class="pre">app/__init__.py</span></code> (deshabilitado en tests con <code class="docutils literal notranslate"><span class="pre">APP_TESTING=1</span></code>).</p></li>
-<li><p><strong>Alcance</strong>: Aplica a todos los endpoints <code class="docutils literal notranslate"><span class="pre">/api/*</span></code>, incluyendo registro y login.</p></li>
+<li><p><strong>Límite</strong>: 3 peticiones por IP por minuto solo en <strong>login</strong> y <strong>register</strong> (<code class="docutils literal notranslate"><span class="pre">POST</span> <span class="pre">/api/auth/login</span></code>, <code class="docutils literal notranslate"><span class="pre">POST</span> <span class="pre">/api/auth/register</span></code>). El resto de la API no está limitado.</p></li>
+<li><p><strong>Configuración</strong>: <code class="docutils literal notranslate"><span class="pre">app/__init__.py</span></code> (limiter) y <code class="docutils literal notranslate"><span class="pre">app/routes.py</span></code> (decorador <code class="docutils literal notranslate"><span class="pre">&#64;limiter.limit(&quot;3</span> <span class="pre">per</span> <span class="pre">minute&quot;)</span></code> en ambas rutas). Deshabilitado en tests con <code class="docutils literal notranslate"><span class="pre">APP_TESTING=1</span></code>.</p></li>
 </ul>
 </section>
 <section id="configuracion-de-seguridad-centralizada">
