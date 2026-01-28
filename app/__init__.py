@@ -6,6 +6,9 @@ from flask_limiter.util import get_remote_address
 from .storage import MemoryStorage, SQLCipherStorage, SQLiteStorage
 from .config import STORAGE_CONFIG, SESSION_CONFIG
 
+# Limiter sin límite por defecto; el límite se aplica solo a login/register en routes.py
+limiter = Limiter(key_func=get_remote_address)
+
 
 def create_app():
     app = Flask(__name__)
@@ -29,13 +32,9 @@ def create_app():
     else:
         app.storage = MemoryStorage()
 
-    # Rate limiting global: 3 intentos por IP por minuto
+    # Rate limiting solo en login/register (3 por minuto por IP); ver decoradores en routes.py
     if os.environ.get("APP_TESTING") != "1":
-        Limiter(
-            get_remote_address,
-            app=app,
-            default_limits=["3 per minute"],
-        )
+        limiter.init_app(app)
 
     # Configurar CORS para permitir llamadas desde el frontend
     # En desarrollo, permite cualquier origen

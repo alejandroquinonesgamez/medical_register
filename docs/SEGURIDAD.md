@@ -28,7 +28,7 @@
    - **HTTPS obligatorio en producción**: La aplicación está preparada para usar HTTPS mediante la configuración `SESSION_COOKIE_SECURE=true`.
    - **HSTS (HTTP Strict Transport Security)**: Cuando HTTPS está activo, se envía el header `Strict-Transport-Security` con `max-age=31536000` (1 año) para forzar conexiones seguras.
    - El contenido viaja en el cuerpo del POST cifrado por HTTPS y **no se registra** en el cliente.
-   - **Rate limiting**: Protección contra fuerza bruta con límite de 3 intentos por IP por minuto (configurado en `app/__init__.py`).
+   - **Rate limiting**: Protección contra fuerza bruta con límite de 3 intentos por IP por minuto solo en `POST /api/auth/login` y `POST /api/auth/register` (configurado en `app/__init__.py` y `app/routes.py`).
 
 #### Verificación de contraseñas filtradas (HIBP + fallback)
 5. **Normalización**: el servidor normaliza `username` y valida reglas de formato.
@@ -153,9 +153,8 @@ Strict-Transport-Security: max-age=31536000; includeSubDomains
 ### Protección contra fuerza bruta
 
 - **Rate limiting**: Implementado con Flask-Limiter.
-- **Límite**: 3 intentos por IP por minuto para todas las rutas de API.
-- **Configuración**: `app/__init__.py` (deshabilitado en tests con `APP_TESTING=1`).
-- **Alcance**: Aplica a todos los endpoints `/api/*`, incluyendo registro y login.
+- **Límite**: 3 peticiones por IP por minuto solo en **login** y **register** (`POST /api/auth/login`, `POST /api/auth/register`). El resto de la API no está limitado.
+- **Configuración**: `app/__init__.py` (limiter) y `app/routes.py` (decorador `@limiter.limit("3 per minute")` en ambas rutas). Deshabilitado en tests con `APP_TESTING=1`.
 
 ### Configuración de seguridad centralizada
 
