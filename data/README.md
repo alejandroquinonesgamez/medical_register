@@ -20,7 +20,7 @@ data/
 - **Excepción**: `defectdojo_db_initial.sql` está incluido en el repositorio como base de datos inicial
 - Los directorios se crean automáticamente al arrancar los servicios
 - **Backup**: Si necesitas hacer backup, copia este directorio completo
-- **Permisos**: Docker gestionará los permisos automáticamente
+- **Permisos**: El contenedor web corre como usuario no root (UID 1000). El entrypoint crea `data/`, `data/temp`, `data/wstg_sync_queue` y ajusta el dueño a ese usuario, de modo que **no es necesario usar chmod 777**. En un despliegue nuevo, si llegas a tener problemas de permisos, ejecuta una sola vez: `sudo chown -R 1000:1000 data` (y si usas informes PDF, `sudo chown -R 1000:1000 docs/informes`).
 
 ## Dump Inicial de Base de Datos
 

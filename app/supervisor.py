@@ -70,17 +70,10 @@ def _extract_headers(headers):
 
 
 def _extract_response_body(response):
-    try:
-        # No intentar leer el body de la respuesta si ya fue consumido
-        # o si es una respuesta de streaming
-        if hasattr(response, "get_data"):
-            content_type = response.mimetype or ""
-            if content_type == "application/json":
-                data = response.get_data(as_text=True)
-                if data:
-                    return _truncate(data, 2048)
-    except Exception:
-        pass
+    # No leer response.get_data() aquí: en algunos entornos (WSGI/gunicorn)
+    # consumiría el body y la respuesta al cliente llegaría vacía. Solo indicar tipo.
+    if getattr(response, "mimetype", None) == "application/json":
+        return "[application/json — no se guarda cuerpo para no alterar la respuesta]"
     return ""
 
 
@@ -177,7 +170,7 @@ def _db_snapshot(storage):
                     {
                         "id": user.user_id,
                         "username": user.username,
-                        "created_at": user.created_at.isoformat(),
+                        "created_at": getattr(user.created_at, "isoformat", lambda: str(user.created_at))(),
                     }
                     for user in storage._auth_users.values()
                 ]
@@ -190,7 +183,7 @@ def _db_snapshot(storage):
                         "id": entry.entry_id,
                         "user_id": entry.user_id,
                         "weight_kg": entry.weight_kg,
-                        "recorded_date": entry.recorded_date.isoformat(),
+                        "recorded_date": getattr(entry.recorded_date, "isoformat", lambda: str(entry.recorded_date))(),
                     }
                     for entry in storage._weight_entries
                 ]
@@ -202,7 +195,7 @@ def _db_snapshot(storage):
                 snapshot["api_tokens"] = [
                     {
                         "user_id": token_data[0],
-                        "expires_at": token_data[1].isoformat() if hasattr(token_data[1], "isoformat") else str(token_data[1]),
+                        "expires_at": getattr(token_data[1], "isoformat", lambda: str(token_data[1]))(),
                     }
                     for token_data in storage._api_tokens.values()
                 ]

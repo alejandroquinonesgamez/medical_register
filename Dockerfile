@@ -2,7 +2,10 @@ FROM python:3.10-slim
 
 WORKDIR /app
 
-# Crear directorio instance
+# Usuario no root (UID 1000) para evitar crear archivos como root en volúmenes montados
+RUN useradd --no-create-home --uid 1000 appuser
+
+# Crear directorio instance (el entrypoint ajustará permisos al arrancar)
 RUN mkdir -p /app/instance
 
 # Instalar Docker CLI para poder ejecutar comandos docker desde el contenedor
@@ -35,7 +38,8 @@ RUN pip install --no-cache-dir --upgrade pip && \
 # Copiar el resto de la aplicación
 COPY . .
 
+# Entrypoint: crea directorios escribibles, chown a appuser y ejecuta la app como no root
+RUN chmod +x /app/scripts/docker-entrypoint.sh
 EXPOSE 5001
-
-CMD ["sh", "-c", "python /app/scripts/init_storage.py && gunicorn --bind 0.0.0.0:5001 --workers 1 --timeout 120 run:app"]
+ENTRYPOINT ["/app/scripts/docker-entrypoint.sh"]
 
