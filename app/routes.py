@@ -32,6 +32,7 @@ from .helpers import (
 )
 from .translations import get_error, get_message, get_text, get_days_text, get_frontend_messages
 from .config import VALIDATION_LIMITS
+from . import limiter
 
 # Obtener COMPOSE_PROJECT_NAME del entorno o usar el valor por defecto
 COMPOSE_PROJECT_NAME = os.environ.get('COMPOSE_PROJECT_NAME', 'medical_register')
@@ -94,6 +95,7 @@ def require_auth(func):
 
 
 @api.route('/auth/register', methods=['POST'])
+@limiter.limit("3 per minute")
 def register():
     storage = current_app.storage
     data = request.json or {}
@@ -123,6 +125,7 @@ def register():
 
 
 @api.route('/auth/login', methods=['POST'])
+@limiter.limit("3 per minute")
 def login():
     storage = current_app.storage
     data = request.json or {}
