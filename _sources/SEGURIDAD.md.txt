@@ -7,13 +7,7 @@
 
 ### Autenticación y contraseñas (detalle completo)
 #### Algoritmo de hash y materiales criptográficos
-- **Algoritmo**: `Argon2id` con parámetros configurables en `app/config.py` → `PASSWORD_HASH_CONFIG`:
-  - **time_cost**: nº de iteraciones sobre la memoria; mayor valor = más lento y más resistencia a fuerza bruta (típico 2–4 para login).
-  - **memory_cost**: memoria en KiB (p. ej. 65536 = 64 MiB); Argon2 es memory-hard, más memoria dificulta ataques con GPU/ASIC.
-  - **parallelism**: nº de hilos/lanes en paralelo (suele usarse 1–4 según CPU).
-  - **hash_len**: longitud del hash de salida en bytes (32 = 256 bits); estándar para derivación de claves.
-  - **salt_len**: longitud del salt aleatorio en bytes (16 = 128 bits); un salt distinto por contraseña evita tablas arcoíris.
-  Los mismos parámetros están documentados como comentarios en `app/config.py`. Si se cambia la configuración, los hashes existentes se migran de forma transparente en el siguiente login (véase apartado de inicio de sesión).
+- **Algoritmo**: `Argon2id` con parámetros configurables (`time_cost`, `memory_cost`, `parallelism`, `hash_len`, `salt_len`).
 - **Salt**: Argon2id genera un **salt aleatorio único por usuario** (incluido en el hash resultante).
 - **Pepper**: valor opcional del servidor (`PASSWORD_PEPPER`) concatenado a la contraseña antes de hashear. **No se guarda en base de datos**.
 
@@ -66,7 +60,6 @@
 4. **Resultado**:
    - Si coincide, crea sesión y devuelve `csrf_token`.
    - Si falla, devuelve error genérico de credenciales inválidas.
-5. **Migración de parámetros de hash**: si en configuración se ha cambiado `PASSWORD_HASH_CONFIG` (p. ej. `time_cost`, `memory_cost`), tras verificar la contraseña el servidor rehashea con la configuración actual y **actualiza el hash en base de datos**. Así los hashes antiguos siguen siendo válidos y se migran de forma transparente en el siguiente login.
 
 #### Cierre de sesión (logout)
 - `POST /api/auth/logout` con `X-CSRF-Token`.
@@ -163,7 +156,7 @@ Todas las configuraciones de seguridad están centralizadas en `app/config.py`:
 
 - **`SESSION_CONFIG`**: Configuración de cookies de sesión (HttpOnly, Secure, SameSite).
 - **`HSTS_CONFIG`**: Configuración de HSTS (max-age, includeSubDomains, preload).
-- **`PASSWORD_HASH_CONFIG`**: Parámetros de Argon2id (time_cost, memory_cost, parallelism, hash_len, salt_len); ver comentarios en `app/config.py` y apartado "Algoritmo de hash y materiales criptográficos" arriba. Los hashes se migran al nuevo coste/parámetros en el siguiente login.
+- **`PASSWORD_HASH_CONFIG`**: Parámetros de Argon2id (time_cost, memory_cost, parallelism).
 - **`AUTH_CONFIG`**: Límites de longitud de username y password.
 
 Esto facilita la gestión y auditoría de las políticas de seguridad.

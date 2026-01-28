@@ -249,16 +249,7 @@
 <section id="algoritmo-de-hash-y-materiales-criptograficos">
 <h3>Algoritmo de hash y materiales criptográficos<a class="headerlink" href="#algoritmo-de-hash-y-materiales-criptograficos" title="Link to this heading">¶</a></h3>
 <ul class="simple">
-<li><p><strong>Algoritmo</strong>: <code class="docutils literal notranslate"><span class="pre">Argon2id</span></code> con parámetros configurables en <code class="docutils literal notranslate"><span class="pre">app/config.py</span></code> → <code class="docutils literal notranslate"><span class="pre">PASSWORD_HASH_CONFIG</span></code>:</p>
-<ul>
-<li><p><strong>time_cost</strong>: nº de iteraciones sobre la memoria; mayor valor = más lento y más resistencia a fuerza bruta (típico 2–4 para login).</p></li>
-<li><p><strong>memory_cost</strong>: memoria en KiB (p. ej. 65536 = 64 MiB); Argon2 es memory-hard, más memoria dificulta ataques con GPU/ASIC.</p></li>
-<li><p><strong>parallelism</strong>: nº de hilos/lanes en paralelo (suele usarse 1–4 según CPU).</p></li>
-<li><p><strong>hash_len</strong>: longitud del hash de salida en bytes (32 = 256 bits); estándar para derivación de claves.</p></li>
-<li><p><strong>salt_len</strong>: longitud del salt aleatorio en bytes (16 = 128 bits); un salt distinto por contraseña evita tablas arcoíris.
-Los mismos parámetros están documentados como comentarios en <code class="docutils literal notranslate"><span class="pre">app/config.py</span></code>. Si se cambia la configuración, los hashes existentes se migran de forma transparente en el siguiente login (véase apartado de inicio de sesión).</p></li>
-</ul>
-</li>
+<li><p><strong>Algoritmo</strong>: <code class="docutils literal notranslate"><span class="pre">Argon2id</span></code> con parámetros configurables (<code class="docutils literal notranslate"><span class="pre">time_cost</span></code>, <code class="docutils literal notranslate"><span class="pre">memory_cost</span></code>, <code class="docutils literal notranslate"><span class="pre">parallelism</span></code>, <code class="docutils literal notranslate"><span class="pre">hash_len</span></code>, <code class="docutils literal notranslate"><span class="pre">salt_len</span></code>).</p></li>
 <li><p><strong>Salt</strong>: Argon2id genera un <strong>salt aleatorio único por usuario</strong> (incluido en el hash resultante).</p></li>
 <li><p><strong>Pepper</strong>: valor opcional del servidor (<code class="docutils literal notranslate"><span class="pre">PASSWORD_PEPPER</span></code>) concatenado a la contraseña antes de hashear. <strong>No se guarda en base de datos</strong>.</p></li>
 </ul>
@@ -356,7 +347,6 @@ Los mismos parámetros están documentados como comentarios en <code class="docu
 <li><p>Si falla, devuelve error genérico de credenciales inválidas.</p></li>
 </ul>
 </li>
-<li><p><strong>Migración de parámetros de hash</strong>: si en configuración se ha cambiado <code class="docutils literal notranslate"><span class="pre">PASSWORD_HASH_CONFIG</span></code> (p. ej. <code class="docutils literal notranslate"><span class="pre">time_cost</span></code>, <code class="docutils literal notranslate"><span class="pre">memory_cost</span></code>), tras verificar la contraseña el servidor rehashea con la configuración actual y <strong>actualiza el hash en base de datos</strong>. Así los hashes antiguos siguen siendo válidos y se migran de forma transparente en el siguiente login.</p></li>
 </ol>
 </section>
 <section id="cierre-de-sesion-logout">
@@ -500,7 +490,7 @@ Los mismos parámetros están documentados como comentarios en <code class="docu
 <ul class="simple">
 <li><p><strong><code class="docutils literal notranslate"><span class="pre">SESSION_CONFIG</span></code></strong>: Configuración de cookies de sesión (HttpOnly, Secure, SameSite).</p></li>
 <li><p><strong><code class="docutils literal notranslate"><span class="pre">HSTS_CONFIG</span></code></strong>: Configuración de HSTS (max-age, includeSubDomains, preload).</p></li>
-<li><p><strong><code class="docutils literal notranslate"><span class="pre">PASSWORD_HASH_CONFIG</span></code></strong>: Parámetros de Argon2id (time_cost, memory_cost, parallelism, hash_len, salt_len); ver comentarios en <code class="docutils literal notranslate"><span class="pre">app/config.py</span></code> y apartado “Algoritmo de hash y materiales criptográficos” arriba. Los hashes se migran al nuevo coste/parámetros en el siguiente login.</p></li>
+<li><p><strong><code class="docutils literal notranslate"><span class="pre">PASSWORD_HASH_CONFIG</span></code></strong>: Parámetros de Argon2id (time_cost, memory_cost, parallelism).</p></li>
 <li><p><strong><code class="docutils literal notranslate"><span class="pre">AUTH_CONFIG</span></code></strong>: Límites de longitud de username y password.</p></li>
 </ul>
 <p>Esto facilita la gestión y auditoría de las políticas de seguridad.</p>
