@@ -52,3 +52,18 @@ def test_hash_uses_pepper(monkeypatch):
     assert helpers.verify_password("clave_segura_123", hashed) is True
     monkeypatch.setattr(helpers, "PASSWORD_PEPPER", "pepper_diferente")
     assert helpers.verify_password("clave_segura_123", hashed) is False
+
+
+def test_different_cost_produces_different_hash_verify_still_works(monkeypatch):
+    """Distinto coste produce distinto hash; verify acepta hashes antiguos (rehash en login)."""
+    import app.config as config
+    password = "clave_segura_123"
+    orig = config.PASSWORD_HASH_CONFIG.copy()
+    monkeypatch.setitem(config.PASSWORD_HASH_CONFIG, "time_cost", 2)
+    hash_coste_2 = hash_password(password)
+    monkeypatch.setitem(config.PASSWORD_HASH_CONFIG, "time_cost", 3)
+    hash_coste_3 = hash_password(password)
+    assert hash_coste_2 != hash_coste_3
+    assert verify_password(password, hash_coste_2) is True
+    assert verify_password(password, hash_coste_3) is True
+    monkeypatch.setitem(config.PASSWORD_HASH_CONFIG, "time_cost", orig["time_cost"])

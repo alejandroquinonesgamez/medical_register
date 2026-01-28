@@ -233,4 +233,3 @@ def verify_password(password, password_hash):
         return hasher.verify(password_hash, peppered)
     except VerifyMismatchError:
         return False
-
