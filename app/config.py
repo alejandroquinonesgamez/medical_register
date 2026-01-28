@@ -44,6 +44,12 @@ COMMON_PASSWORDS_FALLBACK_PATH = os.environ.get(
 )
 
 # Configuración de hash de contraseñas (Argon2id)
+# Parámetros (ver https://argon2-cffi.readthedocs.io/):
+#   time_cost: nº de iteraciones sobre la memoria. Mayor = más lento y más resistencia a fuerza bruta. Típico 2–4 para login.
+#   memory_cost: memoria en KiB (65536 = 64 MiB). Argon2 es memory-hard; más memoria dificulta ataques con GPU/ASIC.
+#   parallelism: nº de hilos/lanes en paralelo. Suele usarse 1–4 según CPU.
+#   hash_len: longitud del hash de salida en bytes (32 = 256 bits). Estándar para derivación de claves.
+#   salt_len: longitud del salt aleatorio en bytes (16 = 128 bits). Un salt distinto por contraseña evita tablas arcoíris.
 PASSWORD_HASH_CONFIG = {
     "time_cost": 3,
     "memory_cost": 65536,

@@ -2,6 +2,7 @@
 Tests de caja negra para autenticación y CSRF
 """
 import json
+import pytest
 from tests.backend.conftest import assert_success, assert_created, assert_bad_request, assert_unauthorized, assert_forbidden
 
 
@@ -82,3 +83,40 @@ def test_csrf_required_for_user_update(client):
         "talla_m": 1.70
     }, headers={"X-CSRF-Token": data["csrf_token"]})
     assert_success(resp)
+
+
+def test_login_rehashes_when_cost_config_changed(client, monkeypatch):
+    """Al hacer login, si el coste de Argon2 ha cambiado, se rehashea y actualiza el hash en BD."""
+    import app.config as config
+    from app.helpers import hash_password
+
+    # Registrar con coste por defecto (p. ej. 3)
+    resp = client.post(
+        '/api/auth/register',
+        data=json.dumps({"username": "migrate_user", "password": "clave_segura_123"}),
+        content_type='application/json'
+    )
+    assert_created(resp)
+    app_flask = client.application
+    storage = app_flask.storage
+    user_before = storage.get_auth_user_by_username("migrate_user")
+    assert user_before is not None
+    hash_antes = user_before.password_hash
+
+    # Cambiar coste en configuración (simula cambio posterior)
+    orig_cost = config.PASSWORD_HASH_CONFIG["time_cost"]
+    monkeypatch.setitem(config.PASSWORD_HASH_CONFIG, "time_cost", 4)
+
+    # Login: debe verificar con hash antiguo y guardar hash nuevo
+    resp = client.post(
+        '/api/auth/login',
+        data=json.dumps({"username": "migrate_user", "password": "clave_segura_123"}),
+        content_type='application/json'
+    )
+    assert_success(resp)
+
+    user_despues = storage.get_auth_user_by_username("migrate_user")
+    new_hash = hash_password("clave_segura_123")
+    assert user_despues.password_hash == new_hash
+    assert user_despues.password_hash != hash_antes
+    monkeypatch.setitem(config.PASSWORD_HASH_CONFIG, "time_cost", orig_cost)

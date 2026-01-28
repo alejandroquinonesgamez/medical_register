@@ -141,6 +141,11 @@ def login():
     if not verify_password(password_raw, auth_user.password_hash):
         return jsonify({"error": get_error("invalid_credentials")}), 401
 
+    # Rehash con el coste actual si la configuración ha cambiado (migración de parámetros)
+    new_hash = hash_password(password_raw)
+    if new_hash != auth_user.password_hash:
+        storage.update_password_hash(auth_user.user_id, new_hash)
+
     session["user_id"] = auth_user.user_id
     _get_csrf_token()
     return jsonify({
@@ -890,5 +895,4 @@ def wstg_status():
     except Exception as e:
         current_app.logger.error(f"Error obteniendo estado WSTG: {e}", exc_info=True)
         return jsonify({"error": str(e)}), 500
-
 
