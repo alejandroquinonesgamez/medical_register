@@ -88,7 +88,7 @@ def test_csrf_required_for_user_update(client):
 def test_login_rehashes_when_cost_config_changed(client, monkeypatch):
     """Al hacer login, si el coste de Argon2 ha cambiado, se rehashea y actualiza el hash en BD."""
     import app.config as config
-    from app.helpers import hash_password
+    from app.helpers import verify_password
 
     # Registrar con coste por defecto (p. ej. 3)
     resp = client.post(
@@ -107,7 +107,7 @@ def test_login_rehashes_when_cost_config_changed(client, monkeypatch):
     orig_cost = config.PASSWORD_HASH_CONFIG["time_cost"]
     monkeypatch.setitem(config.PASSWORD_HASH_CONFIG, "time_cost", 4)
 
-    # Login: debe verificar con hash antiguo y guardar hash nuevo
+    # Login: debe verificar con hash antiguo y guardar hash nuevo (mismo coste, salt nuevo)
     resp = client.post(
         '/api/auth/login',
         data=json.dumps({"username": "migrate_user", "password": "clave_segura_123"}),
@@ -116,7 +116,7 @@ def test_login_rehashes_when_cost_config_changed(client, monkeypatch):
     assert_success(resp)
 
     user_despues = storage.get_auth_user_by_username("migrate_user")
-    new_hash = hash_password("clave_segura_123")
-    assert user_despues.password_hash == new_hash
+    # El hash guardado debe verificar con la contraseña y ser distinto del anterior (rehasheo con config actual)
+    assert verify_password("clave_segura_123", user_despues.password_hash)
     assert user_despues.password_hash != hash_antes
     monkeypatch.setitem(config.PASSWORD_HASH_CONFIG, "time_cost", orig_cost)

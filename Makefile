@@ -253,7 +253,7 @@ test: test-backend test-frontend ## Ejecutar todos los tests
 
 test-backend: ## Ejecutar tests backend dentro del contenedor
 	@echo "🧪 Ejecutando tests en contenedor (backend)..."
-	@$(COMPOSE) run --rm web python -m pytest
+	@$(COMPOSE) run --rm --entrypoint "" web python -m pytest
 
 test-frontend: ## Ejecutar tests frontend dentro del contenedor
 	@echo "🧪 Ejecutando tests en contenedor (frontend)..."
