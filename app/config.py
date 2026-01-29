@@ -11,6 +11,14 @@ Estos valores se sincronizan con el frontend mediante el endpoint /api/config
 y se usan para validaciones tanto en backend como frontend.
 """
 import os
+from pathlib import Path
+
+from dotenv import load_dotenv
+
+# Cargar .env del proyecto (raíz del repo) para tener RECAPTCHA_*, etc. sin depender de Docker
+_env_path = Path(__file__).resolve().parent.parent / ".env"
+load_dotenv(_env_path)
+
 from datetime import datetime
 
 # Configuración de usuario (monousuario legado)
@@ -37,6 +45,17 @@ HIBP_API_URL = os.environ.get(
 HIBP_TIMEOUT_SECONDS = float(os.environ.get("HIBP_TIMEOUT_SECONDS", "2.5"))
 HIBP_FAIL_CLOSED = os.environ.get("HIBP_FAIL_CLOSED", "true").lower() == "true"
 
+# reCAPTCHA v3 (login y register).
+# - Se configura mediante variables de entorno (idealmente desde un archivo `.env` local NO versionado).
+# - Si NO se configuran, NO se exigirá token (útil para desarrollo/tests).
+RECAPTCHA_SECRET_KEY = os.environ.get("RECAPTCHA_SECRET_KEY", "").strip()
+RECAPTCHA_SITE_KEY = os.environ.get("RECAPTCHA_SITE_KEY", "").strip()
+RECAPTCHA_MIN_SCORE = float(os.environ.get("RECAPTCHA_MIN_SCORE", "0.5"))
+RECAPTCHA_VERIFY_URL = os.environ.get(
+    "RECAPTCHA_VERIFY_URL",
+    "https://www.google.com/recaptcha/api/siteverify",
+)
+
 # Fallback local de contraseñas comunes (ruta local)
 COMMON_PASSWORDS_FALLBACK_PATH = os.environ.get(
     "COMMON_PASSWORDS_FALLBACK_PATH",
@@ -46,7 +65,6 @@ COMMON_PASSWORDS_FALLBACK_PATH = os.environ.get(
 # Configuración de hash de contraseñas (Argon2id)
 # Parámetros (ver https://argon2-cffi.readthedocs.io/):
 #   time_cost: nº de iteraciones sobre la memoria. Mayor = más lento y más resistencia a fuerza bruta. Típico 2–4 para login.
-#   memory_cost: memoria en KiB (65536 = 64 MiB). Argon2 es memory-hard; más memoria dificulta ataques con GPU/ASIC.
 #   parallelism: nº de hilos/lanes en paralelo. Suele usarse 1–4 según CPU.
 #   hash_len: longitud del hash de salida en bytes (32 = 256 bits). Estándar para derivación de claves.
 #   salt_len: longitud del salt aleatorio en bytes (16 = 128 bits). Un salt distinto por contraseña evita tablas arcoíris.

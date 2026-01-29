@@ -29,6 +29,7 @@ from .helpers import (
     validate_password_strength,
     hash_password,
     verify_password,
+    verify_recaptcha_v3,
 )
 from .translations import get_error, get_message, get_text, get_days_text, get_frontend_messages
 from .config import VALIDATION_LIMITS
@@ -101,6 +102,11 @@ def register():
     data = request.json or {}
     username_raw = data.get('username', '')
     password_raw = data.get('password', '')
+    recaptcha_token = data.get('recaptcha_token', '')
+
+    ok, _ = verify_recaptcha_v3(recaptcha_token, action="register", remote_ip=request.remote_addr)
+    if not ok:
+        return jsonify({"error": get_error("recaptcha_failed")}), 400
 
     is_valid_username, error_key = validate_username(username_raw)
     if not is_valid_username:
@@ -131,6 +137,11 @@ def login():
     data = request.json or {}
     username_raw = data.get('username', '')
     password_raw = data.get('password', '')
+    recaptcha_token = data.get('recaptcha_token', '')
+
+    ok, _ = verify_recaptcha_v3(recaptcha_token, action="login", remote_ip=request.remote_addr)
+    if not ok:
+        return jsonify({"error": get_error("recaptcha_failed")}), 400
 
     is_valid_username, _ = validate_username(username_raw)
     if not is_valid_username or not password_raw:
@@ -443,10 +454,11 @@ def get_messages():
 @api.route('/config', methods=['GET'])
 def get_config():
     """Endpoint que devuelve las constantes de validación y configuración para el frontend"""
-    from .config import VALIDATION_LIMITS
-    
+    from .config import VALIDATION_LIMITS, RECAPTCHA_SITE_KEY
+
     # Convertir fecha a string ISO para JSON
     config = {
+        "recaptcha_site_key": RECAPTCHA_SITE_KEY or "",
         "validation_limits": {
             "height_min": VALIDATION_LIMITS["height_min"],
             "height_max": VALIDATION_LIMITS["height_max"],

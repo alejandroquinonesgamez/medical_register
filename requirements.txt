@@ -2,6 +2,7 @@ Flask
 flask-cors
 Flask-Limiter
 gunicorn
+python-dotenv>=1.0.0
 pytest
 argon2-cffi
 pysqlcipher3

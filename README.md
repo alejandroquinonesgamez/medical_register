@@ -54,7 +54,7 @@ Este script:
 
 3. **Configurar variables de entorno (recomendado)**:
 
-El proyecto usa un archivo `.env` local (no se sube a GitHub) para configurar opciones y secretos.
+El proyecto usa un archivo `.env` local (no se sube a GitHub) para configurar opciones y secretos. La aplicación carga el `.env` automáticamente (en Docker desde el entrypoint y en Python con python-dotenv desde la raíz del proyecto), por lo que no hace falta exportar las variables a mano.
 Puedes partir del ejemplo:
 
 ```bash

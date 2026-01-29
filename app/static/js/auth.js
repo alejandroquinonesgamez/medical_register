@@ -170,6 +170,41 @@ class AuthManager {
         if (logoutBtn) logoutBtn.style.display = isAuthed ? 'inline-flex' : 'none';
     }
 
+    static async _getRecaptchaToken(action) {
+        const siteKey = (typeof AppConfig !== 'undefined' && AppConfig.getRecaptchaSiteKey) ? AppConfig.getRecaptchaSiteKey() : '';
+        if (!siteKey) return '';
+        await this._loadRecaptchaScript(siteKey);
+        return new Promise((resolve) => {
+            if (window.grecaptcha && window.grecaptcha.execute) {
+                window.grecaptcha.ready(() => {
+                    window.grecaptcha.execute(siteKey, { action }).then(resolve).catch(() => resolve(''));
+                });
+            } else {
+                resolve('');
+            }
+        });
+    }
+
+    static _loadRecaptchaScript(siteKey) {
+        if (window.grecaptcha) return Promise.resolve();
+        if (document.querySelector('script[src*="recaptcha/api.js"]')) {
+            return new Promise((resolve) => {
+                if (window.grecaptcha) return resolve();
+                const t = setInterval(() => {
+                    if (window.grecaptcha) { clearInterval(t); resolve(); }
+                }, 50);
+            });
+        }
+        return new Promise((resolve) => {
+            const script = document.createElement('script');
+            script.src = `https://www.google.com/recaptcha/api.js?render=${encodeURIComponent(siteKey)}`;
+            script.async = true;
+            script.onload = () => resolve();
+            script.onerror = () => resolve();
+            document.head.appendChild(script);
+        });
+    }
+
     static async login(usernameInput, password) {
         const username = this._normalizeUsername(usernameInput);
         if (!username) {
@@ -178,11 +213,14 @@ class AuthManager {
         if (!password) {
             throw new Error('La contraseña es obligatoria');
         }
+        const recaptchaToken = await this._getRecaptchaToken('login');
+        const body = { username, password };
+        if (recaptchaToken) body.recaptcha_token = recaptchaToken;
         const response = await fetch('/api/auth/login', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             credentials: 'same-origin',
-            body: JSON.stringify({ username, password })
+            body: JSON.stringify(body)
         });
         if (!response.ok) {
             const errorData = await response.json().catch(() => ({}));
@@ -208,11 +246,14 @@ class AuthManager {
         if (password !== confirmPassword) {
             throw new Error('Las contraseñas no coinciden');
         }
+        const recaptchaToken = await this._getRecaptchaToken('register');
+        const body = { username, password };
+        if (recaptchaToken) body.recaptcha_token = recaptchaToken;
         const response = await fetch('/api/auth/register', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             credentials: 'same-origin',
-            body: JSON.stringify({ username, password })
+            body: JSON.stringify(body)
         });
         if (!response.ok) {
             const errorData = await response.json().catch(() => ({}));

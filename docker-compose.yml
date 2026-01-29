@@ -39,6 +39,9 @@ services:
       - SQLCIPHER_DB_PATH=${SQLCIPHER_DB_PATH:-/app/data/app_secure.db}
       - SQLCIPHER_KEY=${SQLCIPHER_KEY:-}
       - PASSWORD_PEPPER=${PASSWORD_PEPPER:-}
+      # reCAPTCHA v3 (login/register). Si no se definen en .env, la app usa los valores por defecto de config.py
+      - RECAPTCHA_SITE_KEY=${RECAPTCHA_SITE_KEY:-}
+      - RECAPTCHA_SECRET_KEY=${RECAPTCHA_SECRET_KEY:-}
       # Supervisor (tráfico y DB): 1 = activo (por defecto en desarrollo). En producción usar APP_SUPERVISOR=0
       - APP_SUPERVISOR=${APP_SUPERVISOR:-1}
     healthcheck:

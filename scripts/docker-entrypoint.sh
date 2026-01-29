@@ -13,5 +13,7 @@ chown -R appuser:appuser /app/data /app/instance 2>/dev/null || true
 chown -R appuser:appuser /app/docs/informes 2>/dev/null || true
 [ -d /app/docs ] && chown appuser:appuser /app/docs 2>/dev/null || true
 
+# Cargar .env del proyecto (montado en /app) para que la app tenga RECAPTCHA_*, etc.
+# Así las variables se leen aunque Docker Compose no las inyecte (p. ej. path con espacios).
 # Ejecutar como appuser (init_storage + gunicorn); su está en toda imagen Debian
-exec su appuser -s /bin/sh -c "python /app/scripts/init_storage.py && exec gunicorn --bind 0.0.0.0:5001 --workers 1 --timeout 120 run:app"
+exec su appuser -s /bin/sh -c '[ -f /app/.env ] && . /app/.env; python /app/scripts/init_storage.py && exec gunicorn --bind 0.0.0.0:5001 --workers 1 --timeout 120 run:app'
