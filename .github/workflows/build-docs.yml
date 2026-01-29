@@ -2,9 +2,9 @@ name: Build and Deploy Sphinx Docs
 
 on:
   push:
-    branches: [main]
+    branches: [dev]
   pull_request:
-    branches: [main]
+    branches: [dev]
   # Allows manual workflow execution
   workflow_dispatch:
 
@@ -54,7 +54,7 @@ jobs:
           retention-days: 7
 
       - name: 6. Deploy Documentation
-        if: github.ref == 'refs/heads/main' && github.repository != '' 
+        if: github.ref == 'refs/heads/dev' && github.repository != ''
         uses: peaceiris/actions-gh-pages@v4
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
