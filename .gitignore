@@ -49,4 +49,6 @@ data/*_db_dump.sql
 
 # Archivo .env (se crea automáticamente desde docker-compose.env.example)
 .env
-nul
+
+# Carpeta de entrega (documentos y enlaces de entregas académicas; no subir a GitHub)
+entrega/
