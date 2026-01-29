@@ -52,7 +52,26 @@ Este script:
 - Verifica que Docker esté instalado
 - Construye la imagen de la aplicación
 
-3. **Arrancar la aplicación**:
+3. **Configurar variables de entorno (recomendado)**:
+
+El proyecto usa un archivo `.env` local (no se sube a GitHub) para configurar opciones y secretos.
+Puedes partir del ejemplo:
+
+```bash
+cp docker-compose.env.example .env
+```
+
+Para activar reCAPTCHA v3 en login/registro, define en `.env`:
+
+| Variable | Descripción |
+|----------|-------------|
+| `RECAPTCHA_SITE_KEY` | Clave pública de sitio (desde [reCAPTCHA Admin](https://www.google.com/recaptcha/admin)) |
+| `RECAPTCHA_SECRET_KEY` | Clave secreta para verificación en servidor |
+| `RECAPTCHA_MIN_SCORE` | (Opcional) Umbral de score 0.0–1.0; por defecto `0.5` |
+
+En desarrollo local, añade `localhost` (y `127.0.0.1` si accedes por IP) a los dominios autorizados de tu clave en la consola de reCAPTCHA. Tras cambiar el `.env`, reinicia los contenedores (`make down` y `make`). Detalles en [Autenticación y contraseñas](docs/seguridad/02-autenticacion-contrasenas.md).
+
+4. **Arrancar la aplicación**:
 
 El proyecto ofrece múltiples opciones de arranque según tus necesidades:
 
