@@ -238,9 +238,8 @@ docker-compose --profile defectdojo exec defectdojo python manage.py migrate
 
 ## 📚 Más Información
 
-- [Uso de Docker Compose](DOCKER_COMPOSE_USO.md)
 - [Configuración de DefectDojo](defectdojo/DEFECTDOJO_CONFIGURACION.md)
 - [Credenciales de DefectDojo](defectdojo/DEFECTDOJO_CREDENTIALS.md)
 - [Integración de DefectDojo](defectdojo/DEFECTDOJO_INTEGRATION.md)
-- [Configuración para Raspberry Pi](RASPBERRY_PI_SETUP.md)
+- [Seguridad](SEGURIDAD.md)
 

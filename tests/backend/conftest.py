@@ -4,6 +4,9 @@ Configuración de pytest y fixtures compartidas
 import os
 os.environ.setdefault("STORAGE_BACKEND", "memory")
 os.environ.setdefault("APP_TESTING", "1")
+# Desactivar reCAPTCHA en tests (evita que load_dotenv cargue las claves del .env)
+os.environ["RECAPTCHA_SECRET_KEY"] = ""
+os.environ["RECAPTCHA_SITE_KEY"] = ""
 
 import pytest
 from datetime import datetime, date

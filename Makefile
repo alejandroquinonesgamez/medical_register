@@ -134,6 +134,7 @@ help: ## Mostrar esta ayuda
 	@echo "  make test-backend   # Ejecutar tests backend en contenedor"
 	@echo "  make test-frontend  # Ejecutar tests frontend en contenedor"
 	@echo "  make logs           # Ver logs de la aplicación"
+	@echo "  make logs-waf       # Ver logs del WAF (ModSecurity)"
 	@echo "  make logs-defectdojo # Ver logs de DefectDojo"
 	@echo "  make ps             # Ver estado de contenedores"
 	@echo "  make down           # Detener todos los servicios"
@@ -224,6 +225,10 @@ update: setup-env ensure-proxy-network ## Levantar aplicación y DefectDojo, y a
 logs: setup-env ## Ver logs de la aplicación principal
 	@echo "📋 Logs de la aplicación principal (Ctrl+C para salir)..."
 	@$(COMPOSE) logs -f web
+
+logs-waf: setup-env ## Ver logs del WAF (ModSecurity)
+	@echo "📋 Logs del WAF ModSecurity (Ctrl+C para salir)..."
+	@$(COMPOSE) logs -f waf
 
 logs-defectdojo: setup-env ## Ver logs de DefectDojo
 	@echo "📋 Logs de DefectDojo (Ctrl+C para salir)..."

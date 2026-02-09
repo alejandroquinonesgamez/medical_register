@@ -9,3 +9,4 @@ Documentación de las medidas de seguridad de la aplicación, organizada por tem
 | [03. Sesiones y CSRF](seguridad/03-sesiones-csrf.md) | Sesiones seguras (HttpOnly, SameSite, Secure) y protección CSRF |
 | [04. Headers de seguridad, HSTS y SQLCipher](seguridad/04-headers-https.md) | X-Frame-Options, CSP, HSTS, cifrado de base de datos |
 | [05. Rate limiting y configuración](seguridad/05-rate-limiting-y-config.md) | Límites por IP en login/register y configuración centralizada |
+| [06. WAF: ModSecurity + OWASP CRS](seguridad/06-waf-modsecurity.md) | Arquitectura, configuración, paranoia levels, exclusiones, batería de ataques bloqueados, logs y producción |

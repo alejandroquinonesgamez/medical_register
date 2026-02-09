@@ -1,3 +1,6 @@
+# Build Sphinx docs from branch 'dev' and push HTML to branch 'gh-pages'.
+# IMPORTANTE: En Settings → Pages, Source debe ser "Deploy from a branch" con Branch = gh-pages
+# (no main). Así la web muestra la doc generada desde dev; si pones main, verás la doc de main.
 name: Build and Deploy Sphinx Docs
 
 on:
@@ -59,4 +62,4 @@ jobs:
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           publish_dir: docs/_build/html
-          publish_branch: gh-pages # Deploys to the 'gh-pages' branch
+          publish_branch: gh-pages  # El contenido de esta rama es lo que debe servir GitHub Pages (Settings → Pages → Branch = gh-pages)

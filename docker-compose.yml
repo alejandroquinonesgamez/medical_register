@@ -3,7 +3,8 @@
 # Este archivo define todos los servicios Docker de la aplicación:
 #
 # SERVICIOS PRINCIPALES (sin perfil, se arrancan por defecto):
-# - web: Aplicación Flask principal (puerto 5001)
+# - waf: ModSecurity + OWASP CRS (Nginx reverse proxy, puerto 5001)
+# - web: Aplicación Flask principal (solo accesible internamente por el WAF)
 #
 # SERVICIOS CON PERFIL "tests" (solo con --profile tests o docker-compose run):
 # - frontend-tests: Ejecución de tests del frontend
@@ -21,10 +22,46 @@
 # Usa la variable DD_SKIP_FINDINGS=True para saltar la creación de findings.
 
 services:
+  # ── WAF: ModSecurity v3 + OWASP Core Rule Set (Nginx reverse proxy) ──
+  # Filtra todo el tráfico antes de pasarlo al backend Flask.
+  # El usuario sigue accediendo por http://localhost:5001 como antes.
+  waf:
+    image: owasp/modsecurity-crs:nginx-alpine
+    container_name: waf_modsecurity
+    ports:
+      - "5001:8080"
+    environment:
+      - BACKEND=http://web:5001
+      # ModSecurity: On = bloquea, DetectionOnly = solo registra
+      - MODSEC_RULE_ENGINE=On
+      # OWASP CRS Paranoia Level (1-4). 1 = mínimo de falsos positivos.
+      - PARANOIA=1
+      - ANOMALY_INBOUND=5
+      - ANOMALY_OUTBOUND=4
+      # Permitir Content-Type JSON (necesario para la API REST)
+      - ALLOWED_METHODS=GET HEAD POST OPTIONS PUT DELETE
+      - ALLOWED_REQUEST_CONTENT_TYPE=|application/x-www-form-urlencoded||multipart/form-data||text/xml||application/xml||application/soap+xml||application/json||application/octet-stream|
+    volumes:
+      - ./waf/modsecurity-override.conf:/etc/modsecurity.d/owasp-crs/rules/RESPONSE-999-EXCLUSION-RULES-AFTER-CRS.conf:ro
+      - ./data/waf:/var/log/modsecurity:rw
+    depends_on:
+      web:
+        condition: service_healthy
+    networks:
+      - proxy-network
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8080/"]
+      interval: 30s
+      timeout: 5s
+      start_period: 15s
+      retries: 3
+
+  # ── Backend Flask (solo accesible internamente por el WAF) ──
   web:
     build: .
-    ports:
-      - "5001:5001"
+    expose:
+      - "5001"
     container_name: flask_medical_register
     networks:
       - proxy-network

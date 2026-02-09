@@ -16,4 +16,8 @@
 
 Esta centralización facilita la gestión y auditoría de las políticas de seguridad.
 
+## WAF (ModSecurity + OWASP CRS)
+
+Además del rate limiting a nivel de aplicación, todo el tráfico HTTP pasa por un WAF con ModSecurity y el OWASP Core Rule Set. Configuración detallada en [WAF: ModSecurity + OWASP CRS](06-waf-modsecurity.md).
+
 [← Índice de seguridad](../SEGURIDAD.md)

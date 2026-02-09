@@ -22,7 +22,8 @@ Aplicación web monousuario para el registro personal de peso, talla y cálculo 
   - SQLite (persistente, por defecto)
   - SQLCipher (persistente y cifrado)
 - **Almacenamiento Frontend**: localStorage (persistente en el navegador)
-- **Tests**: 86 tests backend (pytest) + ~66 tests frontend (Jest)
+- **WAF**: ModSecurity v3 + OWASP Core Rule Set (reverse proxy Nginx)
+- **Tests**: 213 tests backend (pytest) + ~66 tests frontend (Jest)
 - **DefectDojo**: Integrado para gestión de vulnerabilidades de seguridad
 - **Supervisor**: Dashboard de desarrollo para monitoreo de tráfico API y base de datos
 
@@ -266,6 +267,7 @@ make help
 #### Comandos de Gestión
 - `make down` - Detener todos los contenedores
 - `make logs` - Ver logs de la aplicación
+- `make logs-waf` - Ver logs del WAF (ModSecurity)
 - `make logs-defectdojo` - Ver logs de DefectDojo
 - `make ps` - Ver estado de los contenedores
 - `make build` - Construir imágenes de la aplicación
@@ -299,7 +301,7 @@ Para ver todos los comandos disponibles: `make help`
   - ⚠️ **Cambiar en producción**
 - **Credenciales base de datos**: Ver `docker-compose.yml` (cambiar en producción)
 
-Para más información, consulta la [documentación de integración de DefectDojo](docs/DEFECTDOJO_INTEGRATION.md).
+Para más información, consulta la [documentación de integración de DefectDojo](docs/defectdojo/DEFECTDOJO_INTEGRATION.md).
 
 ## Coverage
 
