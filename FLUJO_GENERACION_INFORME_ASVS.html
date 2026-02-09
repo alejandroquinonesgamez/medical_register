@@ -1,0 +1,789 @@
+<!doctype html>
+<html class="no-js" lang="en" data-content_root="./">
+  <head><meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <meta name="color-scheme" content="light dark"><meta name="viewport" content="width=device-width, initial-scale=1" />
+<link rel="index" title="Index" href="genindex.html"><link rel="search" title="Search" href="search.html">
+
+    <!-- Generated with Sphinx 8.1.3 and Furo 2025.12.19 -->
+        <title>Flujo de Generación del Informe ASVS 4.0.3 - Medical Register 0.1.0 documentation</title>
+      <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=d111a655" />
+    <link rel="stylesheet" type="text/css" href="_static/styles/furo.css?v=7bdb33bb" />
+    <link rel="stylesheet" type="text/css" href="_static/styles/furo-extensions.css?v=8dab3a3b" />
+    
+    
+
+
+<style>
+  body {
+    --color-code-background: #f2f2f2;
+  --color-code-foreground: #1e1e1e;
+  --color-brand-primary: #254F6D;
+  --color-brand-content: #254F6D;
+  
+  }
+  @media not print {
+    body[data-theme="dark"] {
+      --color-code-background: #202020;
+  --color-code-foreground: #d0d0d0;
+  
+    }
+    @media (prefers-color-scheme: dark) {
+      body:not([data-theme="light"]) {
+        --color-code-background: #202020;
+  --color-code-foreground: #d0d0d0;
+  
+      }
+    }
+  }
+</style></head>
+  <body>
+    
+    <script>
+      document.body.dataset.theme = localStorage.getItem("theme") || "auto";
+    </script>
+    
+
+<svg xmlns="http://www.w3.org/2000/svg" style="display: none;">
+  <symbol id="svg-toc" viewBox="0 0 24 24">
+    <title>Contents</title>
+    <svg stroke="currentColor" fill="currentColor" stroke-width="0" viewBox="0 0 1024 1024">
+      <path d="M408 442h480c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8H408c-4.4 0-8 3.6-8 8v56c0 4.4 3.6 8 8 8zm-8 204c0 4.4 3.6 8 8 8h480c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8H408c-4.4 0-8 3.6-8 8v56zm504-486H120c-4.4 0-8 3.6-8 8v56c0 4.4 3.6 8 8 8h784c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8zm0 632H120c-4.4 0-8 3.6-8 8v56c0 4.4 3.6 8 8 8h784c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8zM115.4 518.9L271.7 642c5.8 4.6 14.4.5 14.4-6.9V388.9c0-7.4-8.5-11.5-14.4-6.9L115.4 505.1a8.74 8.74 0 0 0 0 13.8z"/>
+    </svg>
+  </symbol>
+  <symbol id="svg-menu" viewBox="0 0 24 24">
+    <title>Menu</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather-menu">
+      <line x1="3" y1="12" x2="21" y2="12"></line>
+      <line x1="3" y1="6" x2="21" y2="6"></line>
+      <line x1="3" y1="18" x2="21" y2="18"></line>
+    </svg>
+  </symbol>
+  <symbol id="svg-arrow-right" viewBox="0 0 24 24">
+    <title>Expand</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather-chevron-right">
+      <polyline points="9 18 15 12 9 6"></polyline>
+    </svg>
+  </symbol>
+  <symbol id="svg-sun" viewBox="0 0 24 24">
+    <title>Light mode</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round" class="feather-sun">
+      <circle cx="12" cy="12" r="5"></circle>
+      <line x1="12" y1="1" x2="12" y2="3"></line>
+      <line x1="12" y1="21" x2="12" y2="23"></line>
+      <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+      <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+      <line x1="1" y1="12" x2="3" y2="12"></line>
+      <line x1="21" y1="12" x2="23" y2="12"></line>
+      <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+      <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+    </svg>
+  </symbol>
+  <symbol id="svg-moon" viewBox="0 0 24 24">
+    <title>Dark mode</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round" class="icon-tabler-moon">
+      <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+      <path d="M12 3c.132 0 .263 0 .393 0a7.5 7.5 0 0 0 7.92 12.446a9 9 0 1 1 -8.313 -12.454z" />
+    </svg>
+  </symbol>
+  <symbol id="svg-sun-with-moon" viewBox="0 0 24 24">
+    <title>Auto light/dark, in light mode</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round"
+      class="icon-custom-derived-from-feather-sun-and-tabler-moon">
+      <path style="opacity: 50%" d="M 5.411 14.504 C 5.471 14.504 5.532 14.504 5.591 14.504 C 3.639 16.319 4.383 19.569 6.931 20.352 C 7.693 20.586 8.512 20.551 9.25 20.252 C 8.023 23.207 4.056 23.725 2.11 21.184 C 0.166 18.642 1.702 14.949 4.874 14.536 C 5.051 14.512 5.231 14.5 5.411 14.5 L 5.411 14.504 Z"/>
+      <line x1="14.5" y1="3.25" x2="14.5" y2="1.25"/>
+      <line x1="14.5" y1="15.85" x2="14.5" y2="17.85"/>
+      <line x1="10.044" y1="5.094" x2="8.63" y2="3.68"/>
+      <line x1="19" y1="14.05" x2="20.414" y2="15.464"/>
+      <line x1="8.2" y1="9.55" x2="6.2" y2="9.55"/>
+      <line x1="20.8" y1="9.55" x2="22.8" y2="9.55"/>
+      <line x1="10.044" y1="14.006" x2="8.63" y2="15.42"/>
+      <line x1="19" y1="5.05" x2="20.414" y2="3.636"/>
+      <circle cx="14.5" cy="9.55" r="3.6"/>
+    </svg>
+  </symbol>
+  <symbol id="svg-moon-with-sun" viewBox="0 0 24 24">
+    <title>Auto light/dark, in dark mode</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round"
+      class="icon-custom-derived-from-feather-sun-and-tabler-moon">
+      <path d="M 8.282 7.007 C 8.385 7.007 8.494 7.007 8.595 7.007 C 5.18 10.184 6.481 15.869 10.942 17.24 C 12.275 17.648 13.706 17.589 15 17.066 C 12.851 22.236 5.91 23.143 2.505 18.696 C -0.897 14.249 1.791 7.786 7.342 7.063 C 7.652 7.021 7.965 7 8.282 7 L 8.282 7.007 Z"/>
+      <line style="opacity: 50%" x1="18" y1="3.705" x2="18" y2="2.5"/>
+      <line style="opacity: 50%" x1="18" y1="11.295" x2="18" y2="12.5"/>
+      <line style="opacity: 50%" x1="15.316" y1="4.816" x2="14.464" y2="3.964"/>
+      <line style="opacity: 50%" x1="20.711" y1="10.212" x2="21.563" y2="11.063"/>
+      <line style="opacity: 50%" x1="14.205" y1="7.5" x2="13.001" y2="7.5"/>
+      <line style="opacity: 50%" x1="21.795" y1="7.5" x2="23" y2="7.5"/>
+      <line style="opacity: 50%" x1="15.316" y1="10.184" x2="14.464" y2="11.036"/>
+      <line style="opacity: 50%" x1="20.711" y1="4.789" x2="21.563" y2="3.937"/>
+      <circle style="opacity: 50%" cx="18" cy="7.5" r="2.169"/>
+    </svg>
+  </symbol>
+  <symbol id="svg-pencil" viewBox="0 0 24 24">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round" class="icon-tabler-pencil-code">
+      <path d="M4 20h4l10.5 -10.5a2.828 2.828 0 1 0 -4 -4l-10.5 10.5v4" />
+      <path d="M13.5 6.5l4 4" />
+      <path d="M20 21l2 -2l-2 -2" />
+      <path d="M17 17l-2 2l2 2" />
+    </svg>
+  </symbol>
+  <symbol id="svg-eye" viewBox="0 0 24 24">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round" class="icon-tabler-eye-code">
+      <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+      <path d="M10 12a2 2 0 1 0 4 0a2 2 0 0 0 -4 0" />
+      <path
+        d="M11.11 17.958c-3.209 -.307 -5.91 -2.293 -8.11 -5.958c2.4 -4 5.4 -6 9 -6c3.6 0 6.6 2 9 6c-.21 .352 -.427 .688 -.647 1.008" />
+      <path d="M20 21l2 -2l-2 -2" />
+      <path d="M17 17l-2 2l2 2" />
+    </svg>
+  </symbol>
+</svg>
+
+<input type="checkbox" class="sidebar-toggle" name="__navigation" id="__navigation" aria-label="Toggle site navigation sidebar">
+<input type="checkbox" class="sidebar-toggle" name="__toc" id="__toc" aria-label="Toggle table of contents sidebar">
+<label class="overlay sidebar-overlay" for="__navigation"></label>
+<label class="overlay toc-overlay" for="__toc"></label>
+
+<a class="skip-to-content muted-link" href="#furo-main-content">Skip to content</a>
+
+
+
+<div class="page">
+  <header class="mobile-header">
+    <div class="header-left">
+      <label class="nav-overlay-icon" for="__navigation">
+        <span class="icon"><svg><use href="#svg-menu"></use></svg></span>
+      </label>
+    </div>
+    <div class="header-center">
+      <a href="index.html"><div class="brand">Medical Register 0.1.0 documentation</div></a>
+    </div>
+    <div class="header-right">
+      <div class="theme-toggle-container theme-toggle-header">
+        <button class="theme-toggle" aria-label="Toggle Light / Dark / Auto color theme">
+          <svg class="theme-icon-when-auto-light"><use href="#svg-sun-with-moon"></use></svg>
+          <svg class="theme-icon-when-auto-dark"><use href="#svg-moon-with-sun"></use></svg>
+          <svg class="theme-icon-when-dark"><use href="#svg-moon"></use></svg>
+          <svg class="theme-icon-when-light"><use href="#svg-sun"></use></svg>
+        </button>
+      </div>
+      <label class="toc-overlay-icon toc-header-icon" for="__toc">
+        <span class="icon"><svg><use href="#svg-toc"></use></svg></span>
+      </label>
+    </div>
+  </header>
+  <aside class="sidebar-drawer">
+    <div class="sidebar-container">
+      
+      <div class="sidebar-sticky"><a class="sidebar-brand" href="index.html">
+  
+  
+</a><form class="sidebar-search-container" method="get" action="search.html" role="search">
+  <input class="sidebar-search" placeholder="Search" name="q" aria-label="Search">
+  <input type="hidden" name="check_keywords" value="yes">
+  <input type="hidden" name="area" value="default">
+</form>
+<div id="searchbox"></div><div class="sidebar-scroll"><div class="sidebar-tree">
+  <p class="caption" role="heading"><span class="caption-text">Contenido:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="manual.html">Manual de Usuario - Registro Personal de Peso e IMC</a></li>
+<li class="toctree-l1"><a class="reference internal" href="requeriments.html">Requerimientos Funcionales</a></li>
+<li class="toctree-l1"><a class="reference internal" href="INFORME_SEGURIDAD.html">Informe de Análisis de Seguridad - Aplicación Médica</a></li>
+<li class="toctree-l1"><a class="reference internal" href="INICIO_RAPIDO.html">Inicio Rápido</a></li>
+<li class="toctree-l1"><a class="reference internal" href="mockups/MOCKUPS.html">Mockups y Diagramas</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">DefectDojo:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="defectdojo/ANALISIS_CWE_699.html">Análisis de Seguridad según CWE-699</a></li>
+<li class="toctree-l1"><a class="reference internal" href="defectdojo/ESTADO_ACTUAL_CWE_699.html">Estado Actual del Programa - Análisis CWE-699</a></li>
+<li class="toctree-l1"><a class="reference internal" href="defectdojo/DEFECTDOJO_CONFIGURACION.html">Configuración de DefectDojo</a></li>
+<li class="toctree-l1"><a class="reference internal" href="defectdojo/DEFECTDOJO_CREDENTIALS.html">Credenciales de DefectDojo</a></li>
+<li class="toctree-l1"><a class="reference internal" href="defectdojo/DEFECTDOJO_DATABASE.html">Gestión de Base de Datos de DefectDojo</a></li>
+<li class="toctree-l1"><a class="reference internal" href="defectdojo/DEFECTDOJO_INTEGRATION.html">Integración de DefectDojo</a></li>
+<li class="toctree-l1"><a class="reference internal" href="defectdojo/DEFECTDOJO_FLUJO_CREACION_RESOLUCION.html">Flujo de Creación y Resolución de Findings en DefectDojo</a></li>
+<li class="toctree-l1"><a class="reference internal" href="defectdojo/DEFECTDOJO_FLUJO_IMPLEMENTADO.html">Flujo de Creación → Resolución Implementado en DefectDojo</a></li>
+<li class="toctree-l1"><a class="reference internal" href="defectdojo/MAKE_ALL_USO.html">Uso de <code class="docutils literal notranslate"><span class="pre">make</span> <span class="pre">update</span></code> - Flujo Completo de DefectDojo</a></li>
+</ul>
+
+</div>
+</div>
+
+      </div>
+      
+    </div>
+  </aside>
+  <div class="main">
+    <div class="content">
+      <div class="article-container">
+        <a href="#" class="back-to-top muted-link">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+            <path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8v12z"></path>
+          </svg>
+          <span>Back to top</span>
+        </a>
+        <div class="content-icon-container">
+          <div class="view-this-page">
+  <a class="muted-link" href="_sources/FLUJO_GENERACION_INFORME_ASVS.md.txt" title="View this page">
+    <svg><use href="#svg-eye"></use></svg>
+    <span class="visually-hidden">View this page</span>
+  </a>
+</div>
+<div class="theme-toggle-container theme-toggle-content">
+            <button class="theme-toggle" aria-label="Toggle Light / Dark / Auto color theme">
+              <svg class="theme-icon-when-auto-light"><use href="#svg-sun-with-moon"></use></svg>
+              <svg class="theme-icon-when-auto-dark"><use href="#svg-moon-with-sun"></use></svg>
+              <svg class="theme-icon-when-dark"><use href="#svg-moon"></use></svg>
+              <svg class="theme-icon-when-light"><use href="#svg-sun"></use></svg>
+            </button>
+          </div>
+          <label class="toc-overlay-icon toc-content-icon" for="__toc">
+            <span class="icon"><svg><use href="#svg-toc"></use></svg></span>
+          </label>
+        </div>
+        <article role="main" id="furo-main-content">
+          <section id="flujo-de-generacion-del-informe-asvs-4-0-3">
+<h1>Flujo de Generación del Informe ASVS 4.0.3<a class="headerlink" href="#flujo-de-generacion-del-informe-asvs-4-0-3" title="Link to this heading">¶</a></h1>
+<p>Este documento explica el flujo completo de cómo se obtienen los datos y se genera el informe ASVS automáticamente.</p>
+<section id="diagrama-del-flujo">
+<h2>📊 Diagrama del Flujo<a class="headerlink" href="#diagrama-del-flujo" title="Link to this heading">¶</a></h2>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>┌─────────────────────────────────────────────────────────────────┐
+│                    INICIO: make pdf_report                       │
+└────────────────────────────┬────────────────────────────────────┘
+                             │
+                             ▼
+┌─────────────────────────────────────────────────────────────────┐
+│  PASO 1: generate_asvs_report.py                               │
+│  ────────────────────────────────────────────────────────────  │
+│  🔗 INTEGRADO CON DEFECTDOJO                                    │
+│                                                                │
+│  ┌──────────────────────────────────────────────────────────┐  │
+│  │ 1.1. CONEXIÓN CON DEFECTDOJO                              │  │
+│  │     - Inicializa Django para acceso a DefectDojo          │  │
+│  │     - Obtiene producto &quot;Medical Register App&quot;             │  │
+│  │     - Obtiene Benchmark_Product_Summary (puntajes ASVS) │  │
+│  │     - Obtiene findings activos del producto               │  │
+│  └──────────────────────────────────────────────────────────┘  │
+│                             │                                    │
+│                             ▼                                    │
+│  ┌──────────────────────────────────────────────────────────┐  │
+│  │ 1.2. MAPEO DE FINDINGS A ASVS                            │  │
+│  │     - Mapea CWE → Categorías ASVS:                       │  │
+│  │       • CWE-20, CWE-1287, CWE-843 → V5 (Validación)     │  │
+│  │       • CWE-703 → V7 (Error Handling)                    │  │
+│  │       • CWE-1021 → V8 (Data Protection)                  │  │
+│  │       • CWE-942 → V9 (Communications)                    │  │
+│  │     - Agrupa findings por categoría ASVS                  │  │
+│  └──────────────────────────────────────────────────────────┘  │
+│                             │                                    │
+│                             ▼                                    │
+│  ┌──────────────────────────────────────────────────────────┐  │
+│  │ 1.3. INICIALIZACIÓN                                      │  │
+│  │     - Crea ASVSAnalyzer con estructura ASVS 4.0.3        │  │
+│  │     - Define 14 categorías (V1-V14)                      │  │
+│  │     - Define requisitos Nivel 2 por categoría            │  │
+│  └──────────────────────────────────────────────────────────┘  │
+│                             │                                    │
+│                             ▼                                    │
+│  ┌──────────────────────────────────────────────────────────┐  │
+│  │ 1.4. ANÁLISIS DE CÓDIGO FUENTE (COMPLEMENTARIO)          │  │
+│  │     ┌──────────────────────────────────────────────────┐  │  │
+│  │     │ Archivos Python analizados:                      │  │  │
+│  │     │ - app/routes.py                                  │  │  │
+│  │     │ - app/helpers.py                                 │  │  │
+│  │     │ - app/storage.py                                 │  │  │
+│  │     │ - app/config.py                                  │  │  │
+│  │     └──────────────────────────────────────────────────┘  │  │
+│  │     ┌──────────────────────────────────────────────────┐  │  │
+│  │     │ Archivos JavaScript analizados:                  │  │  │
+│  │     │ - app/static/js/main.js                          │  │  │
+│  │     │ - app/static/js/storage.js                        │  │  │
+│  │     │ - app/static/js/validation.js                     │  │  │
+│  │     └──────────────────────────────────────────────────┘  │  │
+│  │                                                           │  │
+│  │  Patrones detectados:                                     │  │
+│  │  ✓ Validaciones (validate, sanitize)                    │  │
+│  │  ✓ Manejo de errores (try/except)                        │  │
+│  │  ✓ Headers de seguridad (X-Frame-Options, CSP, CORS)     │  │
+│  │  ✓ Configuración centralizada (config.py)                │  │
+│  │  ✓ API REST (@api.route, Blueprint)                      │  │
+│  │  ✓ Sanitización frontend (trim, replace)                 │  │
+│  └──────────────────────────────────────────────────────────┘  │
+│                             │                                    │
+│                             ▼                                    │
+│  ┌──────────────────────────────────────────────────────────┐  │
+│  │ 1.3. VERIFICACIÓN ASVS 4.0.3 Nivel 2                     │  │
+│  │                                                           │  │
+│  │  Para cada categoría V1-V14:                             │  │
+│  │  ┌────────────────────────────────────────────────────┐  │  │
+│  │  │ V1: Architecture, Design and Threat Modeling       │  │  │
+│  │  │   - V1.1: ¿Existe README.md?                       │  │  │
+│  │  │   - V1.2: ¿Existe carpeta docs/?                   │  │  │
+│  │  │   - V1.3: ¿Hay validaciones/error handling?        │  │  │
+│  │  │   - V1.4: ¿Hay API REST?                           │  │  │
+│  │  └────────────────────────────────────────────────────┘  │  │
+│  │  ┌────────────────────────────────────────────────────┐  │  │
+│  │  │ V5: Validation, Sanitization and Encoding          │  │  │
+│  │  │   - V5.1: ¿Validación frontend Y backend?          │  │  │
+│  │  │   - V5.2: ¿Validación de tipos?                    │  │  │
+│  │  │   - V5.3: ¿Sanitización implementada?              │  │  │
+│  │  │   - V5.4: ¿Validación NaN/Infinity? (parcial)      │  │  │
+│  │  │   - V5.5: ¿Validación de límites?                  │  │  │
+│  │  │   - V5.6: ¿Validación de formato?                  │  │  │
+│  │  └────────────────────────────────────────────────────┘  │  │
+│  │  ┌────────────────────────────────────────────────────┐  │  │
+│  │  │ V2, V3, V4, V6: No aplicable (monousuario)         │  │  │
+│  │  └────────────────────────────────────────────────────┘  │  │
+│  │  ... (resto de categorías)                                │  │
+│  │                                                           │  │
+│  │  Resultado: findings = {                                 │  │
+│  │    &#39;compliant&#39;: [&#39;V1&#39;, &#39;V10&#39;, &#39;V11&#39;, &#39;V13&#39;, &#39;V14&#39;],     │  │
+│  │    &#39;partial&#39;: [&#39;V5&#39;, &#39;V7&#39;, &#39;V8&#39;, &#39;V9&#39;],                 │  │
+│  │    &#39;non_applicable&#39;: [&#39;V2&#39;, &#39;V3&#39;, &#39;V4&#39;, &#39;V6&#39;],          │  │
+│  │    &#39;missing&#39;: []                                         │  │
+│  │  }                                                       │  │
+│  └──────────────────────────────────────────────────────────┘  │
+│                             │                                    │
+│                             ▼                                    │
+│  ┌──────────────────────────────────────────────────────────┐  │
+│  │ 1.4. GENERACIÓN DEL INFORME MARKDOWN                     │  │
+│  │                                                           │  │
+│  │  ASVSReportGenerator genera:                             │  │
+│  │  ┌────────────────────────────────────────────────────┐  │  │
+│  │  │ • Encabezado (con ASVS 4.0.3 explícito)          │  │  │
+│  │  │ • Sección 1: Descripción de la aplicación         │  │  │
+│  │  │ • Sección 2: Análisis de seguridad                │  │  │
+│  │  │ • Sección 3: Debilidades identificadas            │  │  │
+│  │  │ • Sección 4: Nivel ASVS y requisitos               │  │  │
+│  │  │   - Para cada V1-V14:                              │  │  │
+│  │  │     * Estado: ✅ CUMPLE / ⚠️ PARCIAL / ❌ PENDIENTE│  │  │
+│  │  │     * Requisitos cumplidos                         │  │  │
+│  │  │     * Justificaciones                             │  │  │
+│  │  │ • Sección 5: Recomendaciones                       │  │  │
+│  │  │ • Referencias (enlaces a GitHub ASVS 4.0.3)        │  │  │
+│  │  └────────────────────────────────────────────────────┘  │  │
+│  │                                                           │  │
+│  │  Guarda en: docs/INFORME_SEGURIDAD.md                   │  │
+│  └──────────────────────────────────────────────────────────┘  │
+└─────────────────────────────────────────────────────────────────┘
+                             │
+                             ▼
+┌─────────────────────────────────────────────────────────────────┐
+│  PASO 2: generate_pdf_report.py                                 │
+│  ────────────────────────────────────────────────────────────  │
+│                                                                 │
+│  ┌──────────────────────────────────────────────────────────┐  │
+│  │ 2.1. LECTURA DEL MARKDOWN                                 │  │
+│  │     - Lee: docs/INFORME_SEGURIDAD.md                     │  │
+│  │     - Verifica que existe                                │  │
+│  └──────────────────────────────────────────────────────────┘  │
+│                             │                                    │
+│                             ▼                                    │
+│  ┌──────────────────────────────────────────────────────────┐  │
+│  │ 2.2. CONVERSIÓN A PDF                                     │  │
+│  │     Intenta métodos en orden:                            │  │
+│  │     1. markdown2pdf (si disponible)                      │  │
+│  │     2. markdown + weasyprint (si disponible)             │  │
+│  │     3. markdown + reportlab (si disponible)               │  │
+│  │     4. pandoc (si está instalado)                        │  │
+│  └──────────────────────────────────────────────────────────┘  │
+│                             │                                    │
+│                             ▼                                    │
+│  ┌──────────────────────────────────────────────────────────┐  │
+│  │ 2.3. GUARDADO DEL PDF                                     │  │
+│  │     - Guarda en: docs/informes/                          │  │
+│  │     - Nombre: INFORME_SEGURIDAD_YYYYMMDD.pdf             │  │
+│  │     - Ejemplo: INFORME_SEGURIDAD_20251203.pdf            │  │
+│  └──────────────────────────────────────────────────────────┘  │
+└─────────────────────────────────────────────────────────────────┘
+                             │
+                             ▼
+                    ✅ PDF GENERADO
+</pre></div>
+</div>
+</section>
+<section id="detalle-del-proceso">
+<h2>🔍 Detalle del Proceso<a class="headerlink" href="#detalle-del-proceso" title="Link to this heading">¶</a></h2>
+<section id="fase-1-analisis-de-codigo-analyze-code">
+<h3>Fase 1: Análisis de Código (<code class="docutils literal notranslate"><span class="pre">analyze_code()</span></code>)<a class="headerlink" href="#fase-1-analisis-de-codigo-analyze-code" title="Link to this heading">¶</a></h3>
+<p>El script analiza los archivos fuente buscando patrones específicos:</p>
+<section id="archivos-python-analizados">
+<h4>Archivos Python analizados:<a class="headerlink" href="#archivos-python-analizados" title="Link to this heading">¶</a></h4>
+<ul class="simple">
+<li><p><strong><code class="docutils literal notranslate"><span class="pre">app/routes.py</span></code></strong>: Busca endpoints API, validaciones, manejo de errores</p></li>
+<li><p><strong><code class="docutils literal notranslate"><span class="pre">app/helpers.py</span></code></strong>: Busca funciones de validación y sanitización</p></li>
+<li><p><strong><code class="docutils literal notranslate"><span class="pre">app/storage.py</span></code></strong>: Busca manejo de datos</p></li>
+<li><p><strong><code class="docutils literal notranslate"><span class="pre">app/config.py</span></code></strong>: Detecta configuración centralizada</p></li>
+</ul>
+</section>
+<section id="archivos-javascript-analizados">
+<h4>Archivos JavaScript analizados:<a class="headerlink" href="#archivos-javascript-analizados" title="Link to this heading">¶</a></h4>
+<ul class="simple">
+<li><p><strong><code class="docutils literal notranslate"><span class="pre">app/static/js/main.js</span></code></strong>: Busca validaciones frontend</p></li>
+<li><p><strong><code class="docutils literal notranslate"><span class="pre">app/static/js/storage.js</span></code></strong>: Busca manejo de datos en cliente</p></li>
+<li><p><strong><code class="docutils literal notranslate"><span class="pre">app/static/js/validation.js</span></code></strong>: Busca funciones de validación</p></li>
+</ul>
+</section>
+<section id="patrones-detectados">
+<h4>Patrones detectados:<a class="headerlink" href="#patrones-detectados" title="Link to this heading">¶</a></h4>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># Ejemplo de detección en Python</span>
+<span class="k">if</span> <span class="s1">&#39;validate&#39;</span> <span class="ow">in</span> <span class="n">content</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span> <span class="ow">or</span> <span class="s1">&#39;sanitize&#39;</span> <span class="ow">in</span> <span class="n">content</span><span class="o">.</span><span class="n">lower</span><span class="p">():</span>
+    <span class="n">code_analysis</span><span class="p">[</span><span class="s1">&#39;validation&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">filename</span><span class="p">)</span>
+
+<span class="k">if</span> <span class="s1">&#39;try:&#39;</span> <span class="ow">in</span> <span class="n">content</span> <span class="ow">and</span> <span class="s1">&#39;except&#39;</span> <span class="ow">in</span> <span class="n">content</span><span class="p">:</span>
+    <span class="n">code_analysis</span><span class="p">[</span><span class="s1">&#39;error_handling&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">filename</span><span class="p">)</span>
+
+<span class="k">if</span> <span class="s1">&#39;X-Frame-Options&#39;</span> <span class="ow">in</span> <span class="n">content</span> <span class="ow">or</span> <span class="s1">&#39;CSP&#39;</span> <span class="ow">in</span> <span class="n">content</span><span class="p">:</span>
+    <span class="n">code_analysis</span><span class="p">[</span><span class="s1">&#39;security_headers&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">filename</span><span class="p">)</span>
+
+<span class="k">if</span> <span class="s1">&#39;@api.route&#39;</span> <span class="ow">in</span> <span class="n">content</span><span class="p">:</span>
+    <span class="n">code_analysis</span><span class="p">[</span><span class="s1">&#39;api_rest&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="kc">True</span>
+</pre></div>
+</div>
+<div class="highlight-javascript notranslate"><div class="highlight"><pre><span></span><span class="c1">// Ejemplo de detección en JavaScript</span>
+<span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="s1">&#39;validate&#39;</span><span class="w"> </span><span class="ow">in</span><span class="w"> </span><span class="nx">content</span><span class="w"> </span><span class="o">||</span><span class="w"> </span><span class="s1">&#39;parseFloat&#39;</span><span class="w"> </span><span class="ow">in</span><span class="w"> </span><span class="nx">content</span><span class="p">)</span><span class="o">:</span>
+<span class="w">    </span><span class="nx">code_analysis</span><span class="p">[</span><span class="s1">&#39;frontend_validation&#39;</span><span class="p">].</span><span class="nx">append</span><span class="p">(</span><span class="nx">filename</span><span class="p">)</span>
+
+<span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="s1">&#39;sanitize&#39;</span><span class="w"> </span><span class="ow">in</span><span class="w"> </span><span class="nx">content</span><span class="w"> </span><span class="o">||</span><span class="w"> </span><span class="s1">&#39;trim&#39;</span><span class="w"> </span><span class="ow">in</span><span class="w"> </span><span class="nx">content</span><span class="p">)</span><span class="o">:</span>
+<span class="w">    </span><span class="nx">code_analysis</span><span class="p">[</span><span class="s1">&#39;frontend_sanitization&#39;</span><span class="p">].</span><span class="nx">append</span><span class="p">(</span><span class="nx">filename</span><span class="p">)</span>
+</pre></div>
+</div>
+</section>
+</section>
+<section id="fase-2-verificacion-asvs-4-0-3-check-asvs-requirements">
+<h3>Fase 2: Verificación ASVS 4.0.3 (<code class="docutils literal notranslate"><span class="pre">check_asvs_requirements()</span></code>)<a class="headerlink" href="#fase-2-verificacion-asvs-4-0-3-check-asvs-requirements" title="Link to this heading">¶</a></h3>
+<p>Para cada categoría V1-V14, el script verifica el cumplimiento:</p>
+<section id="ejemplo-v5-validation-sanitization-and-encoding">
+<h4>Ejemplo: V5 (Validation, Sanitization and Encoding)<a class="headerlink" href="#ejemplo-v5-validation-sanitization-and-encoding" title="Link to this heading">¶</a></h4>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">def</span><span class="w"> </span><span class="nf">_check_v5</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="n">compliant</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">partial</span> <span class="o">=</span> <span class="p">[]</span>
+    
+    <span class="c1"># V5.1: Validación en todas las fuentes</span>
+    <span class="k">if</span> <span class="s1">&#39;validation&#39;</span> <span class="ow">in</span> <span class="n">code_analysis</span> <span class="ow">and</span> <span class="s1">&#39;frontend_validation&#39;</span> <span class="ow">in</span> <span class="n">code_analysis</span><span class="p">:</span>
+        <span class="n">compliant</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s1">&#39;V5.1&#39;</span><span class="p">)</span>  <span class="c1"># ✅ CUMPLE</span>
+    <span class="k">elif</span> <span class="s1">&#39;validation&#39;</span> <span class="ow">in</span> <span class="n">code_analysis</span><span class="p">:</span>
+        <span class="n">partial</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s1">&#39;V5.1&#39;</span><span class="p">)</span>    <span class="c1"># ⚠️ PARCIAL</span>
+    
+    <span class="c1"># V5.2: Validación de tipos</span>
+    <span class="k">if</span> <span class="s1">&#39;validation&#39;</span> <span class="ow">in</span> <span class="n">code_analysis</span><span class="p">:</span>
+        <span class="n">compliant</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s1">&#39;V5.2&#39;</span><span class="p">)</span>  <span class="c1"># ✅ CUMPLE</span>
+    
+    <span class="c1"># V5.3: Sanitización</span>
+    <span class="k">if</span> <span class="s1">&#39;frontend_sanitization&#39;</span> <span class="ow">in</span> <span class="n">code_analysis</span><span class="p">:</span>
+        <span class="n">compliant</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s1">&#39;V5.3&#39;</span><span class="p">)</span>  <span class="c1"># ✅ CUMPLE</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">partial</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s1">&#39;V5.3&#39;</span><span class="p">)</span>    <span class="c1"># ⚠️ PARCIAL</span>
+    
+    <span class="c1"># V5.4: Validación NaN/Infinity (siempre parcial por defecto)</span>
+    <span class="n">partial</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s1">&#39;V5.4&#39;</span><span class="p">)</span>        <span class="c1"># ⚠️ PARCIAL</span>
+    
+    <span class="c1"># Resultado final</span>
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">partial</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="n">findings</span><span class="p">[</span><span class="s1">&#39;partial&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">({</span><span class="s1">&#39;category&#39;</span><span class="p">:</span> <span class="s1">&#39;V5&#39;</span><span class="p">,</span> <span class="o">...</span><span class="p">})</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">findings</span><span class="p">[</span><span class="s1">&#39;compliant&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s1">&#39;V5&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+</section>
+<section id="categorias-no-aplicables">
+<h4>Categorías No Aplicables:<a class="headerlink" href="#categorias-no-aplicables" title="Link to this heading">¶</a></h4>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># V2, V3, V4, V6: No aplicable para aplicación monousuario</span>
+<span class="n">findings</span><span class="p">[</span><span class="s1">&#39;non_applicable&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">({</span>
+    <span class="s1">&#39;category&#39;</span><span class="p">:</span> <span class="s1">&#39;V2&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;reason&#39;</span><span class="p">:</span> <span class="s1">&#39;Aplicación monousuario sin autenticación compleja&#39;</span>
+<span class="p">})</span>
+</pre></div>
+</div>
+</section>
+</section>
+<section id="fase-3-generacion-del-informe-generate-report">
+<h3>Fase 3: Generación del Informe (<code class="docutils literal notranslate"><span class="pre">generate_report()</span></code>)<a class="headerlink" href="#fase-3-generacion-del-informe-generate-report" title="Link to this heading">¶</a></h3>
+<p>El generador crea el Markdown estructurado:</p>
+<section id="estructura-del-informe">
+<h4>Estructura del Informe:<a class="headerlink" href="#estructura-del-informe" title="Link to this heading">¶</a></h4>
+<ol class="arabic simple">
+<li><p><strong>Encabezado</strong>: Fecha, versión ASVS 4.0.3, enlaces a GitHub</p></li>
+<li><p><strong>Sección 1</strong>: Descripción de la aplicación (texto fijo)</p></li>
+<li><p><strong>Sección 2</strong>: Metodología de análisis (texto fijo)</p></li>
+<li><p><strong>Sección 3</strong>: Debilidades identificadas (texto fijo)</p></li>
+<li><p><strong>Sección 4</strong>: Nivel ASVS y requisitos (generado dinámicamente)</p>
+<ul class="simple">
+<li><p>Para cada V1-V14:</p>
+<ul>
+<li><p>Estado basado en <code class="docutils literal notranslate"><span class="pre">findings</span></code></p></li>
+<li><p>Requisitos cumplidos/parciales</p></li>
+<li><p>Justificaciones</p></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><p><strong>Sección 5</strong>: Recomendaciones (texto fijo)</p></li>
+<li><p><strong>Referencias</strong>: Enlaces a ASVS 4.0.3 en GitHub</p></li>
+</ol>
+</section>
+<section id="ejemplo-de-generacion-dinamica">
+<h4>Ejemplo de generación dinámica:<a class="headerlink" href="#ejemplo-de-generacion-dinamica" title="Link to this heading">¶</a></h4>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">def</span><span class="w"> </span><span class="nf">_generate_section4</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">for</span> <span class="n">code</span><span class="p">,</span> <span class="n">name</span> <span class="ow">in</span> <span class="n">ASVS_403_CATEGORIES</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+        <span class="k">if</span> <span class="n">code</span> <span class="ow">in</span> <span class="n">findings</span><span class="p">[</span><span class="s1">&#39;compliant&#39;</span><span class="p">]:</span>
+            <span class="c1"># Genera: ✅ CUMPLE</span>
+        <span class="k">elif</span> <span class="n">code</span> <span class="ow">in</span> <span class="p">[</span><span class="n">f</span><span class="p">[</span><span class="s1">&#39;category&#39;</span><span class="p">]</span> <span class="k">for</span> <span class="n">f</span> <span class="ow">in</span> <span class="n">findings</span><span class="p">[</span><span class="s1">&#39;partial&#39;</span><span class="p">]]:</span>
+            <span class="c1"># Genera: ⚠️ PARCIAL</span>
+        <span class="k">elif</span> <span class="n">code</span> <span class="ow">in</span> <span class="p">[</span><span class="n">f</span><span class="p">[</span><span class="s1">&#39;category&#39;</span><span class="p">]</span> <span class="k">for</span> <span class="n">f</span> <span class="ow">in</span> <span class="n">findings</span><span class="p">[</span><span class="s1">&#39;non_applicable&#39;</span><span class="p">]]:</span>
+            <span class="c1"># Genera: ⚠️ No aplicable</span>
+</pre></div>
+</div>
+</section>
+</section>
+<section id="fase-4-conversion-a-pdf-generate-pdf-report">
+<h3>Fase 4: Conversión a PDF (<code class="docutils literal notranslate"><span class="pre">generate_pdf_report()</span></code>)<a class="headerlink" href="#fase-4-conversion-a-pdf-generate-pdf-report" title="Link to this heading">¶</a></h3>
+<p>El script de conversión:</p>
+<ol class="arabic simple">
+<li><p><strong>Lee el Markdown</strong> generado</p></li>
+<li><p><strong>Intenta convertir</strong> usando múltiples métodos:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">markdown2pdf</span></code> (preferido)</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">weasyprint</span></code> (alternativa)</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">reportlab</span></code> (alternativa)</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">pandoc</span></code> (último recurso)</p></li>
+</ul>
+</li>
+<li><p><strong>Guarda el PDF</strong> con fecha en el nombre</p></li>
+</ol>
+</section>
+</section>
+<section id="datos-utilizados">
+<h2>📋 Datos Utilizados<a class="headerlink" href="#datos-utilizados" title="Link to this heading">¶</a></h2>
+<section id="fuentes-de-datos">
+<h3>Fuentes de Datos:<a class="headerlink" href="#fuentes-de-datos" title="Link to this heading">¶</a></h3>
+<ol class="arabic">
+<li><p><strong>Estructura ASVS 4.0.3</strong> (hardcoded en el script):</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">ASVS_403_CATEGORIES</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="s1">&#39;V1&#39;</span><span class="p">:</span> <span class="s1">&#39;Architecture, Design and Threat Modeling&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;V2&#39;</span><span class="p">:</span> <span class="s1">&#39;Authentication&#39;</span><span class="p">,</span>
+    <span class="c1"># ... 14 categorías</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+</li>
+<li><p><strong>Código fuente de la aplicación</strong>:</p>
+<ul class="simple">
+<li><p>Archivos Python en <code class="docutils literal notranslate"><span class="pre">app/</span></code></p></li>
+<li><p>Archivos JavaScript en <code class="docutils literal notranslate"><span class="pre">app/static/js/</span></code></p></li>
+<li><p>Archivos de configuración</p></li>
+</ul>
+</li>
+<li><p><strong>Análisis de patrones</strong>:</p>
+<ul class="simple">
+<li><p>Búsqueda de palabras clave</p></li>
+<li><p>Detección de estructuras de código</p></li>
+<li><p>Verificación de existencia de archivos</p></li>
+</ul>
+</li>
+</ol>
+</section>
+<section id="limitaciones-del-analisis-automatico">
+<h3>Limitaciones del Análisis Automático:<a class="headerlink" href="#limitaciones-del-analisis-automatico" title="Link to this heading">¶</a></h3>
+<ul class="simple">
+<li><p><strong>Análisis estático básico</strong>: No ejecuta el código, solo lo lee</p></li>
+<li><p><strong>Patrones simples</strong>: Busca palabras clave y estructuras básicas</p></li>
+<li><p><strong>No verifica lógica compleja</strong>: No analiza la implementación detallada</p></li>
+<li><p><strong>Requiere validación manual</strong>: El informe generado debe revisarse</p></li>
+</ul>
+</section>
+</section>
+<section id="flujo-completo-resumido">
+<h2>🔄 Flujo Completo Resumido<a class="headerlink" href="#flujo-completo-resumido" title="Link to this heading">¶</a></h2>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>Usuario ejecuta: make pdf_report
+         │
+         ├─► Paso 1: generate_asvs_report.py
+         │   │
+         │   ├─► Analiza código fuente (Python + JavaScript)
+         │   │   └─► Detecta: validaciones, headers, API, etc.
+         │   │
+         │   ├─► Verifica requisitos ASVS 4.0.3 Nivel 2
+         │   │   └─► Compara código con 14 categorías (V1-V14)
+         │   │
+         │   └─► Genera Markdown
+         │       └─► Guarda: docs/INFORME_SEGURIDAD.md
+         │
+         └─► Paso 2: generate_pdf_report.py
+             │
+             ├─► Lee Markdown generado
+             │
+             ├─► Convierte a PDF (múltiples métodos)
+             │
+             └─► Guarda PDF
+                 └─► docs/informes/INFORME_SEGURIDAD_YYYYMMDD.pdf
+</pre></div>
+</div>
+</section>
+<section id="puntos-clave">
+<h2>🎯 Puntos Clave<a class="headerlink" href="#puntos-clave" title="Link to this heading">¶</a></h2>
+<ol class="arabic simple">
+<li><p><strong>ASVS 4.0.3 está hardcoded</strong> en el script (estructura de categorías)</p></li>
+<li><p><strong>No descarga datos de GitHub</strong> - usa estructura local</p></li>
+<li><p><strong>Análisis estático</strong> - lee código, no lo ejecuta</p></li>
+<li><p><strong>Generación automática</strong> - crea el informe completo desde cero</p></li>
+<li><p><strong>Dos scripts separados</strong>:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">generate_asvs_report.py</span></code>: Genera el contenido (Markdown)</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">generate_pdf_report.py</span></code>: Convierte a PDF</p></li>
+</ul>
+</li>
+</ol>
+</section>
+<section id="relacion-entre-asvs-y-defectdojo">
+<h2>🔗 Relación entre ASVS y DefectDojo<a class="headerlink" href="#relacion-entre-asvs-y-defectdojo" title="Link to this heading">¶</a></h2>
+<section id="estado-actual">
+<h3>Estado Actual<a class="headerlink" href="#estado-actual" title="Link to this heading">¶</a></h3>
+<p><strong>IMPORTANTE</strong>: En el proyecto actual, <strong>ASVS y DefectDojo NO están integrados directamente</strong>.</p>
+<ul class="simple">
+<li><p><strong>El informe ASVS</strong> se genera analizando el código fuente directamente</p></li>
+<li><p><strong>DefectDojo</strong> se usa para gestionar findings/vulnerabilidades (CWE-699, etc.)</p></li>
+<li><p><strong>No hay conexión</strong> entre el informe ASVS y los benchmarks de DefectDojo</p></li>
+</ul>
+</section>
+<section id="funcionalidad-de-defectdojo-con-asvs">
+<h3>Funcionalidad de DefectDojo con ASVS<a class="headerlink" href="#funcionalidad-de-defectdojo-con-asvs" title="Link to this heading">¶</a></h3>
+<p>DefectDojo <strong>SÍ tiene funcionalidad de benchmarks ASVS</strong>, pero <strong>NO se está usando</strong> en este proyecto:</p>
+<ul class="simple">
+<li><p>DefectDojo permite configurar <strong>benchmarks ASVS</strong> para productos</p></li>
+<li><p>Los benchmarks permiten evaluar el cumplimiento de ASVS basándose en findings</p></li>
+<li><p>Se puede ver el puntaje ASVS en la vista del producto</p></li>
+<li><p>DefectDojo soporta ASVS v3.1 (no v4.0.3 directamente)</p></li>
+</ul>
+</section>
+<section id="diferencia-con-el-enfoque-actual">
+<h3>Diferencia con el Enfoque Actual<a class="headerlink" href="#diferencia-con-el-enfoque-actual" title="Link to this heading">¶</a></h3>
+<p><strong>Enfoque actual (implementado)</strong>:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>Código fuente → Análisis estático → Informe ASVS
+</pre></div>
+</div>
+<p><strong>Enfoque con DefectDojo (no implementado)</strong>:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>Findings en DefectDojo → Benchmarks ASVS → Puntaje ASVS
+</pre></div>
+</div>
+</section>
+<section id="posible-integracion-futura">
+<h3>Posible Integración Futura<a class="headerlink" href="#posible-integracion-futura" title="Link to this heading">¶</a></h3>
+<p>Se podría mejorar el informe ASVS integrando con DefectDojo:</p>
+<ol class="arabic simple">
+<li><p><strong>Obtener findings de DefectDojo</strong> relacionados con ASVS</p></li>
+<li><p><strong>Usar benchmarks ASVS de DefectDojo</strong> para evaluar cumplimiento</p></li>
+<li><p><strong>Combinar análisis de código + findings de DefectDojo</strong> para un informe más completo</p></li>
+<li><p><strong>Sincronizar</strong> el informe ASVS con el estado real de findings en DefectDojo</p></li>
+</ol>
+</section>
+</section>
+<section id="mejoras-futuras-posibles">
+<h2>💡 Mejoras Futuras Posibles<a class="headerlink" href="#mejoras-futuras-posibles" title="Link to this heading">¶</a></h2>
+<ol class="arabic simple">
+<li><p><strong>Descargar ASVS 4.0.3 desde GitHub</strong> automáticamente</p></li>
+<li><p><strong>Análisis más profundo</strong> del código (AST parsing)</p></li>
+<li><p><strong>Integración con DefectDojo</strong> para obtener findings reales y usar benchmarks ASVS</p></li>
+<li><p><strong>Análisis dinámico</strong> ejecutando tests de seguridad</p></li>
+<li><p><strong>Generación de evidencias</strong> con ejemplos de código</p></li>
+<li><p><strong>Sincronización con benchmarks ASVS de DefectDojo</strong> para evaluación más precisa</p></li>
+</ol>
+</section>
+</section>
+
+        </article>
+      </div>
+      <footer>
+        
+        <div class="related-pages">
+          
+          
+        </div>
+        <div class="bottom-of-page">
+          <div class="left-details">
+            <div class="copyright">
+                Copyright &#169; 2025, PumukyDev &amp; Alejandro Quiñones
+            </div>
+            Made with <a href="https://www.sphinx-doc.org/">Sphinx</a> and <a class="muted-link" href="https://pradyunsg.me">@pradyunsg</a>'s
+            
+            <a href="https://github.com/pradyunsg/furo">Furo</a>
+            
+          </div>
+          <div class="right-details">
+            
+          </div>
+        </div>
+        
+      </footer>
+    </div>
+    <aside class="toc-drawer">
+      
+      
+      <div class="toc-sticky toc-scroll">
+        <div class="toc-title-container">
+          <span class="toc-title">
+            On this page
+          </span>
+        </div>
+        <div class="toc-tree-container">
+          <div class="toc-tree">
+            <ul>
+<li><a class="reference internal" href="#">Flujo de Generación del Informe ASVS 4.0.3</a><ul>
+<li><a class="reference internal" href="#diagrama-del-flujo">📊 Diagrama del Flujo</a></li>
+<li><a class="reference internal" href="#detalle-del-proceso">🔍 Detalle del Proceso</a><ul>
+<li><a class="reference internal" href="#fase-1-analisis-de-codigo-analyze-code">Fase 1: Análisis de Código (<code class="docutils literal notranslate"><span class="pre">analyze_code()</span></code>)</a><ul>
+<li><a class="reference internal" href="#archivos-python-analizados">Archivos Python analizados:</a></li>
+<li><a class="reference internal" href="#archivos-javascript-analizados">Archivos JavaScript analizados:</a></li>
+<li><a class="reference internal" href="#patrones-detectados">Patrones detectados:</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#fase-2-verificacion-asvs-4-0-3-check-asvs-requirements">Fase 2: Verificación ASVS 4.0.3 (<code class="docutils literal notranslate"><span class="pre">check_asvs_requirements()</span></code>)</a><ul>
+<li><a class="reference internal" href="#ejemplo-v5-validation-sanitization-and-encoding">Ejemplo: V5 (Validation, Sanitization and Encoding)</a></li>
+<li><a class="reference internal" href="#categorias-no-aplicables">Categorías No Aplicables:</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#fase-3-generacion-del-informe-generate-report">Fase 3: Generación del Informe (<code class="docutils literal notranslate"><span class="pre">generate_report()</span></code>)</a><ul>
+<li><a class="reference internal" href="#estructura-del-informe">Estructura del Informe:</a></li>
+<li><a class="reference internal" href="#ejemplo-de-generacion-dinamica">Ejemplo de generación dinámica:</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#fase-4-conversion-a-pdf-generate-pdf-report">Fase 4: Conversión a PDF (<code class="docutils literal notranslate"><span class="pre">generate_pdf_report()</span></code>)</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#datos-utilizados">📋 Datos Utilizados</a><ul>
+<li><a class="reference internal" href="#fuentes-de-datos">Fuentes de Datos:</a></li>
+<li><a class="reference internal" href="#limitaciones-del-analisis-automatico">Limitaciones del Análisis Automático:</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#flujo-completo-resumido">🔄 Flujo Completo Resumido</a></li>
+<li><a class="reference internal" href="#puntos-clave">🎯 Puntos Clave</a></li>
+<li><a class="reference internal" href="#relacion-entre-asvs-y-defectdojo">🔗 Relación entre ASVS y DefectDojo</a><ul>
+<li><a class="reference internal" href="#estado-actual">Estado Actual</a></li>
+<li><a class="reference internal" href="#funcionalidad-de-defectdojo-con-asvs">Funcionalidad de DefectDojo con ASVS</a></li>
+<li><a class="reference internal" href="#diferencia-con-el-enfoque-actual">Diferencia con el Enfoque Actual</a></li>
+<li><a class="reference internal" href="#posible-integracion-futura">Posible Integración Futura</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#mejoras-futuras-posibles">💡 Mejoras Futuras Posibles</a></li>
+</ul>
+</li>
+</ul>
+
+          </div>
+        </div>
+      </div>
+      
+      
+    </aside>
+  </div>
+</div><script src="_static/documentation_options.js?v=01f34227"></script>
+    <script src="_static/doctools.js?v=9bcbadda"></script>
+    <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="_static/scripts/furo.js?v=46bd48cc"></script>
+    </body>
+</html>

