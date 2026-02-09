@@ -13,16 +13,10 @@ on:
 
 permissions:
   contents: write # Required for peaceiris/actions-gh-pages
-  pages: write # For native GitHub Pages deployment
-  id-token: write # For native GitHub Pages deployment
 
 jobs:
   build:
     runs-on: ubuntu-latest
-
-    environment:
-      name: github-pages
-      url: ${{ steps.deployment.outputs.page_url }}
 
     steps:
       - name: 1. Checkout repository
