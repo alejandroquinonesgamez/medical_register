@@ -21,6 +21,8 @@ jobs:
     steps:
       - name: 1. Checkout repository
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
 
       - name: 2. Set up Python
         uses: actions/setup-python@v5
