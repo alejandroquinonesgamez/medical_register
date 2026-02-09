@@ -251,7 +251,7 @@
           <section id="waf-modsecurity-v3-owasp-core-rule-set-crs">
 <h1>WAF: ModSecurity v3 + OWASP Core Rule Set (CRS)<a class="headerlink" href="#waf-modsecurity-v3-owasp-core-rule-set-crs" title="Link to this heading">¶</a></h1>
 <section id="que-es-y-por-que-se-usa">
-<h2>Qué es y por qué se usa<a class="headerlink" href="#que-es-y-por-que-se-usa" title="Link to this heading">¶</a></h2>
+<h2>1. Qué es y por qué se usa<a class="headerlink" href="#que-es-y-por-que-se-usa" title="Link to this heading">¶</a></h2>
 <p>Un <strong>WAF (Web Application Firewall)</strong> es un cortafuegos de aplicación que inspecciona el tráfico HTTP en busca de patrones maliciosos antes de que las peticiones lleguen al backend. A diferencia de un firewall de red (capas 3-4), un WAF opera en la capa 7 (aplicación) y puede analizar el contenido de las peticiones: cabeceras, query strings, cuerpos JSON/formulario, cookies, etc.</p>
 <p>En esta aplicación se despliega <strong>ModSecurity v3</strong> (motor WAF open source, mantenido por Trustwave/OWASP) junto con el <strong>OWASP Core Rule Set (CRS)</strong>, el conjunto de reglas estándar de la industria que cubre las categorías de ataques más comunes (OWASP Top 10).</p>
 <section id="que-aporta-a-la-aplicacion">
@@ -259,6 +259,7 @@
 <ul class="simple">
 <li><p><strong>Defensa en profundidad</strong>: las validaciones de entrada del backend (<code class="docutils literal notranslate"><span class="pre">app/helpers.py</span></code>) protegen contra datos malformados; el WAF actúa como <strong>capa adicional</strong> que bloquea ataques conocidos antes de que lleguen al código de la aplicación.</p></li>
 <li><p><strong>Protección contra ataques genéricos</strong>: SQL injection, XSS, path traversal, command injection, scanners automatizados, etc.</p></li>
+<li><p><strong>Prevención de exfiltración de datos</strong>: inspección de respuestas (outbound filtering) para bloquear fugas de información sensible (números de tarjeta, rutas del sistema, volcados de BD, stack traces).</p></li>
 <li><p><strong>Sin cambios en el código</strong>: el WAF se despliega como reverse proxy delante del backend; la aplicación Flask no necesita modificaciones.</p></li>
 <li><p><strong>Ocultación del backend</strong>: el usuario se conecta al WAF (Nginx); el backend Flask no es accesible directamente desde fuera de la red Docker.</p></li>
 </ul>
@@ -266,7 +267,7 @@
 </section>
 <hr class="docutils" />
 <section id="arquitectura">
-<h2>Arquitectura<a class="headerlink" href="#arquitectura" title="Link to this heading">¶</a></h2>
+<h2>2. Arquitectura<a class="headerlink" href="#arquitectura" title="Link to this heading">¶</a></h2>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span>                    ┌──────────────────────────────────────────────┐
                     │              Red Docker (proxy-network)       │
                     │                                              │
@@ -309,8 +310,36 @@
 <p>El servicio <code class="docutils literal notranslate"><span class="pre">web</span></code> (Flask/Gunicorn) usa <code class="docutils literal notranslate"><span class="pre">expose:</span> <span class="pre">&quot;5001&quot;</span></code> en lugar de <code class="docutils literal notranslate"><span class="pre">ports</span></code>, por lo que <strong>no publica</strong> su puerto en el host. Toda petición del usuario pasa obligatoriamente por el WAF.</p>
 </section>
 <hr class="docutils" />
+<section id="proceso-de-despliegue-detectiononly-on">
+<h2>3. Proceso de despliegue: DetectionOnly → On<a class="headerlink" href="#proceso-de-despliegue-detectiononly-on" title="Link to this heading">¶</a></h2>
+<p>El despliegue se realizó siguiendo la metodología recomendada en dos fases:</p>
+<section id="fase-1-modo-detectiononly-observacion">
+<h3>Fase 1: Modo DetectionOnly (observación)<a class="headerlink" href="#fase-1-modo-detectiononly-observacion" title="Link to this heading">¶</a></h3>
+<p>Se configuró <code class="docutils literal notranslate"><span class="pre">MODSEC_RULE_ENGINE=DetectionOnly</span></code> para que el WAF registrase las alertas en los logs <strong>sin bloquear</strong> ninguna petición:</p>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="c1"># docker-compose.yml → servicio waf → environment</span>
+<span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">MODSEC_RULE_ENGINE=DetectionOnly</span>
+</pre></div>
+</div>
+<p>En esta fase se navegó por toda la aplicación (registro, login, perfil, pesos, supervisor) y se ejecutaron ataques de prueba. Los logs mostraron:</p>
+<ul class="simple">
+<li><p>Qué reglas se activaban con tráfico legítimo (falsos positivos).</p></li>
+<li><p>Qué ataques eran correctamente detectados (verdaderos positivos).</p></li>
+<li><p>El scoring de anomalía acumulado por cada petición.</p></li>
+</ul>
+<p><strong>Resultado</strong>: se identificaron 4 falsos positivos (sección 5) y se redactaron las exclusiones.</p>
+</section>
+<section id="fase-2-modo-on-bloqueo">
+<h3>Fase 2: Modo On (bloqueo)<a class="headerlink" href="#fase-2-modo-on-bloqueo" title="Link to this heading">¶</a></h3>
+<p>Tras verificar que las exclusiones cubrían todos los falsos positivos, se cambió a modo bloqueo:</p>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">MODSEC_RULE_ENGINE=On</span>
+</pre></div>
+</div>
+<p>Se repitieron todas las pruebas: los ataques devolvían HTTP 403 y el tráfico legítimo pasaba sin problemas (HTTP 200).</p>
+</section>
+</section>
+<hr class="docutils" />
 <section id="configuracion">
-<h2>Configuración<a class="headerlink" href="#configuracion" title="Link to this heading">¶</a></h2>
+<h2>4. Configuración<a class="headerlink" href="#configuracion" title="Link to this heading">¶</a></h2>
 <p>Las variables de entorno del contenedor WAF se definen en <code class="docutils literal notranslate"><span class="pre">docker-compose.yml</span></code> → servicio <code class="docutils literal notranslate"><span class="pre">waf</span></code>:</p>
 <div class="table-wrapper colwidths-auto docutils container">
 <table class="docutils align-default">
@@ -327,7 +356,7 @@
 </tr>
 <tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">MODSEC_RULE_ENGINE</span></code></p></td>
 <td><p><code class="docutils literal notranslate"><span class="pre">On</span></code></p></td>
-<td><p>Modo de operación de ModSecurity: <code class="docutils literal notranslate"><span class="pre">On</span></code> bloquea las peticiones que coinciden con reglas; <code class="docutils literal notranslate"><span class="pre">DetectionOnly</span></code> solo las registra sin bloquear (útil para pruebas iniciales)</p></td>
+<td><p>Modo de operación de ModSecurity: <code class="docutils literal notranslate"><span class="pre">On</span></code> bloquea; <code class="docutils literal notranslate"><span class="pre">DetectionOnly</span></code> solo registra</p></td>
 </tr>
 <tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">PARANOIA</span></code></p></td>
 <td><p><code class="docutils literal notranslate"><span class="pre">1</span></code></p></td>
@@ -335,26 +364,25 @@
 </tr>
 <tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">ANOMALY_INBOUND</span></code></p></td>
 <td><p><code class="docutils literal notranslate"><span class="pre">5</span></code></p></td>
-<td><p>Umbral de puntuación de anomalía para peticiones entrantes. Una petición se bloquea cuando la suma de scores de las reglas que activa iguala o supera este umbral</p></td>
+<td><p>Umbral de anomalía para peticiones entrantes</p></td>
 </tr>
 <tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">ANOMALY_OUTBOUND</span></code></p></td>
 <td><p><code class="docutils literal notranslate"><span class="pre">4</span></code></p></td>
-<td><p>Umbral de puntuación de anomalía para respuestas salientes</p></td>
+<td><p>Umbral de anomalía para respuestas salientes</p></td>
 </tr>
 <tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">ALLOWED_METHODS</span></code></p></td>
 <td><p><code class="docutils literal notranslate"><span class="pre">GET</span> <span class="pre">HEAD</span> <span class="pre">POST</span> <span class="pre">OPTIONS</span> <span class="pre">PUT</span> <span class="pre">DELETE</span></code></p></td>
-<td><p>Métodos HTTP permitidos; el resto se bloquea</p></td>
+<td><p>Métodos HTTP permitidos</p></td>
 </tr>
 <tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">ALLOWED_REQUEST_CONTENT_TYPE</span></code></p></td>
 <td><p><code class="docutils literal notranslate"><span class="pre">application/json</span></code>, <code class="docutils literal notranslate"><span class="pre">multipart/form-data</span></code>, etc.</p></td>
-<td><p>Content-Types permitidos. Incluye <code class="docutils literal notranslate"><span class="pre">application/json</span></code> (necesario para la API REST)</p></td>
+<td><p>Content-Types permitidos</p></td>
 </tr>
 </tbody>
 </table>
 </div>
 <section id="paranoia-level-pl">
 <h3>Paranoia Level (PL)<a class="headerlink" href="#paranoia-level-pl" title="Link to this heading">¶</a></h3>
-<p>El OWASP CRS organiza sus reglas en 4 niveles de paranoia:</p>
 <div class="table-wrapper colwidths-auto docutils container">
 <table class="docutils align-default">
 <thead>
@@ -366,96 +394,328 @@
 </thead>
 <tbody>
 <tr class="row-even"><td><p><strong>1</strong></p></td>
-<td><p>Solo reglas de alta confianza. Mínimos falsos positivos.</p></td>
+<td><p>Solo reglas de alta confianza.</p></td>
 <td><p>Muy bajo</p></td>
 <td><p><strong>Producción general</strong> (valor actual)</p></td>
 </tr>
 <tr class="row-odd"><td><p>2</p></td>
 <td><p>Reglas adicionales de confianza media.</p></td>
 <td><p>Bajo-medio</p></td>
-<td><p>Aplicaciones con datos sensibles y tiempo para ajustar exclusiones</p></td>
+<td><p>Datos sensibles con tiempo para ajustar</p></td>
 </tr>
 <tr class="row-even"><td><p>3</p></td>
-<td><p>Reglas agresivas; muchos patrones detectados.</p></td>
+<td><p>Reglas agresivas.</p></td>
 <td><p>Medio-alto</p></td>
-<td><p>Entornos de alta seguridad con exclusiones bien ajustadas</p></td>
+<td><p>Alta seguridad con exclusiones bien ajustadas</p></td>
 </tr>
 <tr class="row-odd"><td><p>4</p></td>
-<td><p>Máxima detección; bloquea casi cualquier patrón sospechoso.</p></td>
+<td><p>Máxima detección.</p></td>
 <td><p>Muy alto</p></td>
-<td><p>Solo para pruebas o entornos muy controlados</p></td>
+<td><p>Solo pruebas o entornos muy controlados</p></td>
 </tr>
 </tbody>
 </table>
 </div>
-<p>Se usa <strong>PL 1</strong> porque proporciona buena cobertura contra las categorías de ataques más comunes con un riesgo muy bajo de bloquear peticiones legítimas. Si se sube el PL, es necesario ampliar las exclusiones para evitar falsos positivos.</p>
 </section>
 <section id="anomaly-scoring">
 <h3>Anomaly Scoring<a class="headerlink" href="#anomaly-scoring" title="Link to this heading">¶</a></h3>
-<p>ModSecurity CRS usa un modelo de <strong>anomaly scoring</strong>: cada regla que se activa suma puntos a un contador. La petición se bloquea solo cuando el total acumulado alcanza el umbral configurado.</p>
+<p>ModSecurity CRS usa un modelo de <strong>anomaly scoring</strong>: cada regla que se activa suma puntos. La petición/respuesta se bloquea solo cuando el total acumulado alcanza el umbral.</p>
 <ul class="simple">
-<li><p><strong>Inbound (5)</strong>: una sola regla crítica (SQL injection, XSS) normalmente suma 5 puntos, lo que bloquea inmediatamente la petición. Dos reglas de severidad menor (2+3) también alcanzan el umbral.</p></li>
-<li><p><strong>Outbound (4)</strong>: protege contra fugas de información en las respuestas (errores SQL, stack traces, etc.).</p></li>
+<li><p><strong>Inbound (5)</strong>: una regla crítica (SQLi, XSS) normalmente suma 5 puntos → bloqueo inmediato.</p></li>
+<li><p><strong>Outbound (4)</strong>: protege contra fugas de información en las respuestas.</p></li>
 </ul>
 </section>
 </section>
 <hr class="docutils" />
-<section id="exclusiones-para-falsos-positivos">
-<h2>Exclusiones para falsos positivos<a class="headerlink" href="#exclusiones-para-falsos-positivos" title="Link to this heading">¶</a></h2>
+<section id="analisis-de-falsos-positivos-y-exclusiones">
+<h2>5. Análisis de falsos positivos y exclusiones<a class="headerlink" href="#analisis-de-falsos-positivos-y-exclusiones" title="Link to this heading">¶</a></h2>
 <p>Fichero: <strong><code class="docutils literal notranslate"><span class="pre">waf/modsecurity-override.conf</span></code></strong></p>
-<p>Este fichero se monta como regla <strong>AFTER-CRS</strong> (se ejecuta después de cargar todas las reglas del Core Rule Set). Contiene exclusiones específicas para los campos y rutas de la aplicación que disparan falsos positivos.</p>
-<section id="regla-10001-campo-password-en-rutas-de-autenticacion">
-<h3>Regla 10001 — Campo <code class="docutils literal notranslate"><span class="pre">password</span></code> en rutas de autenticación<a class="headerlink" href="#regla-10001-campo-password-en-rutas-de-autenticacion" title="Link to this heading">¶</a></h3>
+<p>Este fichero se monta como regla <strong>AFTER-CRS</strong> (<code class="docutils literal notranslate"><span class="pre">RESPONSE-999-EXCLUSION-RULES-AFTER-CRS.conf</span></code>). Las exclusiones se aplican <strong>después</strong> de cargar todas las reglas del Core Rule Set, lo que permite modificar el comportamiento de reglas específicas sin alterar el CRS original.</p>
+<section id="falso-positivo-1-campo-password-en-login-register">
+<h3>5.1. Falso positivo 1: Campo <code class="docutils literal notranslate"><span class="pre">password</span></code> en login/register<a class="headerlink" href="#falso-positivo-1-campo-password-en-login-register" title="Link to this heading">¶</a></h3>
+<p><strong>Detección en logs (modo DetectionOnly):</strong></p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">ruleId</span><span class="p">:</span> <span class="s2">&quot;942100&quot;</span>
+<span class="n">file</span><span class="p">:</span> <span class="s2">&quot;REQUEST-942-APPLICATION-ATTACK-SQLI.conf&quot;</span>
+<span class="n">msg</span><span class="p">:</span> <span class="s2">&quot;SQL Injection Attack Detected via libinjection&quot;</span>
+<span class="n">data</span><span class="p">:</span> <span class="s2">&quot;Matched Data: 1&amp;1 found within ARGS:password&quot;</span>
+<span class="n">severity</span><span class="p">:</span> <span class="mi">2</span>
+<span class="n">Inbound</span> <span class="n">Anomaly</span> <span class="n">Score</span><span class="p">:</span> <span class="mi">5</span>
+</pre></div>
+</div>
+<p><strong>Causa</strong>: las contraseñas pueden contener caracteres como <code class="docutils literal notranslate"><span class="pre">'</span></code>, <code class="docutils literal notranslate"><span class="pre">&quot;</span></code>, <code class="docutils literal notranslate"><span class="pre">&lt;</span></code>, <code class="docutils literal notranslate"><span class="pre">&gt;</span></code>, <code class="docutils literal notranslate"><span class="pre">--</span></code>, <code class="docutils literal notranslate"><span class="pre">OR</span></code>, etc. que disparan reglas de inyección SQL (942xxx) y XSS (941xxx).</p>
+<p><strong>Exclusión (regla 10001)</strong>:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span>SecRule REQUEST_URI &quot;@beginsWith /api/auth/&quot;
     ctl:ruleRemoveTargetById=941100-941999;ARGS:password   ← XSS
     ctl:ruleRemoveTargetById=942100-942999;ARGS:password   ← SQLi
     ctl:ruleRemoveTargetById=920272;ARGS:password          ← Tamaño
 </pre></div>
 </div>
-<p><strong>Motivo</strong>: las contraseñas pueden contener caracteres como <code class="docutils literal notranslate"><span class="pre">'</span></code>, <code class="docutils literal notranslate"><span class="pre">&quot;</span></code>, <code class="docutils literal notranslate"><span class="pre">&lt;</span></code>, <code class="docutils literal notranslate"><span class="pre">&gt;</span></code>, <code class="docutils literal notranslate"><span class="pre">--</span></code>, <code class="docutils literal notranslate"><span class="pre">OR</span></code>, etc., que disparan reglas de inyección SQL y XSS. La exclusión se aplica <strong>solo</strong> al campo <code class="docutils literal notranslate"><span class="pre">password</span></code> y <strong>solo</strong> en las rutas <code class="docutils literal notranslate"><span class="pre">/api/auth/*</span></code>.</p>
+<p><strong>Justificación</strong>: la exclusión se aplica DESPUÉS del CRS (after-CRS) y es específica: solo afecta al campo <code class="docutils literal notranslate"><span class="pre">password</span></code> en las rutas <code class="docutils literal notranslate"><span class="pre">/api/auth/*</span></code>. El resto de campos y rutas siguen protegidos por las reglas completas. Se usa <code class="docutils literal notranslate"><span class="pre">ctl:ruleRemoveTargetById</span></code> para eliminar reglas concretas de un argumento concreto, no se desactiva ningún motor.</p>
 </section>
-<section id="regla-10002-campo-recaptcha-token-en-rutas-de-autenticacion">
-<h3>Regla 10002 — Campo <code class="docutils literal notranslate"><span class="pre">recaptcha_token</span></code> en rutas de autenticación<a class="headerlink" href="#regla-10002-campo-recaptcha-token-en-rutas-de-autenticacion" title="Link to this heading">¶</a></h3>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">SecRule</span> <span class="n">REQUEST_URI</span> <span class="s2">&quot;@beginsWith /api/auth/&quot;</span>
-    <span class="n">ctl</span><span class="p">:</span><span class="n">ruleRemoveTargetById</span><span class="o">=</span><span class="mi">941100</span><span class="o">-</span><span class="mi">941999</span><span class="p">;</span><span class="n">ARGS</span><span class="p">:</span><span class="n">recaptcha_token</span>
-    <span class="n">ctl</span><span class="p">:</span><span class="n">ruleRemoveTargetById</span><span class="o">=</span><span class="mi">942100</span><span class="o">-</span><span class="mi">942999</span><span class="p">;</span><span class="n">ARGS</span><span class="p">:</span><span class="n">recaptcha_token</span>
+<section id="falso-positivo-2-campo-recaptcha-token">
+<h3>5.2. Falso positivo 2: Campo <code class="docutils literal notranslate"><span class="pre">recaptcha_token</span></code><a class="headerlink" href="#falso-positivo-2-campo-recaptcha-token" title="Link to this heading">¶</a></h3>
+<p><strong>Causa</strong>: el token reCAPTCHA v3 es una cadena base64 larga que contiene secuencias que coinciden con patrones de inyección.</p>
+<p><strong>Exclusión (regla 10002)</strong>: elimina reglas 941xxx y 942xxx solo para <code class="docutils literal notranslate"><span class="pre">ARGS:recaptcha_token</span></code> en <code class="docutils literal notranslate"><span class="pre">/api/auth/*</span></code>.</p>
+</section>
+<section id="falso-positivo-3-campos-first-name-last-name">
+<h3>5.3. Falso positivo 3: Campos <code class="docutils literal notranslate"><span class="pre">first_name</span></code> / <code class="docutils literal notranslate"><span class="pre">last_name</span></code><a class="headerlink" href="#falso-positivo-3-campos-first-name-last-name" title="Link to this heading">¶</a></h3>
+<p><strong>Causa</strong>: nombres con apóstrofes (O’Brien), acentos, guiones compuestos activan reglas de inyección.</p>
+<p><strong>Exclusión (regla 10003)</strong>: elimina reglas 941xxx y 942xxx solo para <code class="docutils literal notranslate"><span class="pre">ARGS:first_name</span></code> y <code class="docutils literal notranslate"><span class="pre">ARGS:last_name</span></code> en <code class="docutils literal notranslate"><span class="pre">/api/user</span></code>.</p>
+</section>
+<section id="falso-positivo-4-dashboard-supervisor">
+<h3>5.4. Falso positivo 4: Dashboard Supervisor<a class="headerlink" href="#falso-positivo-4-dashboard-supervisor" title="Link to this heading">¶</a></h3>
+<p><strong>Causa</strong>: el supervisor es un dashboard de desarrollo que muestra estadísticas de tráfico, consultas y datos del sistema. Su contenido HTML/JS activa múltiples familias de reglas.</p>
+<p><strong>Exclusión (reglas 10004 + 10005)</strong>: se eliminan <strong>familias de reglas por ID específico</strong> (NO se desactiva el motor del WAF):</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>SecRule REQUEST_URI &quot;@beginsWith /supervisor&quot;
+    ctl:ruleRemoveById=941100-941999   ← XSS (HTML/JS del dashboard)
+    ctl:ruleRemoveById=942100-942999   ← SQLi (datos SQL en la interfaz)
+    ctl:ruleRemoveById=951100-951999   ← SQL info leakage (outbound)
+    ctl:ruleRemoveById=952100-952999   ← Data leakage (rutas de ficheros)
+    ctl:ruleRemoveById=953100-953999   ← PHP/Java info leakage
+    ctl:ruleRemoveById=954100-954999   ← Application errors
+    ctl:ruleRemoveById=10010-10013     ← Reglas custom de exfiltración
 </pre></div>
 </div>
-<p><strong>Motivo</strong>: el token reCAPTCHA v3 es una cadena base64 larga que puede contener secuencias que coinciden con patrones de inyección.</p>
+<p><strong>Justificación</strong>: en producción, el supervisor debe estar desactivado (<code class="docutils literal notranslate"><span class="pre">APP_SUPERVISOR=0</span></code>), por lo que esta exclusión no aplica. Se usa <code class="docutils literal notranslate"><span class="pre">ctl:ruleRemoveById</span></code> para eliminar familias de reglas concretas en lugar de <code class="docutils literal notranslate"><span class="pre">ctl:ruleEngine=Off</span></code>, cumpliendo el requisito de no desactivar el motor del WAF por completo.</p>
 </section>
-<section id="regla-10003-campos-de-nombre-en-ruta-de-perfil">
-<h3>Regla 10003 — Campos de nombre en ruta de perfil<a class="headerlink" href="#regla-10003-campos-de-nombre-en-ruta-de-perfil" title="Link to this heading">¶</a></h3>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">SecRule</span> <span class="n">REQUEST_URI</span> <span class="s2">&quot;@beginsWith /api/user&quot;</span>
-    <span class="n">ctl</span><span class="p">:</span><span class="n">ruleRemoveTargetById</span><span class="o">=</span><span class="mi">941100</span><span class="o">-</span><span class="mi">941999</span><span class="p">;</span><span class="n">ARGS</span><span class="p">:</span><span class="n">first_name</span>
-    <span class="n">ctl</span><span class="p">:</span><span class="n">ruleRemoveTargetById</span><span class="o">=</span><span class="mi">941100</span><span class="o">-</span><span class="mi">941999</span><span class="p">;</span><span class="n">ARGS</span><span class="p">:</span><span class="n">last_name</span>
-    <span class="n">ctl</span><span class="p">:</span><span class="n">ruleRemoveTargetById</span><span class="o">=</span><span class="mi">942100</span><span class="o">-</span><span class="mi">942999</span><span class="p">;</span><span class="n">ARGS</span><span class="p">:</span><span class="n">first_name</span>
-    <span class="n">ctl</span><span class="p">:</span><span class="n">ruleRemoveTargetById</span><span class="o">=</span><span class="mi">942100</span><span class="o">-</span><span class="mi">942999</span><span class="p">;</span><span class="n">ARGS</span><span class="p">:</span><span class="n">last_name</span>
+</section>
+<hr class="docutils" />
+<section id="proteccion-contra-exfiltracion-de-datos-outbound-filtering">
+<h2>6. Protección contra exfiltración de datos (Outbound Filtering)<a class="headerlink" href="#proteccion-contra-exfiltracion-de-datos-outbound-filtering" title="Link to this heading">¶</a></h2>
+<section id="id1">
+<h3>Configuración<a class="headerlink" href="#id1" title="Link to this heading">¶</a></h3>
+<p>El WAF inspecciona el cuerpo de las respuestas para detectar fugas de información sensible:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">SecResponseBodyAccess</span> <span class="n">On</span>
+<span class="n">SecResponseBodyMimeType</span> <span class="n">text</span><span class="o">/</span><span class="n">plain</span> <span class="n">text</span><span class="o">/</span><span class="n">html</span> <span class="n">text</span><span class="o">/</span><span class="n">xml</span> <span class="n">application</span><span class="o">/</span><span class="n">json</span>
+<span class="n">SecResponseBodyLimit</span> <span class="mi">524288</span>
 </pre></div>
 </div>
-<p><strong>Motivo</strong>: los nombres pueden contener caracteres Unicode, acentos, apóstrofes (O’Brien) y guiones que activan reglas de inyección.</p>
+<ul class="simple">
+<li><p><strong><code class="docutils literal notranslate"><span class="pre">SecResponseBodyAccess</span> <span class="pre">On</span></code></strong>: activa la inspección de respuestas.</p></li>
+<li><p><strong><code class="docutils literal notranslate"><span class="pre">SecResponseBodyMimeType</span></code></strong>: tipos MIME inspeccionados (incluye JSON para la API REST).</p></li>
+<li><p><strong><code class="docutils literal notranslate"><span class="pre">SecResponseBodyLimit</span></code></strong>: límite de 512 KB por respuesta para no impactar excesivamente el rendimiento.</p></li>
+</ul>
 </section>
-<section id="regla-10004-dashboard-supervisor-solo-desarrollo">
-<h3>Regla 10004 — Dashboard Supervisor (solo desarrollo)<a class="headerlink" href="#regla-10004-dashboard-supervisor-solo-desarrollo" title="Link to this heading">¶</a></h3>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">SecRule</span> <span class="n">REQUEST_URI</span> <span class="s2">&quot;@beginsWith /supervisor&quot;</span>
-    <span class="n">ctl</span><span class="p">:</span><span class="n">ruleEngine</span><span class="o">=</span><span class="n">Off</span>
+<section id="reglas-crs-de-respuesta-automaticas">
+<h3>Reglas CRS de respuesta (automáticas)<a class="headerlink" href="#reglas-crs-de-respuesta-automaticas" title="Link to this heading">¶</a></h3>
+<p>Con el outbound filtering activado, las reglas CRS de las familias 950xxx-954xxx se activan automáticamente:</p>
+<div class="table-wrapper colwidths-auto docutils container">
+<table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Familia</p></th>
+<th class="head"><p>Descripción</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>951xxx</p></td>
+<td><p>SQL Information Leakage (errores SQL en respuestas)</p></td>
+</tr>
+<tr class="row-odd"><td><p>952xxx</p></td>
+<td><p>Data Leakage (listados de directorios, rutas de ficheros)</p></td>
+</tr>
+<tr class="row-even"><td><p>953xxx</p></td>
+<td><p>PHP/Java Information Leakage</p></td>
+</tr>
+<tr class="row-odd"><td><p>954xxx</p></td>
+<td><p>Application Error Messages (stack traces genéricos)</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+</section>
+<section id="reglas-personalizadas-de-exfiltracion">
+<h3>Reglas personalizadas de exfiltración<a class="headerlink" href="#reglas-personalizadas-de-exfiltracion" title="Link to this heading">¶</a></h3>
+<p>Se han añadido 4 reglas personalizadas que complementan las reglas CRS:</p>
+<div class="table-wrapper colwidths-auto docutils container">
+<table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>ID</p></th>
+<th class="head"><p>Detección</p></th>
+<th class="head"><p>Ejemplo de patrón</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><strong>10010</strong></p></td>
+<td><p>Números de tarjeta de crédito (Visa, MasterCard, AMEX, Discover)</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">4539578763621486</span></code></p></td>
+</tr>
+<tr class="row-odd"><td><p><strong>10011</strong></p></td>
+<td><p>Contenido de <code class="docutils literal notranslate"><span class="pre">/etc/passwd</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">root:x:0:0:root:/root:/bin/bash</span></code></p></td>
+</tr>
+<tr class="row-even"><td><p><strong>10012</strong></p></td>
+<td><p>Volcados de base de datos</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">CREATE</span> <span class="pre">TABLE</span></code>, <code class="docutils literal notranslate"><span class="pre">INSERT</span> <span class="pre">INTO</span></code>, <code class="docutils literal notranslate"><span class="pre">mysqldump</span></code></p></td>
+</tr>
+<tr class="row-odd"><td><p><strong>10013</strong></p></td>
+<td><p>Stack traces de Python/Flask</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">Traceback</span> <span class="pre">(most</span> <span class="pre">recent</span> <span class="pre">call</span> <span class="pre">last)</span></code>, <code class="docutils literal notranslate"><span class="pre">Debugger</span> <span class="pre">PIN</span></code></p></td>
+</tr>
+</tbody>
+</table>
+</div>
+</section>
+<section id="pruebas-de-exfiltracion-realizadas">
+<h3>Pruebas de exfiltración realizadas<a class="headerlink" href="#pruebas-de-exfiltracion-realizadas" title="Link to this heading">¶</a></h3>
+<p>Se crearon endpoints de test (<code class="docutils literal notranslate"><span class="pre">/test/exfiltration/*</span></code>, solo disponibles en modo desarrollo) que simulan fugas de datos. El WAF bloquea correctamente todas:</p>
+<div class="table-wrapper colwidths-auto docutils container">
+<table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Endpoint</p></th>
+<th class="head"><p>Regla activada</p></th>
+<th class="head"><p>Resultado en log</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">/test/exfiltration/passwd</span></code></p></td>
+<td><p>10011</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">Access</span> <span class="pre">denied</span> <span class="pre">with</span> <span class="pre">code</span> <span class="pre">403</span> <span class="pre">(phase</span> <span class="pre">4).</span> <span class="pre">msg:</span> <span class="pre">'Posible</span> <span class="pre">fuga</span> <span class="pre">de</span> <span class="pre">contenido</span> <span class="pre">de</span> <span class="pre">/etc/passwd</span> <span class="pre">en</span> <span class="pre">respuesta'</span></code></p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">/test/exfiltration/creditcard</span></code></p></td>
+<td><p>10010</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">Access</span> <span class="pre">denied</span> <span class="pre">with</span> <span class="pre">code</span> <span class="pre">403</span> <span class="pre">(phase</span> <span class="pre">4).</span> <span class="pre">msg:</span> <span class="pre">'Posible</span> <span class="pre">fuga</span> <span class="pre">de</span> <span class="pre">número</span> <span class="pre">de</span> <span class="pre">tarjeta</span> <span class="pre">de</span> <span class="pre">crédito</span> <span class="pre">en</span> <span class="pre">respuesta'</span></code></p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">/test/exfiltration/sqldump</span></code></p></td>
+<td><p>10012</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">Access</span> <span class="pre">denied</span> <span class="pre">with</span> <span class="pre">code</span> <span class="pre">403</span> <span class="pre">(phase</span> <span class="pre">4).</span> <span class="pre">msg:</span> <span class="pre">'Posible</span> <span class="pre">volcado</span> <span class="pre">de</span> <span class="pre">base</span> <span class="pre">de</span> <span class="pre">datos</span> <span class="pre">en</span> <span class="pre">respuesta'</span></code></p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">/test/exfiltration/stacktrace</span></code></p></td>
+<td><p>10013</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">Access</span> <span class="pre">denied</span> <span class="pre">with</span> <span class="pre">code</span> <span class="pre">403</span> <span class="pre">(phase</span> <span class="pre">4).</span> <span class="pre">msg:</span> <span class="pre">'Posible</span> <span class="pre">fuga</span> <span class="pre">de</span> <span class="pre">stack</span> <span class="pre">trace</span> <span class="pre">o</span> <span class="pre">debugger</span> <span class="pre">de</span> <span class="pre">Python</span> <span class="pre">en</span> <span class="pre">respuesta'</span></code></p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<p><strong>Extracto real del log (tarjeta de crédito bloqueada):</strong></p>
+<div class="highlight-json notranslate"><div class="highlight"><pre><span></span><span class="p">{</span>
+<span class="w">  </span><span class="nt">&quot;transaction&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="nt">&quot;request&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="nt">&quot;method&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;GET&quot;</span><span class="p">,</span><span class="w"> </span><span class="nt">&quot;uri&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;/test/exfiltration/creditcard&quot;</span><span class="p">},</span>
+<span class="w">    </span><span class="nt">&quot;response&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="nt">&quot;http_code&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">403</span><span class="p">},</span>
+<span class="w">    </span><span class="nt">&quot;producer&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="nt">&quot;secrules_engine&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;Enabled&quot;</span><span class="p">},</span>
+<span class="w">    </span><span class="nt">&quot;messages&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[{</span>
+<span class="w">      </span><span class="nt">&quot;message&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;Posible fuga de número de tarjeta de crédito en respuesta&quot;</span><span class="p">,</span>
+<span class="w">      </span><span class="nt">&quot;details&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="nt">&quot;ruleId&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;10010&quot;</span><span class="p">,</span>
+<span class="w">        </span><span class="nt">&quot;match&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;Matched Operator Rx against variable RESPONSE_BODY&quot;</span><span class="p">,</span>
+<span class="w">        </span><span class="nt">&quot;data&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;4539578763621486&quot;</span><span class="p">,</span>
+<span class="w">        </span><span class="nt">&quot;severity&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;2&quot;</span><span class="p">,</span>
+<span class="w">        </span><span class="nt">&quot;tags&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="s2">&quot;DATA_LEAKAGE/CREDIT_CARD&quot;</span><span class="p">]</span>
+<span class="w">      </span><span class="p">}</span>
+<span class="w">    </span><span class="p">}]</span>
+<span class="w">  </span><span class="p">}</span>
+<span class="p">}</span>
 </pre></div>
 </div>
-<p><strong>Motivo</strong>: el supervisor es un dashboard interno de desarrollo que genera tráfico con patrones que activarían múltiples reglas. Se desactiva completamente el motor de reglas para esta ruta. <strong>En producción, el supervisor debe estar desactivado</strong> (<code class="docutils literal notranslate"><span class="pre">APP_SUPERVISOR=0</span></code>).</p>
 </section>
-<section id="secresponsebodyaccess-off">
-<h3>SecResponseBodyAccess Off<a class="headerlink" href="#secresponsebodyaccess-off" title="Link to this heading">¶</a></h3>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">SecResponseBodyAccess</span> <span class="n">Off</span>
-</pre></div>
-</div>
-<p>No se inspeccionan los cuerpos de las respuestas. Esto evita que el WAF analice (y potencialmente bloquee) las respuestas JSON de la API, y previene fugas de información sobre las reglas internas del WAF.</p>
+<section id="nota-sobre-el-comportamiento-en-reverse-proxy">
+<h3>Nota sobre el comportamiento en reverse proxy<a class="headerlink" href="#nota-sobre-el-comportamiento-en-reverse-proxy" title="Link to this heading">¶</a></h3>
+<p>Cuando una regla de fase 4 (outbound) se activa, ModSecurity intenta devolver un 403 al cliente. En modo reverse proxy, los headers HTTP pueden haberse enviado ya al cliente antes de que se inspeccione el body. En ese caso:</p>
+<ul class="simple">
+<li><p>El log registra <code class="docutils literal notranslate"><span class="pre">header</span> <span class="pre">already</span> <span class="pre">sent</span></code> como advertencia.</p></li>
+<li><p>ModSecurity <strong>cierra la conexión</strong>, truncando la respuesta.</p></li>
+<li><p>El cliente recibe una respuesta incompleta o un error de conexión, impidiendo la exfiltración completa.</p></li>
+</ul>
 </section>
 </section>
 <hr class="docutils" />
 <section id="ataques-bloqueados-bateria-de-pruebas-verificada">
-<h2>Ataques bloqueados (batería de pruebas verificada)<a class="headerlink" href="#ataques-bloqueados-bateria-de-pruebas-verificada" title="Link to this heading">¶</a></h2>
-<p>Se ha ejecutado una batería de 15 pruebas automatizadas contra el WAF. Todas las categorías de ataque son bloqueadas correctamente:</p>
+<h2>7. Ataques bloqueados (batería de pruebas verificada)<a class="headerlink" href="#ataques-bloqueados-bateria-de-pruebas-verificada" title="Link to this heading">¶</a></h2>
+<section id="extracto-real-del-log-sql-injection-detectada-modo-detectiononly">
+<h3>Extracto real del log — SQL Injection detectada (modo DetectionOnly)<a class="headerlink" href="#extracto-real-del-log-sql-injection-detectada-modo-detectiononly" title="Link to this heading">¶</a></h3>
+<div class="highlight-json notranslate"><div class="highlight"><pre><span></span><span class="p">{</span>
+<span class="w">  </span><span class="nt">&quot;transaction&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="nt">&quot;request&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<span class="w">      </span><span class="nt">&quot;method&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;GET&quot;</span><span class="p">,</span>
+<span class="w">      </span><span class="nt">&quot;uri&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;/?id=1%20OR%201=1&quot;</span>
+<span class="w">    </span><span class="p">},</span>
+<span class="w">    </span><span class="nt">&quot;producer&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<span class="w">      </span><span class="nt">&quot;modsecurity&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;ModSecurity v3.0.14 (Linux)&quot;</span><span class="p">,</span>
+<span class="w">      </span><span class="nt">&quot;secrules_engine&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;DetectionOnly&quot;</span><span class="p">,</span>
+<span class="w">      </span><span class="nt">&quot;components&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="s2">&quot;OWASP_CRS/4.23.0&quot;</span><span class="p">]</span>
+<span class="w">    </span><span class="p">},</span>
+<span class="w">    </span><span class="nt">&quot;messages&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[{</span>
+<span class="w">      </span><span class="nt">&quot;message&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;SQL Injection Attack Detected via libinjection&quot;</span><span class="p">,</span>
+<span class="w">      </span><span class="nt">&quot;details&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="nt">&quot;ruleId&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;942100&quot;</span><span class="p">,</span>
+<span class="w">        </span><span class="nt">&quot;file&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;REQUEST-942-APPLICATION-ATTACK-SQLI.conf&quot;</span><span class="p">,</span>
+<span class="w">        </span><span class="nt">&quot;data&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;Matched Data: 1&amp;1 found within ARGS:id: 1 OR 1=1&quot;</span><span class="p">,</span>
+<span class="w">        </span><span class="nt">&quot;severity&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;2&quot;</span><span class="p">,</span>
+<span class="w">        </span><span class="nt">&quot;tags&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="s2">&quot;attack-sqli&quot;</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;paranoia-level/1&quot;</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;OWASP_CRS&quot;</span><span class="p">]</span>
+<span class="w">      </span><span class="p">}</span>
+<span class="w">    </span><span class="p">},</span><span class="w"> </span><span class="p">{</span>
+<span class="w">      </span><span class="nt">&quot;message&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;Inbound Anomaly Score Exceeded (Total Score: 5)&quot;</span><span class="p">,</span>
+<span class="w">      </span><span class="nt">&quot;details&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="nt">&quot;ruleId&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;949110&quot;</span><span class="p">,</span>
+<span class="w">        </span><span class="nt">&quot;data&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;TX:BLOCKING_INBOUND_ANOMALY_SCORE = 5&quot;</span>
+<span class="w">      </span><span class="p">}</span>
+<span class="w">    </span><span class="p">}]</span>
+<span class="w">  </span><span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+</section>
+<section id="extracto-real-del-log-xss-detectada-modo-detectiononly">
+<h3>Extracto real del log — XSS detectada (modo DetectionOnly)<a class="headerlink" href="#extracto-real-del-log-xss-detectada-modo-detectiononly" title="Link to this heading">¶</a></h3>
+<div class="highlight-json notranslate"><div class="highlight"><pre><span></span><span class="p">{</span>
+<span class="w">  </span><span class="nt">&quot;transaction&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="nt">&quot;request&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<span class="w">      </span><span class="nt">&quot;method&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;GET&quot;</span><span class="p">,</span>
+<span class="w">      </span><span class="nt">&quot;uri&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;/?x=&lt;script&gt;alert(1)&lt;/script&gt;&quot;</span>
+<span class="w">    </span><span class="p">},</span>
+<span class="w">    </span><span class="nt">&quot;messages&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span>
+<span class="w">      </span><span class="p">{</span><span class="nt">&quot;message&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;XSS Attack Detected via libinjection&quot;</span><span class="p">,</span><span class="w"> </span><span class="nt">&quot;details&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="nt">&quot;ruleId&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;941100&quot;</span><span class="p">}},</span>
+<span class="w">      </span><span class="p">{</span><span class="nt">&quot;message&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;XSS Filter - Category 1: Script Tag Vector&quot;</span><span class="p">,</span><span class="w"> </span><span class="nt">&quot;details&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="nt">&quot;ruleId&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;941110&quot;</span><span class="p">}},</span>
+<span class="w">      </span><span class="p">{</span><span class="nt">&quot;message&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;NoScript XSS InjectionChecker: HTML Injection&quot;</span><span class="p">,</span><span class="w"> </span><span class="nt">&quot;details&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="nt">&quot;ruleId&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;941160&quot;</span><span class="p">}},</span>
+<span class="w">      </span><span class="p">{</span><span class="nt">&quot;message&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;Javascript method detected&quot;</span><span class="p">,</span><span class="w"> </span><span class="nt">&quot;details&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="nt">&quot;ruleId&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;941390&quot;</span><span class="p">}},</span>
+<span class="w">      </span><span class="p">{</span><span class="nt">&quot;message&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;Inbound Anomaly Score Exceeded (Total Score: 20)&quot;</span><span class="p">,</span><span class="w"> </span><span class="nt">&quot;details&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="nt">&quot;ruleId&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;949110&quot;</span><span class="p">}}</span>
+<span class="w">    </span><span class="p">]</span>
+<span class="w">  </span><span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+</section>
+<section id="extracto-real-del-log-command-injection-lfi-modo-detectiononly">
+<h3>Extracto real del log — Command Injection / LFI (modo DetectionOnly)<a class="headerlink" href="#extracto-real-del-log-command-injection-lfi-modo-detectiononly" title="Link to this heading">¶</a></h3>
+<div class="highlight-json notranslate"><div class="highlight"><pre><span></span><span class="p">{</span>
+<span class="w">  </span><span class="nt">&quot;transaction&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="nt">&quot;request&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<span class="w">      </span><span class="nt">&quot;method&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;GET&quot;</span><span class="p">,</span>
+<span class="w">      </span><span class="nt">&quot;uri&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;/?cmd=;cat%20/etc/passwd&quot;</span>
+<span class="w">    </span><span class="p">},</span>
+<span class="w">    </span><span class="nt">&quot;messages&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span>
+<span class="w">      </span><span class="p">{</span><span class="nt">&quot;message&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;OS File Access Attempt&quot;</span><span class="p">,</span><span class="w"> </span><span class="nt">&quot;details&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="nt">&quot;ruleId&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;930120&quot;</span><span class="p">,</span><span class="w"> </span><span class="nt">&quot;data&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;etc/passwd found within ARGS:cmd&quot;</span><span class="p">}},</span>
+<span class="w">      </span><span class="p">{</span><span class="nt">&quot;message&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;Remote Command Execution: Unix Shell Code Found&quot;</span><span class="p">,</span><span class="w"> </span><span class="nt">&quot;details&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="nt">&quot;ruleId&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;932160&quot;</span><span class="p">}},</span>
+<span class="w">      </span><span class="p">{</span><span class="nt">&quot;message&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;Inbound Anomaly Score Exceeded (Total Score: 10)&quot;</span><span class="p">,</span><span class="w"> </span><span class="nt">&quot;details&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="nt">&quot;ruleId&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;949110&quot;</span><span class="p">}}</span>
+<span class="w">    </span><span class="p">]</span>
+<span class="w">  </span><span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+</section>
+<section id="extracto-real-del-log-scanner-detectado-modo-detectiononly">
+<h3>Extracto real del log — Scanner detectado (modo DetectionOnly)<a class="headerlink" href="#extracto-real-del-log-scanner-detectado-modo-detectiononly" title="Link to this heading">¶</a></h3>
+<div class="highlight-json notranslate"><div class="highlight"><pre><span></span><span class="p">{</span>
+<span class="w">  </span><span class="nt">&quot;transaction&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="nt">&quot;request&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<span class="w">      </span><span class="nt">&quot;method&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;GET&quot;</span><span class="p">,</span><span class="w"> </span><span class="nt">&quot;uri&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;/&quot;</span><span class="p">,</span>
+<span class="w">      </span><span class="nt">&quot;headers&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="nt">&quot;User-Agent&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;Nikto&quot;</span><span class="p">}</span>
+<span class="w">    </span><span class="p">},</span>
+<span class="w">    </span><span class="nt">&quot;messages&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[{</span>
+<span class="w">      </span><span class="nt">&quot;message&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;Found User-Agent associated with security scanner&quot;</span><span class="p">,</span>
+<span class="w">      </span><span class="nt">&quot;details&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="nt">&quot;ruleId&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;913100&quot;</span><span class="p">,</span>
+<span class="w">        </span><span class="nt">&quot;data&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;Matched Data: nikto found within REQUEST_HEADERS:User-Agent: Nikto&quot;</span>
+<span class="w">      </span><span class="p">}</span>
+<span class="w">    </span><span class="p">}]</span>
+<span class="w">  </span><span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+</section>
+<section id="tabla-resumen-modo-on-bloqueo-activo">
+<h3>Tabla resumen — Modo On (bloqueo activo)<a class="headerlink" href="#tabla-resumen-modo-on-bloqueo-activo" title="Link to this heading">¶</a></h3>
 <section id="inyeccion-sql">
-<h3>Inyección SQL<a class="headerlink" href="#inyeccion-sql" title="Link to this heading">¶</a></h3>
+<h4>Inyección SQL<a class="headerlink" href="#inyeccion-sql" title="Link to this heading">¶</a></h4>
 <div class="table-wrapper colwidths-auto docutils container">
 <table class="docutils align-default">
 <thead>
@@ -476,17 +736,12 @@
 <td><p>403</p></td>
 <td><p>Bloqueado</p></td>
 </tr>
-<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">{&quot;username&quot;:&quot;admin'</span> <span class="pre">OR</span> <span class="pre">1=1--&quot;,&quot;password&quot;:&quot;x&quot;}</span></code></p></td>
-<td><p>JSON POST</p></td>
-<td><p>403</p></td>
-<td><p>Bloqueado</p></td>
-</tr>
 </tbody>
 </table>
 </div>
 </section>
 <section id="cross-site-scripting-xss">
-<h3>Cross-Site Scripting (XSS)<a class="headerlink" href="#cross-site-scripting-xss" title="Link to this heading">¶</a></h3>
+<h4>Cross-Site Scripting (XSS)<a class="headerlink" href="#cross-site-scripting-xss" title="Link to this heading">¶</a></h4>
 <div class="table-wrapper colwidths-auto docutils container">
 <table class="docutils align-default">
 <thead>
@@ -516,29 +771,8 @@
 </table>
 </div>
 </section>
-<section id="path-traversal-inclusion-de-ficheros">
-<h3>Path Traversal / Inclusión de ficheros<a class="headerlink" href="#path-traversal-inclusion-de-ficheros" title="Link to this heading">¶</a></h3>
-<div class="table-wrapper colwidths-auto docutils container">
-<table class="docutils align-default">
-<thead>
-<tr class="row-odd"><th class="head"><p>Payload</p></th>
-<th class="head"><p>Vector</p></th>
-<th class="head"><p>HTTP</p></th>
-<th class="head"><p>Estado</p></th>
-</tr>
-</thead>
-<tbody>
-<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">/..%2f..%2f..%2fetc%2fpasswd</span></code></p></td>
-<td><p>URL path</p></td>
-<td><p>400</p></td>
-<td><p>Bloqueado</p></td>
-</tr>
-</tbody>
-</table>
-</div>
-</section>
-<section id="inyeccion-de-comandos-del-sistema">
-<h3>Inyección de comandos del sistema<a class="headerlink" href="#inyeccion-de-comandos-del-sistema" title="Link to this heading">¶</a></h3>
+<section id="inyeccion-de-comandos-lfi">
+<h4>Inyección de comandos / LFI<a class="headerlink" href="#inyeccion-de-comandos-lfi" title="Link to this heading">¶</a></h4>
 <div class="table-wrapper colwidths-auto docutils container">
 <table class="docutils align-default">
 <thead>
@@ -564,7 +798,7 @@
 </div>
 </section>
 <section id="ataques-de-protocolo-aplicacion">
-<h3>Ataques de protocolo / aplicación<a class="headerlink" href="#ataques-de-protocolo-aplicacion" title="Link to this heading">¶</a></h3>
+<h4>Ataques de protocolo / aplicación<a class="headerlink" href="#ataques-de-protocolo-aplicacion" title="Link to this heading">¶</a></h4>
 <div class="table-wrapper colwidths-auto docutils container">
 <table class="docutils align-default">
 <thead>
@@ -585,17 +819,12 @@
 <td><p>403</p></td>
 <td><p>Bloqueado</p></td>
 </tr>
-<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">%0d%0aSet-Cookie:</span> <span class="pre">evil=1</span></code></p></td>
-<td><p>HTTP Response Splitting</p></td>
-<td><p>403</p></td>
-<td><p>Bloqueado</p></td>
-</tr>
 </tbody>
 </table>
 </div>
 </section>
-<section id="deteccion-de-scanners-y-bots">
-<h3>Detección de scanners y bots<a class="headerlink" href="#deteccion-de-scanners-y-bots" title="Link to this heading">¶</a></h3>
+<section id="deteccion-de-scanners">
+<h4>Detección de scanners<a class="headerlink" href="#deteccion-de-scanners" title="Link to this heading">¶</a></h4>
 <div class="table-wrapper colwidths-auto docutils container">
 <table class="docutils align-default">
 <thead>
@@ -620,8 +849,44 @@
 </table>
 </div>
 </section>
-<section id="fugas-de-informacion">
-<h3>Fugas de información<a class="headerlink" href="#fugas-de-informacion" title="Link to this heading">¶</a></h3>
+<section id="exfiltracion-de-datos-outbound">
+<h4>Exfiltración de datos (outbound)<a class="headerlink" href="#exfiltracion-de-datos-outbound" title="Link to this heading">¶</a></h4>
+<div class="table-wrapper colwidths-auto docutils container">
+<table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Tipo de fuga</p></th>
+<th class="head"><p>Regla</p></th>
+<th class="head"><p>HTTP</p></th>
+<th class="head"><p>Estado</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>Números de tarjeta de crédito</p></td>
+<td><p>10010</p></td>
+<td><p>403</p></td>
+<td><p>Bloqueado</p></td>
+</tr>
+<tr class="row-odd"><td><p>Contenido de /etc/passwd</p></td>
+<td><p>10011</p></td>
+<td><p>403</p></td>
+<td><p>Bloqueado</p></td>
+</tr>
+<tr class="row-even"><td><p>Volcado de base de datos</p></td>
+<td><p>10012</p></td>
+<td><p>403</p></td>
+<td><p>Bloqueado</p></td>
+</tr>
+<tr class="row-odd"><td><p>Stack trace de Python</p></td>
+<td><p>10013</p></td>
+<td><p>403</p></td>
+<td><p>Bloqueado</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+</section>
+<section id="fugas-de-informacion-en-cabeceras">
+<h4>Fugas de información en cabeceras<a class="headerlink" href="#fugas-de-informacion-en-cabeceras" title="Link to this heading">¶</a></h4>
 <div class="table-wrapper colwidths-auto docutils container">
 <table class="docutils align-default">
 <thead>
@@ -630,7 +895,7 @@
 </tr>
 </thead>
 <tbody>
-<tr class="row-even"><td><p>La respuesta 403 no revela nombre/versión del WAF, servidor ni motor de reglas</p></td>
+<tr class="row-even"><td><p>La respuesta 403 no revela nombre/versión del WAF</p></td>
 <td><p>Sin fugas</p></td>
 </tr>
 <tr class="row-odd"><td><p>Header <code class="docutils literal notranslate"><span class="pre">Server:</span></code> muestra <code class="docutils literal notranslate"><span class="pre">nginx</span></code> sin número de versión</p></td>
@@ -641,9 +906,10 @@
 </div>
 </section>
 </section>
+</section>
 <hr class="docutils" />
 <section id="pruebas-de-integridad-funcionalidad-no-afectada">
-<h2>Pruebas de integridad (funcionalidad no afectada)<a class="headerlink" href="#pruebas-de-integridad-funcionalidad-no-afectada" title="Link to this heading">¶</a></h2>
+<h2>8. Pruebas de integridad (funcionalidad no afectada)<a class="headerlink" href="#pruebas-de-integridad-funcionalidad-no-afectada" title="Link to this heading">¶</a></h2>
 <p>Verificado que el WAF <strong>no bloquea</strong> el tráfico legítimo de la aplicación:</p>
 <div class="table-wrapper colwidths-auto docutils container">
 <table class="docutils align-default">
@@ -664,11 +930,11 @@
 </tr>
 <tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">/api/auth/register</span></code></p></td>
 <td><p>POST (JSON)</p></td>
-<td><p>Funcional (pasa a través del WAF)</p></td>
+<td><p>Funcional</p></td>
 </tr>
 <tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">/api/auth/login</span></code></p></td>
 <td><p>POST (JSON)</p></td>
-<td><p>Funcional (pasa a través del WAF)</p></td>
+<td><p>Funcional</p></td>
 </tr>
 <tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">/api/user</span></code></p></td>
 <td><p>POST (JSON + CSRF)</p></td>
@@ -690,9 +956,9 @@
 <td><p>GET</p></td>
 <td><p>200 — JavaScript servido</p></td>
 </tr>
-<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">/static/js/auth.js</span></code></p></td>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">/supervisor</span></code></p></td>
 <td><p>GET</p></td>
-<td><p>200 — JavaScript servido</p></td>
+<td><p>200 — Dashboard de desarrollo</p></td>
 </tr>
 </tbody>
 </table>
@@ -701,7 +967,7 @@
 </section>
 <hr class="docutils" />
 <section id="logging-y-monitorizacion">
-<h2>Logging y monitorización<a class="headerlink" href="#logging-y-monitorizacion" title="Link to this heading">¶</a></h2>
+<h2>9. Logging y monitorización<a class="headerlink" href="#logging-y-monitorizacion" title="Link to this heading">¶</a></h2>
 <section id="ver-logs-en-tiempo-real">
 <h3>Ver logs en tiempo real<a class="headerlink" href="#ver-logs-en-tiempo-real" title="Link to this heading">¶</a></h3>
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>make<span class="w"> </span>logs-waf
@@ -715,26 +981,66 @@
 <section id="que-se-registra">
 <h3>Qué se registra<a class="headerlink" href="#que-se-registra" title="Link to this heading">¶</a></h3>
 <ul class="simple">
-<li><p>Peticiones bloqueadas (regla activada, score, payload, IP origen).</p></li>
-<li><p>Peticiones permitidas que activaron reglas pero no alcanzaron el umbral de anomalía.</p></li>
+<li><p>Peticiones bloqueadas: regla activada, score, payload, IP origen.</p></li>
+<li><p>Respuestas bloqueadas (outbound): regla activada, tipo de fuga detectada.</p></li>
+<li><p>Peticiones que activaron reglas pero no alcanzaron el umbral de anomalía.</p></li>
 <li><p>Errores internos del WAF.</p></li>
 </ul>
 </section>
-<section id="ejemplo-de-entrada-de-log-ataque-bloqueado">
-<h3>Ejemplo de entrada de log (ataque bloqueado)<a class="headerlink" href="#ejemplo-de-entrada-de-log-ataque-bloqueado" title="Link to this heading">¶</a></h3>
-<p>Cuando una petición es bloqueada, el log incluye:</p>
+<section id="formato-del-log">
+<h3>Formato del log<a class="headerlink" href="#formato-del-log" title="Link to this heading">¶</a></h3>
+<p>Cada entrada es un objeto JSON con la estructura:</p>
+<div class="highlight-json notranslate"><div class="highlight"><pre><span></span><span class="p">{</span>
+<span class="w">  </span><span class="nt">&quot;transaction&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="nt">&quot;client_ip&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;...&quot;</span><span class="p">,</span>
+<span class="w">    </span><span class="nt">&quot;time_stamp&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;...&quot;</span><span class="p">,</span>
+<span class="w">    </span><span class="nt">&quot;unique_id&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;...&quot;</span><span class="p">,</span>
+<span class="w">    </span><span class="nt">&quot;request&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="nt">&quot;method&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;...&quot;</span><span class="p">,</span><span class="w"> </span><span class="nt">&quot;uri&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;...&quot;</span><span class="p">,</span><span class="w"> </span><span class="nt">&quot;headers&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="err">...</span><span class="p">}},</span>
+<span class="w">    </span><span class="nt">&quot;response&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="nt">&quot;http_code&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">403</span><span class="p">,</span><span class="w"> </span><span class="nt">&quot;headers&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="err">...</span><span class="p">}},</span>
+<span class="w">    </span><span class="nt">&quot;producer&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<span class="w">      </span><span class="nt">&quot;modsecurity&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;ModSecurity v3.0.14 (Linux)&quot;</span><span class="p">,</span>
+<span class="w">      </span><span class="nt">&quot;connector&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;ModSecurity-nginx v1.0.4&quot;</span><span class="p">,</span>
+<span class="w">      </span><span class="nt">&quot;secrules_engine&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;Enabled&quot;</span><span class="p">,</span>
+<span class="w">      </span><span class="nt">&quot;components&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="s2">&quot;OWASP_CRS/4.23.0&quot;</span><span class="p">]</span>
+<span class="w">    </span><span class="p">},</span>
+<span class="w">    </span><span class="nt">&quot;messages&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[{</span>
+<span class="w">      </span><span class="nt">&quot;message&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;Descripción del ataque&quot;</span><span class="p">,</span>
+<span class="w">      </span><span class="nt">&quot;details&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="nt">&quot;ruleId&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;942100&quot;</span><span class="p">,</span>
+<span class="w">        </span><span class="nt">&quot;severity&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;2&quot;</span><span class="p">,</span>
+<span class="w">        </span><span class="nt">&quot;data&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;Matched Data: ...&quot;</span><span class="p">,</span>
+<span class="w">        </span><span class="nt">&quot;tags&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="s2">&quot;attack-sqli&quot;</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;OWASP_CRS&quot;</span><span class="p">]</span>
+<span class="w">      </span><span class="p">}</span>
+<span class="w">    </span><span class="p">}]</span>
+<span class="w">  </span><span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+</section>
+</section>
+<hr class="docutils" />
+<section id="impacto-en-el-rendimiento">
+<h2>10. Impacto en el rendimiento<a class="headerlink" href="#impacto-en-el-rendimiento" title="Link to this heading">¶</a></h2>
+<section id="inspeccion-de-peticiones-inbound">
+<h3>Inspección de peticiones (inbound)<a class="headerlink" href="#inspeccion-de-peticiones-inbound" title="Link to this heading">¶</a></h3>
+<p>La inspección de peticiones entrantes (cabeceras, query strings, body) añade una latencia mínima (&lt;5ms por petición en PL 1). El impacto es imperceptible para el usuario.</p>
+</section>
+<section id="inspeccion-de-respuestas-outbound">
+<h3>Inspección de respuestas (outbound)<a class="headerlink" href="#inspeccion-de-respuestas-outbound" title="Link to this heading">¶</a></h3>
+<p>La activación de <code class="docutils literal notranslate"><span class="pre">SecResponseBodyAccess</span> <span class="pre">On</span></code> tiene un impacto mayor que la inspección inbound:</p>
 <ul class="simple">
-<li><p><strong>ID de regla</strong> que se activó (ej. <code class="docutils literal notranslate"><span class="pre">941100</span></code> para XSS, <code class="docutils literal notranslate"><span class="pre">942100</span></code> para SQLi).</p></li>
-<li><p><strong>URI</strong> de la petición.</p></li>
-<li><p><strong>Datos del match</strong> (el fragmento del payload que activó la regla).</p></li>
-<li><p><strong>Puntuación de anomalía</strong> acumulada.</p></li>
-<li><p><strong>Acción</strong> tomada (<code class="docutils literal notranslate"><span class="pre">deny</span></code>, <code class="docutils literal notranslate"><span class="pre">pass</span></code>).</p></li>
+<li><p><strong>Memoria</strong>: el WAF almacena el body de la respuesta en memoria antes de enviarlo al cliente (hasta <code class="docutils literal notranslate"><span class="pre">SecResponseBodyLimit</span> <span class="pre">=</span> <span class="pre">512</span> <span class="pre">KB</span></code>).</p></li>
+<li><p><strong>CPU</strong>: las reglas de fase 4 (outbound) aplican expresiones regulares sobre el body completo.</p></li>
+<li><p><strong>Latencia</strong>: se añade un overhead de ~10-30ms por respuesta inspeccionada, dependiendo del tamaño.</p></li>
+<li><p><strong>MIME types limitados</strong>: solo se inspeccionan <code class="docutils literal notranslate"><span class="pre">text/plain</span></code>, <code class="docutils literal notranslate"><span class="pre">text/html</span></code>, <code class="docutils literal notranslate"><span class="pre">text/xml</span></code> y <code class="docutils literal notranslate"><span class="pre">application/json</span></code>. Los recursos estáticos (CSS, JS, imágenes) no se inspeccionan, reduciendo significativamente el impacto.</p></li>
 </ul>
+<p><strong>Mitigación aplicada</strong>: <code class="docutils literal notranslate"><span class="pre">SecResponseBodyLimit</span> <span class="pre">524288</span></code> (512 KB) evita que respuestas muy grandes (descargas de ficheros, exports) consuman recursos excesivos.</p>
+<p><strong>Conclusión</strong>: el impacto es aceptable para una aplicación médica de este tamaño. En aplicaciones de alto tráfico, se podría limitar la inspección outbound solo a <code class="docutils literal notranslate"><span class="pre">application/json</span></code> o desactivarla selectivamente para rutas de alto volumen mediante exclusiones por URI.</p>
 </section>
 </section>
 <hr class="docutils" />
 <section id="ficheros-del-waf-en-el-proyecto">
-<h2>Ficheros del WAF en el proyecto<a class="headerlink" href="#ficheros-del-waf-en-el-proyecto" title="Link to this heading">¶</a></h2>
+<h2>11. Ficheros del WAF en el proyecto<a class="headerlink" href="#ficheros-del-waf-en-el-proyecto" title="Link to this heading">¶</a></h2>
 <div class="table-wrapper colwidths-auto docutils container">
 <table class="docutils align-default">
 <thead>
@@ -747,7 +1053,7 @@
 <td><p>Definición del contenedor WAF, variables de entorno, volumes, healthcheck</p></td>
 </tr>
 <tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">waf/modsecurity-override.conf</span></code></p></td>
-<td><p>Exclusiones de reglas (falsos positivos) específicas de la aplicación</p></td>
+<td><p>Exclusiones de reglas y reglas personalizadas de exfiltración</p></td>
 </tr>
 <tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">data/waf/</span></code></p></td>
 <td><p>Logs persistentes de ModSecurity (montado como volumen, ignorado por <code class="docutils literal notranslate"><span class="pre">.gitignore</span></code>)</p></td>
@@ -758,10 +1064,9 @@
 </section>
 <hr class="docutils" />
 <section id="personalizacion">
-<h2>Personalización<a class="headerlink" href="#personalizacion" title="Link to this heading">¶</a></h2>
+<h2>12. Personalización<a class="headerlink" href="#personalizacion" title="Link to this heading">¶</a></h2>
 <section id="cambiar-a-modo-deteccion-sin-bloqueo">
 <h3>Cambiar a modo detección (sin bloqueo)<a class="headerlink" href="#cambiar-a-modo-deteccion-sin-bloqueo" title="Link to this heading">¶</a></h3>
-<p>Para probar el WAF sin bloquear peticiones (solo registra en log):</p>
 <div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="c1"># docker-compose.yml → servicio waf → environment</span>
 <span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">MODSEC_RULE_ENGINE=DetectionOnly</span>
 </pre></div>
@@ -773,14 +1078,14 @@
 </pre></div>
 </div>
 <blockquote>
-<div><p>Al subir el PL, es probable que aparezcan nuevos falsos positivos. Revisar los logs (<code class="docutils literal notranslate"><span class="pre">make</span> <span class="pre">logs-waf</span></code>), identificar las reglas que se activan con tráfico legítimo y añadir exclusiones en <code class="docutils literal notranslate"><span class="pre">waf/modsecurity-override.conf</span></code>.</p>
+<div><p>Al subir el PL, es probable que aparezcan nuevos falsos positivos. Revisar los logs (<code class="docutils literal notranslate"><span class="pre">make</span> <span class="pre">logs-waf</span></code>), identificar las reglas activadas y añadir exclusiones en <code class="docutils literal notranslate"><span class="pre">waf/modsecurity-override.conf</span></code>.</p>
 </div></blockquote>
 </section>
 <section id="anadir-una-nueva-exclusion">
 <h3>Añadir una nueva exclusión<a class="headerlink" href="#anadir-una-nueva-exclusion" title="Link to this heading">¶</a></h3>
-<p>Formato general para excluir un campo específico de una regla en una ruta concreta:</p>
+<p>Formato general (exclusión AFTER-CRS que elimina una regla específica para un campo concreto en una ruta):</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">SecRule</span> <span class="n">REQUEST_URI</span> <span class="s2">&quot;@beginsWith /api/mi-ruta&quot;</span> \
-    <span class="s2">&quot;id:10005,</span><span class="se">\</span>
+    <span class="s2">&quot;id:10006,</span><span class="se">\</span>
 <span class="s2">    phase:1,</span><span class="se">\</span>
 <span class="s2">    pass,</span><span class="se">\</span>
 <span class="s2">    nolog,</span><span class="se">\</span>
@@ -788,7 +1093,7 @@
 </pre></div>
 </div>
 <ul class="simple">
-<li><p>El <code class="docutils literal notranslate"><span class="pre">id</span></code> debe ser único (usar rango 10000+).</p></li>
+<li><p>El <code class="docutils literal notranslate"><span class="pre">id</span></code> debe ser único (rango 10000+).</p></li>
 <li><p><code class="docutils literal notranslate"><span class="pre">phase:1</span></code> = se aplica en la fase de cabeceras/petición.</p></li>
 <li><p><code class="docutils literal notranslate"><span class="pre">ctl:ruleRemoveTargetById</span></code> desactiva una regla específica solo para ese campo.</p></li>
 </ul>
@@ -796,7 +1101,7 @@
 </section>
 <hr class="docutils" />
 <section id="consideraciones-de-produccion">
-<h2>Consideraciones de producción<a class="headerlink" href="#consideraciones-de-produccion" title="Link to this heading">¶</a></h2>
+<h2>13. Consideraciones de producción<a class="headerlink" href="#consideraciones-de-produccion" title="Link to this heading">¶</a></h2>
 <div class="table-wrapper colwidths-auto docutils container">
 <table class="docutils align-default">
 <thead>
@@ -806,28 +1111,80 @@
 </thead>
 <tbody>
 <tr class="row-even"><td><p><strong>Supervisor</strong></p></td>
-<td><p>Desactivar (<code class="docutils literal notranslate"><span class="pre">APP_SUPERVISOR=0</span></code>). La regla 10004 que desactiva el WAF para <code class="docutils literal notranslate"><span class="pre">/supervisor</span></code> no debería existir en producción.</p></td>
+<td><p>Desactivar (<code class="docutils literal notranslate"><span class="pre">APP_SUPERVISOR=0</span></code>). Las exclusiones 10004/10005 dejan de aplicarse.</p></td>
 </tr>
 <tr class="row-odd"><td><p><strong>HTTPS</strong></p></td>
-<td><p>En producción, colocar un terminador TLS (Nginx, Traefik, Cloudflare) delante del WAF o configurar certificados en el propio contenedor WAF.</p></td>
+<td><p>Colocar un terminador TLS delante del WAF o configurar certificados en el contenedor.</p></td>
 </tr>
 <tr class="row-even"><td><p><strong>Logs</strong></p></td>
-<td><p>Rotar los logs de <code class="docutils literal notranslate"><span class="pre">data/waf/</span></code> con logrotate o similar para evitar que crezcan indefinidamente.</p></td>
+<td><p>Rotar los logs de <code class="docutils literal notranslate"><span class="pre">data/waf/</span></code> con logrotate para evitar crecimiento indefinido.</p></td>
 </tr>
 <tr class="row-odd"><td><p><strong>Paranoia Level</strong></p></td>
-<td><p>Evaluar si PL 2 es viable tras un período de observación con <code class="docutils literal notranslate"><span class="pre">DetectionOnly</span></code>.</p></td>
+<td><p>Evaluar PL 2 tras un período de observación con <code class="docutils literal notranslate"><span class="pre">DetectionOnly</span></code>.</p></td>
 </tr>
 <tr class="row-even"><td><p><strong>Actualizaciones</strong></p></td>
-<td><p>La imagen <code class="docutils literal notranslate"><span class="pre">owasp/modsecurity-crs:nginx-alpine</span></code> se actualiza periódicamente con nuevas reglas. Ejecutar <code class="docutils literal notranslate"><span class="pre">docker</span> <span class="pre">pull</span> <span class="pre">owasp/modsecurity-crs:nginx-alpine</span></code> y reiniciar.</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">docker</span> <span class="pre">pull</span> <span class="pre">owasp/modsecurity-crs:nginx-alpine</span></code> y reiniciar para obtener nuevas reglas.</p></td>
+</tr>
+<tr class="row-odd"><td><p><strong>Outbound filtering</strong></p></td>
+<td><p>Mantener activo para detectar fugas. Ajustar <code class="docutils literal notranslate"><span class="pre">SecResponseBodyLimit</span></code> según necesidad.</p></td>
 </tr>
 </tbody>
 </table>
 </div>
 </section>
 <hr class="docutils" />
+<section id="postura-de-seguridad-final">
+<h2>14. Postura de seguridad final<a class="headerlink" href="#postura-de-seguridad-final" title="Link to this heading">¶</a></h2>
+<p>Con la implementación completa del WAF, la aplicación cuenta con las siguientes capas de protección:</p>
+<div class="table-wrapper colwidths-auto docutils container">
+<table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Capa</p></th>
+<th class="head"><p>Medida</p></th>
+<th class="head"><p>Cobertura</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><strong>Perímetro (inbound)</strong></p></td>
+<td><p>ModSecurity + OWASP CRS</p></td>
+<td><p>SQLi, XSS, RCE, LFI, SSRF, scanners, Log4Shell</p></td>
+</tr>
+<tr class="row-odd"><td><p><strong>Perímetro (outbound)</strong></p></td>
+<td><p>Outbound filtering + reglas custom</p></td>
+<td><p>Tarjetas de crédito, /etc/passwd, dumps SQL, stack traces</p></td>
+</tr>
+<tr class="row-even"><td><p><strong>Entrada</strong></p></td>
+<td><p>Validación y sanitización</p></td>
+<td><p>Nombres, fechas, pesos, alturas</p></td>
+</tr>
+<tr class="row-odd"><td><p><strong>Autenticación</strong></p></td>
+<td><p>Argon2id, HIBP, reCAPTCHA v3</p></td>
+<td><p>Contraseñas fuertes, brecha conocida, bots</p></td>
+</tr>
+<tr class="row-even"><td><p><strong>Sesión</strong></p></td>
+<td><p>Cookies HttpOnly, SameSite, CSRF</p></td>
+<td><p>Protección de sesión</p></td>
+</tr>
+<tr class="row-odd"><td><p><strong>Transporte</strong></p></td>
+<td><p>Headers de seguridad, HSTS</p></td>
+<td><p>Clickjacking, MIME sniffing, XSS</p></td>
+</tr>
+<tr class="row-even"><td><p><strong>Aplicación</strong></p></td>
+<td><p>Rate limiting (Flask-Limiter)</p></td>
+<td><p>Fuerza bruta en login/register</p></td>
+</tr>
+<tr class="row-odd"><td><p><strong>Almacenamiento</strong></p></td>
+<td><p>SQLCipher (opcional)</p></td>
+<td><p>Cifrado de BD en reposo</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<p>El WAF complementa (no sustituye) las demás capas. La defensa en profundidad asegura que incluso si una capa falla, las demás siguen protegiendo la aplicación.</p>
+</section>
+<hr class="docutils" />
 <section id="relacion-con-otras-medidas-de-seguridad">
-<h2>Relación con otras medidas de seguridad<a class="headerlink" href="#relacion-con-otras-medidas-de-seguridad" title="Link to this heading">¶</a></h2>
-<p>El WAF complementa (no sustituye) las demás capas de seguridad de la aplicación:</p>
+<h2>15. Relación con otras medidas de seguridad<a class="headerlink" href="#relacion-con-otras-medidas-de-seguridad" title="Link to this heading">¶</a></h2>
 <div class="table-wrapper colwidths-auto docutils container">
 <table class="docutils align-default">
 <thead>
@@ -906,51 +1263,76 @@
           <div class="toc-tree">
             <ul>
 <li><a class="reference internal" href="#">WAF: ModSecurity v3 + OWASP Core Rule Set (CRS)</a><ul>
-<li><a class="reference internal" href="#que-es-y-por-que-se-usa">Qué es y por qué se usa</a><ul>
+<li><a class="reference internal" href="#que-es-y-por-que-se-usa">1. Qué es y por qué se usa</a><ul>
 <li><a class="reference internal" href="#que-aporta-a-la-aplicacion">Qué aporta a la aplicación</a></li>
 </ul>
 </li>
-<li><a class="reference internal" href="#arquitectura">Arquitectura</a></li>
-<li><a class="reference internal" href="#configuracion">Configuración</a><ul>
+<li><a class="reference internal" href="#arquitectura">2. Arquitectura</a></li>
+<li><a class="reference internal" href="#proceso-de-despliegue-detectiononly-on">3. Proceso de despliegue: DetectionOnly → On</a><ul>
+<li><a class="reference internal" href="#fase-1-modo-detectiononly-observacion">Fase 1: Modo DetectionOnly (observación)</a></li>
+<li><a class="reference internal" href="#fase-2-modo-on-bloqueo">Fase 2: Modo On (bloqueo)</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#configuracion">4. Configuración</a><ul>
 <li><a class="reference internal" href="#paranoia-level-pl">Paranoia Level (PL)</a></li>
 <li><a class="reference internal" href="#anomaly-scoring">Anomaly Scoring</a></li>
 </ul>
 </li>
-<li><a class="reference internal" href="#exclusiones-para-falsos-positivos">Exclusiones para falsos positivos</a><ul>
-<li><a class="reference internal" href="#regla-10001-campo-password-en-rutas-de-autenticacion">Regla 10001 — Campo <code class="docutils literal notranslate"><span class="pre">password</span></code> en rutas de autenticación</a></li>
-<li><a class="reference internal" href="#regla-10002-campo-recaptcha-token-en-rutas-de-autenticacion">Regla 10002 — Campo <code class="docutils literal notranslate"><span class="pre">recaptcha_token</span></code> en rutas de autenticación</a></li>
-<li><a class="reference internal" href="#regla-10003-campos-de-nombre-en-ruta-de-perfil">Regla 10003 — Campos de nombre en ruta de perfil</a></li>
-<li><a class="reference internal" href="#regla-10004-dashboard-supervisor-solo-desarrollo">Regla 10004 — Dashboard Supervisor (solo desarrollo)</a></li>
-<li><a class="reference internal" href="#secresponsebodyaccess-off">SecResponseBodyAccess Off</a></li>
+<li><a class="reference internal" href="#analisis-de-falsos-positivos-y-exclusiones">5. Análisis de falsos positivos y exclusiones</a><ul>
+<li><a class="reference internal" href="#falso-positivo-1-campo-password-en-login-register">5.1. Falso positivo 1: Campo <code class="docutils literal notranslate"><span class="pre">password</span></code> en login/register</a></li>
+<li><a class="reference internal" href="#falso-positivo-2-campo-recaptcha-token">5.2. Falso positivo 2: Campo <code class="docutils literal notranslate"><span class="pre">recaptcha_token</span></code></a></li>
+<li><a class="reference internal" href="#falso-positivo-3-campos-first-name-last-name">5.3. Falso positivo 3: Campos <code class="docutils literal notranslate"><span class="pre">first_name</span></code> / <code class="docutils literal notranslate"><span class="pre">last_name</span></code></a></li>
+<li><a class="reference internal" href="#falso-positivo-4-dashboard-supervisor">5.4. Falso positivo 4: Dashboard Supervisor</a></li>
 </ul>
 </li>
-<li><a class="reference internal" href="#ataques-bloqueados-bateria-de-pruebas-verificada">Ataques bloqueados (batería de pruebas verificada)</a><ul>
+<li><a class="reference internal" href="#proteccion-contra-exfiltracion-de-datos-outbound-filtering">6. Protección contra exfiltración de datos (Outbound Filtering)</a><ul>
+<li><a class="reference internal" href="#id1">Configuración</a></li>
+<li><a class="reference internal" href="#reglas-crs-de-respuesta-automaticas">Reglas CRS de respuesta (automáticas)</a></li>
+<li><a class="reference internal" href="#reglas-personalizadas-de-exfiltracion">Reglas personalizadas de exfiltración</a></li>
+<li><a class="reference internal" href="#pruebas-de-exfiltracion-realizadas">Pruebas de exfiltración realizadas</a></li>
+<li><a class="reference internal" href="#nota-sobre-el-comportamiento-en-reverse-proxy">Nota sobre el comportamiento en reverse proxy</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#ataques-bloqueados-bateria-de-pruebas-verificada">7. Ataques bloqueados (batería de pruebas verificada)</a><ul>
+<li><a class="reference internal" href="#extracto-real-del-log-sql-injection-detectada-modo-detectiononly">Extracto real del log — SQL Injection detectada (modo DetectionOnly)</a></li>
+<li><a class="reference internal" href="#extracto-real-del-log-xss-detectada-modo-detectiononly">Extracto real del log — XSS detectada (modo DetectionOnly)</a></li>
+<li><a class="reference internal" href="#extracto-real-del-log-command-injection-lfi-modo-detectiononly">Extracto real del log — Command Injection / LFI (modo DetectionOnly)</a></li>
+<li><a class="reference internal" href="#extracto-real-del-log-scanner-detectado-modo-detectiononly">Extracto real del log — Scanner detectado (modo DetectionOnly)</a></li>
+<li><a class="reference internal" href="#tabla-resumen-modo-on-bloqueo-activo">Tabla resumen — Modo On (bloqueo activo)</a><ul>
 <li><a class="reference internal" href="#inyeccion-sql">Inyección SQL</a></li>
 <li><a class="reference internal" href="#cross-site-scripting-xss">Cross-Site Scripting (XSS)</a></li>
-<li><a class="reference internal" href="#path-traversal-inclusion-de-ficheros">Path Traversal / Inclusión de ficheros</a></li>
-<li><a class="reference internal" href="#inyeccion-de-comandos-del-sistema">Inyección de comandos del sistema</a></li>
+<li><a class="reference internal" href="#inyeccion-de-comandos-lfi">Inyección de comandos / LFI</a></li>
 <li><a class="reference internal" href="#ataques-de-protocolo-aplicacion">Ataques de protocolo / aplicación</a></li>
-<li><a class="reference internal" href="#deteccion-de-scanners-y-bots">Detección de scanners y bots</a></li>
-<li><a class="reference internal" href="#fugas-de-informacion">Fugas de información</a></li>
+<li><a class="reference internal" href="#deteccion-de-scanners">Detección de scanners</a></li>
+<li><a class="reference internal" href="#exfiltracion-de-datos-outbound">Exfiltración de datos (outbound)</a></li>
+<li><a class="reference internal" href="#fugas-de-informacion-en-cabeceras">Fugas de información en cabeceras</a></li>
 </ul>
 </li>
-<li><a class="reference internal" href="#pruebas-de-integridad-funcionalidad-no-afectada">Pruebas de integridad (funcionalidad no afectada)</a></li>
-<li><a class="reference internal" href="#logging-y-monitorizacion">Logging y monitorización</a><ul>
+</ul>
+</li>
+<li><a class="reference internal" href="#pruebas-de-integridad-funcionalidad-no-afectada">8. Pruebas de integridad (funcionalidad no afectada)</a></li>
+<li><a class="reference internal" href="#logging-y-monitorizacion">9. Logging y monitorización</a><ul>
 <li><a class="reference internal" href="#ver-logs-en-tiempo-real">Ver logs en tiempo real</a></li>
 <li><a class="reference internal" href="#ficheros-de-log">Ficheros de log</a></li>
 <li><a class="reference internal" href="#que-se-registra">Qué se registra</a></li>
-<li><a class="reference internal" href="#ejemplo-de-entrada-de-log-ataque-bloqueado">Ejemplo de entrada de log (ataque bloqueado)</a></li>
+<li><a class="reference internal" href="#formato-del-log">Formato del log</a></li>
 </ul>
 </li>
-<li><a class="reference internal" href="#ficheros-del-waf-en-el-proyecto">Ficheros del WAF en el proyecto</a></li>
-<li><a class="reference internal" href="#personalizacion">Personalización</a><ul>
+<li><a class="reference internal" href="#impacto-en-el-rendimiento">10. Impacto en el rendimiento</a><ul>
+<li><a class="reference internal" href="#inspeccion-de-peticiones-inbound">Inspección de peticiones (inbound)</a></li>
+<li><a class="reference internal" href="#inspeccion-de-respuestas-outbound">Inspección de respuestas (outbound)</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#ficheros-del-waf-en-el-proyecto">11. Ficheros del WAF en el proyecto</a></li>
+<li><a class="reference internal" href="#personalizacion">12. Personalización</a><ul>
 <li><a class="reference internal" href="#cambiar-a-modo-deteccion-sin-bloqueo">Cambiar a modo detección (sin bloqueo)</a></li>
 <li><a class="reference internal" href="#subir-el-paranoia-level">Subir el Paranoia Level</a></li>
 <li><a class="reference internal" href="#anadir-una-nueva-exclusion">Añadir una nueva exclusión</a></li>
 </ul>
 </li>
-<li><a class="reference internal" href="#consideraciones-de-produccion">Consideraciones de producción</a></li>
-<li><a class="reference internal" href="#relacion-con-otras-medidas-de-seguridad">Relación con otras medidas de seguridad</a></li>
+<li><a class="reference internal" href="#consideraciones-de-produccion">13. Consideraciones de producción</a></li>
+<li><a class="reference internal" href="#postura-de-seguridad-final">14. Postura de seguridad final</a></li>
+<li><a class="reference internal" href="#relacion-con-otras-medidas-de-seguridad">15. Relación con otras medidas de seguridad</a></li>
 </ul>
 </li>
 </ul>
