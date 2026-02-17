@@ -77,36 +77,47 @@ if command -v docker &> /dev/null; then
     fi
 fi
 
-# Paso 3: Eliminar datos de PostgreSQL
+# Paso 3: Eliminar base de datos SQLite de la aplicación
 echo ""
-echo "Paso 3/8: Eliminando datos de PostgreSQL..."
+echo "Paso 3/9: Eliminando base de datos SQLite de la aplicación..."
+if [ -f "data/app.db" ]; then
+    rm -f data/app.db data/app.db-wal data/app.db-shm
+    echo "  ✓ Base de datos data/app.db eliminada"
+    ((COUNT++))
+else
+    echo "  ℹ️  No se encontró data/app.db"
+fi
+
+# Paso 4: Eliminar datos de PostgreSQL
+echo ""
+echo "Paso 4/9: Eliminando datos de PostgreSQL..."
 if [ -d "data/postgres" ]; then
     rm -rf data/postgres
     echo "  ✓ Directorio data/postgres/ eliminado"
     ((COUNT++))
 fi
 
-# Paso 4: Eliminar datos de Redis
+# Paso 5: Eliminar datos de Redis
 echo ""
-echo "Paso 4/8: Eliminando datos de Redis..."
+echo "Paso 5/9: Eliminando datos de Redis..."
 if [ -d "data/redis" ]; then
     rm -rf data/redis
     echo "  ✓ Directorio data/redis/ eliminado"
     ((COUNT++))
 fi
 
-# Paso 5: Eliminar datos de DefectDojo
+# Paso 6: Eliminar datos de DefectDojo
 echo ""
-echo "Paso 5/8: Eliminando datos de DefectDojo..."
+echo "Paso 6/9: Eliminando datos de DefectDojo..."
 if [ -d "data/defectdojo" ]; then
     rm -rf data/defectdojo
     echo "  ✓ Directorio data/defectdojo/ eliminado"
     ((COUNT++))
 fi
 
-# Paso 6: Eliminar dumps SQL generados (excepto el inicial)
+# Paso 7: Eliminar dumps SQL generados (excepto el inicial)
 echo ""
-echo "Paso 6/8: Eliminando dumps SQL generados..."
+echo "Paso 7/9: Eliminando dumps SQL generados..."
 if [ -d "data" ]; then
     DUMP_FILES=$(find data -name "*_db_dump.sql" -not -name "defectdojo_db_initial.sql" 2>/dev/null || true)
     if [ -n "$DUMP_FILES" ]; then
@@ -119,18 +130,18 @@ if [ -d "data" ]; then
     fi
 fi
 
-# Paso 7: Eliminar entorno virtual
+# Paso 8: Eliminar entorno virtual
 echo ""
-echo "Paso 7/8: Eliminando entorno virtual..."
+echo "Paso 8/9: Eliminando entorno virtual..."
 if [ -d "venv" ]; then
     rm -rf venv
     echo "  ✓ Directorio venv/ eliminado"
     ((COUNT++))
 fi
 
-# Paso 8: Eliminar .env (se recreará automáticamente)
+# Paso 9: Eliminar .env (se recreará automáticamente)
 echo ""
-echo "Paso 8/8: Limpiando archivo .env..."
+echo "Paso 9/9: Limpiando archivo .env..."
 if [ -f ".env" ]; then
     rm -f .env
     echo "  ✓ Archivo .env eliminado (se recreará automáticamente)"

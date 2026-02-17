@@ -125,9 +125,33 @@ def require_auth(func):
             return jsonify({"error": get_error("auth_required")}), 401
 
         g.current_user_id = int(payload["sub"])
+        g.current_user_role = payload.get("role", "user")
         g.jwt_payload = payload
         return func(*args, **kwargs)
     return wrapper
+
+
+def require_role(*allowed_roles):
+    """
+    Decorador que restringe el acceso a usuarios con un rol específico.
+    Debe usarse DESPUÉS de @require_auth para que g.current_user_role esté disponible.
+
+    Ejemplo:
+        @api.route('/admin/action')
+        @require_auth
+        @require_role("admin")
+        def admin_action():
+            ...
+    """
+    def decorator(func):
+        @wraps(func)
+        def wrapper(*args, **kwargs):
+            user_role = getattr(g, "current_user_role", None)
+            if user_role not in allowed_roles:
+                return jsonify({"error": "No tienes permisos para realizar esta acción"}), 403
+            return func(*args, **kwargs)
+        return wrapper
+    return decorator
 
 
 @api.route('/auth/register', methods=['POST'])
@@ -154,15 +178,19 @@ def register():
     if storage.get_auth_user_by_username(username):
         return jsonify({"error": get_error("user_already_exists")}), 400
 
-    password_hash = hash_password(password_raw)
-    auth_user = storage.create_auth_user(username, password_hash)
+    # El primer usuario registrado recibe rol admin; los siguientes, user
+    role = "admin" if storage.count_auth_users() == 0 else "user"
 
-    access_token = create_access_token(auth_user.user_id, auth_user.username)
+    password_hash = hash_password(password_raw)
+    auth_user = storage.create_auth_user(username, password_hash, role=role)
+
+    access_token = create_access_token(auth_user.user_id, auth_user.username, role=auth_user.role)
     refresh_token = create_refresh_token(auth_user.user_id)
 
     resp = make_response(jsonify({
         "user_id": auth_user.user_id,
         "username": auth_user.username,
+        "role": auth_user.role,
         "access_token": access_token,
     }), 201)
     _set_refresh_cookie(resp, refresh_token)
@@ -199,12 +227,13 @@ def login():
     if new_hash != auth_user.password_hash:
         storage.update_password_hash(auth_user.user_id, new_hash)
 
-    access_token = create_access_token(auth_user.user_id, auth_user.username)
+    access_token = create_access_token(auth_user.user_id, auth_user.username, role=auth_user.role)
     refresh_token = create_refresh_token(auth_user.user_id)
 
     resp = make_response(jsonify({
         "user_id": auth_user.user_id,
         "username": auth_user.username,
+        "role": auth_user.role,
         "access_token": access_token,
     }), 200)
     _set_refresh_cookie(resp, refresh_token)
@@ -245,6 +274,7 @@ def me():
     return jsonify({
         "user_id": auth_user.user_id,
         "username": auth_user.username,
+        "role": auth_user.role,
     }), 200
 
 
@@ -286,11 +316,39 @@ def refresh():
         _clear_refresh_cookie(resp)
         return resp
 
-    new_access_token = create_access_token(auth_user.user_id, auth_user.username)
+    new_access_token = create_access_token(auth_user.user_id, auth_user.username, role=auth_user.role)
     return jsonify({
         "access_token": new_access_token,
         "user_id": auth_user.user_id,
         "username": auth_user.username,
+        "role": auth_user.role,
+    }), 200
+
+
+@api.route('/admin/users/<int:target_user_id>/role', methods=['PUT'])
+@require_auth
+@require_role("admin")
+def update_user_role(target_user_id):
+    """Permite a un admin cambiar el rol de otro usuario."""
+    storage = current_app.storage
+    data = request.json or {}
+    new_role = data.get("role", "")
+
+    if new_role not in ("admin", "user"):
+        return jsonify({"error": "Rol inválido. Valores permitidos: admin, user"}), 400
+
+    target_user = storage.get_auth_user_by_id(target_user_id)
+    if not target_user:
+        return jsonify({"error": get_error("user_not_found")}), 404
+
+    if target_user_id == g.current_user_id and new_role != "admin":
+        return jsonify({"error": "No puedes degradar tu propio rol de admin"}), 400
+
+    storage.update_user_role(target_user_id, new_role)
+    return jsonify({
+        "message": f"Rol de '{target_user.username}' actualizado a '{new_role}'",
+        "user_id": target_user_id,
+        "role": new_role,
     }), 200
 
 
@@ -573,6 +631,8 @@ def get_config():
 
 
 @api.route('/defectdojo/export-dump', methods=['GET'])
+@require_auth
+@require_role("admin")
 def export_defectdojo_dump():
     """
     Exportar el dump de la base de datos de DefectDojo
@@ -632,6 +692,8 @@ def export_defectdojo_dump():
 
 
 @api.route('/defectdojo/import-dump', methods=['POST'])
+@require_auth
+@require_role("admin")
 def import_defectdojo_dump():
     """
     Importar un dump de la base de datos de DefectDojo
@@ -721,6 +783,8 @@ def import_defectdojo_dump():
 
 
 @api.route('/defectdojo/generate-pdf', methods=['GET'])
+@require_auth
+@require_role("admin")
 def generate_pdf_report():
     """
     Generar PDF del informe de seguridad ASVS y descargarlo
@@ -820,6 +884,8 @@ def generate_pdf_report():
 
 
 @api.route('/wstg/sync', methods=['POST'])
+@require_auth
+@require_role("admin")
 def wstg_sync():
     """
     Sincronizar estado desde WSTG Tracker hacia DefectDojo
@@ -898,6 +964,8 @@ def wstg_sync():
 
 
 @api.route('/wstg/webhook', methods=['POST'])
+@require_auth
+@require_role("admin")
 def wstg_webhook():
     """
     Recibir webhook de DefectDojo y sincronizar con tracker
@@ -954,6 +1022,8 @@ def wstg_webhook():
 
 
 @api.route('/wstg/status', methods=['GET'])
+@require_auth
+@require_role("admin")
 def wstg_status():
     """
     Obtener estado de sincronización WSTG

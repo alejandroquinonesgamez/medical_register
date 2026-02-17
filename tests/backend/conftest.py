@@ -71,7 +71,8 @@ def client(app):
 
 @pytest.fixture
 def auth_session(client):
-    """Registra un usuario y devuelve access_token JWT para autenticación en tests."""
+    """Registra un usuario y devuelve access_token JWT para autenticación en tests.
+    NOTA: El primer usuario registrado recibe rol 'admin' automáticamente."""
     response = client.post(
         '/api/auth/register',
         data='{"username": "testuser", "password": "clave_segura_123"}',
@@ -83,6 +84,26 @@ def auth_session(client):
         "client": client,
         "user_id": data["user_id"],
         "access_token": data["access_token"],
+        "role": data.get("role", "user"),
+    }
+
+
+@pytest.fixture
+def regular_user_session(client, auth_session):
+    """Registra un segundo usuario con rol 'user' (el primero ya es admin)."""
+    response = client.post(
+        '/api/auth/register',
+        data='{"username": "regularuser", "password": "clave_segura_456"}',
+        content_type='application/json'
+    )
+    assert response.status_code == 201, response.get_data(as_text=True)
+    data = response.get_json()
+    assert data["role"] == "user", f"Esperado role 'user', obtenido '{data['role']}'"
+    return {
+        "client": client,
+        "user_id": data["user_id"],
+        "access_token": data["access_token"],
+        "role": data["role"],
     }
 
 

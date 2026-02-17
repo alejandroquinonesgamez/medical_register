@@ -44,6 +44,18 @@ class AuthManager {
         return this._currentUser;
     }
 
+    /**
+     * Devuelve el rol del usuario actual ("admin" o "user").
+     * Retorna null si no está autenticado.
+     */
+    static getCurrentRole() {
+        return this._currentUser ? this._currentUser.role : null;
+    }
+
+    static isAdmin() {
+        return this.getCurrentRole() === 'admin';
+    }
+
     static setupUI() {
         const modal = document.getElementById('auth-modal');
         const loginForm = document.getElementById('login-form');
@@ -245,7 +257,7 @@ class AuthManager {
         }
         const data = await response.json();
         this._accessToken = data.access_token;
-        this._currentUser = { user_id: data.user_id, username: data.username };
+        this._currentUser = { user_id: data.user_id, username: data.username, role: data.role || 'user' };
         this._updateUI();
         if (typeof LocalStorageManager !== 'undefined') {
             LocalStorageManager.setUserId(data.user_id);
@@ -281,7 +293,7 @@ class AuthManager {
         }
         const data = await response.json();
         this._accessToken = data.access_token;
-        this._currentUser = { user_id: data.user_id, username: data.username };
+        this._currentUser = { user_id: data.user_id, username: data.username, role: data.role || 'user' };
         this._updateUI();
         if (typeof LocalStorageManager !== 'undefined') {
             LocalStorageManager.setUserId(data.user_id);
@@ -337,7 +349,7 @@ class AuthManager {
                 }
                 const data = await response.json();
                 this._accessToken = data.access_token;
-                this._currentUser = { user_id: data.user_id, username: data.username };
+                this._currentUser = { user_id: data.user_id, username: data.username, role: data.role || 'user' };
                 if (typeof LocalStorageManager !== 'undefined') {
                     LocalStorageManager.setUserId(data.user_id);
                 }

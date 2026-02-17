@@ -28,13 +28,14 @@ def _get_secret():
     return secret
 
 
-def create_access_token(user_id, username):
+def create_access_token(user_id, username, role="user"):
     """
     Crea un access token JWT de corta vida.
 
     Payload:
         sub: user_id (int)
         username: nombre de usuario
+        role: rol del usuario ("admin" o "user")
         type: "access"
         jti: identificador único del token
         iat: fecha de emisión
@@ -44,6 +45,7 @@ def create_access_token(user_id, username):
     payload = {
         "sub": str(user_id),
         "username": username,
+        "role": role,
         "type": "access",
         "jti": secrets.token_urlsafe(16),
         "iat": now,
