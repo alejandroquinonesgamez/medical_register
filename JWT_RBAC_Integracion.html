@@ -1,0 +1,739 @@
+<!doctype html>
+<html class="no-js" lang="en" data-content_root="./">
+  <head><meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <meta name="color-scheme" content="light dark"><meta name="viewport" content="width=device-width, initial-scale=1" />
+<link rel="index" title="Index" href="genindex.html"><link rel="search" title="Search" href="search.html">
+
+    <!-- Generated with Sphinx 8.1.3 and Furo 2025.12.19 -->
+        <title>Gestión de Sesiones con JWT y Control de Acceso RBAC - Medical Register 0.1.0 documentation</title>
+      <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=d111a655" />
+    <link rel="stylesheet" type="text/css" href="_static/styles/furo.css?v=7bdb33bb" />
+    <link rel="stylesheet" type="text/css" href="_static/styles/furo-extensions.css?v=8dab3a3b" />
+    
+    
+
+
+<style>
+  body {
+    --color-code-background: #f2f2f2;
+  --color-code-foreground: #1e1e1e;
+  --color-brand-primary: #254F6D;
+  --color-brand-content: #254F6D;
+  
+  }
+  @media not print {
+    body[data-theme="dark"] {
+      --color-code-background: #202020;
+  --color-code-foreground: #d0d0d0;
+  
+    }
+    @media (prefers-color-scheme: dark) {
+      body:not([data-theme="light"]) {
+        --color-code-background: #202020;
+  --color-code-foreground: #d0d0d0;
+  
+      }
+    }
+  }
+</style></head>
+  <body>
+    
+    <script>
+      document.body.dataset.theme = localStorage.getItem("theme") || "auto";
+    </script>
+    
+
+<svg xmlns="http://www.w3.org/2000/svg" style="display: none;">
+  <symbol id="svg-toc" viewBox="0 0 24 24">
+    <title>Contents</title>
+    <svg stroke="currentColor" fill="currentColor" stroke-width="0" viewBox="0 0 1024 1024">
+      <path d="M408 442h480c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8H408c-4.4 0-8 3.6-8 8v56c0 4.4 3.6 8 8 8zm-8 204c0 4.4 3.6 8 8 8h480c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8H408c-4.4 0-8 3.6-8 8v56zm504-486H120c-4.4 0-8 3.6-8 8v56c0 4.4 3.6 8 8 8h784c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8zm0 632H120c-4.4 0-8 3.6-8 8v56c0 4.4 3.6 8 8 8h784c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8zM115.4 518.9L271.7 642c5.8 4.6 14.4.5 14.4-6.9V388.9c0-7.4-8.5-11.5-14.4-6.9L115.4 505.1a8.74 8.74 0 0 0 0 13.8z"/>
+    </svg>
+  </symbol>
+  <symbol id="svg-menu" viewBox="0 0 24 24">
+    <title>Menu</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather-menu">
+      <line x1="3" y1="12" x2="21" y2="12"></line>
+      <line x1="3" y1="6" x2="21" y2="6"></line>
+      <line x1="3" y1="18" x2="21" y2="18"></line>
+    </svg>
+  </symbol>
+  <symbol id="svg-arrow-right" viewBox="0 0 24 24">
+    <title>Expand</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather-chevron-right">
+      <polyline points="9 18 15 12 9 6"></polyline>
+    </svg>
+  </symbol>
+  <symbol id="svg-sun" viewBox="0 0 24 24">
+    <title>Light mode</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round" class="feather-sun">
+      <circle cx="12" cy="12" r="5"></circle>
+      <line x1="12" y1="1" x2="12" y2="3"></line>
+      <line x1="12" y1="21" x2="12" y2="23"></line>
+      <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+      <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+      <line x1="1" y1="12" x2="3" y2="12"></line>
+      <line x1="21" y1="12" x2="23" y2="12"></line>
+      <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+      <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+    </svg>
+  </symbol>
+  <symbol id="svg-moon" viewBox="0 0 24 24">
+    <title>Dark mode</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round" class="icon-tabler-moon">
+      <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+      <path d="M12 3c.132 0 .263 0 .393 0a7.5 7.5 0 0 0 7.92 12.446a9 9 0 1 1 -8.313 -12.454z" />
+    </svg>
+  </symbol>
+  <symbol id="svg-sun-with-moon" viewBox="0 0 24 24">
+    <title>Auto light/dark, in light mode</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round"
+      class="icon-custom-derived-from-feather-sun-and-tabler-moon">
+      <path style="opacity: 50%" d="M 5.411 14.504 C 5.471 14.504 5.532 14.504 5.591 14.504 C 3.639 16.319 4.383 19.569 6.931 20.352 C 7.693 20.586 8.512 20.551 9.25 20.252 C 8.023 23.207 4.056 23.725 2.11 21.184 C 0.166 18.642 1.702 14.949 4.874 14.536 C 5.051 14.512 5.231 14.5 5.411 14.5 L 5.411 14.504 Z"/>
+      <line x1="14.5" y1="3.25" x2="14.5" y2="1.25"/>
+      <line x1="14.5" y1="15.85" x2="14.5" y2="17.85"/>
+      <line x1="10.044" y1="5.094" x2="8.63" y2="3.68"/>
+      <line x1="19" y1="14.05" x2="20.414" y2="15.464"/>
+      <line x1="8.2" y1="9.55" x2="6.2" y2="9.55"/>
+      <line x1="20.8" y1="9.55" x2="22.8" y2="9.55"/>
+      <line x1="10.044" y1="14.006" x2="8.63" y2="15.42"/>
+      <line x1="19" y1="5.05" x2="20.414" y2="3.636"/>
+      <circle cx="14.5" cy="9.55" r="3.6"/>
+    </svg>
+  </symbol>
+  <symbol id="svg-moon-with-sun" viewBox="0 0 24 24">
+    <title>Auto light/dark, in dark mode</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round"
+      class="icon-custom-derived-from-feather-sun-and-tabler-moon">
+      <path d="M 8.282 7.007 C 8.385 7.007 8.494 7.007 8.595 7.007 C 5.18 10.184 6.481 15.869 10.942 17.24 C 12.275 17.648 13.706 17.589 15 17.066 C 12.851 22.236 5.91 23.143 2.505 18.696 C -0.897 14.249 1.791 7.786 7.342 7.063 C 7.652 7.021 7.965 7 8.282 7 L 8.282 7.007 Z"/>
+      <line style="opacity: 50%" x1="18" y1="3.705" x2="18" y2="2.5"/>
+      <line style="opacity: 50%" x1="18" y1="11.295" x2="18" y2="12.5"/>
+      <line style="opacity: 50%" x1="15.316" y1="4.816" x2="14.464" y2="3.964"/>
+      <line style="opacity: 50%" x1="20.711" y1="10.212" x2="21.563" y2="11.063"/>
+      <line style="opacity: 50%" x1="14.205" y1="7.5" x2="13.001" y2="7.5"/>
+      <line style="opacity: 50%" x1="21.795" y1="7.5" x2="23" y2="7.5"/>
+      <line style="opacity: 50%" x1="15.316" y1="10.184" x2="14.464" y2="11.036"/>
+      <line style="opacity: 50%" x1="20.711" y1="4.789" x2="21.563" y2="3.937"/>
+      <circle style="opacity: 50%" cx="18" cy="7.5" r="2.169"/>
+    </svg>
+  </symbol>
+  <symbol id="svg-pencil" viewBox="0 0 24 24">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round" class="icon-tabler-pencil-code">
+      <path d="M4 20h4l10.5 -10.5a2.828 2.828 0 1 0 -4 -4l-10.5 10.5v4" />
+      <path d="M13.5 6.5l4 4" />
+      <path d="M20 21l2 -2l-2 -2" />
+      <path d="M17 17l-2 2l2 2" />
+    </svg>
+  </symbol>
+  <symbol id="svg-eye" viewBox="0 0 24 24">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round" class="icon-tabler-eye-code">
+      <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+      <path d="M10 12a2 2 0 1 0 4 0a2 2 0 0 0 -4 0" />
+      <path
+        d="M11.11 17.958c-3.209 -.307 -5.91 -2.293 -8.11 -5.958c2.4 -4 5.4 -6 9 -6c3.6 0 6.6 2 9 6c-.21 .352 -.427 .688 -.647 1.008" />
+      <path d="M20 21l2 -2l-2 -2" />
+      <path d="M17 17l-2 2l2 2" />
+    </svg>
+  </symbol>
+</svg>
+
+<input type="checkbox" class="sidebar-toggle" name="__navigation" id="__navigation" aria-label="Toggle site navigation sidebar">
+<input type="checkbox" class="sidebar-toggle" name="__toc" id="__toc" aria-label="Toggle table of contents sidebar">
+<label class="overlay sidebar-overlay" for="__navigation"></label>
+<label class="overlay toc-overlay" for="__toc"></label>
+
+<a class="skip-to-content muted-link" href="#furo-main-content">Skip to content</a>
+
+
+
+<div class="page">
+  <header class="mobile-header">
+    <div class="header-left">
+      <label class="nav-overlay-icon" for="__navigation">
+        <span class="icon"><svg><use href="#svg-menu"></use></svg></span>
+      </label>
+    </div>
+    <div class="header-center">
+      <a href="index.html"><div class="brand">Medical Register 0.1.0 documentation</div></a>
+    </div>
+    <div class="header-right">
+      <div class="theme-toggle-container theme-toggle-header">
+        <button class="theme-toggle" aria-label="Toggle Light / Dark / Auto color theme">
+          <svg class="theme-icon-when-auto-light"><use href="#svg-sun-with-moon"></use></svg>
+          <svg class="theme-icon-when-auto-dark"><use href="#svg-moon-with-sun"></use></svg>
+          <svg class="theme-icon-when-dark"><use href="#svg-moon"></use></svg>
+          <svg class="theme-icon-when-light"><use href="#svg-sun"></use></svg>
+        </button>
+      </div>
+      <label class="toc-overlay-icon toc-header-icon" for="__toc">
+        <span class="icon"><svg><use href="#svg-toc"></use></svg></span>
+      </label>
+    </div>
+  </header>
+  <aside class="sidebar-drawer">
+    <div class="sidebar-container">
+      
+      <div class="sidebar-sticky"><a class="sidebar-brand" href="index.html">
+  
+  
+</a><form class="sidebar-search-container" method="get" action="search.html" role="search">
+  <input class="sidebar-search" placeholder="Search" name="q" aria-label="Search">
+  <input type="hidden" name="check_keywords" value="yes">
+  <input type="hidden" name="area" value="default">
+</form>
+<div id="searchbox"></div><div class="sidebar-scroll"><div class="sidebar-tree">
+  <p class="caption" role="heading"><span class="caption-text">Contenido:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="manual.html">Manual de Usuario - Registro Personal de Peso e IMC</a></li>
+<li class="toctree-l1"><a class="reference internal" href="requeriments.html">Requerimientos Funcionales</a></li>
+<li class="toctree-l1"><a class="reference internal" href="INFORME_SEGURIDAD.html">Informe de Análisis de Seguridad - Aplicación Médica</a></li>
+<li class="toctree-l1"><a class="reference internal" href="INICIO_RAPIDO.html">Inicio Rápido</a></li>
+<li class="toctree-l1"><a class="reference internal" href="mockups/MOCKUPS.html">Mockups y Diagramas</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">DefectDojo:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="defectdojo/ANALISIS_CWE_699.html">Análisis de Seguridad según CWE-699</a></li>
+<li class="toctree-l1"><a class="reference internal" href="defectdojo/ESTADO_ACTUAL_CWE_699.html">Estado Actual del Programa - Análisis CWE-699</a></li>
+<li class="toctree-l1"><a class="reference internal" href="defectdojo/DEFECTDOJO_CONFIGURACION.html">Configuración de DefectDojo</a></li>
+<li class="toctree-l1"><a class="reference internal" href="defectdojo/DEFECTDOJO_CREDENTIALS.html">Credenciales de DefectDojo</a></li>
+<li class="toctree-l1"><a class="reference internal" href="defectdojo/DEFECTDOJO_DATABASE.html">Gestión de Base de Datos de DefectDojo</a></li>
+<li class="toctree-l1"><a class="reference internal" href="defectdojo/DEFECTDOJO_INTEGRATION.html">Integración de DefectDojo</a></li>
+<li class="toctree-l1"><a class="reference internal" href="defectdojo/DEFECTDOJO_FLUJO_CREACION_RESOLUCION.html">Flujo de Creación y Resolución de Findings en DefectDojo</a></li>
+<li class="toctree-l1"><a class="reference internal" href="defectdojo/DEFECTDOJO_FLUJO_IMPLEMENTADO.html">Flujo de Creación → Resolución Implementado en DefectDojo</a></li>
+<li class="toctree-l1"><a class="reference internal" href="defectdojo/MAKE_ALL_USO.html">Uso de <code class="docutils literal notranslate"><span class="pre">make</span> <span class="pre">update</span></code> - Flujo Completo de DefectDojo</a></li>
+</ul>
+
+</div>
+</div>
+
+      </div>
+      
+    </div>
+  </aside>
+  <div class="main">
+    <div class="content">
+      <div class="article-container">
+        <a href="#" class="back-to-top muted-link">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+            <path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8v12z"></path>
+          </svg>
+          <span>Back to top</span>
+        </a>
+        <div class="content-icon-container">
+          <div class="view-this-page">
+  <a class="muted-link" href="_sources/JWT_RBAC_Integracion.md.txt" title="View this page">
+    <svg><use href="#svg-eye"></use></svg>
+    <span class="visually-hidden">View this page</span>
+  </a>
+</div>
+<div class="theme-toggle-container theme-toggle-content">
+            <button class="theme-toggle" aria-label="Toggle Light / Dark / Auto color theme">
+              <svg class="theme-icon-when-auto-light"><use href="#svg-sun-with-moon"></use></svg>
+              <svg class="theme-icon-when-auto-dark"><use href="#svg-moon-with-sun"></use></svg>
+              <svg class="theme-icon-when-dark"><use href="#svg-moon"></use></svg>
+              <svg class="theme-icon-when-light"><use href="#svg-sun"></use></svg>
+            </button>
+          </div>
+          <label class="toc-overlay-icon toc-content-icon" for="__toc">
+            <span class="icon"><svg><use href="#svg-toc"></use></svg></span>
+          </label>
+        </div>
+        <article role="main" id="furo-main-content">
+          <section id="gestion-de-sesiones-con-jwt-y-control-de-acceso-rbac">
+<h1>Gestión de Sesiones con JWT y Control de Acceso RBAC<a class="headerlink" href="#gestion-de-sesiones-con-jwt-y-control-de-acceso-rbac" title="Link to this heading">¶</a></h1>
+<p><strong>Repositorio</strong>: <a class="reference external" href="https://github.com/alejandroquinonesgamez/medical_register">github.com/alejandroquinonesgamez/medical_register</a><br />
+<strong>Rama</strong>: <code class="docutils literal notranslate"><span class="pre">dev</span></code><br />
+<strong>Commit JWT</strong>: <code class="docutils literal notranslate"><span class="pre">0e7cf4f</span></code> — <em>feat(auth): integración JWT con access token en memoria y refresh token HttpOnly</em><br />
+<strong>Commit RBAC</strong>: <code class="docutils literal notranslate"><span class="pre">b29605c</span></code> — <em>feat(auth): RBAC con roles admin/user, decorador require_role y documentación completa</em></p>
+<hr class="docutils" />
+<section id="descripcion-de-la-solucion-implementada">
+<h2>1. Descripción de la solución implementada<a class="headerlink" href="#descripcion-de-la-solucion-implementada" title="Link to this heading">¶</a></h2>
+<p>La aplicación médica implementa un sistema de autenticación stateless basado en <strong>JWT (JSON Web Tokens)</strong> con control de acceso basado en roles (<strong>RBAC</strong>), sustituyendo el mecanismo anterior de sesiones Flask + CSRF.</p>
+<section id="esquema-de-doble-token">
+<h3>Esquema de doble token<a class="headerlink" href="#esquema-de-doble-token" title="Link to this heading">¶</a></h3>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>┌─────────────┐    Authorization: Bearer &lt;access_token&gt;    ┌──────────┐
+│  Frontend    │ ─────────────────────────────────────────▶ │  Flask   │
+│  (Browser)   │                                            │  Backend │
+│              │ ◀───────── { access_token, role } ──────── │          │
+│  _accessToken│       payload JWT: { sub, role, ... }      │          │
+│  (memoria JS)│                                            │          │
+│              │    Cookie HttpOnly: refresh_token           │          │
+│              │ ◀══════════════════════════════════════════▶│          │
+└─────────────┘    (no accesible desde JS)                  └──────────┘
+</pre></div>
+</div>
+<div class="table-wrapper colwidths-auto docutils container">
+<table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Token</p></th>
+<th class="head"><p>Duración</p></th>
+<th class="head"><p>Almacenamiento</p></th>
+<th class="head"><p>Transporte</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><strong>Access token</strong></p></td>
+<td><p>15 min</p></td>
+<td><p>Memoria JavaScript (<code class="docutils literal notranslate"><span class="pre">_accessToken</span></code>)</p></td>
+<td><p>Cabecera <code class="docutils literal notranslate"><span class="pre">Authorization:</span> <span class="pre">Bearer</span></code></p></td>
+</tr>
+<tr class="row-odd"><td><p><strong>Refresh token</strong></p></td>
+<td><p>7 días</p></td>
+<td><p>Cookie <code class="docutils literal notranslate"><span class="pre">HttpOnly</span></code> (inaccesible desde JS)</p></td>
+<td><p>Cookie automática del navegador</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<p><strong>Decisiones de seguridad</strong>:</p>
+<ul class="simple">
+<li><p><strong>Access token solo en memoria JS</strong>: no se guarda en <code class="docutils literal notranslate"><span class="pre">localStorage</span></code> → mitiga XSS.</p></li>
+<li><p><strong>Refresh token como cookie HttpOnly</strong>: JavaScript no puede leerlo → protegido contra XSS.</p></li>
+<li><p><strong>CSRF eliminado</strong>: la cabecera <code class="docutils literal notranslate"><span class="pre">Authorization:</span> <span class="pre">Bearer</span></code> no se envía automáticamente en peticiones cross-origin → CSRF no aplica.</p></li>
+<li><p><strong>Token blacklist</strong>: al hacer logout, el <code class="docutils literal notranslate"><span class="pre">jti</span></code> del refresh token se añade a una blacklist en BD → revocación real.</p></li>
+<li><p><strong>Rol embebido en el JWT</strong>: el claim <code class="docutils literal notranslate"><span class="pre">role</span></code> viaja en el access token → sin consultas extra a BD para verificar permisos.</p></li>
+</ul>
+</section>
+<section id="sistema-de-roles-rbac">
+<h3>Sistema de roles (RBAC)<a class="headerlink" href="#sistema-de-roles-rbac" title="Link to this heading">¶</a></h3>
+<div class="table-wrapper colwidths-auto docutils container">
+<table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Rol</p></th>
+<th class="head"><p>Asignación</p></th>
+<th class="head"><p>Permisos</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><strong>admin</strong></p></td>
+<td><p>Primer usuario registrado (automático). Puede promover otros usuarios</p></td>
+<td><p>Acceso total: datos propios + administración (DefectDojo, WSTG, gestión de roles)</p></td>
+</tr>
+<tr class="row-odd"><td><p><strong>user</strong></p></td>
+<td><p>Todos los usuarios registrados después del primero</p></td>
+<td><p>Solo sus propios datos: perfil, peso, IMC, estadísticas</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+</section>
+</section>
+<hr class="docutils" />
+<section id="gestion-de-la-sesion-y-control-de-acceso">
+<h2>2. Gestión de la sesión y control de acceso<a class="headerlink" href="#gestion-de-la-sesion-y-control-de-acceso" title="Link to this heading">¶</a></h2>
+<section id="generacion-del-jwt-backend">
+<h3>2.1 Generación del JWT (backend)<a class="headerlink" href="#generacion-del-jwt-backend" title="Link to this heading">¶</a></h3>
+<p>Al hacer login o registro, el servidor genera dos tokens. El <strong>access token</strong> incluye el claim <code class="docutils literal notranslate"><span class="pre">role</span></code> directamente en el payload:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># app/jwt_utils.py</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">secrets</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">datetime</span><span class="w"> </span><span class="kn">import</span> <span class="n">datetime</span><span class="p">,</span> <span class="n">timezone</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">jwt</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">.config</span><span class="w"> </span><span class="kn">import</span> <span class="n">JWT_CONFIG</span>
+
+<span class="k">def</span><span class="w"> </span><span class="nf">create_access_token</span><span class="p">(</span><span class="n">user_id</span><span class="p">,</span> <span class="n">username</span><span class="p">,</span> <span class="n">role</span><span class="o">=</span><span class="s2">&quot;user&quot;</span><span class="p">):</span>
+    <span class="n">now</span> <span class="o">=</span> <span class="n">datetime</span><span class="o">.</span><span class="n">now</span><span class="p">(</span><span class="n">timezone</span><span class="o">.</span><span class="n">utc</span><span class="p">)</span>
+    <span class="n">payload</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="s2">&quot;sub&quot;</span><span class="p">:</span> <span class="nb">str</span><span class="p">(</span><span class="n">user_id</span><span class="p">),</span>       <span class="c1"># Identificador del usuario</span>
+        <span class="s2">&quot;username&quot;</span><span class="p">:</span> <span class="n">username</span><span class="p">,</span>
+        <span class="s2">&quot;role&quot;</span><span class="p">:</span> <span class="n">role</span><span class="p">,</span>               <span class="c1"># ← Rol para RBAC (&quot;admin&quot; o &quot;user&quot;)</span>
+        <span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;access&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;jti&quot;</span><span class="p">:</span> <span class="n">secrets</span><span class="o">.</span><span class="n">token_urlsafe</span><span class="p">(</span><span class="mi">16</span><span class="p">),</span>  <span class="c1"># ID único para revocación</span>
+        <span class="s2">&quot;iat&quot;</span><span class="p">:</span> <span class="n">now</span><span class="p">,</span>
+        <span class="s2">&quot;exp&quot;</span><span class="p">:</span> <span class="n">now</span> <span class="o">+</span> <span class="n">JWT_CONFIG</span><span class="p">[</span><span class="s2">&quot;access_token_expires&quot;</span><span class="p">],</span>  <span class="c1"># 15 min</span>
+    <span class="p">}</span>
+    <span class="k">return</span> <span class="n">jwt</span><span class="o">.</span><span class="n">encode</span><span class="p">(</span><span class="n">payload</span><span class="p">,</span> <span class="n">_get_secret</span><span class="p">(),</span> <span class="n">algorithm</span><span class="o">=</span><span class="n">JWT_CONFIG</span><span class="p">[</span><span class="s2">&quot;algorithm&quot;</span><span class="p">])</span>
+</pre></div>
+</div>
+<p>El <strong>refresh token</strong> (larga vida) se establece como cookie HttpOnly:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># app/jwt_utils.py</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">create_refresh_token</span><span class="p">(</span><span class="n">user_id</span><span class="p">):</span>
+    <span class="n">now</span> <span class="o">=</span> <span class="n">datetime</span><span class="o">.</span><span class="n">now</span><span class="p">(</span><span class="n">timezone</span><span class="o">.</span><span class="n">utc</span><span class="p">)</span>
+    <span class="n">payload</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="s2">&quot;sub&quot;</span><span class="p">:</span> <span class="nb">str</span><span class="p">(</span><span class="n">user_id</span><span class="p">),</span>
+        <span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;refresh&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;jti&quot;</span><span class="p">:</span> <span class="n">secrets</span><span class="o">.</span><span class="n">token_urlsafe</span><span class="p">(</span><span class="mi">16</span><span class="p">),</span>
+        <span class="s2">&quot;iat&quot;</span><span class="p">:</span> <span class="n">now</span><span class="p">,</span>
+        <span class="s2">&quot;exp&quot;</span><span class="p">:</span> <span class="n">now</span> <span class="o">+</span> <span class="n">JWT_CONFIG</span><span class="p">[</span><span class="s2">&quot;refresh_token_expires&quot;</span><span class="p">],</span>  <span class="c1"># 7 días</span>
+    <span class="p">}</span>
+    <span class="k">return</span> <span class="n">jwt</span><span class="o">.</span><span class="n">encode</span><span class="p">(</span><span class="n">payload</span><span class="p">,</span> <span class="n">_get_secret</span><span class="p">(),</span> <span class="n">algorithm</span><span class="o">=</span><span class="n">JWT_CONFIG</span><span class="p">[</span><span class="s2">&quot;algorithm&quot;</span><span class="p">])</span>
+</pre></div>
+</div>
+<p>Configuración centralizada:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># app/config.py</span>
+<span class="n">JWT_CONFIG</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="s2">&quot;secret_key&quot;</span><span class="p">:</span> <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;JWT_SECRET_KEY&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">),</span>
+    <span class="s2">&quot;algorithm&quot;</span><span class="p">:</span> <span class="s2">&quot;HS256&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;access_token_expires&quot;</span><span class="p">:</span> <span class="n">timedelta</span><span class="p">(</span><span class="n">minutes</span><span class="o">=</span><span class="mi">15</span><span class="p">),</span>
+    <span class="s2">&quot;refresh_token_expires&quot;</span><span class="p">:</span> <span class="n">timedelta</span><span class="p">(</span><span class="n">days</span><span class="o">=</span><span class="mi">7</span><span class="p">),</span>
+    <span class="s2">&quot;refresh_cookie_name&quot;</span><span class="p">:</span> <span class="s2">&quot;refresh_token&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;refresh_cookie_path&quot;</span><span class="p">:</span> <span class="s2">&quot;/api/auth&quot;</span><span class="p">,</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+</section>
+<section id="validacion-del-jwt-middleware-require-auth">
+<h3>2.2 Validación del JWT (middleware <code class="docutils literal notranslate"><span class="pre">require_auth</span></code>)<a class="headerlink" href="#validacion-del-jwt-middleware-require-auth" title="Link to this heading">¶</a></h3>
+<p>Cada petición protegida pasa por el decorador <code class="docutils literal notranslate"><span class="pre">require_auth</span></code>, que extrae el token de la cabecera <code class="docutils literal notranslate"><span class="pre">Authorization:</span> <span class="pre">Bearer</span></code>, verifica su firma, expiración, tipo y blacklist, y almacena el rol en el contexto de Flask:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># app/routes.py</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">require_auth</span><span class="p">(</span><span class="n">func</span><span class="p">):</span>
+    <span class="nd">@wraps</span><span class="p">(</span><span class="n">func</span><span class="p">)</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">wrapper</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="n">token</span> <span class="o">=</span> <span class="n">_get_bearer_token</span><span class="p">()</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">token</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">jsonify</span><span class="p">({</span><span class="s2">&quot;error&quot;</span><span class="p">:</span> <span class="s2">&quot;Autenticación requerida&quot;</span><span class="p">}),</span> <span class="mi">401</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">payload</span> <span class="o">=</span> <span class="n">decode_token</span><span class="p">(</span><span class="n">token</span><span class="p">,</span> <span class="n">expected_type</span><span class="o">=</span><span class="s2">&quot;access&quot;</span><span class="p">)</span>
+        <span class="k">except</span> <span class="n">pyjwt</span><span class="o">.</span><span class="n">ExpiredSignatureError</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">jsonify</span><span class="p">({</span><span class="s2">&quot;error&quot;</span><span class="p">:</span> <span class="s2">&quot;Token expirado&quot;</span><span class="p">}),</span> <span class="mi">401</span>
+        <span class="k">except</span> <span class="p">(</span><span class="n">pyjwt</span><span class="o">.</span><span class="n">InvalidTokenError</span><span class="p">,</span> <span class="ne">ValueError</span><span class="p">):</span>
+            <span class="k">return</span> <span class="n">jsonify</span><span class="p">({</span><span class="s2">&quot;error&quot;</span><span class="p">:</span> <span class="s2">&quot;Autenticación requerida&quot;</span><span class="p">}),</span> <span class="mi">401</span>
+
+        <span class="n">jti</span> <span class="o">=</span> <span class="n">payload</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;jti&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">jti</span> <span class="ow">and</span> <span class="n">current_app</span><span class="o">.</span><span class="n">storage</span><span class="o">.</span><span class="n">is_token_blacklisted</span><span class="p">(</span><span class="n">jti</span><span class="p">):</span>
+            <span class="k">return</span> <span class="n">jsonify</span><span class="p">({</span><span class="s2">&quot;error&quot;</span><span class="p">:</span> <span class="s2">&quot;Autenticación requerida&quot;</span><span class="p">}),</span> <span class="mi">401</span>
+
+        <span class="n">g</span><span class="o">.</span><span class="n">current_user_id</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">payload</span><span class="p">[</span><span class="s2">&quot;sub&quot;</span><span class="p">])</span>
+        <span class="n">g</span><span class="o">.</span><span class="n">current_user_role</span> <span class="o">=</span> <span class="n">payload</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;role&quot;</span><span class="p">,</span> <span class="s2">&quot;user&quot;</span><span class="p">)</span>  <span class="c1"># ← Rol del JWT</span>
+        <span class="n">g</span><span class="o">.</span><span class="n">jwt_payload</span> <span class="o">=</span> <span class="n">payload</span>
+        <span class="k">return</span> <span class="n">func</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">wrapper</span>
+</pre></div>
+</div>
+</section>
+<section id="control-de-acceso-por-rol-middleware-require-role">
+<h3>2.3 Control de acceso por rol (middleware <code class="docutils literal notranslate"><span class="pre">require_role</span></code>)<a class="headerlink" href="#control-de-acceso-por-rol-middleware-require-role" title="Link to this heading">¶</a></h3>
+<p>El decorador <code class="docutils literal notranslate"><span class="pre">require_role</span></code> se aplica <strong>después</strong> de <code class="docutils literal notranslate"><span class="pre">require_auth</span></code> y verifica que el rol del usuario esté en la lista de roles permitidos:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># app/routes.py</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">require_role</span><span class="p">(</span><span class="o">*</span><span class="n">allowed_roles</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">decorator</span><span class="p">(</span><span class="n">func</span><span class="p">):</span>
+        <span class="nd">@wraps</span><span class="p">(</span><span class="n">func</span><span class="p">)</span>
+        <span class="k">def</span><span class="w"> </span><span class="nf">wrapper</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+            <span class="n">user_role</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">g</span><span class="p">,</span> <span class="s2">&quot;current_user_role&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">user_role</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">allowed_roles</span><span class="p">:</span>
+                <span class="k">return</span> <span class="n">jsonify</span><span class="p">({</span><span class="s2">&quot;error&quot;</span><span class="p">:</span> <span class="s2">&quot;No tienes permisos para realizar esta acción&quot;</span><span class="p">}),</span> <span class="mi">403</span>
+            <span class="k">return</span> <span class="n">func</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">wrapper</span>
+    <span class="k">return</span> <span class="n">decorator</span>
+</pre></div>
+</div>
+<p><strong>Ejemplo de uso</strong> — ruta protegida solo para administradores:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="nd">@api</span><span class="o">.</span><span class="n">route</span><span class="p">(</span><span class="s1">&#39;/admin/users/&lt;int:target_user_id&gt;/role&#39;</span><span class="p">,</span> <span class="n">methods</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;PUT&#39;</span><span class="p">])</span>
+<span class="nd">@require_auth</span>                  <span class="c1"># 1. Verifica JWT válido</span>
+<span class="nd">@require_role</span><span class="p">(</span><span class="s2">&quot;admin&quot;</span><span class="p">)</span>         <span class="c1"># 2. Verifica que role == &quot;admin&quot;</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">update_user_role</span><span class="p">(</span><span class="n">target_user_id</span><span class="p">):</span>
+    <span class="o">...</span>
+</pre></div>
+</div>
+</section>
+<section id="mapa-completo-de-rutas-por-rol">
+<h3>2.4 Mapa completo de rutas por rol<a class="headerlink" href="#mapa-completo-de-rutas-por-rol" title="Link to this heading">¶</a></h3>
+<div class="table-wrapper colwidths-auto docutils container">
+<table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Ruta</p></th>
+<th class="head"><p>Método</p></th>
+<th class="head"><p>Acceso</p></th>
+<th class="head"><p>Descripción</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">/api/auth/register</span></code></p></td>
+<td><p>POST</p></td>
+<td><p>Público</p></td>
+<td><p>Registro (primer usuario → admin)</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">/api/auth/login</span></code></p></td>
+<td><p>POST</p></td>
+<td><p>Público</p></td>
+<td><p>Inicio de sesión</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">/api/auth/refresh</span></code></p></td>
+<td><p>POST</p></td>
+<td><p>Cookie HttpOnly</p></td>
+<td><p>Renovar access token</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">/api/auth/logout</span></code></p></td>
+<td><p>POST</p></td>
+<td><p>Autenticado</p></td>
+<td><p>Cerrar sesión (blacklist)</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">/api/auth/me</span></code></p></td>
+<td><p>GET</p></td>
+<td><p>Autenticado</p></td>
+<td><p>Datos del usuario actual</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">/api/user</span></code></p></td>
+<td><p>GET/POST</p></td>
+<td><p>Autenticado</p></td>
+<td><p>Perfil del usuario</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">/api/weight</span></code></p></td>
+<td><p>POST</p></td>
+<td><p>Autenticado</p></td>
+<td><p>Registrar peso</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">/api/imc</span></code></p></td>
+<td><p>GET</p></td>
+<td><p>Autenticado</p></td>
+<td><p>IMC actual</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">/api/stats</span></code></p></td>
+<td><p>GET</p></td>
+<td><p>Autenticado</p></td>
+<td><p>Estadísticas</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">/api/weights</span></code></p></td>
+<td><p>GET</p></td>
+<td><p>Autenticado</p></td>
+<td><p>Historial de pesos</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">/api/admin/users/&lt;id&gt;/role</span></code></p></td>
+<td><p>PUT</p></td>
+<td><p><strong>Solo admin</strong></p></td>
+<td><p>Cambiar rol de usuario</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">/api/defectdojo/*</span></code></p></td>
+<td><p>GET/POST</p></td>
+<td><p><strong>Solo admin</strong></p></td>
+<td><p>Gestión DefectDojo</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">/api/wstg/*</span></code></p></td>
+<td><p>GET/POST</p></td>
+<td><p><strong>Solo admin</strong></p></td>
+<td><p>Sincronización WSTG</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+</section>
+<section id="asignacion-automatica-de-roles-en-el-registro">
+<h3>2.5 Asignación automática de roles en el registro<a class="headerlink" href="#asignacion-automatica-de-roles-en-el-registro" title="Link to this heading">¶</a></h3>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># app/routes.py — endpoint /api/auth/register</span>
+<span class="n">role</span> <span class="o">=</span> <span class="s2">&quot;admin&quot;</span> <span class="k">if</span> <span class="n">storage</span><span class="o">.</span><span class="n">count_auth_users</span><span class="p">()</span> <span class="o">==</span> <span class="mi">0</span> <span class="k">else</span> <span class="s2">&quot;user&quot;</span>
+<span class="n">auth_user</span> <span class="o">=</span> <span class="n">storage</span><span class="o">.</span><span class="n">create_auth_user</span><span class="p">(</span><span class="n">username</span><span class="p">,</span> <span class="n">password_hash</span><span class="p">,</span> <span class="n">role</span><span class="o">=</span><span class="n">role</span><span class="p">)</span>
+<span class="n">access_token</span> <span class="o">=</span> <span class="n">create_access_token</span><span class="p">(</span><span class="n">auth_user</span><span class="o">.</span><span class="n">user_id</span><span class="p">,</span> <span class="n">auth_user</span><span class="o">.</span><span class="n">username</span><span class="p">,</span> <span class="n">role</span><span class="o">=</span><span class="n">auth_user</span><span class="o">.</span><span class="n">role</span><span class="p">)</span>
+</pre></div>
+</div>
+</section>
+<section id="frontend-envio-del-jwt-y-gestion-del-rol">
+<h3>2.6 Frontend: envío del JWT y gestión del rol<a class="headerlink" href="#frontend-envio-del-jwt-y-gestion-del-rol" title="Link to this heading">¶</a></h3>
+<p>El frontend usa <code class="docutils literal notranslate"><span class="pre">authenticatedFetch()</span></code> para añadir automáticamente el token a cada petición y reintentar con refresh si recibe 401:</p>
+<div class="highlight-javascript notranslate"><div class="highlight"><pre><span></span><span class="c1">// app/static/js/auth.js</span>
+<span class="k">static</span><span class="w"> </span><span class="k">async</span><span class="w"> </span><span class="nx">authenticatedFetch</span><span class="p">(</span><span class="nx">url</span><span class="p">,</span><span class="w"> </span><span class="nx">options</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">{})</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="o">!</span><span class="k">this</span><span class="p">.</span><span class="nx">_accessToken</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="kd">const</span><span class="w"> </span><span class="nx">refreshed</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">await</span><span class="w"> </span><span class="k">this</span><span class="p">.</span><span class="nx">_refreshAccessToken</span><span class="p">();</span>
+<span class="w">        </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="o">!</span><span class="nx">refreshed</span><span class="p">)</span><span class="w"> </span><span class="k">throw</span><span class="w"> </span><span class="ow">new</span><span class="w"> </span><span class="ne">Error</span><span class="p">(</span><span class="s1">&#39;No autenticado&#39;</span><span class="p">);</span>
+<span class="w">    </span><span class="p">}</span>
+<span class="w">    </span><span class="nx">options</span><span class="p">.</span><span class="nx">headers</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="p">...</span><span class="nx">options</span><span class="p">.</span><span class="nx">headers</span><span class="p">,</span>
+<span class="w">        </span><span class="s1">&#39;Authorization&#39;</span><span class="o">:</span><span class="w"> </span><span class="sb">`Bearer </span><span class="si">${</span><span class="k">this</span><span class="p">.</span><span class="nx">_accessToken</span><span class="si">}</span><span class="sb">`</span>
+<span class="w">    </span><span class="p">};</span>
+<span class="w">    </span><span class="kd">let</span><span class="w"> </span><span class="nx">response</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">await</span><span class="w"> </span><span class="nx">fetch</span><span class="p">(</span><span class="nx">url</span><span class="p">,</span><span class="w"> </span><span class="nx">options</span><span class="p">);</span>
+<span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="nx">response</span><span class="p">.</span><span class="nx">status</span><span class="w"> </span><span class="o">===</span><span class="w"> </span><span class="mf">401</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="kd">const</span><span class="w"> </span><span class="nx">refreshed</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">await</span><span class="w"> </span><span class="k">this</span><span class="p">.</span><span class="nx">_refreshAccessToken</span><span class="p">();</span>
+<span class="w">        </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="nx">refreshed</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">            </span><span class="nx">options</span><span class="p">.</span><span class="nx">headers</span><span class="p">[</span><span class="s1">&#39;Authorization&#39;</span><span class="p">]</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="sb">`Bearer </span><span class="si">${</span><span class="k">this</span><span class="p">.</span><span class="nx">_accessToken</span><span class="si">}</span><span class="sb">`</span><span class="p">;</span>
+<span class="w">            </span><span class="nx">response</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">await</span><span class="w"> </span><span class="nx">fetch</span><span class="p">(</span><span class="nx">url</span><span class="p">,</span><span class="w"> </span><span class="nx">options</span><span class="p">);</span>
+<span class="w">        </span><span class="p">}</span>
+<span class="w">    </span><span class="p">}</span>
+<span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="nx">response</span><span class="p">;</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>El rol se almacena en el objeto <code class="docutils literal notranslate"><span class="pre">_currentUser</span></code> y se expone con métodos auxiliares:</p>
+<div class="highlight-javascript notranslate"><div class="highlight"><pre><span></span><span class="c1">// app/static/js/auth.js</span>
+<span class="k">static</span><span class="w"> </span><span class="nx">getCurrentRole</span><span class="p">()</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="k">this</span><span class="p">.</span><span class="nx">_currentUser</span><span class="w"> </span><span class="o">?</span><span class="w"> </span><span class="k">this</span><span class="p">.</span><span class="nx">_currentUser</span><span class="p">.</span><span class="nx">role</span><span class="w"> </span><span class="o">:</span><span class="w"> </span><span class="kc">null</span><span class="p">;</span>
+<span class="p">}</span>
+<span class="k">static</span><span class="w"> </span><span class="nx">isAdmin</span><span class="p">()</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="k">this</span><span class="p">.</span><span class="nx">getCurrentRole</span><span class="p">()</span><span class="w"> </span><span class="o">===</span><span class="w"> </span><span class="s1">&#39;admin&#39;</span><span class="p">;</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+</section>
+</section>
+<hr class="docutils" />
+<section id="ejemplos-de-funcionamiento">
+<h2>3. Ejemplos de funcionamiento<a class="headerlink" href="#ejemplos-de-funcionamiento" title="Link to this heading">¶</a></h2>
+<section id="registro-del-primer-usuario-admin-automatico">
+<h3>3.1 Registro del primer usuario (admin automático)<a class="headerlink" href="#registro-del-primer-usuario-admin-automatico" title="Link to this heading">¶</a></h3>
+<p>Al registrar el primer usuario (<code class="docutils literal notranslate"><span class="pre">firstuser</span></code>), el servidor detecta que no hay usuarios en la BD y le asigna automáticamente el rol <code class="docutils literal notranslate"><span class="pre">admin</span></code>:</p>
+<p><img alt="Registro del primer usuario con rol admin" src="capturas/Registro%20usuario%201.png" /></p>
+<p>Se observa que la respuesta incluye <code class="docutils literal notranslate"><span class="pre">&quot;role&quot;:</span> <span class="pre">&quot;admin&quot;</span></code> y <code class="docutils literal notranslate"><span class="pre">&quot;user_id&quot;:</span> <span class="pre">1</span></code>.</p>
+</section>
+<section id="registro-de-un-segundo-usuario-rol-user">
+<h3>3.2 Registro de un segundo usuario (rol user)<a class="headerlink" href="#registro-de-un-segundo-usuario-rol-user" title="Link to this heading">¶</a></h3>
+<p>Al registrar un segundo usuario (<code class="docutils literal notranslate"><span class="pre">alejandro</span></code>), al existir ya un usuario en la BD, se le asigna el rol <code class="docutils literal notranslate"><span class="pre">user</span></code>:</p>
+<p><img alt="Registro del segundo usuario con rol user" src="capturas/Registro%20usuario%20est%C3%A1ndar.png" /></p>
+<p>Se observa que la respuesta incluye <code class="docutils literal notranslate"><span class="pre">&quot;role&quot;:</span> <span class="pre">&quot;user&quot;</span></code> y <code class="docutils literal notranslate"><span class="pre">&quot;user_id&quot;:</span> <span class="pre">2</span></code>.</p>
+</section>
+<section id="acceso-denegado-por-rol-insuficiente-403-forbidden">
+<h3>3.3 Acceso denegado por rol insuficiente (403 Forbidden)<a class="headerlink" href="#acceso-denegado-por-rol-insuficiente-403-forbidden" title="Link to this heading">¶</a></h3>
+<p>El usuario <code class="docutils literal notranslate"><span class="pre">alejandro</span></code> (rol <code class="docutils literal notranslate"><span class="pre">user</span></code>) obtiene un access token e intenta acceder a la ruta de administración <code class="docutils literal notranslate"><span class="pre">/api/wstg/status</span></code>. El middleware <code class="docutils literal notranslate"><span class="pre">require_role(&quot;admin&quot;)</span></code> deniega el acceso:</p>
+<p><img alt="Acceso denegado con error de permisos" src="capturas/Acceso%20Restringido.png" /></p>
+<p>La respuesta muestra <code class="docutils literal notranslate"><span class="pre">&quot;error&quot;:</span> <span class="pre">&quot;No</span> <span class="pre">tienes</span> <span class="pre">permisos</span> <span class="pre">para</span> <span class="pre">realizar</span> <span class="pre">esta</span> <span class="pre">acción&quot;</span></code>.</p>
+<p>Con la opción <code class="docutils literal notranslate"><span class="pre">-i</span></code> de curl, se puede verificar el código HTTP <strong>403 FORBIDDEN</strong> en las cabeceras de respuesta:</p>
+<p><img alt="Respuesta HTTP 403 FORBIDDEN con cabeceras" src="capturas/Acceso%20Restringido%20403.png" /></p>
+</section>
+<section id="token-expirado-401-unauthorized">
+<h3>3.4 Token expirado (401 Unauthorized)<a class="headerlink" href="#token-expirado-401-unauthorized" title="Link to this heading">¶</a></h3>
+<p>Cuando un access token expira (tras 15 minutos), el servidor responde con <strong>401 UNAUTHORIZED</strong> y el mensaje <code class="docutils literal notranslate"><span class="pre">&quot;Token</span> <span class="pre">expirado&quot;</span></code>. Esto demuestra que la validación de expiración funciona correctamente:</p>
+<p><img alt="Respuesta 401 con token expirado" src="capturas/Acceso%20No%20Autorizado%20(Token%20expirado).png" /></p>
+</section>
+<section id="acceso-autorizado-con-rol-admin-200-ok">
+<h3>3.5 Acceso autorizado con rol admin (200 OK)<a class="headerlink" href="#acceso-autorizado-con-rol-admin-200-ok" title="Link to this heading">¶</a></h3>
+<p>El usuario <code class="docutils literal notranslate"><span class="pre">firstuser</span></code> (rol <code class="docutils literal notranslate"><span class="pre">admin</span></code>) obtiene un nuevo access token y accede a la misma ruta <code class="docutils literal notranslate"><span class="pre">/api/wstg/status</span></code>. El middleware <code class="docutils literal notranslate"><span class="pre">require_role(&quot;admin&quot;)</span></code> permite el acceso y devuelve <strong>200 OK</strong>:</p>
+<p><img alt="Acceso autorizado para admin con 200 OK" src="capturas/Acceso%20Autorizado.png" /></p>
+</section>
+<section id="admin-cambia-el-rol-de-un-usuario">
+<h3>3.6 Admin cambia el rol de un usuario<a class="headerlink" href="#admin-cambia-el-rol-de-un-usuario" title="Link to this heading">¶</a></h3>
+<p>El admin (<code class="docutils literal notranslate"><span class="pre">firstuser</span></code>) promueve al usuario <code class="docutils literal notranslate"><span class="pre">alejandro</span></code> (user_id: 2) al rol <code class="docutils literal notranslate"><span class="pre">admin</span></code> mediante <code class="docutils literal notranslate"><span class="pre">PUT</span> <span class="pre">/api/admin/users/2/role</span></code>:</p>
+<p><img alt="Cambio de rol de user a admin" src="capturas/Cambio%20de%20Rol.png" /></p>
+<p>La respuesta confirma: <code class="docutils literal notranslate"><span class="pre">&quot;Rol</span> <span class="pre">de</span> <span class="pre">'alejandro'</span> <span class="pre">actualizado</span> <span class="pre">a</span> <span class="pre">'admin'&quot;</span></code>.</p>
+</section>
+<section id="verificacion-del-cambio-de-rol">
+<h3>3.7 Verificación del cambio de rol<a class="headerlink" href="#verificacion-del-cambio-de-rol" title="Link to this heading">¶</a></h3>
+<p>Tras el cambio de rol, <code class="docutils literal notranslate"><span class="pre">alejandro</span></code> obtiene un nuevo access token (que ahora contiene <code class="docutils literal notranslate"><span class="pre">&quot;role&quot;:</span> <span class="pre">&quot;admin&quot;</span></code> en el JWT) y accede a la ruta <code class="docutils literal notranslate"><span class="pre">/api/wstg/status</span></code> que antes le denegaba. Ahora recibe <strong>200 OK</strong>:</p>
+<p><img alt="Acceso permitido tras cambio de rol" src="capturas/Suplantaci%C3%B3n%20de%20Token%20-%20Acceso%20User.png" /></p>
+<p>Esto demuestra que el sistema RBAC es dinámico: al cambiar el rol en la BD, el siguiente token emitido refleja el nuevo rol.</p>
+</section>
+<section id="tests-automatizados-225-pasados">
+<h3>3.8 Tests automatizados (225 pasados)<a class="headerlink" href="#tests-automatizados-225-pasados" title="Link to this heading">¶</a></h3>
+<p>Se ejecutan 225 tests automatizados que cubren JWT, RBAC, validación de datos y lógica de negocio. Los 3 skipped corresponden a SQLCipher (no disponible en el entorno de test local):</p>
+<p><img alt="225 tests pasados, 3 skipped" src="_images/Tests.png" /></p>
+</section>
+</section>
+<hr class="docutils" />
+<section id="estructura-de-archivos-modificados">
+<h2>4. Estructura de archivos modificados<a class="headerlink" href="#estructura-de-archivos-modificados" title="Link to this heading">¶</a></h2>
+<div class="table-wrapper colwidths-auto docutils container">
+<table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Archivo</p></th>
+<th class="head"><p>Cambio principal</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">app/jwt_utils.py</span></code></p></td>
+<td><p>Generación y validación de JWT con claim <code class="docutils literal notranslate"><span class="pre">role</span></code></p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">app/config.py</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">JWT_CONFIG</span></code> (secreto, algoritmo, tiempos de expiración)</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">app/routes.py</span></code></p></td>
+<td><p>Decoradores <code class="docutils literal notranslate"><span class="pre">require_auth</span></code> y <code class="docutils literal notranslate"><span class="pre">require_role</span></code>, endpoints auth, asignación de roles</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">app/storage.py</span></code></p></td>
+<td><p>Campo <code class="docutils literal notranslate"><span class="pre">role</span></code> en tabla <code class="docutils literal notranslate"><span class="pre">users</span></code>, <code class="docutils literal notranslate"><span class="pre">count_auth_users()</span></code>, <code class="docutils literal notranslate"><span class="pre">update_user_role()</span></code>, token blacklist</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">app/__init__.py</span></code></p></td>
+<td><p>CORS: <code class="docutils literal notranslate"><span class="pre">Authorization</span></code> en lugar de <code class="docutils literal notranslate"><span class="pre">X-CSRF-Token</span></code></p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">app/static/js/auth.js</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">authenticatedFetch()</span></code>, <code class="docutils literal notranslate"><span class="pre">isAdmin()</span></code>, <code class="docutils literal notranslate"><span class="pre">getCurrentRole()</span></code>, token en memoria</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">app/static/js/sync.js</span></code></p></td>
+<td><p>Uso de <code class="docutils literal notranslate"><span class="pre">authenticatedFetch()</span></code> en lugar de <code class="docutils literal notranslate"><span class="pre">fetch()</span></code> + CSRF</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">waf/modsecurity-override.conf</span></code></p></td>
+<td><p>Exclusión de <code class="docutils literal notranslate"><span class="pre">Authorization:</span> <span class="pre">Bearer</span></code> para evitar falsos positivos</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">tests/backend/</span></code></p></td>
+<td><p>225 tests actualizados para JWT + RBAC</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+</section>
+</section>
+
+        </article>
+      </div>
+      <footer>
+        
+        <div class="related-pages">
+          
+          
+        </div>
+        <div class="bottom-of-page">
+          <div class="left-details">
+            <div class="copyright">
+                Copyright &#169; 2025, PumukyDev &amp; Alejandro Quiñones
+            </div>
+            Made with <a href="https://www.sphinx-doc.org/">Sphinx</a> and <a class="muted-link" href="https://pradyunsg.me">@pradyunsg</a>'s
+            
+            <a href="https://github.com/pradyunsg/furo">Furo</a>
+            
+          </div>
+          <div class="right-details">
+            
+          </div>
+        </div>
+        
+      </footer>
+    </div>
+    <aside class="toc-drawer">
+      
+      
+      <div class="toc-sticky toc-scroll">
+        <div class="toc-title-container">
+          <span class="toc-title">
+            On this page
+          </span>
+        </div>
+        <div class="toc-tree-container">
+          <div class="toc-tree">
+            <ul>
+<li><a class="reference internal" href="#">Gestión de Sesiones con JWT y Control de Acceso RBAC</a><ul>
+<li><a class="reference internal" href="#descripcion-de-la-solucion-implementada">1. Descripción de la solución implementada</a><ul>
+<li><a class="reference internal" href="#esquema-de-doble-token">Esquema de doble token</a></li>
+<li><a class="reference internal" href="#sistema-de-roles-rbac">Sistema de roles (RBAC)</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#gestion-de-la-sesion-y-control-de-acceso">2. Gestión de la sesión y control de acceso</a><ul>
+<li><a class="reference internal" href="#generacion-del-jwt-backend">2.1 Generación del JWT (backend)</a></li>
+<li><a class="reference internal" href="#validacion-del-jwt-middleware-require-auth">2.2 Validación del JWT (middleware <code class="docutils literal notranslate"><span class="pre">require_auth</span></code>)</a></li>
+<li><a class="reference internal" href="#control-de-acceso-por-rol-middleware-require-role">2.3 Control de acceso por rol (middleware <code class="docutils literal notranslate"><span class="pre">require_role</span></code>)</a></li>
+<li><a class="reference internal" href="#mapa-completo-de-rutas-por-rol">2.4 Mapa completo de rutas por rol</a></li>
+<li><a class="reference internal" href="#asignacion-automatica-de-roles-en-el-registro">2.5 Asignación automática de roles en el registro</a></li>
+<li><a class="reference internal" href="#frontend-envio-del-jwt-y-gestion-del-rol">2.6 Frontend: envío del JWT y gestión del rol</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#ejemplos-de-funcionamiento">3. Ejemplos de funcionamiento</a><ul>
+<li><a class="reference internal" href="#registro-del-primer-usuario-admin-automatico">3.1 Registro del primer usuario (admin automático)</a></li>
+<li><a class="reference internal" href="#registro-de-un-segundo-usuario-rol-user">3.2 Registro de un segundo usuario (rol user)</a></li>
+<li><a class="reference internal" href="#acceso-denegado-por-rol-insuficiente-403-forbidden">3.3 Acceso denegado por rol insuficiente (403 Forbidden)</a></li>
+<li><a class="reference internal" href="#token-expirado-401-unauthorized">3.4 Token expirado (401 Unauthorized)</a></li>
+<li><a class="reference internal" href="#acceso-autorizado-con-rol-admin-200-ok">3.5 Acceso autorizado con rol admin (200 OK)</a></li>
+<li><a class="reference internal" href="#admin-cambia-el-rol-de-un-usuario">3.6 Admin cambia el rol de un usuario</a></li>
+<li><a class="reference internal" href="#verificacion-del-cambio-de-rol">3.7 Verificación del cambio de rol</a></li>
+<li><a class="reference internal" href="#tests-automatizados-225-pasados">3.8 Tests automatizados (225 pasados)</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#estructura-de-archivos-modificados">4. Estructura de archivos modificados</a></li>
+</ul>
+</li>
+</ul>
+
+          </div>
+        </div>
+      </div>
+      
+      
+    </aside>
+  </div>
+</div><script src="_static/documentation_options.js?v=01f34227"></script>
+    <script src="_static/doctools.js?v=9bcbadda"></script>
+    <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="_static/scripts/furo.js?v=46bd48cc"></script>
+    </body>
+</html>
