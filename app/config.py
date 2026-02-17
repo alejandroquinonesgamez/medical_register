@@ -19,7 +19,7 @@ from dotenv import load_dotenv
 _env_path = Path(__file__).resolve().parent.parent / ".env"
 load_dotenv(_env_path)
 
-from datetime import datetime
+from datetime import datetime, timedelta
 
 # Configuración de usuario (monousuario legado)
 USER_ID = 1
@@ -79,11 +79,30 @@ PASSWORD_HASH_CONFIG = {
 # Pepper (solo servidor)
 PASSWORD_PEPPER = os.environ.get("PASSWORD_PEPPER", "")
 
-# Configuración de sesión
+# Configuración de sesión (legado, mantenido para cookie del refresh token)
 SESSION_CONFIG = {
     "cookie_samesite": "Lax",
     "cookie_secure": os.environ.get("SESSION_COOKIE_SECURE", "false").lower() == "true",
     "cookie_httponly": True,
+}
+
+# Configuración JWT (JSON Web Tokens)
+# - JWT_SECRET_KEY: secreto para firmar tokens. DEBE ser único y seguro en producción.
+#   Si no se define, se genera uno aleatorio al arrancar (tokens invalidados al reiniciar).
+# - Access token (corta vida): se envía en Authorization: Bearer y se almacena solo en
+#   memoria del cliente (no en localStorage) para mitigar XSS.
+# - Refresh token (larga vida): se envía como cookie HttpOnly (no accesible desde JS).
+JWT_CONFIG = {
+    "secret_key": os.environ.get("JWT_SECRET_KEY", ""),
+    "algorithm": "HS256",
+    "access_token_expires": timedelta(
+        minutes=int(os.environ.get("JWT_ACCESS_TOKEN_MINUTES", "15"))
+    ),
+    "refresh_token_expires": timedelta(
+        days=int(os.environ.get("JWT_REFRESH_TOKEN_DAYS", "7"))
+    ),
+    "refresh_cookie_name": "refresh_token",
+    "refresh_cookie_path": "/api/auth",
 }
 
 # Configuración de HSTS (Strict-Transport-Security)

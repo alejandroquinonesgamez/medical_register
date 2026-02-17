@@ -1,9 +1,12 @@
 """
-Tests de caja negra para autenticación y CSRF
+Tests de caja negra para autenticación JWT
 """
 import json
 import pytest
-from tests.backend.conftest import assert_success, assert_created, assert_bad_request, assert_unauthorized, assert_forbidden
+from tests.backend.conftest import (
+    assert_success, assert_created, assert_bad_request,
+    assert_unauthorized, auth_headers,
+)
 
 
 def test_register_login_logout_flow(client):
@@ -16,10 +19,12 @@ def test_register_login_logout_flow(client):
     assert_created(resp)
     data = resp.get_json()
     assert data["username"] == "usuario1"
-    assert data.get("csrf_token")
+    assert data.get("access_token")
 
-    # Logout con CSRF
-    resp = client.post('/api/auth/logout', headers={"X-CSRF-Token": data["csrf_token"]})
+    access_token = data["access_token"]
+
+    # Logout con access token
+    resp = client.post('/api/auth/logout', headers=auth_headers(access_token))
     assert_success(resp)
 
     # Login
@@ -31,7 +36,7 @@ def test_register_login_logout_flow(client):
     assert_success(resp)
     data = resp.get_json()
     assert data["username"] == "usuario1"
-    assert data.get("csrf_token")
+    assert data.get("access_token")
 
 
 def test_login_invalid_credentials(client):
@@ -43,21 +48,15 @@ def test_login_invalid_credentials(client):
     assert_unauthorized(resp)
 
 
-def test_logout_requires_csrf(client):
-    # Registrar para tener sesión
-    resp = client.post(
-        '/api/auth/register',
-        data=json.dumps({"username": "usuario2", "password": "clave_segura_123"}),
-        content_type='application/json'
-    )
-    assert_created(resp)
-
+def test_logout_requires_auth(client):
+    """Logout sin token de autenticación debe devolver 401"""
     resp = client.post('/api/auth/logout')
-    assert_forbidden(resp)
+    assert_unauthorized(resp)
 
 
-def test_csrf_required_for_user_update(client):
-    # Registrar y obtener csrf
+def test_auth_required_for_user_update(client):
+    """POST /api/user sin access token debe devolver 401"""
+    # Registrar usuario
     resp = client.post(
         '/api/auth/register',
         data=json.dumps({"username": "usuario3", "password": "clave_segura_123"}),
@@ -65,24 +64,74 @@ def test_csrf_required_for_user_update(client):
     )
     assert_created(resp)
     data = resp.get_json()
+    access_token = data["access_token"]
 
-    # Sin CSRF -> 403
+    # Sin token -> 401
     resp = client.post('/api/user', json={
         "nombre": "Ana",
         "apellidos": "Prueba",
         "fecha_nacimiento": "1990-01-01",
         "talla_m": 1.70
     })
-    assert_forbidden(resp)
+    assert_unauthorized(resp)
 
-    # Con CSRF -> OK
+    # Con access token -> OK
     resp = client.post('/api/user', json={
         "nombre": "Ana",
         "apellidos": "Prueba",
         "fecha_nacimiento": "1990-01-01",
         "talla_m": 1.70
-    }, headers={"X-CSRF-Token": data["csrf_token"]})
+    }, headers=auth_headers(access_token))
     assert_success(resp)
+
+
+def test_refresh_token_flow(client):
+    """El refresh token (cookie) permite obtener un nuevo access token"""
+    # Registrar usuario (establece refresh cookie)
+    resp = client.post(
+        '/api/auth/register',
+        data=json.dumps({"username": "refresh_user", "password": "clave_segura_123"}),
+        content_type='application/json'
+    )
+    assert_created(resp)
+
+    # Llamar a refresh (la cookie se envía automáticamente por el test client)
+    resp = client.post('/api/auth/refresh')
+    assert_success(resp)
+    data = resp.get_json()
+    assert data.get("access_token")
+    assert data.get("user_id")
+    assert data.get("username") == "refresh_user"
+
+
+def test_refresh_without_cookie(client):
+    """Refresh sin cookie debe devolver 401"""
+    resp = client.post('/api/auth/refresh')
+    assert_unauthorized(resp)
+
+
+def test_me_endpoint(client):
+    """GET /api/auth/me devuelve datos del usuario autenticado"""
+    resp = client.post(
+        '/api/auth/register',
+        data=json.dumps({"username": "me_user", "password": "clave_segura_123"}),
+        content_type='application/json'
+    )
+    assert_created(resp)
+    data = resp.get_json()
+    access_token = data["access_token"]
+
+    resp = client.get('/api/auth/me', headers=auth_headers(access_token))
+    assert_success(resp)
+    me_data = resp.get_json()
+    assert me_data["username"] == "me_user"
+    assert me_data["user_id"] == data["user_id"]
+
+
+def test_me_without_auth(client):
+    """GET /api/auth/me sin token devuelve 401"""
+    resp = client.get('/api/auth/me')
+    assert_unauthorized(resp)
 
 
 def test_login_rehashes_when_cost_config_changed(client, monkeypatch):

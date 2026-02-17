@@ -8,16 +8,23 @@ Este módulo maneja todas las operaciones de la API REST de la aplicación médi
 - Configuración (límites de validación)
 - Integración con DefectDojo (exportar/importar dumps, generar PDF del informe ASVS)
 
+Autenticación JWT (JSON Web Tokens):
+- Access token (15 min): enviado en Authorization: Bearer, almacenado solo en memoria JS.
+- Refresh token (7 días): enviado como cookie HttpOnly (no accesible desde JS).
+- Al recargar la página el frontend llama a /api/auth/refresh para obtener un nuevo access token.
+- CSRF no es necesario: las rutas protegidas usan Authorization header (no cookies).
+
 Todas las rutas están prefijadas con /api y devuelven respuestas JSON.
 Las validaciones incluyen sanitización de nombres (CWE-20 resuelto) y validación de tipos numéricos.
 """
-from flask import request, jsonify, Blueprint, current_app, session, g
-import secrets
+from flask import request, jsonify, Blueprint, current_app, make_response, g
 from functools import wraps
 from datetime import datetime, date
 import math
 import os
 import shutil
+
+import jwt as pyjwt
 
 from .storage import UserData, WeightEntryData
 from .helpers import (
@@ -31,8 +38,9 @@ from .helpers import (
     verify_password,
     verify_recaptcha_v3,
 )
+from .jwt_utils import create_access_token, create_refresh_token, decode_token
 from .translations import get_error, get_message, get_text, get_days_text, get_frontend_messages
-from .config import VALIDATION_LIMITS
+from .config import VALIDATION_LIMITS, JWT_CONFIG, SESSION_CONFIG
 from . import limiter
 
 # Obtener COMPOSE_PROJECT_NAME del entorno o usar el valor por defecto
@@ -61,36 +69,63 @@ def _compose_cmd():
     return ["docker", "compose"]
 
 
-def _get_current_user_id():
-    return session.get("user_id")
+def _set_refresh_cookie(response, refresh_token):
+    """Establece la cookie HttpOnly con el refresh token."""
+    response.set_cookie(
+        JWT_CONFIG["refresh_cookie_name"],
+        refresh_token,
+        httponly=True,
+        secure=SESSION_CONFIG["cookie_secure"],
+        samesite=SESSION_CONFIG["cookie_samesite"],
+        path=JWT_CONFIG["refresh_cookie_path"],
+        max_age=int(JWT_CONFIG["refresh_token_expires"].total_seconds()),
+    )
+    return response
 
 
-def _get_csrf_token():
-    token = session.get("csrf_token")
-    if not token:
-        token = secrets.token_urlsafe(32)
-        session["csrf_token"] = token
-    return token
+def _clear_refresh_cookie(response):
+    """Elimina la cookie del refresh token."""
+    response.set_cookie(
+        JWT_CONFIG["refresh_cookie_name"],
+        "",
+        httponly=True,
+        secure=SESSION_CONFIG["cookie_secure"],
+        samesite=SESSION_CONFIG["cookie_samesite"],
+        path=JWT_CONFIG["refresh_cookie_path"],
+        max_age=0,
+    )
+    return response
 
 
-def require_csrf(func):
-    @wraps(func)
-    def wrapper(*args, **kwargs):
-        sent_token = request.headers.get("X-CSRF-Token", "")
-        expected = session.get("csrf_token", "")
-        if not expected or not sent_token or sent_token != expected:
-            return jsonify({"error": "CSRF token inválido"}), 403
-        return func(*args, **kwargs)
-    return wrapper
+def _get_bearer_token():
+    """Extrae el token Bearer de la cabecera Authorization."""
+    auth_header = request.headers.get("Authorization", "")
+    if auth_header.startswith("Bearer "):
+        return auth_header[7:]
+    return None
 
 
 def require_auth(func):
+    """Decorador que verifica el access token JWT en Authorization: Bearer."""
     @wraps(func)
     def wrapper(*args, **kwargs):
-        user_id = _get_current_user_id()
-        if not user_id:
+        token = _get_bearer_token()
+        if not token:
             return jsonify({"error": get_error("auth_required")}), 401
-        g.current_user_id = user_id
+        try:
+            payload = decode_token(token, expected_type="access")
+        except pyjwt.ExpiredSignatureError:
+            return jsonify({"error": "Token expirado"}), 401
+        except (pyjwt.InvalidTokenError, ValueError):
+            return jsonify({"error": get_error("auth_required")}), 401
+
+        # Comprobar blacklist (por si se hizo logout con este access token aún válido)
+        jti = payload.get("jti")
+        if jti and current_app.storage.is_token_blacklisted(jti):
+            return jsonify({"error": get_error("auth_required")}), 401
+
+        g.current_user_id = int(payload["sub"])
+        g.jwt_payload = payload
         return func(*args, **kwargs)
     return wrapper
 
@@ -121,13 +156,17 @@ def register():
 
     password_hash = hash_password(password_raw)
     auth_user = storage.create_auth_user(username, password_hash)
-    session["user_id"] = auth_user.user_id
-    _get_csrf_token()
-    return jsonify({
+
+    access_token = create_access_token(auth_user.user_id, auth_user.username)
+    refresh_token = create_refresh_token(auth_user.user_id)
+
+    resp = make_response(jsonify({
         "user_id": auth_user.user_id,
         "username": auth_user.username,
-        "csrf_token": session.get("csrf_token")
-    }), 201
+        "access_token": access_token,
+    }), 201)
+    _set_refresh_cookie(resp, refresh_token)
+    return resp
 
 
 @api.route('/auth/login', methods=['POST'])
@@ -160,37 +199,98 @@ def login():
     if new_hash != auth_user.password_hash:
         storage.update_password_hash(auth_user.user_id, new_hash)
 
-    session["user_id"] = auth_user.user_id
-    _get_csrf_token()
-    return jsonify({
+    access_token = create_access_token(auth_user.user_id, auth_user.username)
+    refresh_token = create_refresh_token(auth_user.user_id)
+
+    resp = make_response(jsonify({
         "user_id": auth_user.user_id,
         "username": auth_user.username,
-        "csrf_token": session.get("csrf_token")
-    }), 200
+        "access_token": access_token,
+    }), 200)
+    _set_refresh_cookie(resp, refresh_token)
+    return resp
 
 
 @api.route('/auth/logout', methods=['POST'])
-@require_csrf
+@require_auth
 def logout():
-    session.pop("user_id", None)
-    return jsonify({"message": "ok"}), 200
+    """Invalida el refresh token (blacklist) y limpia la cookie."""
+    storage = current_app.storage
+
+    # Blacklistear el refresh token si existe en la cookie
+    refresh_cookie = request.cookies.get(JWT_CONFIG["refresh_cookie_name"])
+    if refresh_cookie:
+        try:
+            refresh_payload = decode_token(refresh_cookie, expected_type="refresh")
+            jti = refresh_payload.get("jti")
+            exp = datetime.utcfromtimestamp(refresh_payload["exp"])
+            if jti:
+                storage.blacklist_token(jti, exp)
+        except Exception:
+            pass
+
+    resp = make_response(jsonify({"message": "ok"}), 200)
+    _clear_refresh_cookie(resp)
+    return resp
 
 
 @api.route('/auth/me', methods=['GET'])
+@require_auth
 def me():
+    """Devuelve información del usuario autenticado (verificando el access token)."""
     storage = current_app.storage
-    user_id = _get_current_user_id()
-    if not user_id:
-        return jsonify({"error": get_error("auth_required")}), 401
-    auth_user = storage.get_auth_user_by_id(user_id)
+    auth_user = storage.get_auth_user_by_id(g.current_user_id)
     if not auth_user:
-        session.pop("user_id", None)
         return jsonify({"error": get_error("auth_required")}), 401
-    _get_csrf_token()
     return jsonify({
         "user_id": auth_user.user_id,
         "username": auth_user.username,
-        "csrf_token": session.get("csrf_token")
+    }), 200
+
+
+@api.route('/auth/refresh', methods=['POST'])
+def refresh():
+    """
+    Emite un nuevo access token usando el refresh token de la cookie HttpOnly.
+    Llamado automáticamente por el frontend al cargar la página o cuando
+    el access token expira.
+    """
+    storage = current_app.storage
+    refresh_cookie = request.cookies.get(JWT_CONFIG["refresh_cookie_name"])
+    if not refresh_cookie:
+        return jsonify({"error": "Refresh token requerido"}), 401
+
+    try:
+        payload = decode_token(refresh_cookie, expected_type="refresh")
+    except pyjwt.ExpiredSignatureError:
+        resp = make_response(jsonify({"error": "Refresh token expirado, inicie sesión de nuevo"}), 401)
+        _clear_refresh_cookie(resp)
+        return resp
+    except (pyjwt.InvalidTokenError, ValueError):
+        resp = make_response(jsonify({"error": "Refresh token inválido"}), 401)
+        _clear_refresh_cookie(resp)
+        return resp
+
+    # Verificar que el token no esté revocado
+    jti = payload.get("jti")
+    if jti and storage.is_token_blacklisted(jti):
+        resp = make_response(jsonify({"error": "Refresh token revocado"}), 401)
+        _clear_refresh_cookie(resp)
+        return resp
+
+    # Verificar que el usuario siga existiendo
+    user_id = int(payload["sub"])
+    auth_user = storage.get_auth_user_by_id(user_id)
+    if not auth_user:
+        resp = make_response(jsonify({"error": get_error("auth_required")}), 401)
+        _clear_refresh_cookie(resp)
+        return resp
+
+    new_access_token = create_access_token(auth_user.user_id, auth_user.username)
+    return jsonify({
+        "access_token": new_access_token,
+        "user_id": auth_user.user_id,
+        "username": auth_user.username,
     }), 200
 
 
@@ -211,7 +311,6 @@ def get_user():
 
 @api.route('/user', methods=['POST'])
 @require_auth
-@require_csrf
 def create_or_update_user():
     storage = current_app.storage
     data = request.json or {}
@@ -282,7 +381,6 @@ def create_or_update_user():
 
 @api.route('/weight', methods=['POST'])
 @require_auth
-@require_csrf
 def add_weight():
     storage = current_app.storage
     data = request.json or {}

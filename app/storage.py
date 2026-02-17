@@ -192,6 +192,21 @@ class StorageInterface(ABC):
         """Obtiene todas las entradas de peso de un usuario"""
         pass
 
+    @abstractmethod
+    def blacklist_token(self, jti: str, expires_at: datetime) -> None:
+        """Añade un JTI (JWT ID) a la blacklist para revocar el token"""
+        pass
+
+    @abstractmethod
+    def is_token_blacklisted(self, jti: str) -> bool:
+        """Comprueba si un JTI (JWT ID) está en la blacklist"""
+        pass
+
+    @abstractmethod
+    def cleanup_expired_blacklist(self) -> int:
+        """Elimina entradas expiradas de la blacklist. Retorna nº de entradas eliminadas."""
+        pass
+
 
 class MemoryStorage(StorageInterface):
     """Implementación de almacenamiento en memoria"""
@@ -201,6 +216,7 @@ class MemoryStorage(StorageInterface):
         self._auth_users = {}  # {user_id: AuthUserData}
         self._auth_users_by_username = {}  # {username: AuthUserData}
         self._api_tokens = {}  # {token_hash: (user_id, expires_at)}
+        self._token_blacklist = {}  # {jti: expires_at}
         self._weight_entries = []  # List[WeightEntryData]
         self._next_entry_id = 1
         self._next_user_id = 1
@@ -307,6 +323,25 @@ class MemoryStorage(StorageInterface):
         user_entries = [e for e in self._weight_entries if e.user_id == user_id]
         return sorted(user_entries, key=lambda e: e.recorded_date, reverse=True)
 
+    def blacklist_token(self, jti: str, expires_at: datetime) -> None:
+        self._token_blacklist[jti] = expires_at
+
+    def is_token_blacklisted(self, jti: str) -> bool:
+        expires_at = self._token_blacklist.get(jti)
+        if expires_at is None:
+            return False
+        if expires_at < datetime.now():
+            self._token_blacklist.pop(jti, None)
+            return False
+        return True
+
+    def cleanup_expired_blacklist(self) -> int:
+        now = datetime.now()
+        expired = [jti for jti, exp in self._token_blacklist.items() if exp < now]
+        for jti in expired:
+            del self._token_blacklist[jti]
+        return len(expired)
+
 
 class SQLCipherStorage(StorageInterface):
     """Almacenamiento persistente cifrado con SQLCipher"""
@@ -367,6 +402,14 @@ class SQLCipherStorage(StorageInterface):
                     expires_at TEXT NOT NULL,
                     created_at TEXT NOT NULL,
                     FOREIGN KEY(user_id) REFERENCES users(id) ON DELETE CASCADE
+                )
+                """
+            )
+            conn.execute(
+                """
+                CREATE TABLE IF NOT EXISTS token_blacklist (
+                    jti TEXT PRIMARY KEY NOT NULL,
+                    expires_at TEXT NOT NULL
                 )
                 """
             )
@@ -480,6 +523,30 @@ class SQLCipherStorage(StorageInterface):
     def revoke_api_token(self, token_hash: str) -> None:
         with self._connect() as conn:
             conn.execute("DELETE FROM api_tokens WHERE token_hash = ?", (token_hash,))
+
+    def blacklist_token(self, jti: str, expires_at: datetime) -> None:
+        with self._connect() as conn:
+            conn.execute(
+                "INSERT OR REPLACE INTO token_blacklist (jti, expires_at) VALUES (?, ?)",
+                (jti, expires_at.isoformat()),
+            )
+
+    def is_token_blacklisted(self, jti: str) -> bool:
+        now = datetime.now().isoformat()
+        with self._connect() as conn:
+            row = conn.execute(
+                "SELECT 1 FROM token_blacklist WHERE jti = ? AND expires_at > ?",
+                (jti, now),
+            ).fetchone()
+            return row is not None
+
+    def cleanup_expired_blacklist(self) -> int:
+        now = datetime.now().isoformat()
+        with self._connect() as conn:
+            cursor = conn.execute(
+                "DELETE FROM token_blacklist WHERE expires_at <= ?", (now,)
+            )
+            return cursor.rowcount
 
     def get_last_weight_entry(self, user_id: int) -> Optional[WeightEntryData]:
         with self._connect() as conn:
@@ -631,6 +698,14 @@ class SQLiteStorage(StorageInterface):
                 )
                 """
             )
+            conn.execute(
+                """
+                CREATE TABLE IF NOT EXISTS token_blacklist (
+                    jti TEXT PRIMARY KEY NOT NULL,
+                    expires_at TEXT NOT NULL
+                )
+                """
+            )
 
     def get_user(self, user_id: int) -> Optional[UserData]:
         with self._connect() as conn:
@@ -742,6 +817,30 @@ class SQLiteStorage(StorageInterface):
         with self._connect() as conn:
             conn.execute("DELETE FROM api_tokens WHERE token_hash = ?", (token_hash,))
 
+    def blacklist_token(self, jti: str, expires_at: datetime) -> None:
+        with self._connect() as conn:
+            conn.execute(
+                "INSERT OR REPLACE INTO token_blacklist (jti, expires_at) VALUES (?, ?)",
+                (jti, expires_at.isoformat()),
+            )
+
+    def is_token_blacklisted(self, jti: str) -> bool:
+        now = datetime.now().isoformat()
+        with self._connect() as conn:
+            row = conn.execute(
+                "SELECT 1 FROM token_blacklist WHERE jti = ? AND expires_at > ?",
+                (jti, now),
+            ).fetchone()
+            return row is not None
+
+    def cleanup_expired_blacklist(self) -> int:
+        now = datetime.now().isoformat()
+        with self._connect() as conn:
+            cursor = conn.execute(
+                "DELETE FROM token_blacklist WHERE expires_at <= ?", (now,)
+            )
+            return cursor.rowcount
+
     def get_last_weight_entry(self, user_id: int) -> Optional[WeightEntryData]:
         with self._connect() as conn:
             row = conn.execute(
@@ -836,8 +935,4 @@ class SQLiteStorage(StorageInterface):
                 )
                 for row in rows
             ]
-
-
-
-
 

@@ -79,6 +79,8 @@ services:
       # reCAPTCHA v3 (login/register). Si no se definen en .env, la app usa los valores por defecto de config.py
       - RECAPTCHA_SITE_KEY=${RECAPTCHA_SITE_KEY:-}
       - RECAPTCHA_SECRET_KEY=${RECAPTCHA_SECRET_KEY:-}
+      # JWT: secreto para firmar access/refresh tokens. Generar uno único en producción.
+      - JWT_SECRET_KEY=${JWT_SECRET_KEY:-}
       # Supervisor (tráfico y DB): 1 = activo (por defecto en desarrollo). En producción usar APP_SUPERVISOR=0
       - APP_SUPERVISOR=${APP_SUPERVISOR:-1}
     healthcheck:

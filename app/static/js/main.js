@@ -539,7 +539,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
         // Intentar cargar desde el backend primero
         try {
-            const response = await fetch('/api/weights/recent');
+            const response = await AuthManager.authenticatedFetch('/api/weights/recent');
             if (response.ok) {
                 const data = await response.json();
                 weights = data.weights || [];

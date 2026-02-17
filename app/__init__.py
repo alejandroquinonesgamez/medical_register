@@ -43,7 +43,7 @@ def create_app():
         r"/api/*": {
             "origins": "*",
             "methods": ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
-            "allow_headers": ["Content-Type", "X-CSRF-Token"]
+            "allow_headers": ["Content-Type", "Authorization"]
         }
     }, supports_credentials=True)
 

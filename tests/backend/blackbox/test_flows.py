@@ -5,7 +5,7 @@ sin conocer la implementación interna
 """
 import pytest
 import math
-from tests.backend.conftest import assert_success, assert_created, assert_bad_request, assert_not_found, assert_unauthorized
+from tests.backend.conftest import assert_success, assert_created, assert_bad_request, assert_not_found, assert_unauthorized, auth_headers
 
 
 class TestUserAPIBlackBox:
@@ -20,11 +20,11 @@ class TestUserAPIBlackBox:
             "fecha_nacimiento": "1985-05-15",
             "talla_m": 1.80
         }
-        response = client.post('/api/user', json=payload, headers={"X-CSRF-Token": auth_session["csrf_token"]})
+        response = client.post('/api/user', json=payload, headers=auth_headers(auth_session["access_token"]))
         assert_success(response)
         
         # Recuperar usuario
-        response = client.get('/api/user')
+        response = client.get('/api/user', headers=auth_headers(auth_session["access_token"]))
         assert_success(response)
         data = response.get_json()
         assert data["nombre"] == "Juan"
@@ -40,7 +40,7 @@ class TestUserAPIBlackBox:
             "apellidos": "García",
             "fecha_nacimiento": "1990-01-01",
             "talla_m": 1.65
-        }, headers={"X-CSRF-Token": auth_session["csrf_token"]})
+        }, headers=auth_headers(auth_session["access_token"]))
         
         # Actualizar usuario
         response = client.post('/api/user', json={
@@ -48,11 +48,11 @@ class TestUserAPIBlackBox:
             "apellidos": "García López",
             "fecha_nacimiento": "1990-01-01",
             "talla_m": 1.66
-        }, headers={"X-CSRF-Token": auth_session["csrf_token"]})
+        }, headers=auth_headers(auth_session["access_token"]))
         assert_success(response)
         
         # Verificar cambios
-        data = client.get('/api/user').get_json()
+        data = client.get('/api/user', headers=auth_headers(auth_session["access_token"])).get_json()
         assert data["nombre"] == "Ana María"
         assert data["apellidos"] == "García López"
         assert math.isclose(data["talla_m"], 1.66)
@@ -75,14 +75,14 @@ class TestWeightAPIBlackBox:
             "apellidos": "Ruiz",
             "fecha_nacimiento": "1988-03-20",
             "talla_m": 1.75
-        }, headers={"X-CSRF-Token": auth_session["csrf_token"]})
+        }, headers=auth_headers(auth_session["access_token"]))
         
         # Añadir peso
-        response = client.post('/api/weight', json={"peso_kg": 75.5}, headers={"X-CSRF-Token": auth_session["csrf_token"]})
+        response = client.post('/api/weight', json={"peso_kg": 75.5}, headers=auth_headers(auth_session["access_token"]))
         assert_created(response)
         
         # Verificar IMC
-        imc_response = client.get('/api/imc')
+        imc_response = client.get('/api/imc', headers=auth_headers(auth_session["access_token"]))
         assert_success(imc_response)
         imc_data = imc_response.get_json()
         assert imc_data["imc"] > 0
@@ -98,7 +98,7 @@ class TestWeightAPIBlackBox:
             "apellidos": "Sánchez",
             "fecha_nacimiento": "1992-07-10",
             "talla_m": 1.68
-        }, headers={"X-CSRF-Token": auth_session["csrf_token"]})
+        }, headers=auth_headers(auth_session["access_token"]))
         
         # Añadir pesos en días diferentes usando el storage directamente
         # para simular el comportamiento real
@@ -120,7 +120,7 @@ class TestWeightAPIBlackBox:
                 storage.add_weight_entry(entry)
         
         # Verificar estadísticas
-        stats = client.get('/api/stats').get_json()
+        stats = client.get('/api/stats', headers=auth_headers(auth_session["access_token"])).get_json()
         assert stats["num_pesajes"] == 3
         assert stats["peso_max"] == 67.0
         assert stats["peso_min"] == 65.0
@@ -132,24 +132,24 @@ class TestWeightAPIBlackBox:
             "apellidos": "User",
             "fecha_nacimiento": "1990-01-01",
             "talla_m": 1.75
-        }, headers={"X-CSRF-Token": auth_session["csrf_token"]})
+        }, headers=auth_headers(auth_session["access_token"]))
         
         # Añadir primer peso del día
-        response1 = client.post('/api/weight', json={"peso_kg": 70.0}, headers={"X-CSRF-Token": auth_session["csrf_token"]})
+        response1 = client.post('/api/weight', json={"peso_kg": 70.0}, headers=auth_headers(auth_session["access_token"]))
         assert_created(response1)
         
         # Añadir segundo peso del mismo día (debe reemplazar al anterior)
-        response2 = client.post('/api/weight', json={"peso_kg": 75.0}, headers={"X-CSRF-Token": auth_session["csrf_token"]})
+        response2 = client.post('/api/weight', json={"peso_kg": 75.0}, headers=auth_headers(auth_session["access_token"]))
         assert_created(response2)
         
         # Verificar que solo hay un registro (el último)
-        stats = client.get('/api/stats').get_json()
+        stats = client.get('/api/stats', headers=auth_headers(auth_session["access_token"])).get_json()
         assert stats["num_pesajes"] == 1
         assert stats["peso_max"] == 75.0
         assert stats["peso_min"] == 75.0
         
         # Verificar que el IMC usa el último peso
-        imc = client.get('/api/imc').get_json()
+        imc = client.get('/api/imc', headers=auth_headers(auth_session["access_token"])).get_json()
         # IMC con 75kg y 1.75m = 75 / (1.75^2) = 24.5
         assert imc["imc"] == 24.5
     
@@ -175,9 +175,9 @@ class TestIMCAPIBlackBox:
             "apellidos": "Martínez",
             "fecha_nacimiento": "1985-12-05",
             "talla_m": 1.80
-        }, headers={"X-CSRF-Token": auth_session["csrf_token"]})
+        }, headers=auth_headers(auth_session["access_token"]))
         
-        response = client.get('/api/imc')
+        response = client.get('/api/imc', headers=auth_headers(auth_session["access_token"]))
         assert_success(response)
         data = response.get_json()
         assert data["imc"] == 0
@@ -190,12 +190,12 @@ class TestIMCAPIBlackBox:
             "apellidos": "González",
             "fecha_nacimiento": "1990-06-15",
             "talla_m": 1.70
-        }, headers={"X-CSRF-Token": auth_session["csrf_token"]})
+        }, headers=auth_headers(auth_session["access_token"]))
         
         # Peso 70 kg, altura 1.70 m -> IMC = 70 / (1.70^2) = 24.22
-        client.post('/api/weight', json={"peso_kg": 70.0}, headers={"X-CSRF-Token": auth_session["csrf_token"]})
+        client.post('/api/weight', json={"peso_kg": 70.0}, headers=auth_headers(auth_session["access_token"]))
         
-        response = client.get('/api/imc')
+        response = client.get('/api/imc', headers=auth_headers(auth_session["access_token"]))
         assert_success(response)
         data = response.get_json()
         assert math.isclose(data["imc"], 24.22, abs_tol=0.1)
@@ -214,9 +214,9 @@ class TestStatsAPIBlackBox:
             "apellidos": "User",
             "fecha_nacimiento": "1990-01-01",
             "talla_m": 1.75
-        }, headers={"X-CSRF-Token": auth_session["csrf_token"]})
+        }, headers=auth_headers(auth_session["access_token"]))
         
-        response = client.get('/api/stats')
+        response = client.get('/api/stats', headers=auth_headers(auth_session["access_token"]))
         assert_success(response)
         data = response.get_json()
         assert data["num_pesajes"] == 0
@@ -230,11 +230,11 @@ class TestStatsAPIBlackBox:
             "apellidos": "User",
             "fecha_nacimiento": "1990-01-01",
             "talla_m": 1.75
-        }, headers={"X-CSRF-Token": auth_session["csrf_token"]})
+        }, headers=auth_headers(auth_session["access_token"]))
         
-        client.post('/api/weight', json={"peso_kg": 75.0}, headers={"X-CSRF-Token": auth_session["csrf_token"]})
+        client.post('/api/weight', json={"peso_kg": 75.0}, headers=auth_headers(auth_session["access_token"]))
         
-        response = client.get('/api/stats')
+        response = client.get('/api/stats', headers=auth_headers(auth_session["access_token"]))
         data = response.get_json()
         assert data["num_pesajes"] == 1
         assert data["peso_max"] == 75.0
@@ -250,7 +250,7 @@ class TestStatsAPIBlackBox:
             "apellidos": "User",
             "fecha_nacimiento": "1990-01-01",
             "talla_m": 1.75
-        }, headers={"X-CSRF-Token": auth_session["csrf_token"]})
+        }, headers=auth_headers(auth_session["access_token"]))
         
         # Añadir pesos en días diferentes usando el storage directamente
         with client.application.app_context():
@@ -272,7 +272,7 @@ class TestStatsAPIBlackBox:
                 )
                 storage.add_weight_entry(entry)
         
-        response = client.get('/api/stats')
+        response = client.get('/api/stats', headers=auth_headers(auth_session["access_token"]))
         data = response.get_json()
         assert data["num_pesajes"] == 5
         assert data["peso_max"] == 80.0
