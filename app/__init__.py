@@ -49,9 +49,11 @@ def create_app():
 
     # Registrar blueprints
     from .views import views
+    from .api_docs import docs
     from .routes import api
     
     app.register_blueprint(views)
+    app.register_blueprint(docs)
     app.register_blueprint(api)
 
     # Agregar headers de seguridad para prevenir clickjacking y otros ataques

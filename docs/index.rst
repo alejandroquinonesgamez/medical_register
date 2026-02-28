@@ -2,35 +2,35 @@
 Medical Register
 ================
 
-Documentación del proyecto Medical Register. Ahora mismo en desarrollo. 
+Documentacion principal del proyecto Medical Register.
 
 .. toctree::
    :maxdepth: 2
    :caption: Contenido:
    :hidden:
 
+   INDICE_DOCUMENTACION
    manual
    requeriments
+   SEGURIDAD
    INFORME_SEGURIDAD
-   INICIO_RAPIDO
+   JWT_RBAC_Integracion
    mockups/MOCKUPS
 
 DefectDojo
 ----------
 
-Documentación relacionada con DefectDojo - Gestión de Vulnerabilidades.
+Documentacion relacionada con DefectDojo y automatizacion WSTG.
 
 .. toctree::
    :maxdepth: 2
    :caption: DefectDojo:
    :hidden:
 
-   defectdojo/ANALISIS_CWE_699
-   defectdojo/ESTADO_ACTUAL_CWE_699
    defectdojo/DEFECTDOJO_CONFIGURACION
    defectdojo/DEFECTDOJO_CREDENTIALS
    defectdojo/DEFECTDOJO_DATABASE
    defectdojo/DEFECTDOJO_INTEGRATION
    defectdojo/DEFECTDOJO_FLUJO_CREACION_RESOLUCION
    defectdojo/DEFECTDOJO_FLUJO_IMPLEMENTADO
-   defectdojo/MAKE_ALL_USO
+   IMPLEMENTACION_WSTG_BIDIRECCIONAL

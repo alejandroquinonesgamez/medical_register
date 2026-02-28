@@ -162,3 +162,7 @@ AVAILABLE_LANGUAGES = ['es']
 # Configuración WSTG Sync
 WSTG_WEBHOOK_KEY = os.environ.get('WSTG_WEBHOOK_KEY', 'change_me_in_production')
 WSTG_SYNC_API_URL = os.environ.get('WSTG_SYNC_API_URL', 'http://localhost:5001/api/wstg/sync')
+
+# Documentación interactiva de la API (Swagger UI + OpenAPI)
+# Recomendación: en producción usar API_DOCS_ENABLED=0
+API_DOCS_ENABLED = os.environ.get("API_DOCS_ENABLED", "1").lower() in {"1", "true", "yes"}

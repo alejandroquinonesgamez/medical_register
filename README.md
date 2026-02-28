@@ -27,6 +27,16 @@ Aplicación web monousuario para el registro personal de peso, talla y cálculo 
 - **DefectDojo**: Integrado para gestión de vulnerabilidades de seguridad
 - **Supervisor**: Dashboard de desarrollo para monitoreo de tráfico API y base de datos
 
+## Documentación
+
+- Índice general: `docs/INDICE_DOCUMENTACION.md`
+- Manual de usuario: `docs/manual.md`
+- Requerimientos: `docs/requeriments.md`
+- Seguridad (índice): `docs/SEGURIDAD.md`
+- Informe ASVS: `docs/INFORME_SEGURIDAD.md`
+- JWT + RBAC: `docs/JWT_RBAC_Integracion.md`
+- OpenAPI: `docs/openapi.yaml`
+
 ## Instalación Rápida
 
 ### Requisitos Previos
@@ -62,6 +72,14 @@ Puedes partir del ejemplo:
 cp docker-compose.env.example .env
 ```
 
+Si trabajas en una ruta con espacios o caracteres especiales, asegúrate de mantener el `.env` con:
+
+```env
+COMPOSE_PROJECT_NAME=medical_register
+COMPOSE_DOCKER_CLI_BUILD=0
+DOCKER_BUILDKIT=0
+```
+
 Para activar reCAPTCHA v3 en login/registro, define en `.env`:
 
 | Variable | Descripción |
@@ -71,6 +89,19 @@ Para activar reCAPTCHA v3 en login/registro, define en `.env`:
 | `RECAPTCHA_MIN_SCORE` | (Opcional) Umbral de score 0.0–1.0; por defecto `0.5` |
 
 En desarrollo local, añade `localhost` (y `127.0.0.1` si accedes por IP) a los dominios autorizados de tu clave en la consola de reCAPTCHA. Tras cambiar el `.env`, reinicia los contenedores (`make down` y `make`). Detalles en [Autenticación y contraseñas](docs/seguridad/02-autenticacion-contrasenas.md).
+
+### Documentación de API (OpenAPI + Swagger UI)
+
+La API expone documentación interactiva para pruebas y validación de entregables:
+
+- **Swagger UI**: `http://localhost:5001/swagger`
+- **OpenAPI YAML**: `http://localhost:5001/api/openapi.yaml`
+
+Se puede desactivar en producción con:
+
+```bash
+API_DOCS_ENABLED=0
+```
 
 4. **Arrancar la aplicación**:
 
