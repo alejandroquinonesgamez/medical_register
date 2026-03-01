@@ -236,7 +236,7 @@ static isAdmin() {
 
 Al registrar el primer usuario (`firstuser`), el servidor detecta que no hay usuarios en la BD y le asigna automáticamente el rol `admin`:
 
-![Registro del primer usuario con rol admin](./capturas/Registro%20usuario%201.png)
+![Registro del primer usuario con rol admin](./capturas/registro-usuario-1.png)
 
 Se observa que la respuesta incluye `"role": "admin"` y `"user_id": 1`.
 
@@ -244,7 +244,7 @@ Se observa que la respuesta incluye `"role": "admin"` y `"user_id": 1`.
 
 Al registrar un segundo usuario (`alejandro`), al existir ya un usuario en la BD, se le asigna el rol `user`:
 
-![Registro del segundo usuario con rol user](./capturas/Registro%20usuario%20estándar.png)
+![Registro del segundo usuario con rol user](./capturas/registro-usuario-estandar.png)
 
 Se observa que la respuesta incluye `"role": "user"` y `"user_id": 2`.
 
@@ -252,31 +252,31 @@ Se observa que la respuesta incluye `"role": "user"` y `"user_id": 2`.
 
 El usuario `alejandro` (rol `user`) obtiene un access token e intenta acceder a la ruta de administración `/api/wstg/status`. El middleware `require_role("admin")` deniega el acceso:
 
-![Acceso denegado con error de permisos](./capturas/Acceso%20Restringido.png)
+![Acceso denegado con error de permisos](./capturas/acceso-restringido.png)
 
 La respuesta muestra `"error": "No tienes permisos para realizar esta acción"`.
 
 Con la opción `-i` de curl, se puede verificar el código HTTP **403 FORBIDDEN** en las cabeceras de respuesta:
 
-![Respuesta HTTP 403 FORBIDDEN con cabeceras](./capturas/Acceso%20Restringido%20403.png)
+![Respuesta HTTP 403 FORBIDDEN con cabeceras](./capturas/acceso-restringido-403.png)
 
 ### 3.4 Token expirado (401 Unauthorized)
 
 Cuando un access token expira (tras 15 minutos), el servidor responde con **401 UNAUTHORIZED** y el mensaje `"Token expirado"`. Esto demuestra que la validación de expiración funciona correctamente:
 
-![Respuesta 401 con token expirado](./capturas/Acceso%20No%20Autorizado%20(Token%20expirado).png)
+![Respuesta 401 con token expirado](./capturas/acceso-no-autorizado-token-expirado.png)
 
 ### 3.5 Acceso autorizado con rol admin (200 OK)
 
 El usuario `firstuser` (rol `admin`) obtiene un nuevo access token y accede a la misma ruta `/api/wstg/status`. El middleware `require_role("admin")` permite el acceso y devuelve **200 OK**:
 
-![Acceso autorizado para admin con 200 OK](./capturas/Acceso%20Autorizado.png)
+![Acceso autorizado para admin con 200 OK](./capturas/acceso-autorizado.png)
 
 ### 3.6 Admin cambia el rol de un usuario
 
 El admin (`firstuser`) promueve al usuario `alejandro` (user_id: 2) al rol `admin` mediante `PUT /api/admin/users/2/role`:
 
-![Cambio de rol de user a admin](./capturas/Cambio%20de%20Rol.png)
+![Cambio de rol de user a admin](./capturas/cambio-de-rol.png)
 
 La respuesta confirma: `"Rol de 'alejandro' actualizado a 'admin'"`.
 
@@ -284,7 +284,7 @@ La respuesta confirma: `"Rol de 'alejandro' actualizado a 'admin'"`.
 
 Tras el cambio de rol, `alejandro` obtiene un nuevo access token (que ahora contiene `"role": "admin"` en el JWT) y accede a la ruta `/api/wstg/status` que antes le denegaba. Ahora recibe **200 OK**:
 
-![Acceso permitido tras cambio de rol](./capturas/Suplantación%20de%20Token%20-%20Acceso%20User.png)
+![Acceso permitido tras cambio de rol](./capturas/suplantacion-token-acceso-user.png)
 
 Esto demuestra que el sistema RBAC es dinámico: al cambiar el rol en la BD, el siguiente token emitido refleja el nuevo rol.
 

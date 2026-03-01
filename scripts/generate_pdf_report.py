@@ -26,6 +26,19 @@ import re
 from datetime import datetime
 from pathlib import Path
 
+def configure_console_encoding():
+    """Evita errores Unicode en consolas Windows cp1252."""
+    try:
+        if hasattr(sys.stdout, "reconfigure"):
+            sys.stdout.reconfigure(encoding="utf-8", errors="replace")
+        if hasattr(sys.stderr, "reconfigure"):
+            sys.stderr.reconfigure(encoding="utf-8", errors="replace")
+    except Exception:
+        # Si no se puede reconfigurar, continuamos con la codificación por defecto.
+        pass
+
+configure_console_encoding()
+
 def remove_emojis(text):
     """Eliminar emojis del texto para el PDF"""
     # Patrón para eliminar emojis Unicode comunes y variantes
