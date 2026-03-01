@@ -102,11 +102,13 @@ class WeightEntryData:
 
 class AuthUserData:
     """Clase de datos para autenticación de usuario"""
-    def __init__(self, user_id: int, username: str, password_hash: str, created_at: datetime):
+    def __init__(self, user_id: int, username: str, password_hash: str,
+                 created_at: datetime, role: str = "user"):
         self.user_id = user_id
         self.username = username
         self.password_hash = password_hash
         self.created_at = created_at
+        self.role = role
 
 
 class StorageInterface(ABC):
@@ -192,6 +194,31 @@ class StorageInterface(ABC):
         """Obtiene todas las entradas de peso de un usuario"""
         pass
 
+    @abstractmethod
+    def blacklist_token(self, jti: str, expires_at: datetime) -> None:
+        """Añade un JTI (JWT ID) a la blacklist para revocar el token"""
+        pass
+
+    @abstractmethod
+    def is_token_blacklisted(self, jti: str) -> bool:
+        """Comprueba si un JTI (JWT ID) está en la blacklist"""
+        pass
+
+    @abstractmethod
+    def cleanup_expired_blacklist(self) -> int:
+        """Elimina entradas expiradas de la blacklist. Retorna nº de entradas eliminadas."""
+        pass
+
+    @abstractmethod
+    def count_auth_users(self) -> int:
+        """Cuenta el número total de usuarios registrados (para asignar rol admin al primero)."""
+        pass
+
+    @abstractmethod
+    def update_user_role(self, user_id: int, role: str) -> bool:
+        """Actualiza el rol de un usuario. Devuelve True si se actualizó."""
+        pass
+
 
 class MemoryStorage(StorageInterface):
     """Implementación de almacenamiento en memoria"""
@@ -201,6 +228,7 @@ class MemoryStorage(StorageInterface):
         self._auth_users = {}  # {user_id: AuthUserData}
         self._auth_users_by_username = {}  # {username: AuthUserData}
         self._api_tokens = {}  # {token_hash: (user_id, expires_at)}
+        self._token_blacklist = {}  # {jti: expires_at}
         self._weight_entries = []  # List[WeightEntryData]
         self._next_entry_id = 1
         self._next_user_id = 1
@@ -211,12 +239,14 @@ class MemoryStorage(StorageInterface):
     def save_user(self, user: UserData) -> None:
         self._users[user.user_id] = user
 
-    def create_auth_user(self, username: str, password_hash: str) -> AuthUserData:
+    def create_auth_user(self, username: str, password_hash: str,
+                         role: str = "user") -> AuthUserData:
         user = AuthUserData(
             user_id=self._next_user_id,
             username=username,
             password_hash=password_hash,
-            created_at=datetime.now()
+            created_at=datetime.now(),
+            role=role,
         )
         self._next_user_id += 1
         self._auth_users[user.user_id] = user
@@ -307,6 +337,35 @@ class MemoryStorage(StorageInterface):
         user_entries = [e for e in self._weight_entries if e.user_id == user_id]
         return sorted(user_entries, key=lambda e: e.recorded_date, reverse=True)
 
+    def blacklist_token(self, jti: str, expires_at: datetime) -> None:
+        self._token_blacklist[jti] = expires_at
+
+    def is_token_blacklisted(self, jti: str) -> bool:
+        expires_at = self._token_blacklist.get(jti)
+        if expires_at is None:
+            return False
+        if expires_at < datetime.now():
+            self._token_blacklist.pop(jti, None)
+            return False
+        return True
+
+    def cleanup_expired_blacklist(self) -> int:
+        now = datetime.now()
+        expired = [jti for jti, exp in self._token_blacklist.items() if exp < now]
+        for jti in expired:
+            del self._token_blacklist[jti]
+        return len(expired)
+
+    def count_auth_users(self) -> int:
+        return len(self._auth_users)
+
+    def update_user_role(self, user_id: int, role: str) -> bool:
+        user = self._auth_users.get(user_id)
+        if not user:
+            return False
+        user.role = role
+        return True
+
 
 class SQLCipherStorage(StorageInterface):
     """Almacenamiento persistente cifrado con SQLCipher"""
@@ -339,6 +398,7 @@ class SQLCipherStorage(StorageInterface):
                     id INTEGER PRIMARY KEY AUTOINCREMENT,
                     username TEXT UNIQUE NOT NULL,
                     password_hash TEXT NOT NULL,
+                    role TEXT NOT NULL DEFAULT 'user',
                     first_name TEXT,
                     last_name TEXT,
                     birth_date TEXT,
@@ -347,6 +407,11 @@ class SQLCipherStorage(StorageInterface):
                 )
                 """
             )
+            # Migración: añadir columna role si no existe (BD anteriores)
+            try:
+                conn.execute("ALTER TABLE users ADD COLUMN role TEXT NOT NULL DEFAULT 'user'")
+            except Exception:
+                pass
             conn.execute(
                 """
                 CREATE TABLE IF NOT EXISTS weights (
@@ -367,6 +432,14 @@ class SQLCipherStorage(StorageInterface):
                     expires_at TEXT NOT NULL,
                     created_at TEXT NOT NULL,
                     FOREIGN KEY(user_id) REFERENCES users(id) ON DELETE CASCADE
+                )
+                """
+            )
+            conn.execute(
+                """
+                CREATE TABLE IF NOT EXISTS token_blacklist (
+                    jti TEXT PRIMARY KEY NOT NULL,
+                    expires_at TEXT NOT NULL
                 )
                 """
             )
@@ -404,12 +477,13 @@ class SQLCipherStorage(StorageInterface):
                 ),
             )
 
-    def create_auth_user(self, username: str, password_hash: str) -> AuthUserData:
+    def create_auth_user(self, username: str, password_hash: str,
+                         role: str = "user") -> AuthUserData:
         now = datetime.now().isoformat()
         with self._connect() as conn:
             cursor = conn.execute(
-                "INSERT INTO users (username, password_hash, created_at) VALUES (?, ?, ?)",
-                (username, password_hash, now),
+                "INSERT INTO users (username, password_hash, role, created_at) VALUES (?, ?, ?, ?)",
+                (username, password_hash, role, now),
             )
             user_id = cursor.lastrowid
         return AuthUserData(
@@ -417,12 +491,13 @@ class SQLCipherStorage(StorageInterface):
             username=username,
             password_hash=password_hash,
             created_at=datetime.fromisoformat(now),
+            role=role,
         )
 
     def get_auth_user_by_username(self, username: str) -> Optional[AuthUserData]:
         with self._connect() as conn:
             row = conn.execute(
-                "SELECT id, username, password_hash, created_at FROM users WHERE username = ?",
+                "SELECT id, username, password_hash, role, created_at FROM users WHERE username = ?",
                 (username,),
             ).fetchone()
             if not row:
@@ -432,12 +507,13 @@ class SQLCipherStorage(StorageInterface):
                 username=row["username"],
                 password_hash=row["password_hash"],
                 created_at=datetime.fromisoformat(row["created_at"]),
+                role=row["role"],
             )
 
     def get_auth_user_by_id(self, user_id: int) -> Optional[AuthUserData]:
         with self._connect() as conn:
             row = conn.execute(
-                "SELECT id, username, password_hash, created_at FROM users WHERE id = ?",
+                "SELECT id, username, password_hash, role, created_at FROM users WHERE id = ?",
                 (user_id,),
             ).fetchone()
             if not row:
@@ -447,6 +523,7 @@ class SQLCipherStorage(StorageInterface):
                 username=row["username"],
                 password_hash=row["password_hash"],
                 created_at=datetime.fromisoformat(row["created_at"]),
+                role=row["role"],
             )
 
     def update_password_hash(self, user_id: int, password_hash: str) -> None:
@@ -480,6 +557,42 @@ class SQLCipherStorage(StorageInterface):
     def revoke_api_token(self, token_hash: str) -> None:
         with self._connect() as conn:
             conn.execute("DELETE FROM api_tokens WHERE token_hash = ?", (token_hash,))
+
+    def blacklist_token(self, jti: str, expires_at: datetime) -> None:
+        with self._connect() as conn:
+            conn.execute(
+                "INSERT OR REPLACE INTO token_blacklist (jti, expires_at) VALUES (?, ?)",
+                (jti, expires_at.isoformat()),
+            )
+
+    def is_token_blacklisted(self, jti: str) -> bool:
+        now = datetime.now().isoformat()
+        with self._connect() as conn:
+            row = conn.execute(
+                "SELECT 1 FROM token_blacklist WHERE jti = ? AND expires_at > ?",
+                (jti, now),
+            ).fetchone()
+            return row is not None
+
+    def cleanup_expired_blacklist(self) -> int:
+        now = datetime.now().isoformat()
+        with self._connect() as conn:
+            cursor = conn.execute(
+                "DELETE FROM token_blacklist WHERE expires_at <= ?", (now,)
+            )
+            return cursor.rowcount
+
+    def count_auth_users(self) -> int:
+        with self._connect() as conn:
+            row = conn.execute("SELECT COUNT(*) AS count FROM users").fetchone()
+            return int(row["count"]) if row else 0
+
+    def update_user_role(self, user_id: int, role: str) -> bool:
+        with self._connect() as conn:
+            cursor = conn.execute(
+                "UPDATE users SET role = ? WHERE id = ?", (role, user_id)
+            )
+            return cursor.rowcount > 0
 
     def get_last_weight_entry(self, user_id: int) -> Optional[WeightEntryData]:
         with self._connect() as conn:
@@ -600,6 +713,7 @@ class SQLiteStorage(StorageInterface):
                     id INTEGER PRIMARY KEY AUTOINCREMENT,
                     username TEXT UNIQUE NOT NULL,
                     password_hash TEXT NOT NULL,
+                    role TEXT NOT NULL DEFAULT 'user',
                     first_name TEXT,
                     last_name TEXT,
                     birth_date TEXT,
@@ -608,6 +722,11 @@ class SQLiteStorage(StorageInterface):
                 )
                 """
             )
+            # Migración: añadir columna role si no existe (BD anteriores)
+            try:
+                conn.execute("ALTER TABLE users ADD COLUMN role TEXT NOT NULL DEFAULT 'user'")
+            except Exception:
+                pass
             conn.execute(
                 """
                 CREATE TABLE IF NOT EXISTS weights (
@@ -628,6 +747,14 @@ class SQLiteStorage(StorageInterface):
                     expires_at TEXT NOT NULL,
                     created_at TEXT NOT NULL,
                     FOREIGN KEY(user_id) REFERENCES users(id) ON DELETE CASCADE
+                )
+                """
+            )
+            conn.execute(
+                """
+                CREATE TABLE IF NOT EXISTS token_blacklist (
+                    jti TEXT PRIMARY KEY NOT NULL,
+                    expires_at TEXT NOT NULL
                 )
                 """
             )
@@ -665,12 +792,13 @@ class SQLiteStorage(StorageInterface):
                 ),
             )
 
-    def create_auth_user(self, username: str, password_hash: str) -> AuthUserData:
+    def create_auth_user(self, username: str, password_hash: str,
+                         role: str = "user") -> AuthUserData:
         now = datetime.now().isoformat()
         with self._connect() as conn:
             cursor = conn.execute(
-                "INSERT INTO users (username, password_hash, created_at) VALUES (?, ?, ?)",
-                (username, password_hash, now),
+                "INSERT INTO users (username, password_hash, role, created_at) VALUES (?, ?, ?, ?)",
+                (username, password_hash, role, now),
             )
             user_id = cursor.lastrowid
         return AuthUserData(
@@ -678,12 +806,13 @@ class SQLiteStorage(StorageInterface):
             username=username,
             password_hash=password_hash,
             created_at=datetime.fromisoformat(now),
+            role=role,
         )
 
     def get_auth_user_by_username(self, username: str) -> Optional[AuthUserData]:
         with self._connect() as conn:
             row = conn.execute(
-                "SELECT id, username, password_hash, created_at FROM users WHERE username = ?",
+                "SELECT id, username, password_hash, role, created_at FROM users WHERE username = ?",
                 (username,),
             ).fetchone()
             if not row:
@@ -693,12 +822,13 @@ class SQLiteStorage(StorageInterface):
                 username=row["username"],
                 password_hash=row["password_hash"],
                 created_at=datetime.fromisoformat(row["created_at"]),
+                role=row["role"],
             )
 
     def get_auth_user_by_id(self, user_id: int) -> Optional[AuthUserData]:
         with self._connect() as conn:
             row = conn.execute(
-                "SELECT id, username, password_hash, created_at FROM users WHERE id = ?",
+                "SELECT id, username, password_hash, role, created_at FROM users WHERE id = ?",
                 (user_id,),
             ).fetchone()
             if not row:
@@ -708,6 +838,7 @@ class SQLiteStorage(StorageInterface):
                 username=row["username"],
                 password_hash=row["password_hash"],
                 created_at=datetime.fromisoformat(row["created_at"]),
+                role=row["role"],
             )
 
     def update_password_hash(self, user_id: int, password_hash: str) -> None:
@@ -741,6 +872,42 @@ class SQLiteStorage(StorageInterface):
     def revoke_api_token(self, token_hash: str) -> None:
         with self._connect() as conn:
             conn.execute("DELETE FROM api_tokens WHERE token_hash = ?", (token_hash,))
+
+    def blacklist_token(self, jti: str, expires_at: datetime) -> None:
+        with self._connect() as conn:
+            conn.execute(
+                "INSERT OR REPLACE INTO token_blacklist (jti, expires_at) VALUES (?, ?)",
+                (jti, expires_at.isoformat()),
+            )
+
+    def is_token_blacklisted(self, jti: str) -> bool:
+        now = datetime.now().isoformat()
+        with self._connect() as conn:
+            row = conn.execute(
+                "SELECT 1 FROM token_blacklist WHERE jti = ? AND expires_at > ?",
+                (jti, now),
+            ).fetchone()
+            return row is not None
+
+    def cleanup_expired_blacklist(self) -> int:
+        now = datetime.now().isoformat()
+        with self._connect() as conn:
+            cursor = conn.execute(
+                "DELETE FROM token_blacklist WHERE expires_at <= ?", (now,)
+            )
+            return cursor.rowcount
+
+    def count_auth_users(self) -> int:
+        with self._connect() as conn:
+            row = conn.execute("SELECT COUNT(*) AS count FROM users").fetchone()
+            return int(row["count"]) if row else 0
+
+    def update_user_role(self, user_id: int, role: str) -> bool:
+        with self._connect() as conn:
+            cursor = conn.execute(
+                "UPDATE users SET role = ? WHERE id = ?", (role, user_id)
+            )
+            return cursor.rowcount > 0
 
     def get_last_weight_entry(self, user_id: int) -> Optional[WeightEntryData]:
         with self._connect() as conn:
@@ -836,8 +1003,4 @@ class SQLiteStorage(StorageInterface):
                 )
                 for row in rows
             ]
-
-
-
-
 

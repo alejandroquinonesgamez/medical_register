@@ -9,6 +9,9 @@ from .config import STORAGE_CONFIG, SESSION_CONFIG
 # Limiter sin límite por defecto; el límite se aplica solo a login/register en routes.py
 limiter = Limiter(key_func=get_remote_address)
 
+# Limiter sin límite por defecto; el límite se aplica solo a login/register en routes.py
+limiter = Limiter(key_func=get_remote_address)
+
 
 def create_app():
     app = Flask(__name__)
@@ -43,15 +46,17 @@ def create_app():
         r"/api/*": {
             "origins": "*",
             "methods": ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
-            "allow_headers": ["Content-Type", "X-CSRF-Token"]
+            "allow_headers": ["Content-Type", "Authorization"]
         }
     }, supports_credentials=True)
 
     # Registrar blueprints
     from .views import views
+    from .api_docs import docs
     from .routes import api
     
     app.register_blueprint(views)
+    app.register_blueprint(docs)
     app.register_blueprint(api)
 
     # Agregar headers de seguridad para prevenir clickjacking y otros ataques

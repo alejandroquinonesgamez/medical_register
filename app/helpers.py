@@ -10,9 +10,15 @@ Este módulo contiene funciones de utilidad para:
   - Normaliza espacios múltiples
   - Valida caracteres permitidos (letras Unicode, espacios, guiones, apóstrofes)
 """
+import logging
 import re
 import hashlib
+import json
+import urllib.error
+import urllib.parse
 import urllib.request
+
+logger = logging.getLogger(__name__)
 from argon2 import PasswordHasher
 from argon2.exceptions import VerifyMismatchError
 from .translations import get_bmi_complete_description
@@ -25,6 +31,9 @@ from .config import (
     HIBP_TIMEOUT_SECONDS,
     HIBP_FAIL_CLOSED,
     COMMON_PASSWORDS_FALLBACK_PATH,
+    RECAPTCHA_SECRET_KEY,
+    RECAPTCHA_VERIFY_URL,
+    RECAPTCHA_MIN_SCORE,
 )
 
 
@@ -233,3 +242,47 @@ def verify_password(password, password_hash):
         return hasher.verify(password_hash, peppered)
     except VerifyMismatchError:
         return False
+
+
+def verify_recaptcha_v3(token, action=None, remote_ip=None):
+    """
+    Verifica un token de reCAPTCHA v3 con la API de Google.
+    Returns:
+        tuple[bool, float]: (éxito, score). Si no hay secret configurado, (True, 1.0).
+    """
+    if not RECAPTCHA_SECRET_KEY or not token:
+        if RECAPTCHA_SECRET_KEY and not token:
+            logger.warning("reCAPTCHA: token vacío (cliente no envió token o no obtuvo clave de sitio)")
+        return (True, 1.0) if not RECAPTCHA_SECRET_KEY else (False, 0.0)
+    data = {
+        "secret": RECAPTCHA_SECRET_KEY,
+        "response": token,
+    }
+    if remote_ip:
+        data["remoteip"] = remote_ip
+    body = urllib.parse.urlencode(data).encode("utf-8")
+    req = urllib.request.Request(
+        RECAPTCHA_VERIFY_URL,
+        data=body,
+        method="POST",
+        headers={"Content-Type": "application/x-www-form-urlencoded"},
+    )
+    try:
+        with urllib.request.urlopen(req, timeout=10) as resp:
+            result = json.loads(resp.read().decode("utf-8"))
+        success = result.get("success") is True
+        score = float(result.get("score", 0))
+        result_action = result.get("action")
+        error_codes = result.get("error-codes", [])
+        if action and result_action != action:
+            logger.warning("reCAPTCHA: acción no coincide (esperada=%r, recibida=%r)", action, result_action)
+            success = False
+        if success and score < RECAPTCHA_MIN_SCORE:
+            logger.warning("reCAPTCHA: score %.2f por debajo del umbral %.2f", score, RECAPTCHA_MIN_SCORE)
+            success = False
+        if not success and error_codes:
+            logger.warning("reCAPTCHA: Google devolvió error-codes=%s, success=%s, score=%.2f", error_codes, success, score)
+        return (success, score)
+    except (urllib.error.URLError, urllib.error.HTTPError, json.JSONDecodeError, ValueError) as e:
+        logger.warning("reCAPTCHA: excepción al verificar con Google: %s", e)
+        return (False, 0.0)

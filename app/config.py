@@ -11,7 +11,15 @@ Estos valores se sincronizan con el frontend mediante el endpoint /api/config
 y se usan para validaciones tanto en backend como frontend.
 """
 import os
-from datetime import datetime
+from pathlib import Path
+
+from dotenv import load_dotenv
+
+# Cargar .env del proyecto (raíz del repo) para tener RECAPTCHA_*, etc. sin depender de Docker
+_env_path = Path(__file__).resolve().parent.parent / ".env"
+load_dotenv(_env_path)
+
+from datetime import datetime, timedelta
 
 # Configuración de usuario (monousuario legado)
 USER_ID = 1
@@ -37,6 +45,17 @@ HIBP_API_URL = os.environ.get(
 HIBP_TIMEOUT_SECONDS = float(os.environ.get("HIBP_TIMEOUT_SECONDS", "2.5"))
 HIBP_FAIL_CLOSED = os.environ.get("HIBP_FAIL_CLOSED", "true").lower() == "true"
 
+# reCAPTCHA v3 (login y register).
+# - Se configura mediante variables de entorno (idealmente desde un archivo `.env` local NO versionado).
+# - Si NO se configuran, NO se exigirá token (útil para desarrollo/tests).
+RECAPTCHA_SECRET_KEY = os.environ.get("RECAPTCHA_SECRET_KEY", "").strip()
+RECAPTCHA_SITE_KEY = os.environ.get("RECAPTCHA_SITE_KEY", "").strip()
+RECAPTCHA_MIN_SCORE = float(os.environ.get("RECAPTCHA_MIN_SCORE", "0.5"))
+RECAPTCHA_VERIFY_URL = os.environ.get(
+    "RECAPTCHA_VERIFY_URL",
+    "https://www.google.com/recaptcha/api/siteverify",
+)
+
 # Fallback local de contraseñas comunes (ruta local)
 COMMON_PASSWORDS_FALLBACK_PATH = os.environ.get(
     "COMMON_PASSWORDS_FALLBACK_PATH",
@@ -46,7 +65,6 @@ COMMON_PASSWORDS_FALLBACK_PATH = os.environ.get(
 # Configuración de hash de contraseñas (Argon2id)
 # Parámetros (ver https://argon2-cffi.readthedocs.io/):
 #   time_cost: nº de iteraciones sobre la memoria. Mayor = más lento y más resistencia a fuerza bruta. Típico 2–4 para login.
-#   memory_cost: memoria en KiB (65536 = 64 MiB). Argon2 es memory-hard; más memoria dificulta ataques con GPU/ASIC.
 #   parallelism: nº de hilos/lanes en paralelo. Suele usarse 1–4 según CPU.
 #   hash_len: longitud del hash de salida en bytes (32 = 256 bits). Estándar para derivación de claves.
 #   salt_len: longitud del salt aleatorio en bytes (16 = 128 bits). Un salt distinto por contraseña evita tablas arcoíris.
@@ -61,11 +79,37 @@ PASSWORD_HASH_CONFIG = {
 # Pepper (solo servidor)
 PASSWORD_PEPPER = os.environ.get("PASSWORD_PEPPER", "")
 
-# Configuración de sesión
+# Configuración de sesión (legado, mantenido para cookie del refresh token)
 SESSION_CONFIG = {
     "cookie_samesite": "Lax",
     "cookie_secure": os.environ.get("SESSION_COOKIE_SECURE", "false").lower() == "true",
     "cookie_httponly": True,
+}
+
+# Configuración JWT (JSON Web Tokens)
+# - JWT_SECRET_KEY: secreto para firmar tokens. DEBE ser único y seguro en producción.
+#   Si no se define, se genera uno aleatorio al arrancar (tokens invalidados al reiniciar).
+# - Access token (corta vida): se envía en Authorization: Bearer y se almacena solo en
+#   memoria del cliente (no en localStorage) para mitigar XSS.
+# - Refresh token (larga vida): se envía como cookie HttpOnly (no accesible desde JS).
+JWT_CONFIG = {
+    "secret_key": os.environ.get("JWT_SECRET_KEY", ""),
+    "algorithm": "HS256",
+    "access_token_expires": timedelta(
+        minutes=int(os.environ.get("JWT_ACCESS_TOKEN_MINUTES", "15"))
+    ),
+    "refresh_token_expires": timedelta(
+        days=int(os.environ.get("JWT_REFRESH_TOKEN_DAYS", "7"))
+    ),
+    "refresh_cookie_name": "refresh_token",
+    "refresh_cookie_path": "/api/auth",
+}
+
+# Configuración de HSTS (Strict-Transport-Security)
+HSTS_CONFIG = {
+    "max_age": int(os.environ.get("HSTS_MAX_AGE", "31536000")),  # 1 año por defecto
+    "include_subdomains": os.environ.get("HSTS_INCLUDE_SUBDOMAINS", "true").lower() == "true",
+    "preload": os.environ.get("HSTS_PRELOAD", "false").lower() == "true",
 }
 
 # Configuración de almacenamiento (memory / sqlite / sqlcipher)
@@ -114,3 +158,11 @@ ACTIVE_LANGUAGE = 'es'
 
 # Lista de idiomas disponibles (códigos de idioma)
 AVAILABLE_LANGUAGES = ['es']
+
+# Configuración WSTG Sync
+WSTG_WEBHOOK_KEY = os.environ.get('WSTG_WEBHOOK_KEY', 'change_me_in_production')
+WSTG_SYNC_API_URL = os.environ.get('WSTG_SYNC_API_URL', 'http://localhost:5001/api/wstg/sync')
+
+# Documentación interactiva de la API (Swagger UI + OpenAPI)
+# Recomendación: en producción usar API_DOCS_ENABLED=0
+API_DOCS_ENABLED = os.environ.get("API_DOCS_ENABLED", "1").lower() in {"1", "true", "yes"}

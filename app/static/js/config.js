@@ -17,6 +17,7 @@ const DEFAULT_VALIDATION_LIMITS = {
 
 // Configuración actual (se actualiza desde el backend)
 let VALIDATION_LIMITS = { ...DEFAULT_VALIDATION_LIMITS };
+let RECAPTCHA_SITE_KEY = '';
 
 /**
  * Carga la configuración desde el backend
@@ -27,6 +28,7 @@ async function loadConfigFromBackend() {
         const response = await fetch('/api/config');
         if (response.ok) {
             const config = await response.json();
+            RECAPTCHA_SITE_KEY = config.recaptcha_site_key || '';
             VALIDATION_LIMITS = {
                 height_min: config.validation_limits.height_min,
                 height_max: config.validation_limits.height_max,
@@ -51,6 +53,14 @@ async function loadConfigFromBackend() {
  */
 function getValidationLimits() {
     return { ...VALIDATION_LIMITS };
+}
+
+/**
+ * Clave pública de reCAPTCHA v3 (vacía si no está configurada).
+ * @returns {string}
+ */
+function getRecaptchaSiteKey() {
+    return RECAPTCHA_SITE_KEY;
 }
 
 /**
@@ -162,6 +172,7 @@ if (document.readyState === 'loading') {
 // Exportar para uso global
 window.AppConfig = {
     getValidationLimits,
+    getRecaptchaSiteKey,
     validateHeight,
     validateWeight,
     validateBirthDate,

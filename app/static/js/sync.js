@@ -81,7 +81,7 @@ class SyncManager {
         try {
             let syncOk = true;
             // Sincronizar usuario
-            const userResponse = await fetch('/api/user', { credentials: 'same-origin' });
+            const userResponse = await AuthManager.authenticatedFetch('/api/user');
             if (userResponse.ok) {
                 const userData = await userResponse.json();
                 // Convertir formato del backend al formato del frontend
@@ -100,7 +100,7 @@ class SyncManager {
             }
 
             // Sincronizar pesos
-            const weightsResponse = await fetch('/api/weights', { credentials: 'same-origin' });
+            const weightsResponse = await AuthManager.authenticatedFetch('/api/weights');
             if (weightsResponse.ok) {
                 const weightsData = await weightsResponse.json();
                 const backendWeights = weightsData.weights || [];
@@ -186,14 +186,9 @@ class SyncManager {
         }
 
         try {
-            const csrfToken = window.AuthManager ? AuthManager.getCsrfToken() : null;
-            const response = await fetch('/api/user', {
+            const response = await AuthManager.authenticatedFetch('/api/user', {
                 method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    ...(csrfToken ? { 'X-CSRF-Token': csrfToken } : {})
-                },
-                credentials: 'same-origin',
+                headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
                     nombre: user.nombre,
                     apellidos: user.apellidos,
@@ -236,14 +231,9 @@ class SyncManager {
         }
 
         try {
-            const csrfToken = window.AuthManager ? AuthManager.getCsrfToken() : null;
-            const response = await fetch('/api/weight', {
+            const response = await AuthManager.authenticatedFetch('/api/weight', {
                 method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    ...(csrfToken ? { 'X-CSRF-Token': csrfToken } : {})
-                },
-                credentials: 'same-origin',
+                headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
                     peso_kg: weight.peso_kg
                 })

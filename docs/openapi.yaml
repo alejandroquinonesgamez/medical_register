@@ -1,0 +1,672 @@
+openapi: 3.0.3
+info:
+  title: Medical Register API
+  version: "1.0.0"
+  description: >
+    API REST de la aplicación médica para autenticación JWT, gestión de perfil,
+    registro de peso, estadísticas e integración administrativa.
+servers:
+  - url: http://localhost:5001
+    description: Entorno local
+tags:
+  - name: Auth
+  - name: User
+  - name: Weight
+  - name: Admin
+  - name: WSTG
+  - name: Utility
+paths:
+  /api/auth/register:
+    post:
+      tags: [Auth]
+      summary: Registrar usuario
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/RegisterRequest"
+      responses:
+        "201":
+          description: Usuario registrado correctamente
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AuthResponse"
+        "400":
+          $ref: "#/components/responses/Error400"
+  /api/auth/login:
+    post:
+      tags: [Auth]
+      summary: Iniciar sesión
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/LoginRequest"
+      responses:
+        "200":
+          description: Login correcto
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AuthResponse"
+        "401":
+          $ref: "#/components/responses/Error401"
+        "400":
+          $ref: "#/components/responses/Error400"
+  /api/auth/logout:
+    post:
+      tags: [Auth]
+      summary: Cerrar sesión
+      security:
+        - BearerAuth: []
+      responses:
+        "200":
+          description: Sesión cerrada
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/MessageResponse"
+        "401":
+          $ref: "#/components/responses/Error401"
+  /api/auth/me:
+    get:
+      tags: [Auth]
+      summary: Obtener usuario autenticado
+      security:
+        - BearerAuth: []
+      responses:
+        "200":
+          description: Usuario autenticado
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/MeResponse"
+        "401":
+          $ref: "#/components/responses/Error401"
+  /api/auth/refresh:
+    post:
+      tags: [Auth]
+      summary: Refrescar access token
+      responses:
+        "200":
+          description: Token renovado
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AuthResponse"
+        "401":
+          $ref: "#/components/responses/Error401"
+  /api/admin/users/{target_user_id}/role:
+    put:
+      tags: [Admin]
+      summary: Cambiar rol de usuario
+      security:
+        - BearerAuth: []
+      parameters:
+        - in: path
+          name: target_user_id
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/RoleUpdateRequest"
+      responses:
+        "200":
+          description: Rol actualizado
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/RoleUpdateResponse"
+        "400":
+          $ref: "#/components/responses/Error400"
+        "401":
+          $ref: "#/components/responses/Error401"
+        "403":
+          $ref: "#/components/responses/Error403"
+        "404":
+          $ref: "#/components/responses/Error404"
+  /api/user:
+    get:
+      tags: [User]
+      summary: Obtener perfil de usuario
+      security:
+        - BearerAuth: []
+      responses:
+        "200":
+          description: Perfil actual
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UserProfileResponse"
+        "401":
+          $ref: "#/components/responses/Error401"
+        "404":
+          $ref: "#/components/responses/Error404"
+    post:
+      tags: [User]
+      summary: Crear o actualizar perfil
+      security:
+        - BearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UserProfileRequest"
+      responses:
+        "200":
+          description: Perfil guardado
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/MessageResponse"
+        "400":
+          $ref: "#/components/responses/Error400"
+        "401":
+          $ref: "#/components/responses/Error401"
+  /api/weight:
+    post:
+      tags: [Weight]
+      summary: Registrar peso
+      security:
+        - BearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/WeightRequest"
+      responses:
+        "201":
+          description: Peso registrado
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/MessageResponse"
+        "400":
+          $ref: "#/components/responses/Error400"
+        "401":
+          $ref: "#/components/responses/Error401"
+  /api/imc:
+    get:
+      tags: [Weight]
+      summary: Obtener IMC actual
+      security:
+        - BearerAuth: []
+      responses:
+        "200":
+          description: IMC calculado
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ImcResponse"
+        "401":
+          $ref: "#/components/responses/Error401"
+        "404":
+          $ref: "#/components/responses/Error404"
+  /api/stats:
+    get:
+      tags: [Weight]
+      summary: Obtener estadísticas de peso
+      security:
+        - BearerAuth: []
+      responses:
+        "200":
+          description: Estadísticas
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/StatsResponse"
+        "401":
+          $ref: "#/components/responses/Error401"
+  /api/weights:
+    get:
+      tags: [Weight]
+      summary: Obtener historial completo de pesos
+      security:
+        - BearerAuth: []
+      responses:
+        "200":
+          description: Historial de pesos
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/WeightsResponse"
+        "401":
+          $ref: "#/components/responses/Error401"
+  /api/weights/recent:
+    get:
+      tags: [Weight]
+      summary: Obtener últimos 5 registros de peso
+      security:
+        - BearerAuth: []
+      responses:
+        "200":
+          description: Pesos recientes
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/WeightsResponse"
+        "401":
+          $ref: "#/components/responses/Error401"
+  /api/messages:
+    get:
+      tags: [Utility]
+      summary: Obtener mensajes de frontend
+      responses:
+        "200":
+          description: Diccionario de mensajes
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: true
+  /api/config:
+    get:
+      tags: [Utility]
+      summary: Obtener configuración pública del frontend
+      responses:
+        "200":
+          description: Configuración de validación y reCAPTCHA
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ConfigResponse"
+  /api/defectdojo/export-dump:
+    get:
+      tags: [Admin]
+      summary: Exportar dump SQL de DefectDojo
+      security:
+        - BearerAuth: []
+      responses:
+        "200":
+          description: Archivo SQL
+          content:
+            application/sql:
+              schema:
+                type: string
+                format: binary
+        "401":
+          $ref: "#/components/responses/Error401"
+        "403":
+          $ref: "#/components/responses/Error403"
+        "500":
+          $ref: "#/components/responses/Error500"
+  /api/defectdojo/import-dump:
+    post:
+      tags: [Admin]
+      summary: Importar dump SQL en DefectDojo
+      security:
+        - BearerAuth: []
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              required: [file]
+              properties:
+                file:
+                  type: string
+                  format: binary
+      responses:
+        "200":
+          description: Importación correcta
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ImportDumpResponse"
+        "400":
+          $ref: "#/components/responses/Error400"
+        "401":
+          $ref: "#/components/responses/Error401"
+        "403":
+          $ref: "#/components/responses/Error403"
+        "500":
+          $ref: "#/components/responses/Error500"
+  /api/defectdojo/generate-pdf:
+    get:
+      tags: [Admin]
+      summary: Generar y descargar PDF del informe de seguridad
+      security:
+        - BearerAuth: []
+      responses:
+        "200":
+          description: Archivo PDF
+          content:
+            application/pdf:
+              schema:
+                type: string
+                format: binary
+        "401":
+          $ref: "#/components/responses/Error401"
+        "403":
+          $ref: "#/components/responses/Error403"
+        "500":
+          $ref: "#/components/responses/Error500"
+  /api/wstg/sync:
+    post:
+      tags: [WSTG]
+      summary: Encolar sincronización Tracker -> DefectDojo
+      security:
+        - BearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/WstgSyncRequest"
+      responses:
+        "202":
+          description: Solicitud aceptada y encolada
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/QueuedResponse"
+        "400":
+          $ref: "#/components/responses/Error400"
+        "401":
+          $ref: "#/components/responses/Error401"
+        "403":
+          $ref: "#/components/responses/Error403"
+  /api/wstg/webhook:
+    post:
+      tags: [WSTG]
+      summary: Encolar webhook DefectDojo -> Tracker
+      security:
+        - BearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              additionalProperties: true
+      responses:
+        "202":
+          description: Webhook aceptado y encolado
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/QueuedResponse"
+        "400":
+          $ref: "#/components/responses/Error400"
+        "401":
+          $ref: "#/components/responses/Error401"
+        "403":
+          $ref: "#/components/responses/Error403"
+  /api/wstg/status:
+    get:
+      tags: [WSTG]
+      summary: Estado de sincronización WSTG
+      security:
+        - BearerAuth: []
+      responses:
+        "200":
+          description: Estado de sincronización
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/WstgStatusResponse"
+        "401":
+          $ref: "#/components/responses/Error401"
+        "403":
+          $ref: "#/components/responses/Error403"
+components:
+  securitySchemes:
+    BearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+  responses:
+    Error400:
+      description: Error de validación o petición incorrecta
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/ErrorResponse"
+    Error401:
+      description: No autenticado
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/ErrorResponse"
+    Error403:
+      description: No autorizado
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/ErrorResponse"
+    Error404:
+      description: Recurso no encontrado
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/ErrorResponse"
+    Error500:
+      description: Error interno del servidor
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/ErrorResponse"
+  schemas:
+    ErrorResponse:
+      type: object
+      properties:
+        error:
+          type: string
+      required: [error]
+    MessageResponse:
+      type: object
+      properties:
+        message:
+          type: string
+      required: [message]
+    LoginRequest:
+      type: object
+      properties:
+        username:
+          type: string
+        password:
+          type: string
+        recaptcha_token:
+          type: string
+      required: [username, password]
+    RegisterRequest:
+      type: object
+      properties:
+        username:
+          type: string
+        password:
+          type: string
+        recaptcha_token:
+          type: string
+      required: [username, password]
+    AuthResponse:
+      type: object
+      properties:
+        user_id:
+          type: integer
+        username:
+          type: string
+        role:
+          type: string
+          enum: [admin, user]
+        access_token:
+          type: string
+      required: [user_id, username, role, access_token]
+    MeResponse:
+      type: object
+      properties:
+        user_id:
+          type: integer
+        username:
+          type: string
+        role:
+          type: string
+      required: [user_id, username, role]
+    RoleUpdateRequest:
+      type: object
+      properties:
+        role:
+          type: string
+          enum: [admin, user]
+      required: [role]
+    RoleUpdateResponse:
+      type: object
+      properties:
+        message:
+          type: string
+        user_id:
+          type: integer
+        role:
+          type: string
+      required: [message, user_id, role]
+    UserProfileRequest:
+      type: object
+      properties:
+        nombre:
+          type: string
+        apellidos:
+          type: string
+        fecha_nacimiento:
+          type: string
+          format: date
+        talla_m:
+          type: number
+          format: float
+      required: [nombre, apellidos, fecha_nacimiento, talla_m]
+    UserProfileResponse:
+      type: object
+      properties:
+        nombre:
+          type: string
+        apellidos:
+          type: string
+        fecha_nacimiento:
+          type: string
+          format: date
+        talla_m:
+          type: number
+          format: float
+      required: [nombre, apellidos, fecha_nacimiento, talla_m]
+    WeightRequest:
+      type: object
+      properties:
+        peso_kg:
+          type: number
+          format: float
+      required: [peso_kg]
+    ImcResponse:
+      type: object
+      properties:
+        imc:
+          type: number
+          format: float
+        description:
+          type: string
+      required: [imc, description]
+    StatsResponse:
+      type: object
+      properties:
+        num_pesajes:
+          type: integer
+        peso_max:
+          type: number
+          format: float
+        peso_min:
+          type: number
+          format: float
+      required: [num_pesajes, peso_max, peso_min]
+    WeightItem:
+      type: object
+      properties:
+        id:
+          type: integer
+        peso_kg:
+          type: number
+          format: float
+        fecha_registro:
+          type: string
+      required: [id, peso_kg, fecha_registro]
+    WeightsResponse:
+      type: object
+      properties:
+        weights:
+          type: array
+          items:
+            $ref: "#/components/schemas/WeightItem"
+      required: [weights]
+    ConfigResponse:
+      type: object
+      properties:
+        recaptcha_site_key:
+          type: string
+        validation_limits:
+          type: object
+          properties:
+            height_min:
+              type: number
+            height_max:
+              type: number
+            weight_min:
+              type: number
+            weight_max:
+              type: number
+            birth_date_min:
+              type: string
+            weight_variation_per_day:
+              type: number
+            name_min_length:
+              type: integer
+            name_max_length:
+              type: integer
+    ImportDumpResponse:
+      type: object
+      properties:
+        message:
+          type: string
+        success:
+          type: boolean
+      required: [message, success]
+    WstgSyncRequest:
+      type: object
+      properties:
+        wstg_id:
+          type: string
+        status:
+          type: string
+        notes:
+          type: string
+      required: [wstg_id, status]
+    QueuedResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+        message:
+          type: string
+        queued:
+          type: boolean
+      required: [success, message, queued]
+    WstgStatusResponse:
+      type: object
+      properties:
+        last_sync:
+          type: string
+        total_items:
+          type: integer
+        synced_items:
+          type: integer
+        pending_items:
+          type: integer
+        conflicts:
+          type: integer
+      required: [last_sync, total_items, synced_items, pending_items, conflicts]

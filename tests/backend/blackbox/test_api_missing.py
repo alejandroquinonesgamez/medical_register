@@ -6,7 +6,7 @@ import pytest
 import json
 import math
 from datetime import datetime, timedelta
-from tests.backend.conftest import assert_success, assert_created, assert_bad_request, assert_not_found, assert_unauthorized
+from tests.backend.conftest import assert_success, assert_created, assert_bad_request, assert_not_found, assert_unauthorized, auth_headers
 from app.storage import WeightEntryData
 
 
@@ -15,7 +15,7 @@ class TestAPIWeightsRecent:
     
     def test_get_recent_weights_success(self, client, sample_user, sample_weights, auth_session):
         """Test GET /api/weights/recent retorna los últimos 5 pesos"""
-        response = client.get('/api/weights/recent')
+        response = client.get('/api/weights/recent', headers=auth_headers(auth_session["access_token"]))
         assert_success(response)
         data = json.loads(response.data)
         assert 'weights' in data
@@ -25,7 +25,7 @@ class TestAPIWeightsRecent:
     
     def test_get_recent_weights_empty(self, client, sample_user, auth_session):
         """Test GET /api/weights/recent retorna lista vacía cuando no hay pesos"""
-        response = client.get('/api/weights/recent')
+        response = client.get('/api/weights/recent', headers=auth_headers(auth_session["access_token"]))
         assert_success(response)
         data = json.loads(response.data)
         assert 'weights' in data
@@ -49,14 +49,14 @@ class TestAPIWeightsRecent:
                 )
                 storage.add_weight_entry(weight)
         
-        response = client.get('/api/weights/recent')
+        response = client.get('/api/weights/recent', headers=auth_headers(auth_session["access_token"]))
         assert_success(response)
         data = json.loads(response.data)
         assert len(data['weights']) == 5  # Debe limitar a 5
     
     def test_get_recent_weights_format(self, client, sample_user, sample_weights, auth_session):
         """Test que los pesos recientes tienen el formato correcto"""
-        response = client.get('/api/weights/recent')
+        response = client.get('/api/weights/recent', headers=auth_headers(auth_session["access_token"]))
         assert_success(response)
         data = json.loads(response.data)
         weights = data['weights']
@@ -105,7 +105,7 @@ class TestAPIUserEdgeCases:
             'fecha_nacimiento': '1990-01-01',
             'talla_m': float('nan')
         }
-        response = client.post('/api/user', data=json.dumps(data), headers={"X-CSRF-Token": auth_session["csrf_token"]}, content_type='application/json')
+        response = client.post('/api/user', data=json.dumps(data), headers=auth_headers(auth_session["access_token"]), content_type='application/json')
         assert_bad_request(response)
     
     def test_create_user_height_infinity(self, client, auth_session):
@@ -117,7 +117,7 @@ class TestAPIUserEdgeCases:
             'fecha_nacimiento': '1990-01-01',
             'talla_m': float('inf')
         }
-        response = client.post('/api/user', data=json.dumps(data), headers={"X-CSRF-Token": auth_session["csrf_token"]}, content_type='application/json')
+        response = client.post('/api/user', data=json.dumps(data), headers=auth_headers(auth_session["access_token"]), content_type='application/json')
         assert_bad_request(response)
     
     def test_create_user_height_negative_infinity(self, client, auth_session):
@@ -129,7 +129,7 @@ class TestAPIUserEdgeCases:
             'fecha_nacimiento': '1990-01-01',
             'talla_m': float('-inf')
         }
-        response = client.post('/api/user', data=json.dumps(data), headers={"X-CSRF-Token": auth_session["csrf_token"]}, content_type='application/json')
+        response = client.post('/api/user', data=json.dumps(data), headers=auth_headers(auth_session["access_token"]), content_type='application/json')
         assert_bad_request(response)
     
     def test_create_user_height_list_type(self, client, auth_session):
@@ -140,7 +140,7 @@ class TestAPIUserEdgeCases:
             'fecha_nacimiento': '1990-01-01',
             'talla_m': [1.75]  # Lista en lugar de número
         }
-        response = client.post('/api/user', data=json.dumps(data), headers={"X-CSRF-Token": auth_session["csrf_token"]}, content_type='application/json')
+        response = client.post('/api/user', data=json.dumps(data), headers=auth_headers(auth_session["access_token"]), content_type='application/json')
         assert_bad_request(response)
     
     def test_create_user_height_dict_type(self, client, auth_session):
@@ -151,7 +151,7 @@ class TestAPIUserEdgeCases:
             'fecha_nacimiento': '1990-01-01',
             'talla_m': {'value': 1.75}  # Diccionario en lugar de número
         }
-        response = client.post('/api/user', data=json.dumps(data), headers={"X-CSRF-Token": auth_session["csrf_token"]}, content_type='application/json')
+        response = client.post('/api/user', data=json.dumps(data), headers=auth_headers(auth_session["access_token"]), content_type='application/json')
         assert_bad_request(response)
     
     def test_create_user_birth_date_before_min(self, client, auth_session):
@@ -162,7 +162,7 @@ class TestAPIUserEdgeCases:
             'fecha_nacimiento': '1899-12-31',  # Antes de 1900-01-01
             'talla_m': 1.75
         }
-        response = client.post('/api/user', data=json.dumps(data), headers={"X-CSRF-Token": auth_session["csrf_token"]}, content_type='application/json')
+        response = client.post('/api/user', data=json.dumps(data), headers=auth_headers(auth_session["access_token"]), content_type='application/json')
         assert_bad_request(response)
     
     def test_create_user_birth_date_future(self, client, auth_session):
@@ -175,7 +175,7 @@ class TestAPIUserEdgeCases:
             'fecha_nacimiento': future_date,
             'talla_m': 1.75
         }
-        response = client.post('/api/user', data=json.dumps(data), headers={"X-CSRF-Token": auth_session["csrf_token"]}, content_type='application/json')
+        response = client.post('/api/user', data=json.dumps(data), headers=auth_headers(auth_session["access_token"]), content_type='application/json')
         assert_bad_request(response)
     
     def test_create_user_height_min_boundary(self, client, auth_session):
@@ -186,7 +186,7 @@ class TestAPIUserEdgeCases:
             'fecha_nacimiento': '1990-01-01',
             'talla_m': 0.4
         }
-        response = client.post('/api/user', data=json.dumps(data), headers={"X-CSRF-Token": auth_session["csrf_token"]}, content_type='application/json')
+        response = client.post('/api/user', data=json.dumps(data), headers=auth_headers(auth_session["access_token"]), content_type='application/json')
         assert_success(response)
     
     def test_create_user_height_max_boundary(self, client, auth_session):
@@ -197,7 +197,7 @@ class TestAPIUserEdgeCases:
             'fecha_nacimiento': '1990-01-01',
             'talla_m': 2.72
         }
-        response = client.post('/api/user', data=json.dumps(data), headers={"X-CSRF-Token": auth_session["csrf_token"]}, content_type='application/json')
+        response = client.post('/api/user', data=json.dumps(data), headers=auth_headers(auth_session["access_token"]), content_type='application/json')
         assert_success(response)
     
     def test_create_user_height_below_min(self, client, auth_session):
@@ -208,7 +208,7 @@ class TestAPIUserEdgeCases:
             'fecha_nacimiento': '1990-01-01',
             'talla_m': 0.39  # Por debajo de 0.4
         }
-        response = client.post('/api/user', data=json.dumps(data), headers={"X-CSRF-Token": auth_session["csrf_token"]}, content_type='application/json')
+        response = client.post('/api/user', data=json.dumps(data), headers=auth_headers(auth_session["access_token"]), content_type='application/json')
         assert_bad_request(response)
     
     def test_create_user_height_above_max(self, client, auth_session):
@@ -219,7 +219,7 @@ class TestAPIUserEdgeCases:
             'fecha_nacimiento': '1990-01-01',
             'talla_m': 2.73  # Por encima de 2.72
         }
-        response = client.post('/api/user', data=json.dumps(data), headers={"X-CSRF-Token": auth_session["csrf_token"]}, content_type='application/json')
+        response = client.post('/api/user', data=json.dumps(data), headers=auth_headers(auth_session["access_token"]), content_type='application/json')
         assert_bad_request(response)
 
 
@@ -230,67 +230,67 @@ class TestAPIWeightEdgeCases:
         """Test error cuando peso es NaN"""
         import math
         data = {'peso_kg': float('nan')}
-        response = client.post('/api/weight', data=json.dumps(data), headers={"X-CSRF-Token": auth_session["csrf_token"]}, content_type='application/json')
+        response = client.post('/api/weight', data=json.dumps(data), headers=auth_headers(auth_session["access_token"]), content_type='application/json')
         assert_bad_request(response)
     
     def test_add_weight_infinity(self, client, sample_user, auth_session):
         """Test error cuando peso es Infinity"""
         import math
         data = {'peso_kg': float('inf')}
-        response = client.post('/api/weight', data=json.dumps(data), headers={"X-CSRF-Token": auth_session["csrf_token"]}, content_type='application/json')
+        response = client.post('/api/weight', data=json.dumps(data), headers=auth_headers(auth_session["access_token"]), content_type='application/json')
         assert_bad_request(response)
     
     def test_add_weight_negative_infinity(self, client, sample_user, auth_session):
         """Test error cuando peso es -Infinity"""
         import math
         data = {'peso_kg': float('-inf')}
-        response = client.post('/api/weight', data=json.dumps(data), headers={"X-CSRF-Token": auth_session["csrf_token"]}, content_type='application/json')
+        response = client.post('/api/weight', data=json.dumps(data), headers=auth_headers(auth_session["access_token"]), content_type='application/json')
         assert_bad_request(response)
     
     def test_add_weight_list_type(self, client, sample_user, auth_session):
         """Test error cuando peso es una lista (tipo no convertible)"""
         data = {'peso_kg': [70.0]}  # Lista en lugar de número
-        response = client.post('/api/weight', data=json.dumps(data), headers={"X-CSRF-Token": auth_session["csrf_token"]}, content_type='application/json')
+        response = client.post('/api/weight', data=json.dumps(data), headers=auth_headers(auth_session["access_token"]), content_type='application/json')
         assert_bad_request(response)
     
     def test_add_weight_dict_type(self, client, sample_user, auth_session):
         """Test error cuando peso es un diccionario (tipo no convertible)"""
         data = {'peso_kg': {'value': 70.0}}  # Diccionario en lugar de número
-        response = client.post('/api/weight', data=json.dumps(data), headers={"X-CSRF-Token": auth_session["csrf_token"]}, content_type='application/json')
+        response = client.post('/api/weight', data=json.dumps(data), headers=auth_headers(auth_session["access_token"]), content_type='application/json')
         assert_bad_request(response)
     
     def test_add_weight_min_boundary(self, client, sample_user, auth_session):
         """Test peso en el límite mínimo (2)"""
         data = {'peso_kg': 2}
-        response = client.post('/api/weight', data=json.dumps(data), headers={"X-CSRF-Token": auth_session["csrf_token"]}, content_type='application/json')
+        response = client.post('/api/weight', data=json.dumps(data), headers=auth_headers(auth_session["access_token"]), content_type='application/json')
         assert_created(response)
     
     def test_add_weight_max_boundary(self, client, sample_user, auth_session):
         """Test peso en el límite máximo (650)"""
         data = {'peso_kg': 650}
-        response = client.post('/api/weight', data=json.dumps(data), headers={"X-CSRF-Token": auth_session["csrf_token"]}, content_type='application/json')
+        response = client.post('/api/weight', data=json.dumps(data), headers=auth_headers(auth_session["access_token"]), content_type='application/json')
         assert_created(response)
     
     def test_add_weight_below_min(self, client, sample_user, auth_session):
         """Test error cuando peso está por debajo del mínimo"""
         data = {'peso_kg': 1.9}  # Por debajo de 2
-        response = client.post('/api/weight', data=json.dumps(data), headers={"X-CSRF-Token": auth_session["csrf_token"]}, content_type='application/json')
+        response = client.post('/api/weight', data=json.dumps(data), headers=auth_headers(auth_session["access_token"]), content_type='application/json')
         assert_bad_request(response)
     
     def test_add_weight_above_max(self, client, sample_user, auth_session):
         """Test error cuando peso está por encima del máximo"""
         data = {'peso_kg': 651}  # Por encima de 650
-        response = client.post('/api/weight', data=json.dumps(data), headers={"X-CSRF-Token": auth_session["csrf_token"]}, content_type='application/json')
+        response = client.post('/api/weight', data=json.dumps(data), headers=auth_headers(auth_session["access_token"]), content_type='application/json')
         assert_bad_request(response)
     
     def test_add_weight_string_number(self, client, sample_user, auth_session):
         """Test que acepta peso como string numérico"""
         data = {'peso_kg': '70.5'}  # String numérico
-        response = client.post('/api/weight', data=json.dumps(data), headers={"X-CSRF-Token": auth_session["csrf_token"]}, content_type='application/json')
+        response = client.post('/api/weight', data=json.dumps(data), headers=auth_headers(auth_session["access_token"]), content_type='application/json')
         assert_created(response)
     
     def test_add_weight_integer(self, client, sample_user, auth_session):
         """Test que acepta peso como entero"""
         data = {'peso_kg': 70}  # Entero
-        response = client.post('/api/weight', data=json.dumps(data), headers={"X-CSRF-Token": auth_session["csrf_token"]}, content_type='application/json')
+        response = client.post('/api/weight', data=json.dumps(data), headers=auth_headers(auth_session["access_token"]), content_type='application/json')
         assert_created(response)

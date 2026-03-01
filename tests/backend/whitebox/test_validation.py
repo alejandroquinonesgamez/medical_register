@@ -6,7 +6,7 @@ import pytest
 import json
 from datetime import datetime, date, timedelta
 from app.config import VALIDATION_LIMITS
-from tests.backend.conftest import assert_success, assert_created, assert_bad_request, assert_not_found, client, sample_user
+from tests.backend.conftest import assert_success, assert_created, assert_bad_request, assert_not_found, client, sample_user, auth_headers
 
 
 class TestBoundaryValuesAPI:
@@ -20,7 +20,7 @@ class TestBoundaryValuesAPI:
             'fecha_nacimiento': '1990-01-01',
             'talla_m': VALIDATION_LIMITS['height_min']
         }
-        response = client.post('/api/user', data=json.dumps(data), headers={"X-CSRF-Token": auth_session["csrf_token"]}, content_type='application/json')
+        response = client.post('/api/user', data=json.dumps(data), headers=auth_headers(auth_session["access_token"]), content_type='application/json')
         assert_success(response)
     
     def test_talla_maximo_valido(self, client, auth_session):
@@ -31,7 +31,7 @@ class TestBoundaryValuesAPI:
             'fecha_nacimiento': '1990-01-01',
             'talla_m': VALIDATION_LIMITS['height_max']
         }
-        response = client.post('/api/user', data=json.dumps(data), headers={"X-CSRF-Token": auth_session["csrf_token"]}, content_type='application/json')
+        response = client.post('/api/user', data=json.dumps(data), headers=auth_headers(auth_session["access_token"]), content_type='application/json')
         assert_success(response)
     
     def test_talla_justo_bajo_minimo(self, client, auth_session):
@@ -42,7 +42,7 @@ class TestBoundaryValuesAPI:
             'fecha_nacimiento': '1990-01-01',
             'talla_m': VALIDATION_LIMITS['height_min'] - 0.01
         }
-        response = client.post('/api/user', data=json.dumps(data), headers={"X-CSRF-Token": auth_session["csrf_token"]}, content_type='application/json')
+        response = client.post('/api/user', data=json.dumps(data), headers=auth_headers(auth_session["access_token"]), content_type='application/json')
         assert_bad_request(response)
     
     def test_talla_justo_sobre_maximo(self, client, auth_session):
@@ -53,31 +53,31 @@ class TestBoundaryValuesAPI:
             'fecha_nacimiento': '1990-01-01',
             'talla_m': VALIDATION_LIMITS['height_max'] + 0.01
         }
-        response = client.post('/api/user', data=json.dumps(data), headers={"X-CSRF-Token": auth_session["csrf_token"]}, content_type='application/json')
+        response = client.post('/api/user', data=json.dumps(data), headers=auth_headers(auth_session["access_token"]), content_type='application/json')
         assert_bad_request(response)
     
     def test_peso_minimo_valido(self, client, sample_user, auth_session):
         """Límite inferior válido"""
         data = {'peso_kg': VALIDATION_LIMITS['weight_min']}
-        response = client.post('/api/weight', data=json.dumps(data), headers={"X-CSRF-Token": auth_session["csrf_token"]}, content_type='application/json')
+        response = client.post('/api/weight', data=json.dumps(data), headers=auth_headers(auth_session["access_token"]), content_type='application/json')
         assert_created(response)
     
     def test_peso_maximo_valido(self, client, sample_user, auth_session):
         """Límite superior válido"""
         data = {'peso_kg': VALIDATION_LIMITS['weight_max']}
-        response = client.post('/api/weight', data=json.dumps(data), headers={"X-CSRF-Token": auth_session["csrf_token"]}, content_type='application/json')
+        response = client.post('/api/weight', data=json.dumps(data), headers=auth_headers(auth_session["access_token"]), content_type='application/json')
         assert_created(response)
     
     def test_peso_justo_bajo_minimo(self, client, sample_user, auth_session):
         """Límite inferior inválido (justo debajo del mínimo)"""
         data = {'peso_kg': VALIDATION_LIMITS['weight_min'] - 0.1}
-        response = client.post('/api/weight', data=json.dumps(data), headers={"X-CSRF-Token": auth_session["csrf_token"]}, content_type='application/json')
+        response = client.post('/api/weight', data=json.dumps(data), headers=auth_headers(auth_session["access_token"]), content_type='application/json')
         assert_bad_request(response)
     
     def test_peso_justo_sobre_maximo(self, client, sample_user, auth_session):
         """Límite superior inválido (justo sobre el máximo)"""
         data = {'peso_kg': VALIDATION_LIMITS['weight_max'] + 0.1}
-        response = client.post('/api/weight', data=json.dumps(data), headers={"X-CSRF-Token": auth_session["csrf_token"]}, content_type='application/json')
+        response = client.post('/api/weight', data=json.dumps(data), headers=auth_headers(auth_session["access_token"]), content_type='application/json')
         assert_bad_request(response)
     
     def test_fecha_minimo_valido(self, client, auth_session):
@@ -88,7 +88,7 @@ class TestBoundaryValuesAPI:
             'fecha_nacimiento': VALIDATION_LIMITS['birth_date_min'].isoformat(),
             'talla_m': 1.75
         }
-        response = client.post('/api/user', data=json.dumps(data), headers={"X-CSRF-Token": auth_session["csrf_token"]}, content_type='application/json')
+        response = client.post('/api/user', data=json.dumps(data), headers=auth_headers(auth_session["access_token"]), content_type='application/json')
         assert_success(response)
     
     def test_fecha_maximo_valido(self, client, auth_session):
@@ -100,7 +100,7 @@ class TestBoundaryValuesAPI:
             'fecha_nacimiento': hoy,
             'talla_m': 1.75
         }
-        response = client.post('/api/user', data=json.dumps(data), headers={"X-CSRF-Token": auth_session["csrf_token"]}, content_type='application/json')
+        response = client.post('/api/user', data=json.dumps(data), headers=auth_headers(auth_session["access_token"]), content_type='application/json')
         assert_success(response)
     
     def test_fecha_justo_bajo_minimo(self, client, auth_session):
@@ -112,7 +112,7 @@ class TestBoundaryValuesAPI:
             'fecha_nacimiento': fecha_invalida,
             'talla_m': 1.75
         }
-        response = client.post('/api/user', data=json.dumps(data), headers={"X-CSRF-Token": auth_session["csrf_token"]}, content_type='application/json')
+        response = client.post('/api/user', data=json.dumps(data), headers=auth_headers(auth_session["access_token"]), content_type='application/json')
         assert_bad_request(response)
     
     def test_fecha_justo_sobre_maximo(self, client, auth_session):
@@ -124,7 +124,7 @@ class TestBoundaryValuesAPI:
             'fecha_nacimiento': mañana,
             'talla_m': 1.75
         }
-        response = client.post('/api/user', data=json.dumps(data), headers={"X-CSRF-Token": auth_session["csrf_token"]}, content_type='application/json')
+        response = client.post('/api/user', data=json.dumps(data), headers=auth_headers(auth_session["access_token"]), content_type='application/json')
         assert_bad_request(response)
 
 
@@ -147,7 +147,7 @@ class TestEquivalencePartitionsAPI:
                 'fecha_nacimiento': '1990-01-01',
                 'talla_m': talla
             }
-            response = client.post('/api/user', data=json.dumps(data), headers={"X-CSRF-Token": auth_session["csrf_token"]}, content_type='application/json')
+            response = client.post('/api/user', data=json.dumps(data), headers=auth_headers(auth_session["access_token"]), content_type='application/json')
             assert_bad_request(response)
     
     def test_talla_particion_valida(self, client, auth_session):
@@ -166,7 +166,7 @@ class TestEquivalencePartitionsAPI:
                 'fecha_nacimiento': '1990-01-01',
                 'talla_m': talla
             }
-            response = client.post('/api/user', data=json.dumps(data), headers={"X-CSRF-Token": auth_session["csrf_token"]}, content_type='application/json')
+            response = client.post('/api/user', data=json.dumps(data), headers=auth_headers(auth_session["access_token"]), content_type='application/json')
             assert_success(response)
     
     def test_talla_particion_invalida_alta(self, client, auth_session):
@@ -185,7 +185,7 @@ class TestEquivalencePartitionsAPI:
                 'fecha_nacimiento': '1990-01-01',
                 'talla_m': talla
             }
-            response = client.post('/api/user', data=json.dumps(data), headers={"X-CSRF-Token": auth_session["csrf_token"]}, content_type='application/json')
+            response = client.post('/api/user', data=json.dumps(data), headers=auth_headers(auth_session["access_token"]), content_type='application/json')
             assert_bad_request(response)
     
     def test_peso_particion_invalido_bajo(self, client, sample_user, auth_session):
@@ -199,7 +199,7 @@ class TestEquivalencePartitionsAPI:
         ]
         for peso in casos:
             data = {'peso_kg': peso}
-            response = client.post('/api/weight', data=json.dumps(data), headers={"X-CSRF-Token": auth_session["csrf_token"]}, content_type='application/json')
+            response = client.post('/api/weight', data=json.dumps(data), headers=auth_headers(auth_session["access_token"]), content_type='application/json')
             assert_bad_request(response)
     
     def test_peso_particion_valido(self, client, sample_user, auth_session):
@@ -215,7 +215,7 @@ class TestEquivalencePartitionsAPI:
         ]
         for peso in casos:
             data = {'peso_kg': peso}
-            response = client.post('/api/weight', data=json.dumps(data), headers={"X-CSRF-Token": auth_session["csrf_token"]}, content_type='application/json')
+            response = client.post('/api/weight', data=json.dumps(data), headers=auth_headers(auth_session["access_token"]), content_type='application/json')
             assert_created(response)
     
     def test_peso_particion_invalido_alto(self, client, sample_user, auth_session):
@@ -227,7 +227,7 @@ class TestEquivalencePartitionsAPI:
         ]
         for peso in casos:
             data = {'peso_kg': peso}
-            response = client.post('/api/weight', data=json.dumps(data), headers={"X-CSRF-Token": auth_session["csrf_token"]}, content_type='application/json')
+            response = client.post('/api/weight', data=json.dumps(data), headers=auth_headers(auth_session["access_token"]), content_type='application/json')
             assert_bad_request(response)
     
     def test_fecha_particion_invalida_antigua(self, client, auth_session):
@@ -244,7 +244,7 @@ class TestEquivalencePartitionsAPI:
                 'fecha_nacimiento': fecha,
                 'talla_m': 1.75
             }
-            response = client.post('/api/user', data=json.dumps(data), headers={"X-CSRF-Token": auth_session["csrf_token"]}, content_type='application/json')
+            response = client.post('/api/user', data=json.dumps(data), headers=auth_headers(auth_session["access_token"]), content_type='application/json')
             assert_bad_request(response)
     
     def test_fecha_particion_valida(self, client, auth_session):
@@ -262,7 +262,7 @@ class TestEquivalencePartitionsAPI:
                 'fecha_nacimiento': fecha,
                 'talla_m': 1.75
             }
-            response = client.post('/api/user', data=json.dumps(data), headers={"X-CSRF-Token": auth_session["csrf_token"]}, content_type='application/json')
+            response = client.post('/api/user', data=json.dumps(data), headers=auth_headers(auth_session["access_token"]), content_type='application/json')
             assert_success(response)
     
     def test_fecha_particion_invalida_futura(self, client, auth_session):
@@ -277,6 +277,6 @@ class TestEquivalencePartitionsAPI:
                 'fecha_nacimiento': fecha,
                 'talla_m': 1.75
             }
-            response = client.post('/api/user', data=json.dumps(data), headers={"X-CSRF-Token": auth_session["csrf_token"]}, content_type='application/json')
+            response = client.post('/api/user', data=json.dumps(data), headers=auth_headers(auth_session["access_token"]), content_type='application/json')
             assert_bad_request(response)
 

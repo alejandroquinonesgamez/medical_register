@@ -4,6 +4,11 @@ Configuración de pytest y fixtures compartidas
 import os
 os.environ.setdefault("STORAGE_BACKEND", "memory")
 os.environ.setdefault("APP_TESTING", "1")
+# Desactivar reCAPTCHA en tests (evita que load_dotenv cargue las claves del .env)
+os.environ["RECAPTCHA_SECRET_KEY"] = ""
+os.environ["RECAPTCHA_SITE_KEY"] = ""
+# Secreto JWT fijo para tests (reproducibilidad)
+os.environ.setdefault("JWT_SECRET_KEY", "test-jwt-secret-key-for-testing-only")
 
 import pytest
 from datetime import datetime, date
@@ -38,6 +43,11 @@ def assert_forbidden(response):
     assert response.status_code == 403, f"Esperado 403 Forbidden, obtenido {response.status_code}: {response.get_data(as_text=True)}"
 
 
+def auth_headers(access_token):
+    """Devuelve las cabeceras de autenticación JWT para tests."""
+    return {"Authorization": f"Bearer {access_token}"}
+
+
 @pytest.fixture
 def app():
     """Crea una aplicación Flask para testing con almacenamiento en memoria"""
@@ -49,7 +59,6 @@ def app():
 
     app = app_module.create_app()
     app.config['TESTING'] = True
-    app.config['WTF_CSRF_ENABLED'] = False
     
     yield app
 
@@ -62,7 +71,8 @@ def client(app):
 
 @pytest.fixture
 def auth_session(client):
-    """Registra un usuario y devuelve sesión y csrf"""
+    """Registra un usuario y devuelve access_token JWT para autenticación en tests.
+    NOTA: El primer usuario registrado recibe rol 'admin' automáticamente."""
     response = client.post(
         '/api/auth/register',
         data='{"username": "testuser", "password": "clave_segura_123"}',
@@ -73,7 +83,27 @@ def auth_session(client):
     return {
         "client": client,
         "user_id": data["user_id"],
-        "csrf_token": data.get("csrf_token", "")
+        "access_token": data["access_token"],
+        "role": data.get("role", "user"),
+    }
+
+
+@pytest.fixture
+def regular_user_session(client, auth_session):
+    """Registra un segundo usuario con rol 'user' (el primero ya es admin)."""
+    response = client.post(
+        '/api/auth/register',
+        data='{"username": "regularuser", "password": "clave_segura_456"}',
+        content_type='application/json'
+    )
+    assert response.status_code == 201, response.get_data(as_text=True)
+    data = response.get_json()
+    assert data["role"] == "user", f"Esperado role 'user', obtenido '{data['role']}'"
+    return {
+        "client": client,
+        "user_id": data["user_id"],
+        "access_token": data["access_token"],
+        "role": data["role"],
     }
 
 

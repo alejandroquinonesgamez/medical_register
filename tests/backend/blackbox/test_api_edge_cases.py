@@ -5,7 +5,7 @@ Cubre casos específicos que pueden no estar cubiertos en otros tests
 import pytest
 import json
 from datetime import datetime, timedelta
-from tests.backend.conftest import assert_success, assert_created, assert_bad_request, assert_not_found
+from tests.backend.conftest import assert_success, assert_created, assert_bad_request, assert_not_found, auth_headers
 from app.storage import WeightEntryData
 
 
@@ -34,7 +34,7 @@ class TestAPIWeightVariationEdgeCases:
             '/api/weight',
             data=json.dumps(data),
             content_type='application/json',
-            headers={"X-CSRF-Token": auth_session["csrf_token"]},
+            headers=auth_headers(auth_session["access_token"]),
         )
         assert_created(response)
     
@@ -58,7 +58,7 @@ class TestAPIWeightVariationEdgeCases:
             '/api/weight',
             data=json.dumps(data),
             content_type='application/json',
-            headers={"X-CSRF-Token": auth_session["csrf_token"]},
+            headers=auth_headers(auth_session["access_token"]),
         )
         assert_created(response)
     
@@ -84,7 +84,7 @@ class TestAPIWeightVariationEdgeCases:
             '/api/weight',
             data=json.dumps(data),
             content_type='application/json',
-            headers={"X-CSRF-Token": auth_session["csrf_token"]},
+            headers=auth_headers(auth_session["access_token"]),
         )
         assert_created(response)
     
@@ -110,7 +110,7 @@ class TestAPIWeightVariationEdgeCases:
             '/api/weight',
             data=json.dumps(data),
             content_type='application/json',
-            headers={"X-CSRF-Token": auth_session["csrf_token"]},
+            headers=auth_headers(auth_session["access_token"]),
         )
         assert_created(response)
 
@@ -130,7 +130,7 @@ class TestAPIUserValidationEdgeCases:
             '/api/user',
             data=json.dumps(data),
             content_type='application/json',
-            headers={"X-CSRF-Token": auth_session["csrf_token"]},
+            headers=auth_headers(auth_session["access_token"]),
         )
         assert_success(response)
     
@@ -147,7 +147,7 @@ class TestAPIUserValidationEdgeCases:
             '/api/user',
             data=json.dumps(data),
             content_type='application/json',
-            headers={"X-CSRF-Token": auth_session["csrf_token"]},
+            headers=auth_headers(auth_session["access_token"]),
         )
         assert_success(response)
     
@@ -164,7 +164,7 @@ class TestAPIUserValidationEdgeCases:
             '/api/user',
             data=json.dumps(data),
             content_type='application/json',
-            headers={"X-CSRF-Token": auth_session["csrf_token"]},
+            headers=auth_headers(auth_session["access_token"]),
         )
         assert_bad_request(response)
     
@@ -180,7 +180,7 @@ class TestAPIUserValidationEdgeCases:
             '/api/user',
             data=json.dumps(data),
             content_type='application/json',
-            headers={"X-CSRF-Token": auth_session["csrf_token"]},
+            headers=auth_headers(auth_session["access_token"]),
         )
         assert_bad_request(response)
     
@@ -196,7 +196,7 @@ class TestAPIUserValidationEdgeCases:
             '/api/user',
             data=json.dumps(data),
             content_type='application/json',
-            headers={"X-CSRF-Token": auth_session["csrf_token"]},
+            headers=auth_headers(auth_session["access_token"]),
         )
         assert_bad_request(response)
     
@@ -212,12 +212,12 @@ class TestAPIUserValidationEdgeCases:
             '/api/user',
             data=json.dumps(data),
             content_type='application/json',
-            headers={"X-CSRF-Token": auth_session["csrf_token"]},
+            headers=auth_headers(auth_session["access_token"]),
         )
         # Debe aceptar pero sanitizar
         assert_success(response)
         # Verificar que se guardó sanitizado
-        user_response = client.get('/api/user')
+        user_response = client.get('/api/user', headers=auth_headers(auth_session["access_token"]))
         user_data = user_response.get_json()
         assert '<' not in user_data['nombre']
         assert '>' not in user_data['nombre']
@@ -235,7 +235,7 @@ class TestAPIUserValidationEdgeCases:
             '/api/user',
             data=json.dumps(data),
             content_type='application/json',
-            headers={"X-CSRF-Token": auth_session["csrf_token"]},
+            headers=auth_headers(auth_session["access_token"]),
         )
         assert_success(response)
     
@@ -251,7 +251,7 @@ class TestAPIUserValidationEdgeCases:
             '/api/user',
             data=json.dumps(data),
             content_type='application/json',
-            headers={"X-CSRF-Token": auth_session["csrf_token"]},
+            headers=auth_headers(auth_session["access_token"]),
         )
         assert_success(response)
 
@@ -259,9 +259,9 @@ class TestAPIUserValidationEdgeCases:
 class TestAPIIMCEdgeCases:
     """Tests adicionales para casos edge de IMC"""
     
-    def test_get_imc_no_weights_returns_zero(self, client, sample_user):
+    def test_get_imc_no_weights_returns_zero(self, client, sample_user, auth_session):
         """Test que IMC retorna 0 cuando no hay pesos"""
-        response = client.get('/api/imc')
+        response = client.get('/api/imc', headers=auth_headers(auth_session["access_token"]))
         assert_success(response)
         data = response.get_json()
         assert data['imc'] == 0
@@ -293,7 +293,7 @@ class TestAPIIMCEdgeCases:
             storage.add_weight_entry(weight)
         
         # El cálculo de IMC debería retornar 0 cuando altura es 0
-        response = client.get('/api/imc')
+        response = client.get('/api/imc', headers=auth_headers(auth_session["access_token"]))
         # Puede retornar error o 0, dependiendo de validaciones
         # Verificamos que no crashea
         assert response.status_code in [200, 400]
@@ -304,7 +304,7 @@ class TestAPIStatsEdgeCases:
     
     def test_stats_no_user(self, client, auth_session):
         """Test estadísticas sin usuario (debe funcionar)"""
-        response = client.get('/api/stats')
+        response = client.get('/api/stats', headers=auth_headers(auth_session["access_token"]))
         assert_success(response)
         data = response.get_json()
         assert data['num_pesajes'] == 0
@@ -316,10 +316,10 @@ class TestAPIStatsEdgeCases:
         client.post(
             '/api/weight',
             json={'peso_kg': 75.0},
-            headers={"X-CSRF-Token": auth_session["csrf_token"]},
+            headers=auth_headers(auth_session["access_token"]),
         )
         
-        response = client.get('/api/stats')
+        response = client.get('/api/stats', headers=auth_headers(auth_session["access_token"]))
         assert_success(response)
         data = response.get_json()
         assert data['num_pesajes'] == 1

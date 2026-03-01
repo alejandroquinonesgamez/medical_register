@@ -5,7 +5,7 @@ Prueban los endpoints sin conocer la implementación interna
 import pytest
 import json
 from datetime import datetime
-from tests.backend.conftest import assert_success, assert_created, assert_bad_request, assert_not_found, assert_unauthorized, assert_forbidden
+from tests.backend.conftest import assert_success, assert_created, assert_bad_request, assert_not_found, assert_unauthorized, assert_forbidden, auth_headers
 
 
 
@@ -19,7 +19,7 @@ class TestAPIWeight:
         response = client.post(
             '/api/weight',
             data=json.dumps(data),
-            headers={"X-CSRF-Token": auth_session["csrf_token"]},
+            headers=auth_headers(auth_session["access_token"]),
             content_type='application/json'
         )
         assert_created(response)
@@ -34,7 +34,7 @@ class TestAPIWeight:
             response = client.post(
                 '/api/weight',
                 data=json.dumps(data),
-                headers={"X-CSRF-Token": auth_session["csrf_token"]},
+                headers=auth_headers(auth_session["access_token"]),
                 content_type='application/json'
             )
             assert_created(response)
@@ -51,7 +51,7 @@ class TestAPIErrorHandling:
             'fecha_nacimiento': '1990-01-01',
             'talla_m': 'not_a_number'
         }
-        response = client.post('/api/user', data=json.dumps(data), headers={"X-CSRF-Token": auth_session["csrf_token"]}, content_type='application/json')
+        response = client.post('/api/user', data=json.dumps(data), headers=auth_headers(auth_session["access_token"]), content_type='application/json')
         assert_bad_request(response)
         error_msg = response.get_json()['error'].lower()
         assert 'altura' in error_msg or 'talla' in error_msg or 'inválid' in error_msg
@@ -63,7 +63,7 @@ class TestAPIErrorHandling:
             'apellidos': 'User',
             'fecha_nacimiento': '1990-01-01'
         }
-        response = client.post('/api/user', data=json.dumps(data), headers={"X-CSRF-Token": auth_session["csrf_token"]}, content_type='application/json')
+        response = client.post('/api/user', data=json.dumps(data), headers=auth_headers(auth_session["access_token"]), content_type='application/json')
         assert_bad_request(response)
     
     def test_create_user_invalid_birth_date_format(self, client, auth_session):
@@ -74,7 +74,7 @@ class TestAPIErrorHandling:
             'fecha_nacimiento': 'invalid-date',
             'talla_m': 1.75
         }
-        response = client.post('/api/user', data=json.dumps(data), headers={"X-CSRF-Token": auth_session["csrf_token"]}, content_type='application/json')
+        response = client.post('/api/user', data=json.dumps(data), headers=auth_headers(auth_session["access_token"]), content_type='application/json')
         assert_bad_request(response)
         error_msg = response.get_json()['error'].lower()
         assert 'fecha' in error_msg or 'inválid' in error_msg
@@ -86,13 +86,13 @@ class TestAPIErrorHandling:
             'apellidos': 'User',
             'talla_m': 1.75
         }
-        response = client.post('/api/user', data=json.dumps(data), headers={"X-CSRF-Token": auth_session["csrf_token"]}, content_type='application/json')
+        response = client.post('/api/user', data=json.dumps(data), headers=auth_headers(auth_session["access_token"]), content_type='application/json')
         assert_bad_request(response)
     
     def test_add_weight_invalid_weight_type(self, client, sample_user, auth_session):
         """Test error al convertir peso_kg a float"""
         data = {'peso_kg': 'not_a_number'}
-        response = client.post('/api/weight', data=json.dumps(data), headers={"X-CSRF-Token": auth_session["csrf_token"]}, content_type='application/json')
+        response = client.post('/api/weight', data=json.dumps(data), headers=auth_headers(auth_session["access_token"]), content_type='application/json')
         assert_bad_request(response)
         error_msg = response.get_json()['error'].lower()
         assert 'peso' in error_msg or 'inválid' in error_msg
@@ -100,7 +100,7 @@ class TestAPIErrorHandling:
     def test_add_weight_missing_weight(self, client, sample_user, auth_session):
         """Test error cuando falta peso_kg"""
         data = {}
-        response = client.post('/api/weight', data=json.dumps(data), headers={"X-CSRF-Token": auth_session["csrf_token"]}, content_type='application/json')
+        response = client.post('/api/weight', data=json.dumps(data), headers=auth_headers(auth_session["access_token"]), content_type='application/json')
         assert_bad_request(response)
     
     def test_weight_variation_exceeded(self, client, sample_user, auth_session):
@@ -122,7 +122,7 @@ class TestAPIErrorHandling:
         
         # Intentar añadir un peso con variación excesiva (más de 10kg en 2 días)
         data = {'peso_kg': 85.0}  # 15kg de diferencia, máximo permitido: 10kg (2 días x 5kg/día)
-        response = client.post('/api/weight', data=json.dumps(data), headers={"X-CSRF-Token": auth_session["csrf_token"]}, content_type='application/json')
+        response = client.post('/api/weight', data=json.dumps(data), headers=auth_headers(auth_session["access_token"]), content_type='application/json')
         assert_bad_request(response)
         error_msg = response.get_json()['error'].lower()
         assert 'variation' in error_msg or 'variación' in error_msg
@@ -134,7 +134,7 @@ class TestAPIIMC:
     
     def test_get_imc_with_weights(self, client, sample_user, sample_weights, auth_session):
         """Test GET /api/imc con registros de peso"""
-        response = client.get('/api/imc')
+        response = client.get('/api/imc', headers=auth_headers(auth_session["access_token"]))
         assert_success(response)
         data = json.loads(response.data)
         assert 'imc' in data
@@ -162,7 +162,7 @@ class TestAPIIMC:
             )
             storage.add_weight_entry(invalid_weight)
         
-        response = client.get('/api/imc')
+        response = client.get('/api/imc', headers=auth_headers(auth_session["access_token"]))
         assert_bad_request(response)
         data = json.loads(response.data)
         assert 'error' in data
@@ -195,7 +195,7 @@ class TestAPIIMC:
             )
             storage.add_weight_entry(valid_weight)
         
-        response = client.get('/api/imc')
+        response = client.get('/api/imc', headers=auth_headers(auth_session["access_token"]))
         assert_bad_request(response)
         data = json.loads(response.data)
         assert 'error' in data
@@ -208,7 +208,7 @@ class TestAPIWeights:
     
     def test_get_weights_success(self, client, sample_user, sample_weights, auth_session):
         """Test GET /api/weights retorna todos los pesos"""
-        response = client.get('/api/weights')
+        response = client.get('/api/weights', headers=auth_headers(auth_session["access_token"]))
         assert_success(response)
         data = json.loads(response.data)
         assert 'weights' in data
@@ -217,7 +217,7 @@ class TestAPIWeights:
     
     def test_get_weights_empty(self, client, sample_user, auth_session):
         """Test GET /api/weights retorna lista vacía cuando no hay pesos"""
-        response = client.get('/api/weights')
+        response = client.get('/api/weights', headers=auth_headers(auth_session["access_token"]))
         assert_success(response)
         data = json.loads(response.data)
         assert 'weights' in data
@@ -233,7 +233,7 @@ class TestAPIWeights:
     
     def test_get_weights_format(self, client, sample_user, sample_weights, auth_session):
         """Test que los pesos tienen el formato correcto"""
-        response = client.get('/api/weights')
+        response = client.get('/api/weights', headers=auth_headers(auth_session["access_token"]))
         assert_success(response)
         data = json.loads(response.data)
         weights = data['weights']
@@ -288,7 +288,7 @@ class TestAPIWeights:
             storage.add_weight_entry(mid_weight)
         
         # Verificar que están ordenados por fecha descendente
-        response = client.get('/api/weights')
+        response = client.get('/api/weights', headers=auth_headers(auth_session["access_token"]))
         assert_success(response)
         data = json.loads(response.data)
         weights = data['weights']
