@@ -20,11 +20,14 @@ COPY requirements.txt .
 RUN pip install --no-cache-dir --upgrade pip && \
     pip install --no-cache-dir -r requirements.txt
 
+# Copiar entrypoint fuera de /app para evitar que el bind mount lo sobreescriba
+COPY scripts/docker-entrypoint.sh /usr/local/bin/docker-entrypoint.sh
+RUN sed -i 's/\r$//' /usr/local/bin/docker-entrypoint.sh && \
+    chmod +x /usr/local/bin/docker-entrypoint.sh
+
 # Copiar el resto de la aplicación
 COPY . .
 
-# Entrypoint: crea directorios escribibles, chown a appuser y ejecuta la app como no root
-RUN chmod +x /app/scripts/docker-entrypoint.sh
 EXPOSE 5001
-ENTRYPOINT ["/app/scripts/docker-entrypoint.sh"]
+ENTRYPOINT ["/usr/local/bin/docker-entrypoint.sh"]
 
