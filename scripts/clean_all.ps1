@@ -31,14 +31,25 @@ $count = 0
 
 # Paso 1: Detener y eliminar contenedores Docker
 Write-Host "Paso 1/8: Deteniendo y eliminando contenedores Docker..." -ForegroundColor Yellow
-if (Get-Command docker-compose -ErrorAction SilentlyContinue) {
+$useComposeV2 = $false
+try {
+    docker compose version 2>$null | Out-Null
+    if ($LASTEXITCODE -eq 0) { $useComposeV2 = $true }
+} catch { }
+
+if ($useComposeV2 -or (Get-Command docker-compose -ErrorAction SilentlyContinue)) {
     $env:COMPOSE_PROJECT_NAME = if ($env:COMPOSE_PROJECT_NAME) { $env:COMPOSE_PROJECT_NAME } else { "medical_register" }
     $env:COMPOSE_DOCKER_CLI_BUILD = if ($env:COMPOSE_DOCKER_CLI_BUILD) { $env:COMPOSE_DOCKER_CLI_BUILD } else { "0" }
     $env:DOCKER_BUILDKIT = if ($env:DOCKER_BUILDKIT) { $env:DOCKER_BUILDKIT } else { "0" }
     
     # Detener y eliminar contenedores
-    docker-compose down --volumes --remove-orphans 2>$null
-    docker-compose --profile defectdojo down --volumes --remove-orphans 2>$null
+    if ($useComposeV2) {
+        docker compose down --volumes --remove-orphans 2>$null
+        docker compose --profile defectdojo down --volumes --remove-orphans 2>$null
+    } else {
+        docker-compose down --volumes --remove-orphans 2>$null
+        docker-compose --profile defectdojo down --volumes --remove-orphans 2>$null
+    }
     
     Write-Host "  [OK] Contenedores detenidos y eliminados" -ForegroundColor Gray
     $count++

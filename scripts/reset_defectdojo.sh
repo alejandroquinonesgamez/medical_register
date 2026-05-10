@@ -16,13 +16,18 @@
 
 set -e
 
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+# shellcheck source=docker_compose.sh
+source "$SCRIPT_DIR/docker_compose.sh"
+cd "$SCRIPT_DIR/.."
+
 echo "🔄 Reinicializando DefectDojo..."
 echo "ℹ️  Nota: La inicialización normalmente es automática al arrancar el contenedor"
 echo ""
 
 # Esperar a que la base de datos esté lista
 echo "⏳ Esperando a que la base de datos esté lista..."
-until docker-compose --profile defectdojo exec -T defectdojo-db pg_isready -U defectdojo > /dev/null 2>&1; do
+until docker_compose --profile defectdojo exec -T defectdojo-db pg_isready -U defectdojo > /dev/null 2>&1; do
   sleep 2
 done
 
@@ -30,15 +35,15 @@ echo "✅ Base de datos lista"
 
 # Ejecutar migraciones
 echo "📦 Ejecutando migraciones de Django..."
-docker-compose --profile defectdojo exec -T defectdojo python manage.py migrate --noinput
+docker_compose --profile defectdojo exec -T defectdojo python manage.py migrate --noinput
 
 # Recolectar archivos estáticos
 echo "📁 Recolectando archivos estáticos..."
-docker-compose --profile defectdojo exec -T defectdojo python manage.py collectstatic --noinput || true
+docker_compose --profile defectdojo exec -T defectdojo python manage.py collectstatic --noinput || true
 
 # Crear usuario admin si no existe
 echo "👤 Creando usuario admin (admin/admin)..."
-docker-compose --profile defectdojo exec -T defectdojo python manage.py shell << 'EOF'
+docker_compose --profile defectdojo exec -T defectdojo python manage.py shell << 'EOF'
 from dojo.models import User
 user, created = User.objects.get_or_create(
     username='admin',

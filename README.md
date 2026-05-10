@@ -22,7 +22,7 @@ Aplicación web monousuario para el registro personal de peso, talla y cálculo 
   - SQLite (persistente, por defecto)
   - SQLCipher (persistente y cifrado)
 - **Almacenamiento Frontend**: localStorage (persistente en el navegador)
-- **WAF**: ModSecurity v3 + OWASP Core Rule Set (reverse proxy Nginx)
+- **WAF**: ModSecurity v3 + OWASP Core Rule Set (reverse proxy Nginx; plantilla `waf/proxy_backend.conf.template` con resolución DNS del backend en tiempo de petición para la red externa `proxy-network`)
 - **Tests**: 213 tests backend (pytest) + ~66 tests frontend (Jest)
 - **DefectDojo**: Integrado para gestión de vulnerabilidades de seguridad
 - **Supervisor**: Dashboard de desarrollo para monitoreo de tráfico API y base de datos
@@ -41,9 +41,35 @@ Aplicación web monousuario para el registro personal de peso, talla y cálculo 
 
 ### Requisitos Previos
 
-- Docker y docker-compose instalados
+- **Docker Engine** y **Docker Compose** (ver detalle abajo: se aceptan **dos formas** de invocación).
 - Git (para clonar el repositorio)
-- Make (opcional, para usar comandos simplificados)
+- Make (opcional, para usar comandos simplificados; el `Makefile` detecta Compose automáticamente)
+
+#### Docker Compose: doble camino (v2 recomendado, v1 como respaldo)
+
+El proyecto **no obliga** a una sola variante: debe funcionar tanto con instalaciones **actuales** como con entornos que aún exponen el binario clásico.
+
+| Forma | Comando típico | Notas |
+|--------|------------------|--------|
+| **Plugin v2 (recomendado)** | `docker compose` (subcomando de `docker`) | Es la opción que Docker mantiene hoy. Comprueba con `docker compose version`. |
+| **Binario v1 (compatibilidad)** | `docker-compose` (ejecutable aparte) | Deprecado por upstream, pero sigue presente en muchas máquinas. Comprueba con `docker-compose --version`. |
+
+**Qué hace este repositorio**
+
+- El **`Makefile`** elige solo: si `docker compose version` funciona, usa **`docker compose`**; si no, usa **`docker-compose`**. Si ninguno existe, `make` muestra un error explícito.
+- Los scripts en **`scripts/`** (p. ej. `setup.sh`, `clean_all.sh`, `reset_defectdojo.sh`) y los equivalentes **PowerShell** siguen la misma prioridad: **v2 primero, v1 después**.
+- En los ejemplos de este README se escribe **`docker compose`**; si tu sistema solo tiene **`docker-compose`**, sustituye literalmente ese prefijo en los mismos argumentos (p. ej. `docker-compose up -d` en lugar de `docker compose up -d`).
+
+**Recomendación:** instala o actualiza el **plugin Compose v2** para alinearte con el estándar actual; el soporte de `docker-compose` v1 es para reducir fricción en evaluaciones o equipos heterogéneos.
+
+#### Problemas al descargar imágenes (`docker pull` / `build`: error TLS / certificado)
+
+Si aparece un error del tipo `x509: certificate is not valid` al descargar capas desde el registro:
+
+1. Comprueba la **hora del sistema** (`timedatectl` en Linux) y que el almacén de **certificados CA** esté actualizado (en Arch: `sudo pacman -Syu ca-certificates`).
+2. Si usas **proxy o inspección HTTPS** (antivirus, Zscaler, etc.), añade la **CA corporativa** al almacén que usa el daemon de Docker (según la documentación de tu distribución o de Docker Desktop).
+3. Tras corregir certificados, vuelve a ejecutar `docker compose pull` o `make`.
+4. Si el fallo afecta **solo** al descargar capas desde el CDN de Docker Hub pero el resto del sistema tiene TLS sano, el **`Dockerfile`** usa como base `public.ecr.aws/docker/library/python` (espejo oficial de la misma imagen `python:3.10-slim`) para poder construir la imagen `web` sin depender de ese CDN.
 
 ### Pasos de Instalación
 
@@ -153,22 +179,22 @@ Arranca solo el frontend en modo local, simulando errores de comunicación con e
 
 #### Opciones con Docker Compose
 
-Si prefieres usar `docker-compose` directamente:
+Si prefieres invocar Compose sin `make`, usa el plugin **v2** (`docker compose`). Si solo tienes el binario clásico, sustituye `docker compose` por `docker-compose`:
 ```bash
 # Aplicación principal (por defecto)
-COMPOSE_DOCKER_CLI_BUILD=0 DOCKER_BUILDKIT=0 docker-compose up -d
+COMPOSE_DOCKER_CLI_BUILD=0 DOCKER_BUILDKIT=0 docker compose up -d
 
 # Con almacenamiento en memoria
-STORAGE_BACKEND=memory COMPOSE_DOCKER_CLI_BUILD=0 DOCKER_BUILDKIT=0 docker-compose up -d
+STORAGE_BACKEND=memory COMPOSE_DOCKER_CLI_BUILD=0 DOCKER_BUILDKIT=0 docker compose up -d
 
 # Con base de datos
-STORAGE_BACKEND=sqlite COMPOSE_DOCKER_CLI_BUILD=0 DOCKER_BUILDKIT=0 docker-compose up -d
+STORAGE_BACKEND=sqlite COMPOSE_DOCKER_CLI_BUILD=0 DOCKER_BUILDKIT=0 docker compose up -d
 
 # Con supervisor (desarrollo)
-APP_SUPERVISOR=1 FLASK_ENV=development COMPOSE_DOCKER_CLI_BUILD=0 DOCKER_BUILDKIT=0 docker-compose up -d
+APP_SUPERVISOR=1 FLASK_ENV=development COMPOSE_DOCKER_CLI_BUILD=0 DOCKER_BUILDKIT=0 docker compose up -d
 ```
 
-> **Nota**: El proyecto incluye un `Makefile` que desactiva automáticamente BuildKit para evitar errores de gRPC. Se recomienda usar `make` para mayor compatibilidad.
+> **Nota**: El `Makefile` detecta automáticamente `docker compose` o `docker-compose` y desactiva BuildKit por defecto para evitar errores de gRPC en algunos entornos.
 
 4. **Arrancar DefectDojo (opcional)**:
 
@@ -181,9 +207,9 @@ make initDefectDojo
 make up
 ```
 
-**Opción B - Usando docker-compose directamente**:
+**Opción B - Usando Docker Compose directamente**:
 ```bash
-COMPOSE_DOCKER_CLI_BUILD=0 DOCKER_BUILDKIT=0 docker-compose --profile defectdojo up -d
+COMPOSE_DOCKER_CLI_BUILD=0 DOCKER_BUILDKIT=0 docker compose --profile defectdojo up -d
 ```
 
 **La inicialización es automática** al arrancar DefectDojo. El contenedor ejecuta:
@@ -248,16 +274,16 @@ make logs-defectdojo
 make ps
 ```
 
-**Usando docker-compose directamente**:
+**Usando Docker Compose directamente**:
 ```bash
 # Iniciar DefectDojo y sus dependencias
-COMPOSE_DOCKER_CLI_BUILD=0 DOCKER_BUILDKIT=0 docker-compose --profile defectdojo up -d
+COMPOSE_DOCKER_CLI_BUILD=0 DOCKER_BUILDKIT=0 docker compose --profile defectdojo up -d
 
 # Ver logs de DefectDojo
-COMPOSE_DOCKER_CLI_BUILD=0 DOCKER_BUILDKIT=0 docker-compose --profile defectdojo logs -f defectdojo
+COMPOSE_DOCKER_CLI_BUILD=0 DOCKER_BUILDKIT=0 docker compose --profile defectdojo logs -f defectdojo
 
 # Verificar estado de los servicios
-COMPOSE_DOCKER_CLI_BUILD=0 DOCKER_BUILDKIT=0 docker-compose --profile defectdojo ps
+COMPOSE_DOCKER_CLI_BUILD=0 DOCKER_BUILDKIT=0 docker compose --profile defectdojo ps
 ```
 
 > **Nota**: El script `reset_defectdojo.sh` está disponible para hacer un reset manual de DefectDojo si es necesario. La inicialización automática se ejecuta al arrancar el contenedor.

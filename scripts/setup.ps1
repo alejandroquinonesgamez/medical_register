@@ -80,16 +80,27 @@ try {
     exit 1
 }
 
-# Verificar Docker Compose
+# Verificar Docker Compose (v2 plugin o binario v1)
+$composeOk = $false
 try {
-    $composeVersion = docker-compose --version 2>$null
-    if ($composeVersion) {
-        Write-Host "  ✓ Docker Compose: $composeVersion" -ForegroundColor Gray
-    } else {
-        Write-Host "  ⚠️  docker-compose no está disponible (se intentará con 'docker compose')" -ForegroundColor Yellow
+    docker compose version 2>$null | Out-Null
+    if ($LASTEXITCODE -eq 0) {
+        Write-Host "  ✓ Docker Compose: $(docker compose version)" -ForegroundColor Gray
+        $composeOk = $true
     }
-} catch {
-    Write-Host "  ⚠️  docker-compose no está disponible (se intentará con 'docker compose')" -ForegroundColor Yellow
+} catch { }
+if (-not $composeOk) {
+    try {
+        $composeVersion = docker-compose --version 2>$null
+        if ($composeVersion) {
+            Write-Host "  ✓ Docker Compose: $composeVersion" -ForegroundColor Gray
+            $composeOk = $true
+        }
+    } catch { }
+}
+if (-not $composeOk) {
+    Write-Host "  ❌ Docker Compose no está disponible (instala el plugin: docker compose)" -ForegroundColor Red
+    exit 1
 }
 
 # Verificar que Docker esté corriendo
@@ -127,7 +138,12 @@ if (Test-Path $envFile) {
     }
 }
 
-docker-compose build web
+docker compose version 2>$null | Out-Null
+if ($LASTEXITCODE -eq 0) {
+    docker compose build web
+} else {
+    docker-compose build web
+}
 
 Write-Host ""
 Write-Host "✅ Configuración completada" -ForegroundColor Green
@@ -136,7 +152,7 @@ Write-Host "📋 Próximos pasos:" -ForegroundColor Cyan
 Write-Host ""
 Write-Host "1. Arrancar la aplicación principal:" -ForegroundColor White
 Write-Host "   .\make.ps1 default" -ForegroundColor Gray
-Write-Host "   # o: docker-compose up -d" -ForegroundColor DarkGray
+Write-Host "   # o: docker compose up -d" -ForegroundColor DarkGray
 Write-Host ""
 Write-Host "2. Arrancar DefectDojo (opcional):" -ForegroundColor White
 Write-Host "   .\make.ps1 initDefectDojo  # DefectDojo vacío" -ForegroundColor Gray

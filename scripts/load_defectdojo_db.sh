@@ -5,6 +5,11 @@
 
 set -e
 
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+# shellcheck source=docker_compose.sh
+source "$SCRIPT_DIR/docker_compose.sh"
+cd "$SCRIPT_DIR/.."
+
 DUMP_FILE="${1:-./data/defectdojo_db_initial.sql}"
 
 if [ ! -f "$DUMP_FILE" ]; then
@@ -22,7 +27,7 @@ docker-compose --profile defectdojo exec -T defectdojo-db psql -U defectdojo -d 
 if [ $? -eq 0 ]; then
     echo "✅ Dump cargado correctamente"
     echo "🔄 Reiniciando DefectDojo para aplicar los cambios..."
-    docker-compose --profile defectdojo restart defectdojo
+    docker_compose --profile defectdojo restart defectdojo
 else
     echo "❌ Error al cargar el dump"
     exit 1

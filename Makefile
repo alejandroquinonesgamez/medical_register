@@ -29,7 +29,13 @@ export COMPOSE_DOCKER_CLI_BUILD
 export DOCKER_BUILDKIT
 export COMPOSE_PROJECT_NAME
 
-COMPOSE = COMPOSE_DOCKER_CLI_BUILD=$(COMPOSE_DOCKER_CLI_BUILD) DOCKER_BUILDKIT=$(DOCKER_BUILDKIT) COMPOSE_PROJECT_NAME=$(COMPOSE_PROJECT_NAME) docker-compose
+# Compose v2 (`docker compose`) es el predeterminado; fallback a `docker-compose` v1
+DOCKER_COMPOSE_CMD := $(shell if docker compose version >/dev/null 2>&1; then echo "docker compose"; elif command -v docker-compose >/dev/null 2>&1; then echo "docker-compose"; else echo ""; fi)
+ifeq ($(DOCKER_COMPOSE_CMD),)
+$(error No se encontró Docker Compose. Instala el plugin v2: ejecuta "docker compose version", o el paquete docker-compose v1.)
+endif
+
+COMPOSE = COMPOSE_DOCKER_CLI_BUILD=$(COMPOSE_DOCKER_CLI_BUILD) DOCKER_BUILDKIT=$(DOCKER_BUILDKIT) COMPOSE_PROJECT_NAME=$(COMPOSE_PROJECT_NAME) $(DOCKER_COMPOSE_CMD)
 
 # Crear .env si no existe (solo en el primer uso)
 .env:
@@ -266,8 +272,8 @@ test-frontend: ## Ejecutar tests frontend dentro del contenedor
 
 down: setup-env ## Detener todos los servicios
 	@echo "🛑 Deteniendo todos los servicios..."
-	@$(COMPOSE) down 2>nul || true
-	@$(COMPOSE) --profile defectdojo down 2>nul || true
+	@$(COMPOSE) down 2>/dev/null || true
+	@$(COMPOSE) --profile defectdojo down 2>/dev/null || true
 	@echo ""
 	@echo "✅ Todos los servicios detenidos"
 
@@ -275,9 +281,9 @@ pdf_report: setup-env ## Generar PDF del informe de seguridad (ASVS + WSTG) con 
 	@echo "📄 Generando informe de seguridad (ASVS + WSTG) y PDF..."
 	@echo ""
 	@echo "Paso 1/3: Generando informe Markdown desde DefectDojo + análisis de código..."
-	@if docker-compose ps defectdojo | grep -q "Up"; then \
+	@if $(COMPOSE) ps defectdojo | grep -q "Up"; then \
 		echo "   ℹ️  Ejecutando desde contenedor de DefectDojo para acceso a benchmarks ASVS..."; \
-		docker-compose exec -T defectdojo python /app/scripts/generate_asvs_report.py; \
+		$(COMPOSE) exec -T defectdojo python /app/scripts/generate_asvs_report.py; \
 	else \
 		echo "   ⚠️  DefectDojo no está corriendo, ejecutando localmente (sin datos de DefectDojo)..."; \
 		python3 scripts/generate_asvs_report.py; \

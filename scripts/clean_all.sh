@@ -4,6 +4,12 @@
 
 set -e
 
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+PROJECT_ROOT="$(cd "$SCRIPT_DIR/.." && pwd)"
+cd "$PROJECT_ROOT"
+# shellcheck source=docker_compose.sh
+source "$SCRIPT_DIR/docker_compose.sh"
+
 echo "⚠️  ⚠️  ⚠️  ADVERTENCIA ⚠️  ⚠️  ⚠️"
 echo ""
 echo "Este comando eliminará:"
@@ -34,16 +40,10 @@ COUNT=0
 
 # Paso 1: Detener y eliminar contenedores Docker
 echo "Paso 1/8: Deteniendo y eliminando contenedores Docker..."
-if command -v docker-compose &> /dev/null; then
-    COMPOSE_PROJECT_NAME="${COMPOSE_PROJECT_NAME:-medical_register}"
-    COMPOSE_DOCKER_CLI_BUILD="${COMPOSE_DOCKER_CLI_BUILD:-0}"
-    DOCKER_BUILDKIT="${DOCKER_BUILDKIT:-0}"
-    
-    COMPOSE="COMPOSE_DOCKER_CLI_BUILD=${COMPOSE_DOCKER_CLI_BUILD} DOCKER_BUILDKIT=${DOCKER_BUILDKIT} COMPOSE_PROJECT_NAME=${COMPOSE_PROJECT_NAME} docker-compose"
-    
+if docker_compose_available; then
     # Detener y eliminar contenedores
-    $COMPOSE down --volumes --remove-orphans 2>/dev/null || true
-    $COMPOSE --profile defectdojo down --volumes --remove-orphans 2>/dev/null || true
+    docker_compose down --volumes --remove-orphans 2>/dev/null || true
+    docker_compose --profile defectdojo down --volumes --remove-orphans 2>/dev/null || true
     
     echo "  ✓ Contenedores detenidos y eliminados"
     ((COUNT++))
@@ -58,6 +58,8 @@ if command -v docker-compose &> /dev/null; then
         done
         echo "  ✓ Redes huérfanas eliminadas"
     fi
+else
+    echo "  ⚠️  Docker Compose no disponible; omitiendo bajada de contenedores"
 fi
 
 # Paso 2: Eliminar imágenes del proyecto

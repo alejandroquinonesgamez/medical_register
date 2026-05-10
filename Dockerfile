@@ -1,4 +1,7 @@
-FROM python:3.10-slim
+# Imagen oficial espejada en AWS Public ECR (misma `library/python` que Docker Hub).
+# En redes donde el CDN de Hub (p. ej. certificados hacia cloudflarestorage.com) falla en TLS,
+# este origen suele permitir construir sin cambiar el daemon de Docker.
+FROM public.ecr.aws/docker/library/python:3.10-slim
 
 WORKDIR /app
 

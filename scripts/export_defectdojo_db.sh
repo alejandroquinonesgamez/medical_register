@@ -4,6 +4,11 @@
 
 set -e
 
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+# shellcheck source=docker_compose.sh
+source "$SCRIPT_DIR/docker_compose.sh"
+cd "$SCRIPT_DIR/.."
+
 OUTPUT_FILE="${1:-./data/defectdojo_db_dump.sql}"
 
 # Crear directorio si no existe
@@ -13,7 +18,7 @@ echo "📤 Exportando base de datos de DefectDojo..."
 echo "⏳ Esto puede tardar unos minutos..."
 
 # Exportar la base de datos
-docker-compose --profile defectdojo exec -T defectdojo-db pg_dump -U defectdojo defectdojo > "$OUTPUT_FILE"
+docker_compose --profile defectdojo exec -T defectdojo-db pg_dump -U defectdojo defectdojo > "$OUTPUT_FILE"
 
 if [ $? -eq 0 ]; then
     FILE_SIZE=$(du -h "$OUTPUT_FILE" | cut -f1)

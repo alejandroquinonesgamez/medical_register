@@ -8,9 +8,14 @@
 # 4. Construye la imagen de la aplicación
 #
 # Este script se ejecuta automáticamente al clonar el repositorio
-# y debe ejecutarse antes de usar make o docker-compose.
+# y debe ejecutarse antes de usar make o Docker Compose.
 
 set -e
+
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+PROJECT_ROOT="$(cd "$SCRIPT_DIR/.." && pwd)"
+# shellcheck source=docker_compose.sh
+source "$SCRIPT_DIR/docker_compose.sh"
 
 echo "🚀 Configurando el proyecto Medical Register..."
 echo ""
@@ -35,19 +40,18 @@ if ! command -v docker &> /dev/null; then
     exit 1
 fi
 
-if ! command -v docker-compose &> /dev/null; then
-    echo "❌ Error: docker-compose no está instalado"
-    echo "   Por favor, instala docker-compose"
+if ! docker_compose_available; then
+    echo "❌ Error: Docker Compose no está disponible"
+    echo "   Instala el plugin v2 (recomendado): \"docker compose version\" debe funcionar"
+    echo "   O el binario v1: paquete docker-compose en tu distribución"
     exit 1
 fi
 
-echo "✅ Docker y docker-compose detectados"
+echo "✅ Docker y Docker Compose detectados"
 echo ""
 
 # Configurar archivo .env para Docker Compose (soluciona problemas con caracteres especiales)
 echo "⚙️  Configurando Docker Compose..."
-SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-PROJECT_ROOT="$(cd "$SCRIPT_DIR/.." && pwd)"
 ENV_FILE="$PROJECT_ROOT/.env"
 ENV_EXAMPLE="$PROJECT_ROOT/docker-compose.env.example"
 
@@ -81,7 +85,7 @@ if [ -f "$ENV_FILE" ]; then
     set +a
 fi
 
-docker-compose build web
+(cd "$PROJECT_ROOT" && docker_compose build web)
 
 echo ""
 echo "✅ Configuración completada"
@@ -89,10 +93,11 @@ echo ""
 echo "📋 Próximos pasos:"
 echo ""
 echo "1. Arrancar la aplicación principal:"
-echo "   docker-compose up -d"
+echo "   docker compose up -d"
+echo "   # o: make"
 echo ""
 echo "2. Arrancar DefectDojo (opcional):"
-echo "   docker-compose --profile defectdojo up -d"
+echo "   docker compose --profile defectdojo up -d"
 echo "   ./scripts/reset_defectdojo.sh  # Solo si necesitas hacer un reset"
 echo ""
 echo "3. Acceder a las aplicaciones:"

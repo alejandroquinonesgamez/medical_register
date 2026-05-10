@@ -76,6 +76,32 @@ DOCKER_BUILDKIT=0
 # Inicializar entorno de Docker Compose al cargar el script
 Initialize-DockerComposeEnv
 
+function Test-DockerComposeV2Available {
+    docker compose version 2>$null | Out-Null
+    return ($LASTEXITCODE -eq 0)
+}
+
+function Invoke-ProjectCompose {
+    [CmdletBinding()]
+    param(
+        [Parameter(ValueFromRemainingArguments = $true)]
+        [string[]]$ComposeArgs
+    )
+    Push-Location $PSScriptRoot
+    try {
+        if (Test-DockerComposeV2Available) {
+            & docker compose @ComposeArgs
+        } elseif (Get-Command docker-compose -ErrorAction SilentlyContinue) {
+            & docker-compose @ComposeArgs
+        } else {
+            Write-Error "Docker Compose no encontrado. Instala el plugin v2 (docker compose) o el binario docker-compose v1."
+            exit 127
+        }
+    } finally {
+        Pop-Location
+    }
+}
+
 function Test-Requirements {
     Write-Host "Verificando requisitos previos..." -ForegroundColor Cyan
     Write-Host ""
@@ -99,9 +125,14 @@ function Test-Requirements {
         $allOk = $false
     }
     
-    # Verificar Docker Compose
+    # Verificar Docker Compose (v2 plugin recomendado, v1 como respaldo)
     try {
-        $composeVersion = docker-compose --version 2>$null
+        $composeVersion = $null
+        if (Test-DockerComposeV2Available) {
+            $composeVersion = docker compose version
+        } elseif (Get-Command docker-compose -ErrorAction SilentlyContinue) {
+            $composeVersion = docker-compose --version 2>$null
+        }
         if ($composeVersion) {
             Write-Host "  Docker Compose: " -NoNewline -ForegroundColor Green
             Write-Host $composeVersion
@@ -209,7 +240,7 @@ function Show-Help {
 
 function Start-Default {
     Write-Host "Arrancando aplicacion principal..." -ForegroundColor Cyan
-    docker-compose up -d --build
+    Invoke-ProjectCompose up -d --build
     Write-Host ""
     Write-Host "Aplicacion principal arrancada" -ForegroundColor Green
     Write-Host "Accede a la aplicacion en: http://localhost:5001" -ForegroundColor Cyan
@@ -218,7 +249,7 @@ function Start-Default {
 function Start-Memory {
     Write-Host "Arrancando aplicacion (modo memoria)..." -ForegroundColor Cyan
     $env:STORAGE_BACKEND = "memory"
-    docker-compose up -d --build
+    Invoke-ProjectCompose up -d --build
     Write-Host ""
     Write-Host "Aplicacion principal arrancada (memory)" -ForegroundColor Green
     Write-Host "Accede a la aplicacion en: http://localhost:5001" -ForegroundColor Cyan
@@ -227,7 +258,7 @@ function Start-Memory {
 function Start-Db {
     Write-Host "Arrancando aplicacion (modo BD)..." -ForegroundColor Cyan
     $env:STORAGE_BACKEND = "sqlite"
-    docker-compose up -d --build
+    Invoke-ProjectCompose up -d --build
     Write-Host ""
     Write-Host "Aplicacion principal arrancada (db)" -ForegroundColor Green
     Write-Host "Accede a la aplicacion en: http://localhost:5001" -ForegroundColor Cyan
@@ -236,7 +267,7 @@ function Start-Db {
 function Start-Local {
     Write-Host "Arrancando frontend en modo local (sin backend)..." -ForegroundColor Cyan
     Write-Host "Asegurate de que el puerto 5001 este libre" -ForegroundColor Gray
-    docker-compose --profile local up -d --build frontend-local
+    Invoke-ProjectCompose --profile local up -d --build frontend-local
     Write-Host ""
     Write-Host "Frontend local arrancado" -ForegroundColor Green
     Write-Host "Accede a la aplicacion en: http://localhost:5001" -ForegroundColor Cyan
@@ -247,7 +278,7 @@ function Start-Supervisor {
     Write-Host "Arrancando Supervisor (modo desarrollo)..." -ForegroundColor Cyan
     $env:APP_SUPERVISOR = "1"
     $env:FLASK_ENV = "development"
-    docker-compose up -d --build
+    Invoke-ProjectCompose up -d --build
     Write-Host ""
     Write-Host "Supervisor activo" -ForegroundColor Green
     Write-Host "App: http://localhost:5001" -ForegroundColor Cyan
@@ -260,14 +291,14 @@ function Start-Up {
     
     # Paso 1: Arrancar aplicacion principal
     Write-Host "Paso 1/3: Arrancando aplicacion principal..." -ForegroundColor Yellow
-    docker-compose up -d
+    Invoke-ProjectCompose up -d
     Write-Host "   Aplicacion principal arrancada" -ForegroundColor Green
     Write-Host ""
     
     # Paso 2: Arrancar DefectDojo vacio
     Write-Host "Paso 2/3: Arrancando servicios de DefectDojo..." -ForegroundColor Yellow
     $env:DD_SKIP_FINDINGS = "True"
-    docker-compose --profile defectdojo up -d
+    Invoke-ProjectCompose --profile defectdojo up -d
     Write-Host ""
     Write-Host "Esperando 60 segundos a que DefectDojo este listo..." -ForegroundColor Yellow
     Write-Host "   (Esto puede tardar en la primera ejecucion...)" -ForegroundColor Gray
@@ -286,7 +317,7 @@ function Start-Up {
             Start-Sleep -Seconds 5
             docker cp $scriptPath defectdojo:/tmp/init_defectdojo_empty.py
         }
-        docker-compose --profile defectdojo exec -T defectdojo python3 /tmp/init_defectdojo_empty.py 2>&1
+        Invoke-ProjectCompose --profile defectdojo exec -T defectdojo python3 /tmp/init_defectdojo_empty.py 2>&1
     } else {
         Write-Host "   DefectDojo puede estar ya inicializado (esto es normal)" -ForegroundColor Yellow
     }
@@ -307,7 +338,7 @@ function Start-InitDefectDojo {
     Write-Host ""
     Write-Host "Paso 1/2: Arrancando servicios de DefectDojo..." -ForegroundColor Yellow
     $env:DD_SKIP_FINDINGS = "True"
-    docker-compose --profile defectdojo up -d
+    Invoke-ProjectCompose --profile defectdojo up -d
     Write-Host ""
     Write-Host "Esperando 60 segundos a que DefectDojo este listo..." -ForegroundColor Yellow
     Write-Host "   (Esto puede tardar en la primera ejecucion...)" -ForegroundColor Gray
@@ -324,7 +355,7 @@ function Start-InitDefectDojo {
             Start-Sleep -Seconds 5
             docker cp $scriptPath defectdojo:/tmp/init_defectdojo_empty.py
         }
-        docker-compose --profile defectdojo exec -T defectdojo python3 /tmp/init_defectdojo_empty.py 2>&1
+        Invoke-ProjectCompose --profile defectdojo exec -T defectdojo python3 /tmp/init_defectdojo_empty.py 2>&1
     } else {
         Write-Host "   DefectDojo puede estar ya inicializado (esto es normal)" -ForegroundColor Yellow
     }
@@ -342,10 +373,10 @@ function Start-Update {
     
     # Paso 1: Verificar aplicacion principal
     Write-Host "Paso 1/3: Verificando aplicacion principal..." -ForegroundColor Yellow
-    $webStatus = docker-compose ps web 2>$null | Select-String "Up"
+    $webStatus = Invoke-ProjectCompose ps web 2>$null | Select-String "Up"
     if (-not $webStatus) {
         Write-Host "   Arrancando aplicacion principal..." -ForegroundColor Gray
-        docker-compose up -d web
+        Invoke-ProjectCompose up -d web
         Start-Sleep -Seconds 5
     }
     Write-Host "   Aplicacion principal lista" -ForegroundColor Green
@@ -353,10 +384,10 @@ function Start-Update {
     
     # Paso 2: Verificar DefectDojo
     Write-Host "Paso 2/3: Verificando DefectDojo..." -ForegroundColor Yellow
-    $defectdojoStatus = docker-compose --profile defectdojo ps defectdojo 2>$null | Select-String "Up"
+    $defectdojoStatus = Invoke-ProjectCompose --profile defectdojo ps defectdojo 2>$null | Select-String "Up"
     if (-not $defectdojoStatus) {
         Write-Host "   Arrancando DefectDojo..." -ForegroundColor Gray
-        docker-compose --profile defectdojo up -d
+        Invoke-ProjectCompose --profile defectdojo up -d
         Write-Host "   Esperando 60 segundos..." -ForegroundColor Gray
         Start-Sleep -Seconds 60
     }
@@ -369,7 +400,7 @@ function Start-Update {
     $defectdojoRunning = docker ps | Select-String "defectdojo"
     if (-not $defectdojoRunning) {
         Write-Host "   DefectDojo no esta corriendo. Reiniciando..." -ForegroundColor Yellow
-        docker-compose --profile defectdojo up -d defectdojo
+        Invoke-ProjectCompose --profile defectdojo up -d defectdojo
         Start-Sleep -Seconds 10
     }
     
@@ -379,7 +410,7 @@ function Start-Update {
         docker cp $scriptPath defectdojo:/tmp/manage_findings.py
         
         Write-Host "   Ejecutando script consolidado en DefectDojo..." -ForegroundColor Gray
-        docker-compose --profile defectdojo exec -T defectdojo python3 /tmp/manage_findings.py
+        Invoke-ProjectCompose --profile defectdojo exec -T defectdojo python3 /tmp/manage_findings.py
     } else {
         Write-Host "   Error: No se encontro el script: $scriptPath" -ForegroundColor Red
         exit 1
@@ -395,12 +426,12 @@ function Start-Update {
 
 function Run-Tests {
     Write-Host "Ejecutando tests en contenedor (backend)..." -ForegroundColor Cyan
-    docker-compose run --rm web python -m pytest
+    Invoke-ProjectCompose run --rm web python -m pytest
 }
 
 function Run-FrontendTests {
     Write-Host "Ejecutando tests en contenedor (frontend)..." -ForegroundColor Cyan
-    docker-compose run --rm frontend-tests
+    Invoke-ProjectCompose run --rm frontend-tests
 }
 
 function Run-AllTests {
@@ -413,28 +444,28 @@ function Run-AllTests {
 
 function Show-Logs {
     Write-Host "Logs de la aplicacion principal (Ctrl+C para salir)..." -ForegroundColor Cyan
-    docker-compose logs -f web
+    Invoke-ProjectCompose logs -f web
 }
 
 function Show-LogsDefectDojo {
     Write-Host "Logs de DefectDojo (Ctrl+C para salir)..." -ForegroundColor Cyan
-    docker-compose --profile defectdojo logs -f defectdojo
+    Invoke-ProjectCompose --profile defectdojo logs -f defectdojo
 }
 
 function Show-Status {
     Write-Host "Estado de los contenedores:" -ForegroundColor Cyan
     Write-Host ""
     Write-Host "=== Aplicacion Principal ===" -ForegroundColor Yellow
-    docker-compose ps
+    Invoke-ProjectCompose ps
     Write-Host ""
     Write-Host "=== DefectDojo ===" -ForegroundColor Yellow
-    docker-compose --profile defectdojo ps
+    Invoke-ProjectCompose --profile defectdojo ps
 }
 
 function Stop-All {
     Write-Host "Deteniendo todos los servicios..." -ForegroundColor Cyan
-    docker-compose down 2>$null
-    docker-compose --profile defectdojo down 2>$null
+    Invoke-ProjectCompose down 2>$null
+    Invoke-ProjectCompose --profile defectdojo down 2>$null
     Write-Host ""
     Write-Host "Todos los servicios detenidos" -ForegroundColor Green
 }

@@ -44,7 +44,12 @@ class TestDefectDojoExportDump:
         
         assert mock_subprocess.call_count >= 1
         call_args = mock_subprocess.call_args_list[-1]
-        assert 'docker-compose' in call_args[0][0] or 'pg_dump' in str(call_args)
+        cmd_repr = str(call_args)
+        assert (
+            'docker-compose' in cmd_repr
+            or 'pg_dump' in cmd_repr
+            or ('docker' in cmd_repr and 'compose' in cmd_repr)
+        )
         
         mock_makedirs.assert_called_once()
         assert response.status_code in [200, 500]
