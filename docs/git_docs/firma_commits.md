@@ -5,6 +5,8 @@
 > Objetivo: configurar la firma criptográfica de commits con GPG en los
 > repositorios de la asignatura y demostrar que GitHub muestra el badge
 > **"Verified"** en los commits firmados.
+>
+> **Ubicación:** `docs/git_docs/firma_commits.md` (repositorio *Aplicación Médica*).
 
 ## 1. Introducción
 
@@ -37,8 +39,9 @@ evidencia:
 - `Aplicación Médica` (backend Flask + Docker).
 
 > **Nota (2026-05-14):** la documentación del `.gitignore` de ambos proyectos
-> vive solo en `Aplicación Médica/docs/gitignore.md`; no forma parte de la
+> vive solo en `docs/gitignore.md` de este repositorio; no forma parte de la
 > configuración GPG, pero conviene tenerlo claro al entregar la práctica.
+> Este informe de firma GPG y sus capturas viven bajo `docs/git_docs/`.
 
 ## 2. Estado inicial
 
@@ -107,7 +110,7 @@ La columna `%G?` muestra el estado de la firma:
 | Nombre | `Alejandro Quiñones` | Mismo nombre del autor que aparece en los commits actuales. |
 | Email | `alejandroquinonesgamez@users.noreply.github.com` | Email *noreply* de GitHub. Evita exponer la dirección personal y es el que ya se usaba en commits. GitHub lo trata como verificado automáticamente para la cuenta. |
 | Caducidad | Sin caducidad | Tal como sugiere el enunciado. La rotación se puede hacer manualmente cuando proceda. |
-| Passphrase | Temporal (`PuestaProduccionSegura`) | Solo para la práctica. Se debe rotar a una passphrase robusta del gestor de contraseñas. |
+| Passphrase | Temporal (no versionar la real en informes públicos) | Solo para la práctica. Rotar a una passphrase robusta del gestor de contraseñas. |
 
 ### 3.2. Generación en modo batch
 
@@ -449,7 +452,7 @@ GPG key ID: 54B736719B025729
 ### 8.1. Evidencia visual (capturas)
 
 En este repositorio se incluye al menos la siguiente captura en
-`docs/img/GPG/`:
+`docs/git_docs/img/GPG/`:
 
 | Archivo | Contenido |
 |---|---|
@@ -504,7 +507,7 @@ profesores, alumnos que entregan código).
 | 3. Config Git | `git config --global user.signingkey 54B736719B025729` + `commit.gpgsign true` | | ✅ |
 | 4. Commit Android | `git commit -m "docs: añadir gitignore.md ..."` | commit `4f4c9f5` con `%G? = G` | ✅ |
 | 5. Commit App Médica | `git commit -m "docs: añadir gitignore.md ..."` | commit `65fc9cc` con `%G? = G` | ✅ |
-| 6. Subir clave a GitHub | UI web *Settings → SSH and GPG keys* | Captura `docs/img/GPG/GPG_created.png` | ✅ (evidencia en repo) |
+| 6. Subir clave a GitHub | UI web *Settings → SSH and GPG keys* | Captura `docs/git_docs/img/GPG/GPG_created.png` | ✅ (evidencia en repo) |
 | 7. Push y verificación | `git push` + badge **Verified** en la web | Comprueba en GitHub tras `git push`; opcional: añadir `verified_*.png` | ⏳ / opcional |
 
 ---
