@@ -36,6 +36,10 @@ evidencia:
 - `medical_register_android` (cliente Android Kotlin/Gradle, repo activo).
 - `Aplicación Médica` (backend Flask + Docker).
 
+> **Nota (2026-05-14):** la documentación del `.gitignore` de ambos proyectos
+> vive solo en `Aplicación Médica/docs/gitignore.md`; no forma parte de la
+> configuración GPG, pero conviene tenerlo claro al entregar la práctica.
+
 ## 2. Estado inicial
 
 ### 2.1. Versiones de las herramientas
@@ -442,17 +446,27 @@ Signed by: Alejandro Quiñones
 GPG key ID: 54B736719B025729
 ```
 
-Las capturas se guardan en `docs/img/firma_commits/`:
+### 8.1. Evidencia visual (capturas)
 
-| Captura | Descripción |
+En este repositorio se incluye al menos la siguiente captura en
+`docs/img/GPG/`:
+
+| Archivo | Contenido |
 |---|---|
-| `verified_android.png` | Commit `4f4c9f5` del repo `medical_register_apk` con el badge `Verified`. |
-| `verified_appmedica.png` | Commit `65fc9cc` del repo `medical_register` con el badge `Verified`. |
-| `github_gpg_keys.png` | Pantalla **Settings → SSH and GPG keys** mostrando la clave Ed25519 dada de alta. |
+| `GPG_created.png` | Evidencia de la clave GPG en GitHub (pantalla **Settings → SSH and GPG keys** o equivalente). |
 
-> Pendiente de añadir tras subir la clave y hacer push. Mientras tanto, el
-> repositorio local ya marca las firmas como `G` (válidas), lo que confirma
-> que la cadena criptográfica funciona correctamente del lado del cliente.
+![Clave GPG en GitHub](img/GPG/GPG_created.png)
+
+**Opcional** (si quieres completar el informe con más pruebas), guarda también:
+
+| Archivo sugerido | Descripción |
+|---|---|
+| `verified_android.png` | Vista de un commit en `medical_register_apk` con badge **Verified**. |
+| `verified_appmedica.png` | Vista de un commit en `medical_register` con badge **Verified**. |
+
+Si aún no has hecho push, el repositorio local sigue siendo válido como
+prueba criptográfica: `git log --show-signature` debe mostrar
+`gpg: Firma correcta` y `%G? = G` en los commits recientes.
 
 ## 9. Buenas prácticas y "Vigilant Mode"
 
@@ -490,8 +504,8 @@ profesores, alumnos que entregan código).
 | 3. Config Git | `git config --global user.signingkey 54B736719B025729` + `commit.gpgsign true` | | ✅ |
 | 4. Commit Android | `git commit -m "docs: añadir gitignore.md ..."` | commit `4f4c9f5` con `%G? = G` | ✅ |
 | 5. Commit App Médica | `git commit -m "docs: añadir gitignore.md ..."` | commit `65fc9cc` con `%G? = G` | ✅ |
-| 6. Subir clave a GitHub | UI web *Settings → SSH and GPG keys* | (pendiente paso manual) | ⏳ |
-| 7. Push y verificación | `git push` + captura `Verified` en GitHub | (pendiente paso manual) | ⏳ |
+| 6. Subir clave a GitHub | UI web *Settings → SSH and GPG keys* | Captura `docs/img/GPG/GPG_created.png` | ✅ (evidencia en repo) |
+| 7. Push y verificación | `git push` + badge **Verified** en la web | Comprueba en GitHub tras `git push`; opcional: añadir `verified_*.png` | ⏳ / opcional |
 
 ---
 
