@@ -3,7 +3,8 @@ name: gitleaks
 on:
   pull_request:
   push:
-    branches: [main, dev]
+    # Antes solo [main, dev]: los push a ramas pps/* no disparaban el workflow.
+  workflow_dispatch:
 
 jobs:
   scan:
