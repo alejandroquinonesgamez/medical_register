@@ -1,2 +1,0 @@
-# DEMO PPS — token ficticio con formato PAT de GitHub (no es credencial real)
-github_pat_demo=ghp_11AABBCCDDEEFF00112233445566778899AABBCC
