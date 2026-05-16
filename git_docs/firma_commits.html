@@ -1,0 +1,968 @@
+<!doctype html>
+<html class="no-js" lang="en" data-content_root="../">
+  <head><meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <meta name="color-scheme" content="light dark"><meta name="viewport" content="width=device-width, initial-scale=1" />
+<link rel="index" title="Index" href="../genindex.html"><link rel="search" title="Search" href="../search.html">
+
+    <!-- Generated with Sphinx 8.1.3 and Furo 2025.12.19 -->
+        <title>Firma de commits con GPG - Medical Register 0.1.0 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=d111a655" />
+    <link rel="stylesheet" type="text/css" href="../_static/styles/furo.css?v=7bdb33bb" />
+    <link rel="stylesheet" type="text/css" href="../_static/styles/furo-extensions.css?v=8dab3a3b" />
+    
+    
+
+
+<style>
+  body {
+    --color-code-background: #f2f2f2;
+  --color-code-foreground: #1e1e1e;
+  --color-brand-primary: #254F6D;
+  --color-brand-content: #254F6D;
+  
+  }
+  @media not print {
+    body[data-theme="dark"] {
+      --color-code-background: #202020;
+  --color-code-foreground: #d0d0d0;
+  
+    }
+    @media (prefers-color-scheme: dark) {
+      body:not([data-theme="light"]) {
+        --color-code-background: #202020;
+  --color-code-foreground: #d0d0d0;
+  
+      }
+    }
+  }
+</style></head>
+  <body>
+    
+    <script>
+      document.body.dataset.theme = localStorage.getItem("theme") || "auto";
+    </script>
+    
+
+<svg xmlns="http://www.w3.org/2000/svg" style="display: none;">
+  <symbol id="svg-toc" viewBox="0 0 24 24">
+    <title>Contents</title>
+    <svg stroke="currentColor" fill="currentColor" stroke-width="0" viewBox="0 0 1024 1024">
+      <path d="M408 442h480c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8H408c-4.4 0-8 3.6-8 8v56c0 4.4 3.6 8 8 8zm-8 204c0 4.4 3.6 8 8 8h480c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8H408c-4.4 0-8 3.6-8 8v56zm504-486H120c-4.4 0-8 3.6-8 8v56c0 4.4 3.6 8 8 8h784c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8zm0 632H120c-4.4 0-8 3.6-8 8v56c0 4.4 3.6 8 8 8h784c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8zM115.4 518.9L271.7 642c5.8 4.6 14.4.5 14.4-6.9V388.9c0-7.4-8.5-11.5-14.4-6.9L115.4 505.1a8.74 8.74 0 0 0 0 13.8z"/>
+    </svg>
+  </symbol>
+  <symbol id="svg-menu" viewBox="0 0 24 24">
+    <title>Menu</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather-menu">
+      <line x1="3" y1="12" x2="21" y2="12"></line>
+      <line x1="3" y1="6" x2="21" y2="6"></line>
+      <line x1="3" y1="18" x2="21" y2="18"></line>
+    </svg>
+  </symbol>
+  <symbol id="svg-arrow-right" viewBox="0 0 24 24">
+    <title>Expand</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather-chevron-right">
+      <polyline points="9 18 15 12 9 6"></polyline>
+    </svg>
+  </symbol>
+  <symbol id="svg-sun" viewBox="0 0 24 24">
+    <title>Light mode</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round" class="feather-sun">
+      <circle cx="12" cy="12" r="5"></circle>
+      <line x1="12" y1="1" x2="12" y2="3"></line>
+      <line x1="12" y1="21" x2="12" y2="23"></line>
+      <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+      <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+      <line x1="1" y1="12" x2="3" y2="12"></line>
+      <line x1="21" y1="12" x2="23" y2="12"></line>
+      <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+      <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+    </svg>
+  </symbol>
+  <symbol id="svg-moon" viewBox="0 0 24 24">
+    <title>Dark mode</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round" class="icon-tabler-moon">
+      <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+      <path d="M12 3c.132 0 .263 0 .393 0a7.5 7.5 0 0 0 7.92 12.446a9 9 0 1 1 -8.313 -12.454z" />
+    </svg>
+  </symbol>
+  <symbol id="svg-sun-with-moon" viewBox="0 0 24 24">
+    <title>Auto light/dark, in light mode</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round"
+      class="icon-custom-derived-from-feather-sun-and-tabler-moon">
+      <path style="opacity: 50%" d="M 5.411 14.504 C 5.471 14.504 5.532 14.504 5.591 14.504 C 3.639 16.319 4.383 19.569 6.931 20.352 C 7.693 20.586 8.512 20.551 9.25 20.252 C 8.023 23.207 4.056 23.725 2.11 21.184 C 0.166 18.642 1.702 14.949 4.874 14.536 C 5.051 14.512 5.231 14.5 5.411 14.5 L 5.411 14.504 Z"/>
+      <line x1="14.5" y1="3.25" x2="14.5" y2="1.25"/>
+      <line x1="14.5" y1="15.85" x2="14.5" y2="17.85"/>
+      <line x1="10.044" y1="5.094" x2="8.63" y2="3.68"/>
+      <line x1="19" y1="14.05" x2="20.414" y2="15.464"/>
+      <line x1="8.2" y1="9.55" x2="6.2" y2="9.55"/>
+      <line x1="20.8" y1="9.55" x2="22.8" y2="9.55"/>
+      <line x1="10.044" y1="14.006" x2="8.63" y2="15.42"/>
+      <line x1="19" y1="5.05" x2="20.414" y2="3.636"/>
+      <circle cx="14.5" cy="9.55" r="3.6"/>
+    </svg>
+  </symbol>
+  <symbol id="svg-moon-with-sun" viewBox="0 0 24 24">
+    <title>Auto light/dark, in dark mode</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round"
+      class="icon-custom-derived-from-feather-sun-and-tabler-moon">
+      <path d="M 8.282 7.007 C 8.385 7.007 8.494 7.007 8.595 7.007 C 5.18 10.184 6.481 15.869 10.942 17.24 C 12.275 17.648 13.706 17.589 15 17.066 C 12.851 22.236 5.91 23.143 2.505 18.696 C -0.897 14.249 1.791 7.786 7.342 7.063 C 7.652 7.021 7.965 7 8.282 7 L 8.282 7.007 Z"/>
+      <line style="opacity: 50%" x1="18" y1="3.705" x2="18" y2="2.5"/>
+      <line style="opacity: 50%" x1="18" y1="11.295" x2="18" y2="12.5"/>
+      <line style="opacity: 50%" x1="15.316" y1="4.816" x2="14.464" y2="3.964"/>
+      <line style="opacity: 50%" x1="20.711" y1="10.212" x2="21.563" y2="11.063"/>
+      <line style="opacity: 50%" x1="14.205" y1="7.5" x2="13.001" y2="7.5"/>
+      <line style="opacity: 50%" x1="21.795" y1="7.5" x2="23" y2="7.5"/>
+      <line style="opacity: 50%" x1="15.316" y1="10.184" x2="14.464" y2="11.036"/>
+      <line style="opacity: 50%" x1="20.711" y1="4.789" x2="21.563" y2="3.937"/>
+      <circle style="opacity: 50%" cx="18" cy="7.5" r="2.169"/>
+    </svg>
+  </symbol>
+  <symbol id="svg-pencil" viewBox="0 0 24 24">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round" class="icon-tabler-pencil-code">
+      <path d="M4 20h4l10.5 -10.5a2.828 2.828 0 1 0 -4 -4l-10.5 10.5v4" />
+      <path d="M13.5 6.5l4 4" />
+      <path d="M20 21l2 -2l-2 -2" />
+      <path d="M17 17l-2 2l2 2" />
+    </svg>
+  </symbol>
+  <symbol id="svg-eye" viewBox="0 0 24 24">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round" class="icon-tabler-eye-code">
+      <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+      <path d="M10 12a2 2 0 1 0 4 0a2 2 0 0 0 -4 0" />
+      <path
+        d="M11.11 17.958c-3.209 -.307 -5.91 -2.293 -8.11 -5.958c2.4 -4 5.4 -6 9 -6c3.6 0 6.6 2 9 6c-.21 .352 -.427 .688 -.647 1.008" />
+      <path d="M20 21l2 -2l-2 -2" />
+      <path d="M17 17l-2 2l2 2" />
+    </svg>
+  </symbol>
+</svg>
+
+<input type="checkbox" class="sidebar-toggle" name="__navigation" id="__navigation" aria-label="Toggle site navigation sidebar">
+<input type="checkbox" class="sidebar-toggle" name="__toc" id="__toc" aria-label="Toggle table of contents sidebar">
+<label class="overlay sidebar-overlay" for="__navigation"></label>
+<label class="overlay toc-overlay" for="__toc"></label>
+
+<a class="skip-to-content muted-link" href="#furo-main-content">Skip to content</a>
+
+
+
+<div class="page">
+  <header class="mobile-header">
+    <div class="header-left">
+      <label class="nav-overlay-icon" for="__navigation">
+        <span class="icon"><svg><use href="#svg-menu"></use></svg></span>
+      </label>
+    </div>
+    <div class="header-center">
+      <a href="../index.html"><div class="brand">Medical Register 0.1.0 documentation</div></a>
+    </div>
+    <div class="header-right">
+      <div class="theme-toggle-container theme-toggle-header">
+        <button class="theme-toggle" aria-label="Toggle Light / Dark / Auto color theme">
+          <svg class="theme-icon-when-auto-light"><use href="#svg-sun-with-moon"></use></svg>
+          <svg class="theme-icon-when-auto-dark"><use href="#svg-moon-with-sun"></use></svg>
+          <svg class="theme-icon-when-dark"><use href="#svg-moon"></use></svg>
+          <svg class="theme-icon-when-light"><use href="#svg-sun"></use></svg>
+        </button>
+      </div>
+      <label class="toc-overlay-icon toc-header-icon" for="__toc">
+        <span class="icon"><svg><use href="#svg-toc"></use></svg></span>
+      </label>
+    </div>
+  </header>
+  <aside class="sidebar-drawer">
+    <div class="sidebar-container">
+      
+      <div class="sidebar-sticky"><a class="sidebar-brand" href="../index.html">
+  
+  
+</a><form class="sidebar-search-container" method="get" action="../search.html" role="search">
+  <input class="sidebar-search" placeholder="Search" name="q" aria-label="Search">
+  <input type="hidden" name="check_keywords" value="yes">
+  <input type="hidden" name="area" value="default">
+</form>
+<div id="searchbox"></div><div class="sidebar-scroll"><div class="sidebar-tree">
+  <p class="caption" role="heading"><span class="caption-text">Contenido:</span></p>
+<ul>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../INDICE_DOCUMENTACION.html">Indice de Documentacion</a><input aria-label="Toggle navigation of Indice de Documentacion" class="toctree-checkbox" id="toctree-checkbox-1" name="toctree-checkbox-1" role="switch" type="checkbox"/><label for="toctree-checkbox-1"><span class="icon"><svg><use href="#svg-arrow-right"></use></svg></span></label><ul>
+<li class="toctree-l2"><a class="reference internal" href="../manual.html">Manual de Usuario - Registro Personal de Peso e IMC</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../requeriments.html">Requerimientos Funcionales</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../SEGURIDAD.html">Seguridad: documentación</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../INFORME_SEGURIDAD.html">Informe de Análisis de Seguridad - Aplicación Médica</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../JWT_RBAC_Integracion.html">Gestión de Sesiones con JWT y Control de Acceso RBAC</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../IMPLEMENTACION_WSTG_BIDIRECCIONAL.html">Implementación Completa: Integración Bidireccional Automática WSTG Tracker ↔ DefectDojo</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../FLUJO_GENERACION_INFORME_ASVS.html">Flujo de Generación del Informe ASVS 4.0.3</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../mockups/MOCKUPS.html">Mockups y Diagramas</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../seguridad/01-validacion-entradas.html">Validación y sanitización de entradas</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../seguridad/02-autenticacion-contrasenas.html">Autenticación y contraseñas</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../seguridad/03-sesiones-csrf.html">Sesiones seguras y protección CSRF</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../seguridad/04-headers-https.html">Headers de seguridad y HTTPS</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../seguridad/05-rate-limiting-y-config.html">Rate limiting y configuración centralizada</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../seguridad/06-waf-modsecurity.html">WAF: ModSecurity v3 + OWASP Core Rule Set (CRS)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../defectdojo/DEFECTDOJO_CONFIGURACION.html">Configuración de DefectDojo</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../defectdojo/DEFECTDOJO_CREDENTIALS.html">Credenciales de DefectDojo</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../defectdojo/DEFECTDOJO_DATABASE.html">Gestión de Base de Datos de DefectDojo</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../defectdojo/DEFECTDOJO_INTEGRATION.html">Integración de DefectDojo</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../defectdojo/DEFECTDOJO_FLUJO_CREACION_RESOLUCION.html">Flujo de Creación y Resolución de Findings en DefectDojo</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../defectdojo/DEFECTDOJO_FLUJO_IMPLEMENTADO.html">Flujo de Creación → Resolución Implementado en DefectDojo</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../defectdojo/ANALISIS_CWE_699.html">Análisis de Seguridad según CWE-699</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../defectdojo/ESTADO_ACTUAL_CWE_699.html">Estado Actual del Programa - Análisis CWE-699</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../defectdojo/MAKE_ALL_USO.html">Uso de <code class="docutils literal notranslate"><span class="pre">make</span> <span class="pre">update</span></code> - Flujo Completo de DefectDojo</a></li>
+</ul>
+</li>
+</ul>
+
+</div>
+</div>
+
+      </div>
+      
+    </div>
+  </aside>
+  <div class="main">
+    <div class="content">
+      <div class="article-container">
+        <a href="#" class="back-to-top muted-link">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+            <path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8v12z"></path>
+          </svg>
+          <span>Back to top</span>
+        </a>
+        <div class="content-icon-container">
+          <div class="view-this-page">
+  <a class="muted-link" href="../_sources/git_docs/firma_commits.md.txt" title="View this page">
+    <svg><use href="#svg-eye"></use></svg>
+    <span class="visually-hidden">View this page</span>
+  </a>
+</div>
+<div class="theme-toggle-container theme-toggle-content">
+            <button class="theme-toggle" aria-label="Toggle Light / Dark / Auto color theme">
+              <svg class="theme-icon-when-auto-light"><use href="#svg-sun-with-moon"></use></svg>
+              <svg class="theme-icon-when-auto-dark"><use href="#svg-moon-with-sun"></use></svg>
+              <svg class="theme-icon-when-dark"><use href="#svg-moon"></use></svg>
+              <svg class="theme-icon-when-light"><use href="#svg-sun"></use></svg>
+            </button>
+          </div>
+          <label class="toc-overlay-icon toc-content-icon" for="__toc">
+            <span class="icon"><svg><use href="#svg-toc"></use></svg></span>
+          </label>
+        </div>
+        <article role="main" id="furo-main-content">
+          <section id="firma-de-commits-con-gpg">
+<h1>Firma de commits con GPG<a class="headerlink" href="#firma-de-commits-con-gpg" title="Link to this heading">¶</a></h1>
+<blockquote>
+<div><p>Actividad PPS — Puesta a Producción Segura · Fernando Raya · 2026-04-20</p>
+<p>Objetivo: configurar la firma criptográfica de commits con GPG en los
+repositorios de la asignatura y demostrar que GitHub muestra el badge
+<strong>“Verified”</strong> en los commits firmados.</p>
+<p><strong>Ubicación:</strong> <code class="docutils literal notranslate"><span class="pre">docs/git_docs/firma_commits.md</span></code> (repositorio <em>Aplicación Médica</em>).</p>
+</div></blockquote>
+<section id="introduccion">
+<h2>1. Introducción<a class="headerlink" href="#introduccion" title="Link to this heading">¶</a></h2>
+<p>La firma de commits añade dos garantías al control de versiones:</p>
+<ul class="simple">
+<li><p><strong>Autenticación</strong>: el autor del commit es realmente quien dice ser.</p></li>
+<li><p><strong>Integridad</strong>: el contenido del commit no se ha alterado después de la firma.</p></li>
+</ul>
+<p>Sin firma, cualquiera puede ejecutar:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>git<span class="w"> </span>config<span class="w"> </span>--global<span class="w"> </span>user.name<span class="w">  </span><span class="s2">&quot;Linus Torvalds&quot;</span>
+git<span class="w"> </span>config<span class="w"> </span>--global<span class="w"> </span>user.email<span class="w"> </span><span class="s2">&quot;torvalds@linux-foundation.org&quot;</span>
+git<span class="w"> </span>commit<span class="w"> </span>-m<span class="w"> </span><span class="s2">&quot;Backdoor&quot;</span>
+</pre></div>
+</div>
+<p>…y Git aceptará ese commit como si fuera de Linus. Plataformas como GitHub
+mostrarán el nombre y el email tal cual, sin validar nada.</p>
+<p>La firma con GPG resuelve esto adhiriendo al commit un bloque PGP firmado con
+la clave privada del autor. GitHub valida la firma contra la clave pública
+subida a la cuenta y, si la verificación es correcta, muestra el badge
+verde <strong><code class="docutils literal notranslate"><span class="pre">Verified</span></code></strong>.</p>
+<p>Este documento recoge <strong>paso a paso</strong> la configuración realizada en los dos
+proyectos de la asignatura, incluyendo la salida real de cada comando como
+evidencia:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">medical_register_android</span></code> (cliente Android Kotlin/Gradle, repo activo).</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">Aplicación</span> <span class="pre">Médica</span></code> (backend Flask + Docker).</p></li>
+</ul>
+<blockquote>
+<div><p><strong>Nota (2026-05-14):</strong> la documentación del <code class="docutils literal notranslate"><span class="pre">.gitignore</span></code> de ambos proyectos
+vive solo en <code class="docutils literal notranslate"><span class="pre">docs/gitignore.md</span></code> de este repositorio; no forma parte de la
+configuración GPG, pero conviene tenerlo claro al entregar la práctica.
+Este informe de firma GPG y sus capturas viven bajo <code class="docutils literal notranslate"><span class="pre">docs/git_docs/</span></code>.</p>
+</div></blockquote>
+</section>
+<section id="estado-inicial">
+<h2>2. Estado inicial<a class="headerlink" href="#estado-inicial" title="Link to this heading">¶</a></h2>
+<section id="versiones-de-las-herramientas">
+<h3>2.1. Versiones de las herramientas<a class="headerlink" href="#versiones-de-las-herramientas" title="Link to this heading">¶</a></h3>
+<div class="highlight-text notranslate"><div class="highlight"><pre><span></span>$ gpg --version
+gpg (GnuPG) 2.4.9
+libgcrypt 1.12.2
+Copyright (C) 2025 g10 Code GmbH
+
+$ git --version
+git version 2.54.0
+</pre></div>
+</div>
+</section>
+<section id="no-hay-clave-gpg-previa">
+<h3>2.2. No hay clave GPG previa<a class="headerlink" href="#no-hay-clave-gpg-previa" title="Link to this heading">¶</a></h3>
+<div class="highlight-text notranslate"><div class="highlight"><pre><span></span>$ gpg --list-secret-keys --keyid-format=LONG
+(salida vacía → no existe clave privada en ~/.gnupg)
+</pre></div>
+</div>
+</section>
+<section id="no-hay-configuracion-de-firma-en-git">
+<h3>2.3. No hay configuración de firma en Git<a class="headerlink" href="#no-hay-configuracion-de-firma-en-git" title="Link to this heading">¶</a></h3>
+<div class="highlight-text notranslate"><div class="highlight"><pre><span></span>$ git config --global --get user.signingkey
+$ git config --global --get commit.gpgsign
+$ git config --global --get gpg.format
+(las tres salidas son vacías → la firma de commits NO está activada)
+</pre></div>
+</div>
+</section>
+<section id="los-commits-anteriores-no-estan-firmados">
+<h3>2.4. Los commits anteriores no están firmados<a class="headerlink" href="#los-commits-anteriores-no-estan-firmados" title="Link to this heading">¶</a></h3>
+<p>Verificación con el placeholder <code class="docutils literal notranslate"><span class="pre">%G?</span></code> (estado de la firma):</p>
+<div class="highlight-text notranslate"><div class="highlight"><pre><span></span>$ git log -n 5 --pretty=format:&#39;%h %G? %s&#39;
+9b9e945 N  docs(MSTG-RES): sustituir guía por informe técnico
+af32e8b N  docs(MSTG-RES): informe unificado, sin registro de cambios, PDF regenerado
+f56b28e N  docs: regenerar MSTG_RESILIENCE.pdf (Pandoc + xelatex)
+673ff71 N  chore: ignorar guion de capturas, script PDF y assets no usados
+db1f37a N  docs: informe MSTG-RES en PDF, README de entrega y limpieza Play Integrity
+</pre></div>
+</div>
+<p>La columna <code class="docutils literal notranslate"><span class="pre">%G?</span></code> muestra el estado de la firma:</p>
+<div class="table-wrapper colwidths-auto docutils container">
+<table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Letra</p></th>
+<th class="head"><p>Significado</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">G</span></code></p></td>
+<td><p>Firma válida (Good)</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">B</span></code></p></td>
+<td><p>Firma mala (Bad)</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">U</span></code></p></td>
+<td><p>Firma válida con confianza desconocida (Unknown)</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">X</span></code></p></td>
+<td><p>Firma expirada (eXpired)</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">Y</span></code></p></td>
+<td><p>Clave expirada</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">R</span></code></p></td>
+<td><p>Clave revocada</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">E</span></code></p></td>
+<td><p>Error al validar</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">N</span></code></p></td>
+<td><p><strong>No hay firma</strong> ← estado inicial</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+</section>
+</section>
+<section id="generacion-de-la-clave-gpg">
+<h2>3. Generación de la clave GPG<a class="headerlink" href="#generacion-de-la-clave-gpg" title="Link to this heading">¶</a></h2>
+<section id="decisiones-tomadas">
+<h3>3.1. Decisiones tomadas<a class="headerlink" href="#decisiones-tomadas" title="Link to this heading">¶</a></h3>
+<div class="table-wrapper colwidths-auto docutils container">
+<table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Parámetro</p></th>
+<th class="head"><p>Valor</p></th>
+<th class="head"><p>Motivo</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>Algoritmo</p></td>
+<td><p><strong>Ed25519</strong> (EdDSA)</p></td>
+<td><p>Recomendado por GitHub: moderno, claves cortas, firmas rápidas.</p></td>
+</tr>
+<tr class="row-odd"><td><p>Subclave de cifrado</p></td>
+<td><p>Curve25519 (ECDH)</p></td>
+<td><p>Pareja natural de Ed25519 para cifrado.</p></td>
+</tr>
+<tr class="row-even"><td><p>Nombre</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">Alejandro</span> <span class="pre">Quiñones</span></code></p></td>
+<td><p>Mismo nombre del autor que aparece en los commits actuales.</p></td>
+</tr>
+<tr class="row-odd"><td><p>Email</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">alejandroquinonesgamez&#64;users.noreply.github.com</span></code></p></td>
+<td><p>Email <em>noreply</em> de GitHub. Evita exponer la dirección personal y es el que ya se usaba en commits. GitHub lo trata como verificado automáticamente para la cuenta.</p></td>
+</tr>
+<tr class="row-even"><td><p>Caducidad</p></td>
+<td><p>Sin caducidad</p></td>
+<td><p>Tal como sugiere el enunciado. La rotación se puede hacer manualmente cuando proceda.</p></td>
+</tr>
+<tr class="row-odd"><td><p>Passphrase</p></td>
+<td><p>Temporal (no versionar la real en informes públicos)</p></td>
+<td><p>Solo para la práctica. Rotar a una passphrase robusta del gestor de contraseñas.</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+</section>
+<section id="generacion-en-modo-batch">
+<h3>3.2. Generación en modo batch<a class="headerlink" href="#generacion-en-modo-batch" title="Link to this heading">¶</a></h3>
+<p>Para no depender de un TTY interactivo se usó <code class="docutils literal notranslate"><span class="pre">gpg</span> <span class="pre">--batch</span> <span class="pre">--generate-key</span></code>
+con un fichero de instrucciones (<code class="docutils literal notranslate"><span class="pre">/tmp/gpg_batch.txt</span></code>) eliminado
+inmediatamente después.</p>
+<p>Contenido del batch (con la passphrase <strong>redactada</strong>):</p>
+<div class="highlight-text notranslate"><div class="highlight"><pre><span></span>%echo Generando clave Ed25519 para Alejandro Quiñones
+Key-Type: EDDSA
+Key-Curve: ed25519
+Key-Usage: sign
+Subkey-Type: ECDH
+Subkey-Curve: cv25519
+Subkey-Usage: encrypt
+Name-Real: Alejandro Quiñones
+Name-Email: alejandroquinonesgamez@users.noreply.github.com
+Expire-Date: 0
+Passphrase: ***REDACTED***
+%commit
+%echo Clave generada
+</pre></div>
+</div>
+<p>Ejecución:</p>
+<div class="highlight-text notranslate"><div class="highlight"><pre><span></span>$ gpg --batch --pinentry-mode loopback --generate-key /tmp/gpg_batch.txt
+gpg: Generando clave Ed25519 para Alejandro Quiñones
+gpg: creado el directorio &#39;/home/alejandro/.gnupg/openpgp-revocs.d&#39;
+gpg: certificado de revocación guardado como
+     &#39;/home/alejandro/.gnupg/openpgp-revocs.d/6DF65CE25E4CDA2BF3B0E38C54B736719B025729.rev&#39;
+gpg: Clave generada
+
+$ rm -v /tmp/gpg_batch.txt
+&#39;/tmp/gpg_batch.txt&#39; borrado
+</pre></div>
+</div>
+<blockquote>
+<div><p><strong>Importante</strong>: GnuPG generó automáticamente un <em>certificado de revocación</em>
+en <code class="docutils literal notranslate"><span class="pre">~/.gnupg/openpgp-revocs.d/&lt;fingerprint&gt;.rev</span></code>. Conviene <strong>moverlo fuera
+del equipo</strong> (a un USB cifrado o un gestor de secretos) para poder revocar
+la clave si se compromete.</p>
+</div></blockquote>
+</section>
+<section id="verificacion-la-clave-existe">
+<h3>3.3. Verificación: la clave existe<a class="headerlink" href="#verificacion-la-clave-existe" title="Link to this heading">¶</a></h3>
+<div class="highlight-text notranslate"><div class="highlight"><pre><span></span>$ gpg --list-secret-keys --keyid-format=LONG
+gpg: comprobando base de datos de confianza
+gpg: marginals needed: 3  completes needed: 1  trust model: pgp
+gpg: nivel: 0  validez:   1  firmada:   0  confianza: 0-, 0q, 0n, 0m, 0f, 1u
+[keyboxd]
+---------
+sec   ed25519/54B736719B025729 2026-05-13 [SC]
+      6DF65CE25E4CDA2BF3B0E38C54B736719B025729
+uid              [  absoluta ] Alejandro Quiñones &lt;alejandroquinonesgamez@users.noreply.github.com&gt;
+ssb   cv25519/705932B5D62C8ED3 2026-05-13 [E]
+</pre></div>
+</div>
+<p>Datos relevantes que se extraen de la salida:</p>
+<div class="table-wrapper colwidths-auto docutils container">
+<table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Concepto</p></th>
+<th class="head"><p>Valor</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><strong>ID corto (8 bytes)</strong></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">54B736719B025729</span></code></p></td>
+</tr>
+<tr class="row-odd"><td><p><strong>Fingerprint (20 bytes)</strong></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">6DF6</span> <span class="pre">5CE2</span> <span class="pre">5E4C</span> <span class="pre">DA2B</span> <span class="pre">F3B0</span>&#160; <span class="pre">E38C</span> <span class="pre">54B7</span> <span class="pre">3671</span> <span class="pre">9B02</span> <span class="pre">5729</span></code></p></td>
+</tr>
+<tr class="row-even"><td><p>Algoritmo</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">ed25519</span></code> (firma) + <code class="docutils literal notranslate"><span class="pre">cv25519</span></code> (cifrado)</p></td>
+</tr>
+<tr class="row-odd"><td><p>Capacidades</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">[SC]</span></code> Sign + Certify · <code class="docutils literal notranslate"><span class="pre">[E]</span></code> Encrypt</p></td>
+</tr>
+<tr class="row-even"><td><p>Caducidad</p></td>
+<td><p>sin caducidad</p></td>
+</tr>
+<tr class="row-odd"><td><p>Confianza</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">absoluta</span></code> (la propia del usuario)</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="highlight-text notranslate"><div class="highlight"><pre><span></span>$ gpg --fingerprint 54B736719B025729
+pub   ed25519 2026-05-13 [SC]
+      6DF6 5CE2 5E4C DA2B F3B0  E38C 54B7 3671 9B02 5729
+uid        [  absoluta ] Alejandro Quiñones &lt;alejandroquinonesgamez@users.noreply.github.com&gt;
+sub   cv25519 2026-05-13 [E]
+</pre></div>
+</div>
+</section>
+</section>
+<section id="configurar-gpg-agent-para-uso-no-interactivo">
+<h2>4. Configurar gpg-agent para uso no interactivo<a class="headerlink" href="#configurar-gpg-agent-para-uso-no-interactivo" title="Link to this heading">¶</a></h2>
+<p>Por defecto <code class="docutils literal notranslate"><span class="pre">gpg-agent</span></code> lanza un cuadro de diálogo gráfico (<code class="docutils literal notranslate"><span class="pre">pinentry-gtk</span></code>)
+para pedir la passphrase. En esta sesión necesito que la passphrase se pueda
+introducir por <em>loopback</em> (texto plano desde stdin) y que se cachee durante
+toda la jornada, así que ajusto los ficheros de configuración del agente:</p>
+<div class="highlight-text notranslate"><div class="highlight"><pre><span></span>$ cat ~/.gnupg/gpg-agent.conf
+default-cache-ttl 28800     # 8 horas
+max-cache-ttl 28800
+allow-loopback-pinentry
+
+$ cat ~/.gnupg/gpg.conf
+use-agent
+pinentry-mode loopback
+
+$ gpgconf --kill gpg-agent
+$ gpg-connect-agent /bye    # arranca el agente con la nueva config
+</pre></div>
+</div>
+<p>Firma de prueba para precachear la passphrase en el agente:</p>
+<div class="highlight-text notranslate"><div class="highlight"><pre><span></span>$ echo &quot;test sign&quot; | gpg --batch --pinentry-mode loopback \
+                         --passphrase &quot;***REDACTED***&quot; \
+                         --local-user 54B736719B025729 --clearsign
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA512
+
+test sign
+
+-----BEGIN PGP SIGNATURE-----
+
+iHUEARYKAB0WIQRt9lziXkzaK/Ow44xUtzZxmwJXKQUCagTIaAAKCRBUtzZxmwJX
+KQy3AQDLnh8nDkkED8EpXGKFeHDzZigKYEukNgVZE0fAzvcapgEAvirgo8H+yuC8
+I1Sw0ljGvN6DAHiXEysX8je1rWrFrwE=
+=R0Fr
+-----END PGP SIGNATURE-----
+</pre></div>
+</div>
+<p>La firma sale en texto plano, lo que confirma que <strong>la clave funciona</strong>.</p>
+</section>
+<section id="configurar-git-para-usar-la-clave">
+<h2>5. Configurar Git para usar la clave<a class="headerlink" href="#configurar-git-para-usar-la-clave" title="Link to this heading">¶</a></h2>
+<section id="configuracion-global">
+<h3>5.1. Configuración global<a class="headerlink" href="#configuracion-global" title="Link to this heading">¶</a></h3>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="c1"># ID de la clave de firma</span>
+git<span class="w"> </span>config<span class="w"> </span>--global<span class="w"> </span>user.signingkey<span class="w"> </span>54B736719B025729
+
+<span class="c1"># Firmar TODOS los commits automáticamente</span>
+git<span class="w"> </span>config<span class="w"> </span>--global<span class="w"> </span>commit.gpgsign<span class="w"> </span><span class="nb">true</span>
+
+<span class="c1"># Firmar también las etiquetas (tags)</span>
+git<span class="w"> </span>config<span class="w"> </span>--global<span class="w"> </span>tag.gpgsign<span class="w"> </span><span class="nb">true</span>
+
+<span class="c1"># Binario de GPG (por si hay más de uno instalado)</span>
+git<span class="w"> </span>config<span class="w"> </span>--global<span class="w"> </span>gpg.program<span class="w"> </span>/usr/bin/gpg
+
+<span class="c1"># Identidad para los commits (tiene que coincidir con un UID de la clave)</span>
+git<span class="w"> </span>config<span class="w"> </span>--global<span class="w"> </span>user.name<span class="w">  </span><span class="s2">&quot;Alejandro Quiñones&quot;</span>
+git<span class="w"> </span>config<span class="w"> </span>--global<span class="w"> </span>user.email<span class="w"> </span><span class="s2">&quot;alejandroquinonesgamez@users.noreply.github.com&quot;</span>
+</pre></div>
+</div>
+<p>Comprobación:</p>
+<div class="highlight-text notranslate"><div class="highlight"><pre><span></span>$ git config --global --get user.signingkey
+54B736719B025729
+$ git config --global --get commit.gpgsign
+true
+$ git config --global --get tag.gpgsign
+true
+$ git config --global --get gpg.program
+/usr/bin/gpg
+$ git config --global --get user.name
+Alejandro Quiñones
+$ git config --global --get user.email
+alejandroquinonesgamez@users.noreply.github.com
+</pre></div>
+</div>
+</section>
+<section id="ajuste-local-en-aplicacion-medica">
+<h3>5.2. Ajuste local en <code class="docutils literal notranslate"><span class="pre">Aplicación</span> <span class="pre">Médica</span></code><a class="headerlink" href="#ajuste-local-en-aplicacion-medica" title="Link to this heading">¶</a></h3>
+<p>El repositorio <code class="docutils literal notranslate"><span class="pre">Aplicación</span> <span class="pre">Médica</span></code> tenía configurado localmente
+<code class="docutils literal notranslate"><span class="pre">user.email</span> <span class="pre">=</span> <span class="pre">alejandroquinonesgamez&#64;gmail.com</span></code> (anulando la global). Como el
+UID de la clave es el email <em>noreply</em>, GitHub solo marcará <code class="docutils literal notranslate"><span class="pre">Verified</span></code> si el
+<strong>email del commit coincide con un UID de la clave</strong> subida. Por tanto se
+ajusta también la config local de ese repo:</p>
+<div class="highlight-text notranslate"><div class="highlight"><pre><span></span>$ # Antes
+$ git config user.email
+alejandroquinonesgamez@gmail.com
+
+$ git config user.email alejandroquinonesgamez@users.noreply.github.com
+$ git config user.name  &quot;Alejandro Quiñones&quot;
+
+$ # Después
+$ git config user.email
+alejandroquinonesgamez@users.noreply.github.com
+$ git config user.signingkey
+54B736719B025729
+$ git config commit.gpgsign
+true
+</pre></div>
+</div>
+<blockquote>
+<div><p>Alternativa: añadir un UID adicional a la clave con el email <code class="docutils literal notranslate"><span class="pre">&#64;gmail.com</span></code>
+y verificar ese email también en GitHub. Para esta práctica se ha optado
+por la solución más simple: un único UID <code class="docutils literal notranslate"><span class="pre">noreply</span></code>.</p>
+</div></blockquote>
+</section>
+</section>
+<section id="exportar-la-clave-publica-y-subirla-a-github">
+<h2>6. Exportar la clave pública y subirla a GitHub<a class="headerlink" href="#exportar-la-clave-publica-y-subirla-a-github" title="Link to this heading">¶</a></h2>
+<p>Para que GitHub valide las firmas, necesita la <strong>clave pública</strong>.</p>
+<div class="highlight-text notranslate"><div class="highlight"><pre><span></span>$ gpg --armor --export 54B736719B025729
+-----BEGIN PGP PUBLIC KEY BLOCK-----
+
+mDMEagTIQhYJKwYBBAHaRw8BAQdAPBDSV0b8KmZtJ9tqoaESr37Z6f/AOO/V0qfW
+IHT82o+0RUFsZWphbmRybyBRdWnDsW9uZXMgPGFsZWphbmRyb3F1aW5vbmVzZ2Ft
+ZXpAdXNlcnMubm9yZXBseS5naXRodWIuY29tPoiQBBMWCgA4FiEEbfZc4l5M2ivz
+sOOMVLc2cZsCVykFAmoEyEICGwMFCwkIBwIGFQoJCAsCBBYCAwECHgECF4AACgkQ
+VLc2cZsCVylNkgEAmdTH7bVxcAYNR6sNL52SZWJCnWn+TnQErmFyLmuMmVoA/iL4
+7PQzEQoThFXtogYV78oE55SIGR1PUx+h9bQQ9NwIuDgEagTIQhIKKwYBBAGXVQEF
+AQEHQOoPQoBeG8tT7mgkAD24Hgfv7Vcy1GtMoZm7P/NxGSkCAwEIB4h4BBgWCgAg
+FiEEbfZc4l5M2ivzsOOMVLc2cZsCVykFAmoEyEICGwwACgkQVLc2cZsCVykTIAD9
+HYf5cJ6XcA94YHOyBrCbpjM3JwS1549MFFmhZqsoUvMA/3q2+/Rh4vM053walKQi
+gazekJ++oAO0z6QFwXC87DUE
+=ROuP
+-----END PGP PUBLIC KEY BLOCK-----
+</pre></div>
+</div>
+<p>Pasos en GitHub:</p>
+<ol class="arabic simple">
+<li><p>Entrar en <strong>Settings → Access → SSH and GPG keys → New GPG key</strong>.</p></li>
+<li><p>Pegar todo el bloque anterior (incluidas las líneas
+<code class="docutils literal notranslate"><span class="pre">-----BEGIN</span> <span class="pre">PGP</span> <span class="pre">PUBLIC</span> <span class="pre">KEY</span> <span class="pre">BLOCK-----</span></code> y <code class="docutils literal notranslate"><span class="pre">-----END</span> <span class="pre">PGP</span> <span class="pre">PUBLIC</span> <span class="pre">KEY</span> <span class="pre">BLOCK-----</span></code>).</p></li>
+<li><p>Guardar.</p></li>
+</ol>
+<p>Para comprobar después que GitHub ya tiene la clave:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>gh<span class="w"> </span>api<span class="w"> </span>user/gpg_keys<span class="w"> </span>--jq<span class="w"> </span><span class="s1">&#39;.[] | {name: .name, key_id: .key_id, emails: .emails}&#39;</span>
+</pre></div>
+</div>
+</section>
+<section id="hacer-commits-firmados">
+<h2>7. Hacer commits firmados<a class="headerlink" href="#hacer-commits-firmados" title="Link to this heading">¶</a></h2>
+<p>Con <code class="docutils literal notranslate"><span class="pre">commit.gpgsign</span> <span class="pre">=</span> <span class="pre">true</span></code> en la configuración global, <strong>cualquier <code class="docutils literal notranslate"><span class="pre">git</span> <span class="pre">commit</span></code></strong> lo firmará automáticamente. No hace falta el flag <code class="docutils literal notranslate"><span class="pre">-S</span></code>.</p>
+<section id="commit-firmado-en-medical-register-android">
+<h3>7.1. Commit firmado en <code class="docutils literal notranslate"><span class="pre">medical_register_android</span></code><a class="headerlink" href="#commit-firmado-en-medical-register-android" title="Link to this heading">¶</a></h3>
+<div class="highlight-text notranslate"><div class="highlight"><pre><span></span>$ git add docs/gitignore.md
+
+$ git commit -m &quot;docs: añadir gitignore.md documentando ambos proyectos
+
+Documenta el contenido del .gitignore de medical_register_android y de
+Aplicación Médica, con justificación por bloques y comparativa.
+
+Ejercicio PPS .gitignore (Fernando Raya, 2026-04-20).&quot;
+[main 4f4c9f5] docs: añadir gitignore.md documentando ambos proyectos
+ 1 file changed, 289 insertions(+)
+ create mode 100644 docs/gitignore.md
+</pre></div>
+</div>
+<p>Verificación con <code class="docutils literal notranslate"><span class="pre">git</span> <span class="pre">log</span> <span class="pre">--show-signature</span></code>:</p>
+<div class="highlight-text notranslate"><div class="highlight"><pre><span></span>$ git log --show-signature -n 1
+commit 4f4c9f587a6bf4dfba390964af005c471bc9f60a
+gpg: Firmado el mié 13 may 2026 20:53:04 CEST
+gpg:                usando EDDSA clave 6DF65CE25E4CDA2BF3B0E38C54B736719B025729
+gpg: Firma correcta de &quot;Alejandro Quiñones &lt;alejandroquinonesgamez@users.noreply.github.com&gt;&quot; [absoluta]
+Author: Alejandro Quiñones &lt;alejandroquinonesgamez@users.noreply.github.com&gt;
+Date:   Wed May 13 20:53:04 2026 +0200
+
+    docs: añadir gitignore.md documentando ambos proyectos
+</pre></div>
+</div>
+<p>Verificación rápida con <code class="docutils literal notranslate"><span class="pre">%G?</span></code>:</p>
+<div class="highlight-text notranslate"><div class="highlight"><pre><span></span>$ git log -n 5 --pretty=format:&#39;%h %G? %s&#39;
+4f4c9f5 G docs: añadir gitignore.md documentando ambos proyectos   ← firma OK
+9b9e945 N docs(MSTG-RES): sustituir guía por informe técnico
+af32e8b N docs(MSTG-RES): informe unificado, sin registro de cambios, PDF regenerado
+f56b28e N docs: regenerar MSTG_RESILIENCE.pdf (Pandoc + xelatex)
+673ff71 N chore: ignorar guion de capturas, script PDF y assets no usados
+</pre></div>
+</div>
+<p>El commit <code class="docutils literal notranslate"><span class="pre">4f4c9f5</span></code> pasa de <code class="docutils literal notranslate"><span class="pre">N</span></code> (sin firma) a <strong><code class="docutils literal notranslate"><span class="pre">G</span></code></strong> (firma válida).</p>
+</section>
+<section id="commit-firmado-en-aplicacion-medica">
+<h3>7.2. Commit firmado en <code class="docutils literal notranslate"><span class="pre">Aplicación</span> <span class="pre">Médica</span></code><a class="headerlink" href="#commit-firmado-en-aplicacion-medica" title="Link to this heading">¶</a></h3>
+<p>Antes del commit hubo que igualar el <code class="docutils literal notranslate"><span class="pre">user.email</span></code> local al UID de la clave
+(ver §5.2). Tras eso:</p>
+<div class="highlight-text notranslate"><div class="highlight"><pre><span></span>$ git add docs/gitignore.md       # solo el fichero nuevo, sin tocar WIP
+
+$ git commit -m &quot;docs: añadir gitignore.md documentando ambos proyectos
+
+Documenta el contenido del .gitignore de medical_register_android y de
+Aplicación Médica, con justificación por bloques y comparativa.
+
+Ejercicio PPS .gitignore (Fernando Raya, 2026-04-20).&quot;
+[dev 65fc9cc] docs: añadir gitignore.md documentando ambos proyectos
+ 1 file changed, 289 insertions(+)
+ create mode 100644 docs/gitignore.md
+</pre></div>
+</div>
+<p>Verificación:</p>
+<div class="highlight-text notranslate"><div class="highlight"><pre><span></span>$ git log --show-signature -n 1
+commit 65fc9ccd6ef199d10847417ceed28e5062443584
+gpg: Firmado el mié 13 may 2026 20:53:44 CEST
+gpg:                usando EDDSA clave 6DF65CE25E4CDA2BF3B0E38C54B736719B025729
+gpg: Firma correcta de &quot;Alejandro Quiñones &lt;alejandroquinonesgamez@users.noreply.github.com&gt;&quot; [absoluta]
+Author: Alejandro Quiñones &lt;alejandroquinonesgamez@users.noreply.github.com&gt;
+Date:   Wed May 13 20:53:44 2026 +0200
+
+    docs: añadir gitignore.md documentando ambos proyectos
+</pre></div>
+</div>
+<div class="highlight-text notranslate"><div class="highlight"><pre><span></span>$ git log -n 5 --pretty=format:&#39;%h %G? %s&#39;
+65fc9cc G docs: añadir gitignore.md documentando ambos proyectos   ← firma OK
+64d6a4e N Docker: soporte Compose v2/v1, base ECR y WAF con DNS dinámico
+d80b1db N docs: limpiar archivos legacy duplicados en capturas y PDFs
+6b3dd91 N fix(docker): evitar fallo de entrypoint en Windows con bind mount
+dae5bf3 N chore: normalizar permisos de scripts
+</pre></div>
+</div>
+<p>El commit <code class="docutils literal notranslate"><span class="pre">65fc9cc</span></code> también queda con <strong><code class="docutils literal notranslate"><span class="pre">G</span></code></strong>.</p>
+</section>
+</section>
+<section id="push-a-github-y-badge-verified">
+<h2>8. Push a GitHub y badge “Verified”<a class="headerlink" href="#push-a-github-y-badge-verified" title="Link to this heading">¶</a></h2>
+<p>Una vez subida la clave pública a GitHub (§6), basta con hacer <code class="docutils literal notranslate"><span class="pre">git</span> <span class="pre">push</span></code> en
+ambos repos:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="c1"># medical_register_android</span>
+git<span class="w"> </span>push<span class="w"> </span>origin<span class="w"> </span>main
+
+<span class="c1"># Aplicación Médica</span>
+git<span class="w"> </span>push<span class="w"> </span>origin<span class="w"> </span>dev
+</pre></div>
+</div>
+<p>GitHub validará la firma y, junto al hash corto del commit, mostrará un
+badge verde <strong><code class="docutils literal notranslate"><span class="pre">Verified</span></code></strong>. Al pulsarlo, se despliega un panel con:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>This commit was signed with the committer’s verified signature.
+Signed by: Alejandro Quiñones
+GPG key ID: 54B736719B025729
+</pre></div>
+</div>
+<section id="evidencia-visual-capturas">
+<h3>8.1. Evidencia visual (capturas)<a class="headerlink" href="#evidencia-visual-capturas" title="Link to this heading">¶</a></h3>
+<p>En este repositorio se incluye al menos la siguiente captura en
+<code class="docutils literal notranslate"><span class="pre">docs/git_docs/img/GPG/</span></code>:</p>
+<div class="table-wrapper colwidths-auto docutils container">
+<table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Archivo</p></th>
+<th class="head"><p>Contenido</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">GPG_created.png</span></code></p></td>
+<td><p>Evidencia de la clave GPG en GitHub (pantalla <strong>Settings → SSH and GPG keys</strong> o equivalente).</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<p><img alt="Clave GPG en GitHub" src="../_images/GPG_created.png" /></p>
+<p><strong>Opcional</strong> (si quieres completar el informe con más pruebas), guarda también:</p>
+<div class="table-wrapper colwidths-auto docutils container">
+<table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Archivo sugerido</p></th>
+<th class="head"><p>Descripción</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">verified_android.png</span></code></p></td>
+<td><p>Vista de un commit en <code class="docutils literal notranslate"><span class="pre">medical_register_apk</span></code> con badge <strong>Verified</strong>.</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">verified_appmedica.png</span></code></p></td>
+<td><p>Vista de un commit en <code class="docutils literal notranslate"><span class="pre">medical_register</span></code> con badge <strong>Verified</strong>.</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<p>Si aún no has hecho push, el repositorio local sigue siendo válido como
+prueba criptográfica: <code class="docutils literal notranslate"><span class="pre">git</span> <span class="pre">log</span> <span class="pre">--show-signature</span></code> debe mostrar
+<code class="docutils literal notranslate"><span class="pre">gpg:</span> <span class="pre">Firma</span> <span class="pre">correcta</span></code> y <code class="docutils literal notranslate"><span class="pre">%G?</span> <span class="pre">=</span> <span class="pre">G</span></code> en los commits recientes.</p>
+</section>
+</section>
+<section id="buenas-practicas-y-vigilant-mode">
+<h2>9. Buenas prácticas y “Vigilant Mode”<a class="headerlink" href="#buenas-practicas-y-vigilant-mode" title="Link to this heading">¶</a></h2>
+<p>GitHub ofrece un modo avanzado en <strong>Settings → Code, planning, and
+automation → SSH and GPG keys → Flag unsigned commits as unverified</strong>
+(<em>Vigilant Mode</em>).</p>
+<ul class="simple">
+<li><p><strong>Sin Vigilant Mode</strong>: los commits firmados llevan badge <code class="docutils literal notranslate"><span class="pre">Verified</span></code>; los no
+firmados aparecen sin badge.</p></li>
+<li><p><strong>Con Vigilant Mode</strong>: los firmados llevan <code class="docutils literal notranslate"><span class="pre">Verified</span></code> y los no firmados
+aparecen explícitamente como <strong><code class="docutils literal notranslate"><span class="pre">Unverified</span></code></strong>, lo que hace que cualquier
+commit sospechoso destaque.</p></li>
+</ul>
+<p>Se recomienda <strong>activarlo</strong> en cuentas de alto perfil (mantenedores,
+profesores, alumnos que entregan código).</p>
+<section id="limitaciones-de-la-firma-de-commits">
+<h3>Limitaciones de la firma de commits<a class="headerlink" href="#limitaciones-de-la-firma-de-commits" title="Link to this heading">¶</a></h3>
+<ul class="simple">
+<li><p><strong>Solo prueba quién firmó</strong>, no qué se hizo. Un atacante con tu clave puede
+firmar lo que quiera. Por eso la <em>passphrase</em> y el certificado de
+revocación son críticos.</p></li>
+<li><p><strong>No es protección contra exfiltración</strong>: si la clave privada se filtra,
+hay que revocarla (<code class="docutils literal notranslate"><span class="pre">gpg</span> <span class="pre">--gen-revoke</span></code>) y subir el certificado a GitHub
+o a un keyserver.</p></li>
+<li><p><strong><code class="docutils literal notranslate"><span class="pre">.gitignore</span></code> y firma se complementan</strong>: el primero evita subir
+secretos; la segunda evita suplantaciones. Idealmente se combinan con
+<code class="docutils literal notranslate"><span class="pre">pre-commit</span></code> (gitleaks, ruff) y CI/CD que rechace commits no firmados.</p></li>
+</ul>
+</section>
+</section>
+<section id="resumen-de-evidencias">
+<h2>10. Resumen de evidencias<a class="headerlink" href="#resumen-de-evidencias" title="Link to this heading">¶</a></h2>
+<div class="table-wrapper colwidths-auto docutils container">
+<table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Hito</p></th>
+<th class="head"><p>Comando</p></th>
+<th class="head"><p>Salida clave</p></th>
+<th class="head"><p>Estado</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>1. Generar clave</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">gpg</span> <span class="pre">--batch</span> <span class="pre">--generate-key</span> <span class="pre">...</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">gpg:</span> <span class="pre">Clave</span> <span class="pre">generada</span></code></p></td>
+<td><p>✅</p></td>
+</tr>
+<tr class="row-odd"><td><p>2. Listar clave</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">gpg</span> <span class="pre">--list-secret-keys</span> <span class="pre">--keyid-format=LONG</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">sec</span> <span class="pre">ed25519/54B736719B025729</span></code></p></td>
+<td><p>✅</p></td>
+</tr>
+<tr class="row-even"><td><p>3. Config Git</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">git</span> <span class="pre">config</span> <span class="pre">--global</span> <span class="pre">user.signingkey</span> <span class="pre">54B736719B025729</span></code> + <code class="docutils literal notranslate"><span class="pre">commit.gpgsign</span> <span class="pre">true</span></code></p></td>
+<td><p></p></td>
+<td><p>✅</p></td>
+</tr>
+<tr class="row-odd"><td><p>4. Commit Android</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">git</span> <span class="pre">commit</span> <span class="pre">-m</span> <span class="pre">&quot;docs:</span> <span class="pre">añadir</span> <span class="pre">gitignore.md</span> <span class="pre">...&quot;</span></code></p></td>
+<td><p>commit <code class="docutils literal notranslate"><span class="pre">4f4c9f5</span></code> con <code class="docutils literal notranslate"><span class="pre">%G?</span> <span class="pre">=</span> <span class="pre">G</span></code></p></td>
+<td><p>✅</p></td>
+</tr>
+<tr class="row-even"><td><p>5. Commit App Médica</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">git</span> <span class="pre">commit</span> <span class="pre">-m</span> <span class="pre">&quot;docs:</span> <span class="pre">añadir</span> <span class="pre">gitignore.md</span> <span class="pre">...&quot;</span></code></p></td>
+<td><p>commit <code class="docutils literal notranslate"><span class="pre">65fc9cc</span></code> con <code class="docutils literal notranslate"><span class="pre">%G?</span> <span class="pre">=</span> <span class="pre">G</span></code></p></td>
+<td><p>✅</p></td>
+</tr>
+<tr class="row-odd"><td><p>6. Subir clave a GitHub</p></td>
+<td><p>UI web <em>Settings → SSH and GPG keys</em></p></td>
+<td><p>Captura <code class="docutils literal notranslate"><span class="pre">docs/git_docs/img/GPG/GPG_created.png</span></code></p></td>
+<td><p>✅ (evidencia en repo)</p></td>
+</tr>
+<tr class="row-even"><td><p>7. Push y verificación</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">git</span> <span class="pre">push</span></code> + badge <strong>Verified</strong> en la web</p></td>
+<td><p>Comprueba en GitHub tras <code class="docutils literal notranslate"><span class="pre">git</span> <span class="pre">push</span></code>; opcional: añadir <code class="docutils literal notranslate"><span class="pre">verified_*.png</span></code></p></td>
+<td><p>⏳ / opcional</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<hr class="docutils" />
+<p><strong>Autor</strong>: Alejandro Cánovas Sánchez · <strong>Asignatura</strong>: PPS — Puesta a
+Producción Segura · <strong>Ejercicio</strong>: Firma de commits (Fernando Raya, 2026-04-20)</p>
+</section>
+</section>
+
+        </article>
+      </div>
+      <footer>
+        
+        <div class="related-pages">
+          
+          
+        </div>
+        <div class="bottom-of-page">
+          <div class="left-details">
+            <div class="copyright">
+                Copyright &#169; 2025, PumukyDev &amp; Alejandro Quiñones
+            </div>
+            Made with <a href="https://www.sphinx-doc.org/">Sphinx</a> and <a class="muted-link" href="https://pradyunsg.me">@pradyunsg</a>'s
+            
+            <a href="https://github.com/pradyunsg/furo">Furo</a>
+            
+          </div>
+          <div class="right-details">
+            
+          </div>
+        </div>
+        
+      </footer>
+    </div>
+    <aside class="toc-drawer">
+      
+      
+      <div class="toc-sticky toc-scroll">
+        <div class="toc-title-container">
+          <span class="toc-title">
+            On this page
+          </span>
+        </div>
+        <div class="toc-tree-container">
+          <div class="toc-tree">
+            <ul>
+<li><a class="reference internal" href="#">Firma de commits con GPG</a><ul>
+<li><a class="reference internal" href="#introduccion">1. Introducción</a></li>
+<li><a class="reference internal" href="#estado-inicial">2. Estado inicial</a><ul>
+<li><a class="reference internal" href="#versiones-de-las-herramientas">2.1. Versiones de las herramientas</a></li>
+<li><a class="reference internal" href="#no-hay-clave-gpg-previa">2.2. No hay clave GPG previa</a></li>
+<li><a class="reference internal" href="#no-hay-configuracion-de-firma-en-git">2.3. No hay configuración de firma en Git</a></li>
+<li><a class="reference internal" href="#los-commits-anteriores-no-estan-firmados">2.4. Los commits anteriores no están firmados</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#generacion-de-la-clave-gpg">3. Generación de la clave GPG</a><ul>
+<li><a class="reference internal" href="#decisiones-tomadas">3.1. Decisiones tomadas</a></li>
+<li><a class="reference internal" href="#generacion-en-modo-batch">3.2. Generación en modo batch</a></li>
+<li><a class="reference internal" href="#verificacion-la-clave-existe">3.3. Verificación: la clave existe</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#configurar-gpg-agent-para-uso-no-interactivo">4. Configurar gpg-agent para uso no interactivo</a></li>
+<li><a class="reference internal" href="#configurar-git-para-usar-la-clave">5. Configurar Git para usar la clave</a><ul>
+<li><a class="reference internal" href="#configuracion-global">5.1. Configuración global</a></li>
+<li><a class="reference internal" href="#ajuste-local-en-aplicacion-medica">5.2. Ajuste local en <code class="docutils literal notranslate"><span class="pre">Aplicación</span> <span class="pre">Médica</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#exportar-la-clave-publica-y-subirla-a-github">6. Exportar la clave pública y subirla a GitHub</a></li>
+<li><a class="reference internal" href="#hacer-commits-firmados">7. Hacer commits firmados</a><ul>
+<li><a class="reference internal" href="#commit-firmado-en-medical-register-android">7.1. Commit firmado en <code class="docutils literal notranslate"><span class="pre">medical_register_android</span></code></a></li>
+<li><a class="reference internal" href="#commit-firmado-en-aplicacion-medica">7.2. Commit firmado en <code class="docutils literal notranslate"><span class="pre">Aplicación</span> <span class="pre">Médica</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#push-a-github-y-badge-verified">8. Push a GitHub y badge “Verified”</a><ul>
+<li><a class="reference internal" href="#evidencia-visual-capturas">8.1. Evidencia visual (capturas)</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#buenas-practicas-y-vigilant-mode">9. Buenas prácticas y “Vigilant Mode”</a><ul>
+<li><a class="reference internal" href="#limitaciones-de-la-firma-de-commits">Limitaciones de la firma de commits</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#resumen-de-evidencias">10. Resumen de evidencias</a></li>
+</ul>
+</li>
+</ul>
+
+          </div>
+        </div>
+      </div>
+      
+      
+    </aside>
+  </div>
+</div><script src="../_static/documentation_options.js?v=01f34227"></script>
+    <script src="../_static/doctools.js?v=9bcbadda"></script>
+    <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../_static/scripts/furo.js?v=46bd48cc"></script>
+    </body>
+</html>
