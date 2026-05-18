@@ -23,7 +23,20 @@ from abc import ABC, abstractmethod
 from datetime import datetime, date
 from typing import Optional
 import os
+import re
 import sqlite3
+
+_DEVICE_FP_RE = re.compile(r"^[0-9a-f]{64}$")
+
+
+def _normalize_device_fingerprint(raw: str) -> Optional[str]:
+    """SHA-256 hex en minúsculas (64 caracteres) o None si no es válido."""
+    if not raw:
+        return None
+    s = raw.strip().lower()
+    if _DEVICE_FP_RE.fullmatch(s):
+        return s
+    return None
 try:
     from .config import STORAGE_CONFIG
 except ImportError:
@@ -219,6 +232,14 @@ class StorageInterface(ABC):
         """Actualiza el rol de un usuario. Devuelve True si se actualizó."""
         pass
 
+    @abstractmethod
+    def record_device_risk(self, fingerprint: str, reason: str) -> None:
+        """Marca una huella de dispositivo (SHA-256 hex) como bloqueada."""
+
+    @abstractmethod
+    def is_device_blocked(self, fingerprint: str) -> bool:
+        """True si la huella está marcada como riesgosa (fingerprint ya normalizado o raw hex)."""
+
 
 class MemoryStorage(StorageInterface):
     """Implementación de almacenamiento en memoria"""
@@ -232,7 +253,8 @@ class MemoryStorage(StorageInterface):
         self._weight_entries = []  # List[WeightEntryData]
         self._next_entry_id = 1
         self._next_user_id = 1
-    
+        self._device_risk = {}  # fingerprint_lower -> reason
+
     def get_user(self, user_id: int) -> Optional[UserData]:
         return self._users.get(user_id)
     
@@ -366,6 +388,17 @@ class MemoryStorage(StorageInterface):
         user.role = role
         return True
 
+    def record_device_risk(self, fingerprint: str, reason: str) -> None:
+        fp = _normalize_device_fingerprint(fingerprint)
+        if fp:
+            self._device_risk[fp] = (reason or "")[:256]
+
+    def is_device_blocked(self, fingerprint: str) -> bool:
+        fp = _normalize_device_fingerprint(fingerprint)
+        if not fp:
+            return False
+        return fp in self._device_risk
+
 
 class SQLCipherStorage(StorageInterface):
     """Almacenamiento persistente cifrado con SQLCipher"""
@@ -443,6 +476,15 @@ class SQLCipherStorage(StorageInterface):
                 )
                 """
             )
+            conn.execute(
+                """
+                CREATE TABLE IF NOT EXISTS device_risk (
+                    fingerprint TEXT PRIMARY KEY NOT NULL,
+                    reason TEXT NOT NULL,
+                    created_at TEXT NOT NULL
+                )
+                """
+            )
 
     def get_user(self, user_id: int) -> Optional[UserData]:
         with self._connect() as conn:
@@ -688,6 +730,30 @@ class SQLCipherStorage(StorageInterface):
                 )
                 for row in rows
             ]
+
+    def record_device_risk(self, fingerprint: str, reason: str) -> None:
+        fp = _normalize_device_fingerprint(fingerprint)
+        if not fp:
+            return
+        now = datetime.now().isoformat()
+        with self._connect() as conn:
+            conn.execute(
+                """
+                INSERT OR REPLACE INTO device_risk (fingerprint, reason, created_at)
+                VALUES (?, ?, ?)
+                """,
+                (fp, (reason or "")[:256], now),
+            )
+
+    def is_device_blocked(self, fingerprint: str) -> bool:
+        fp = _normalize_device_fingerprint(fingerprint)
+        if not fp:
+            return False
+        with self._connect() as conn:
+            row = conn.execute(
+                "SELECT 1 FROM device_risk WHERE fingerprint = ?", (fp,)
+            ).fetchone()
+            return row is not None
 
 
 class SQLiteStorage(StorageInterface):
@@ -758,6 +824,15 @@ class SQLiteStorage(StorageInterface):
                 )
                 """
             )
+            conn.execute(
+                """
+                CREATE TABLE IF NOT EXISTS device_risk (
+                    fingerprint TEXT PRIMARY KEY NOT NULL,
+                    reason TEXT NOT NULL,
+                    created_at TEXT NOT NULL
+                )
+                """
+            )
 
     def get_user(self, user_id: int) -> Optional[UserData]:
         with self._connect() as conn:
@@ -1003,4 +1078,28 @@ class SQLiteStorage(StorageInterface):
                 )
                 for row in rows
             ]
+
+    def record_device_risk(self, fingerprint: str, reason: str) -> None:
+        fp = _normalize_device_fingerprint(fingerprint)
+        if not fp:
+            return
+        now = datetime.now().isoformat()
+        with self._connect() as conn:
+            conn.execute(
+                """
+                INSERT OR REPLACE INTO device_risk (fingerprint, reason, created_at)
+                VALUES (?, ?, ?)
+                """,
+                (fp, (reason or "")[:256], now),
+            )
+
+    def is_device_blocked(self, fingerprint: str) -> bool:
+        fp = _normalize_device_fingerprint(fingerprint)
+        if not fp:
+            return False
+        with self._connect() as conn:
+            row = conn.execute(
+                "SELECT 1 FROM device_risk WHERE fingerprint = ?", (fp,)
+            ).fetchone()
+            return row is not None
 

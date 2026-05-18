@@ -26,7 +26,7 @@ import shutil
 
 import jwt as pyjwt
 
-from .storage import UserData, WeightEntryData
+from .storage import UserData, WeightEntryData, _normalize_device_fingerprint
 from .helpers import (
     calculate_bmi,
     get_bmi_description,
@@ -123,6 +123,10 @@ def require_auth(func):
         jti = payload.get("jti")
         if jti and current_app.storage.is_token_blacklisted(jti):
             return jsonify({"error": get_error("auth_required")}), 401
+
+        hdr_fp = request.headers.get("X-Device-Fingerprint", "")
+        if hdr_fp and current_app.storage.is_device_blocked(hdr_fp):
+            return jsonify({"error": "Dispositivo bloqueado por política de seguridad"}), 403
 
         g.current_user_id = int(payload["sub"])
         g.current_user_role = payload.get("role", "user")
@@ -238,6 +242,74 @@ def login():
     }), 200)
     _set_refresh_cookie(resp, refresh_token)
     return resp
+
+
+@api.route('/security/report', methods=['POST'])
+@limiter.limit("30 per minute")
+def security_report():
+    """
+    Marca una huella de dispositivo (SHA-256 hex, 64 caracteres) como bloqueada.
+    Sin autenticación (el cliente Android la invoca en contexto de incidente);
+    limitada por tasa. En producción convendría firmar la petición o restringir por red.
+    """
+    data = request.get_json(silent=True) or {}
+    fp = _normalize_device_fingerprint(str(data.get("fingerprint", "")))
+    if not fp:
+        return jsonify({"error": "fingerprint inválido (se espera SHA-256 hex, 64 caracteres)"}), 400
+    reason = str(data.get("reason") or "")[:256]
+    current_app.storage.record_device_risk(fp, reason)
+    return make_response("", 204)
+
+
+@api.route('/integrity/verify', methods=['POST'])
+@limiter.limit("60 per minute")
+def integrity_verify():
+    """
+    Cliente Android (Play Integrity): decodifica el token con Google cuando
+    PLAY_INTEGRITY_ENABLED y credenciales/paquete están configurados.
+    """
+    enabled = os.environ.get("PLAY_INTEGRITY_ENABLED", "").strip().lower() in (
+        "1",
+        "true",
+        "yes",
+    )
+    if not enabled:
+        return jsonify(
+            {
+                "verdict": "UNAVAILABLE",
+                "reason": "PLAY_INTEGRITY_DISABLED",
+            }
+        ), 200
+
+    data = request.get_json(silent=True) or {}
+    integrity_token = data.get("integrity_token") or data.get("integrityToken")
+    _nonce_raw = data.get("nonce")
+    nonce = "" if _nonce_raw is None else str(_nonce_raw)
+
+    package_name = os.environ.get("PLAY_INTEGRITY_PACKAGE_NAME", "").strip()
+    sa_json = os.environ.get("PLAY_INTEGRITY_SERVICE_ACCOUNT_JSON", "").strip()
+
+    if not package_name or not sa_json:
+        return jsonify(
+            {
+                "error": "Defina PLAY_INTEGRITY_PACKAGE_NAME y PLAY_INTEGRITY_SERVICE_ACCOUNT_JSON",
+                "verdict": "UNAVAILABLE",
+                "reason": "PLAY_INTEGRITY_SERVER_MISCONFIGURED",
+            }
+        ), 501
+
+    from .play_integrity import verify_play_integrity_token
+
+    result = verify_play_integrity_token(
+        str(integrity_token or ""),
+        nonce,
+        package_name,
+        sa_json,
+    )
+    body = {"verdict": result.verdict}
+    if result.reason:
+        body["reason"] = result.reason
+    return jsonify(body), 200
 
 
 @api.route('/auth/logout', methods=['POST'])
