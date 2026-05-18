@@ -106,9 +106,9 @@ git config commit.gpgsign false
 | 0 | `gitignore.md` | ✅ Hecho | — |
 | 1 | `firma_commits.md` | ✅ Evidencias en §8.1 y §11 | — |
 | 2 | `proteccion-ramas.md` | ✅ Evidencias en §5 | — |
-| 3 | `gitleaks.md` | ✅ Evidencias en §9 | Limpiar demo + opc. `action-ok-tras-limpieza.png` |
-| 4 | `github.md` | ✅ Evidencias en §5 | Revocar PAT; borrar `_demo_github` si queda en local |
-| 5 | `semgrep.md` | ✅ Evidencias en §9 | Opc.: `action-fallo.png` si quieres CI en rojo |
+| 3 | `gitleaks.md` | ✅ Evidencias en §9 (incl. limpieza) | — |
+| 4 | `github.md` | ✅ Evidencias en §5 | — |
+| 5 | `semgrep.md` | ✅ Evidencias en §9 | — |
 
 ---
 
@@ -626,7 +626,7 @@ git push origin dev
 | **github.md** | ✅ | — | — |
 | **semgrep.md** | ✅ | — | — |
 
-**Bloque PPS Git (documentación)**: apartados 0–5 cerrados. Solo quedan capturas **opcionales** (§9 abajo).
+**Bloque PPS Git (documentación)**: apartados 0–5 **cerrados** para entrega (§9).
 
 ---
 
@@ -647,12 +647,10 @@ docs/git_docs/img/PPS_git/
 │   ├── action-verde-setup.png
 │   ├── action-verde-setup-detail.png
 │   ├── action-fallo.png
-│   └── action-ok-tras-limpieza.png   # opcional
+│   └── action-ok-tras-limpieza.png
 ├── github/                      # ✅ apartado 4
 │   ├── options-enabled.png
 │   └── push-rejected.png
-│   ├── alerta-abierta.png       # opcional
-│   └── alerta-cerrada.png       # opcional
 └── semgrep/                     # ✅ apartado 5
     ├── scan-auto.png
     ├── deteccion-vuln.png
@@ -660,7 +658,6 @@ docs/git_docs/img/PPS_git/
     ├── action-verde.png
     ├── cloud-proyecto.png
     └── cloud-proyecto2.png
-    └── action-fallo.png         # opcional (CI rojo con demo)
 ```
 
 (`GPG_created.png` sigue en `docs/git_docs/img/GPG/`.)
@@ -669,7 +666,7 @@ docs/git_docs/img/PPS_git/
 
 ---
 
-## 9. Resumen global — capturas opcionales y cierre de entrega
+## 9. Cierre de entrega — estado final
 
 ### 9.0. Estado actual (mínimo exigible ya cubierto)
 
@@ -678,11 +675,22 @@ docs/git_docs/img/PPS_git/
 | `gitignore.md` | Sin sección gráfica (contenido de `.gitignore`) | — |
 | `firma_commits.md` | §11 | GPG ×4 + `img/GPG/GPG_created.png` |
 | `proteccion-ramas.md` | §5 | 7 PNG en `proteccion-ramas/` |
-| `gitleaks.md` | §9 | 3 PNG en `gitleaks/` |
+| `gitleaks.md` | §9 | 4 PNG en `gitleaks/` |
 | `github.md` | §5 | 2 PNG en `github/` |
 | `semgrep.md` | §9 | 6 PNG en `semgrep/` |
 
-Las subsecciones **9.1–9.4** explican cómo obtener capturas **opcionales** que refuerzan la memoria. Si no las haces, la entrega sigue siendo válida con lo de la tabla anterior.
+Capturas **no** exigidas explícitamente en los HTML y **omitidas** a propósito (sin dejar tareas pendientes en los informes):
+
+| Captura omitida | Motivo |
+|----------------|--------|
+| `github/alerta-abierta.png`, `alerta-cerrada.png` | Push bloqueado (GH013); PAT de prueba caducado/revocado; no hay alerta en reposo |
+| `proteccion-ramas/pr-bloqueado.png`, `pr-listo-merge.png` | Redundante con regla + `pr-checks-build` + push rechazado |
+| `semgrep/action-fallo.png` | Redundante con `vuln-scan.png` + `action-verde.png` |
+
+Captura **añadida** tras el ciclo gitleaks: `gitleaks/action-ok-tras-limpieza.png` (integrada en `gitleaks.md` §9).
+
+<details>
+<summary>Guía histórica: cómo obtener capturas opcionales (solo referencia)</summary>
 
 **Preparación común** (ejecutar una vez por sesión):
 
@@ -1040,16 +1048,7 @@ git commit --no-gpg-sign -m "docs(PPS): evidencias Git (gitleaks, github, semgre
 
 **Android** (`medical_register_apk`): no mezcles en el mismo commit del backend; las capturas GPG/protección Android ya están en sus rutas bajo `docs/git_docs/img/PPS_git/`.
 
----
-
-### 9.6. Índice rápido de capturas opcionales
-
-| Fichero | Sección detallada |
-|---------|-------------------|
-| `gitleaks/action-ok-tras-limpieza.png` | §9.1 |
-| `github/alerta-abierta.png`, `alerta-cerrada.png` | §9.2 |
-| `proteccion-ramas/pr-bloqueado.png`, `pr-listo-merge.png` | §9.3 |
-| `semgrep/action-fallo.png` | §9.4 |
+</details>
 
 ---
 

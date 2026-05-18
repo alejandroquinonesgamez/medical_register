@@ -232,7 +232,7 @@ semgrep scan --config auto app/_semgrep_demo_vuln.py
 | 5 | CI sin `SEMGREP_APP_TOKEN`: workflow en PR `pps/semgrep-vuln-demo` (#1, Success) | [`../img/PPS_git/semgrep/action-verde.png`](../img/PPS_git/semgrep/action-verde.png) |
 | 6 | Semgrep Cloud: proyecto y escaneo en `dev` | [`../img/PPS_git/semgrep/cloud-proyecto.png`](../img/PPS_git/semgrep/cloud-proyecto.png) |
 | 7 | Semgrep Cloud: pestaña *Supply Chain* (CVE en dependencias) | [`../img/PPS_git/semgrep/cloud-proyecto2.png`](../img/PPS_git/semgrep/cloud-proyecto2.png) |
-| 8 | (Opcional) Run CI en rojo con demo | `action-fallo.png` — guía en [`pasos.md`](pasos.md) **§9.4** (PR #1 pasó en verde; basta `vuln-scan.png` si no lo haces) |
+| 8 | Run CI en rojo con demo | No incluido | El PR de integración terminó en verde (`action-verde.png`). La detección de la vulnerabilidad de prueba se documenta en CLI con `vuln-scan.png` (regla blocking, línea 7), suficiente frente al enunciado. |
 
 ![Escaneo auto en app/: 9 findings en 28 ficheros](../img/PPS_git/semgrep/scan-auto.png)
 
@@ -261,7 +261,7 @@ semgrep scan --config auto app/_semgrep_demo_vuln.py
 | `semgrep-rules/no-flask-debug.yaml` | Regla personalizada (debug Flask) |
 | `.semgrepignore` | Excluye `tests/` y demos PPS |
 | `.github/workflows/semgrep.yml` | CI: reglas del repo; OWASP en PR si existe el demo |
-| `app/_semgrep_demo_vuln.py` | Solo en rama de práctica hasta limpieza pre-merge |
+| `app/_semgrep_demo_vuln.py` | Solo en rama de práctica; **no** debe quedar en `dev` tras el merge (se eliminó antes de fusionar) |
 
 **Guía operativa**: [`pasos.md`](pasos.md) §5.
 

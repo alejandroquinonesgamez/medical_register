@@ -185,13 +185,15 @@ Rama de trabajo de la práctica: `pps/gitleaks-setup` → PR a `dev`.
 | 1 | PR con check **gitleaks** en verde (sin secreto en el diff) | [`../img/PPS_git/gitleaks/action-verde-setup.png`](../img/PPS_git/gitleaks/action-verde-setup.png) |
 | 2 | Detalle del run: **No leaks detected** / job `gitleaks` correcto | [`../img/PPS_git/gitleaks/action-verde-setup-detail.png`](../img/PPS_git/gitleaks/action-verde-setup-detail.png) |
 | 3 | Run en **rojo** tras PAT ficticio en `_demo_gitleaks/leak.txt` (regla `github-pat`) | [`../img/PPS_git/gitleaks/action-fallo.png`](../img/PPS_git/gitleaks/action-fallo.png) |
-| 4 | (Opcional) Run verde tras `git rm` de la carpeta demo | `action-ok-tras-limpieza.png` — guía paso a paso: [`pasos.md`](pasos.md) **§9.1** |
+| 4 | Run verde tras eliminar la carpeta demo (`git rm` de `_demo_gitleaks`) | [`../img/PPS_git/gitleaks/action-ok-tras-limpieza.png`](../img/PPS_git/gitleaks/action-ok-tras-limpieza.png) |
 
 ![PR: check gitleaks en verde](../img/PPS_git/gitleaks/action-verde-setup.png)
 
 ![Run gitleaks: sin fugas](../img/PPS_git/gitleaks/action-verde-setup-detail.png)
 
 ![Run gitleaks: detección de secreto (fallo esperado)](../img/PPS_git/gitleaks/action-fallo.png)
+
+![Run gitleaks tras limpiar demo (sin fugas)](../img/PPS_git/gitleaks/action-ok-tras-limpieza.png)
 
 **Flujo documentado**: integración en CI → prueba negativa (fallo) → limpieza y revocación de credenciales de prueba si se usó un PAT real.
 

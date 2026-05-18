@@ -195,9 +195,9 @@ Repositorio: **`alejandroquinonesgamez/medical_register`**. Rama de prueba: `pps
 
 ![Push rechazado por GitHub Push Protection (GH013)](../img/PPS_git/github/push-rejected.png)
 
-**Interpretación**: GitHub impidió que el PAT entrara en el historial remoto. La remediación correcta es **rotar/revocar** el token (aunque el push fallara, si se creó un PAT real debe revocarse) y **no** subir el secreto; borrar `leak.txt` del commit local antes de un push limpio.
+**Interpretación**: GitHub impidió que el PAT entrara en el historial remoto (**GH013**). La remediación correcta es **revocar** el token de prueba (aunque el push fallara) y no confiar en borrar el fichero local sin rotación.
 
-**Alertas en Security (opcional)**: capturas `alerta-abierta.png` / `alerta-cerrada.png` — guía detallada en [`pasos.md`](pasos.md) **§9.2** (caso push bloqueado vs alerta en reposo).
+**Alertas en Security**: con *push protection* activo el secreto **no llega al remoto**, por lo que **no** suele generarse alerta en *Secret scanning*. No se aportan capturas `alerta-abierta` / `alerta-cerrada`: la evidencia del control es `push-rejected.png` más la configuración en `options-enabled.png`, conforme al flujo del enunciado cuando el bloqueo en `git push` funciona. El PAT de prueba usado en la demo **caducó o fue revocado** tras el ejercicio; no se creó uno nuevo.
 
 **Guía operativa**: [`pasos.md`](pasos.md) §4.
 
