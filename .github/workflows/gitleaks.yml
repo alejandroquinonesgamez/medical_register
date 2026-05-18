@@ -1,0 +1,56 @@
+name: gitleaks
+
+on:
+  pull_request:
+  push:
+  workflow_dispatch:
+
+jobs:
+  scan:
+    name: gitleaks
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Install Gitleaks
+        run: |
+          GL_VERSION=8.24.2
+          curl -sSfL "https://github.com/gitleaks/gitleaks/releases/download/v${GL_VERSION}/gitleaks_${GL_VERSION}_linux_x64.tar.gz" \
+            | tar xz -C /usr/local/bin gitleaks
+          gitleaks version
+
+      - name: Set scan range
+        id: range
+        run: |
+          if [ "${{ github.event_name }}" = "pull_request" ]; then
+            echo "opts=${{ github.event.pull_request.base.sha }}..${{ github.event.pull_request.head.sha }}" >> "$GITHUB_OUTPUT"
+          elif [ "${{ github.event_name }}" = "push" ] \
+            && [ -n "${{ github.event.before }}" ] \
+            && [ "${{ github.event.before }}" != "0000000000000000000000000000000000000000" ]; then
+            echo "opts=${{ github.event.before }}..${{ github.event.after }}" >> "$GITHUB_OUTPUT"
+          else
+            echo "opts=HEAD~1..HEAD" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Gitleaks detect (falla si hay secretos)
+        run: |
+          # Carpeta de demo PPS: escaneo directo (re-run / workflow_dispatch no pierden el rango)
+          if [ -d docs/git_docs/PPS_git/_demo_gitleaks ]; then
+            echo "Escaneando docs/git_docs/PPS_git/_demo_gitleaks/"
+            gitleaks detect \
+              --source docs/git_docs/PPS_git/_demo_gitleaks \
+              --no-git \
+              --verbose \
+              --redact \
+              --exit-code 1
+          else
+            echo "Escaneando commits: ${{ steps.range.outputs.opts }}"
+            gitleaks detect \
+              --source . \
+              --log-opts "${{ steps.range.outputs.opts }}" \
+              --verbose \
+              --redact \
+              --exit-code 1
+          fi
