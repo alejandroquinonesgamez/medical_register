@@ -1,0 +1,852 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
+<head>
+<!-- 2026-04-20 lun 13:31 -->
+<meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Gitleaks</title>
+<meta name="author" content="Fernando Raya" />
+<meta name="generator" content="Org Mode" />
+<style type="text/css">
+  #content { max-width: 60em; margin: auto; }
+  .title  { text-align: center;
+             margin-bottom: .2em; }
+  .subtitle { text-align: center;
+              font-size: medium;
+              font-weight: bold;
+              margin-top:0; }
+  .todo   { font-family: monospace; color: red; }
+  .done   { font-family: monospace; color: green; }
+  .priority { font-family: monospace; color: orange; }
+  .tag    { background-color: #eee; font-family: monospace;
+            padding: 2px; font-size: 80%; font-weight: normal; }
+  .timestamp { color: #bebebe; }
+  .timestamp-kwd { color: #5f9ea0; }
+  .org-right  { margin-left: auto; margin-right: 0px;  text-align: right; }
+  .org-left   { margin-left: 0px;  margin-right: auto; text-align: left; }
+  .org-center { margin-left: auto; margin-right: auto; text-align: center; }
+  .underline { text-decoration: underline; }
+  #postamble p, #preamble p { font-size: 90%; margin: .2em; }
+  p.verse { margin-left: 3%; }
+  pre {
+    border: 1px solid #e6e6e6;
+    border-radius: 3px;
+    background-color: #f2f2f2;
+    padding: 8pt;
+    font-family: monospace;
+    overflow: auto;
+    margin: 1.2em;
+  }
+  pre.src {
+    position: relative;
+    overflow: auto;
+  }
+  pre.src:before {
+    display: none;
+    position: absolute;
+    top: -8px;
+    right: 12px;
+    padding: 3px;
+    color: #555;
+    background-color: #f2f2f299;
+  }
+  pre.src:hover:before { display: inline; margin-top: 14px;}
+  /* Languages per Org manual */
+  pre.src-asymptote:before { content: 'Asymptote'; }
+  pre.src-awk:before { content: 'Awk'; }
+  pre.src-authinfo::before { content: 'Authinfo'; }
+  pre.src-C:before { content: 'C'; }
+  /* pre.src-C++ doesn't work in CSS */
+  pre.src-clojure:before { content: 'Clojure'; }
+  pre.src-css:before { content: 'CSS'; }
+  pre.src-D:before { content: 'D'; }
+  pre.src-ditaa:before { content: 'ditaa'; }
+  pre.src-dot:before { content: 'Graphviz'; }
+  pre.src-calc:before { content: 'Emacs Calc'; }
+  pre.src-emacs-lisp:before { content: 'Emacs Lisp'; }
+  pre.src-fortran:before { content: 'Fortran'; }
+  pre.src-gnuplot:before { content: 'gnuplot'; }
+  pre.src-haskell:before { content: 'Haskell'; }
+  pre.src-hledger:before { content: 'hledger'; }
+  pre.src-java:before { content: 'Java'; }
+  pre.src-js:before { content: 'Javascript'; }
+  pre.src-latex:before { content: 'LaTeX'; }
+  pre.src-ledger:before { content: 'Ledger'; }
+  pre.src-lisp:before { content: 'Lisp'; }
+  pre.src-lilypond:before { content: 'Lilypond'; }
+  pre.src-lua:before { content: 'Lua'; }
+  pre.src-matlab:before { content: 'MATLAB'; }
+  pre.src-mscgen:before { content: 'Mscgen'; }
+  pre.src-ocaml:before { content: 'Objective Caml'; }
+  pre.src-octave:before { content: 'Octave'; }
+  pre.src-org:before { content: 'Org mode'; }
+  pre.src-oz:before { content: 'OZ'; }
+  pre.src-plantuml:before { content: 'Plantuml'; }
+  pre.src-processing:before { content: 'Processing.js'; }
+  pre.src-python:before { content: 'Python'; }
+  pre.src-R:before { content: 'R'; }
+  pre.src-ruby:before { content: 'Ruby'; }
+  pre.src-sass:before { content: 'Sass'; }
+  pre.src-scheme:before { content: 'Scheme'; }
+  pre.src-screen:before { content: 'Gnu Screen'; }
+  pre.src-sed:before { content: 'Sed'; }
+  pre.src-sh:before { content: 'shell'; }
+  pre.src-sql:before { content: 'SQL'; }
+  pre.src-sqlite:before { content: 'SQLite'; }
+  /* additional languages in org.el's org-babel-load-languages alist */
+  pre.src-forth:before { content: 'Forth'; }
+  pre.src-io:before { content: 'IO'; }
+  pre.src-J:before { content: 'J'; }
+  pre.src-makefile:before { content: 'Makefile'; }
+  pre.src-maxima:before { content: 'Maxima'; }
+  pre.src-perl:before { content: 'Perl'; }
+  pre.src-picolisp:before { content: 'Pico Lisp'; }
+  pre.src-scala:before { content: 'Scala'; }
+  pre.src-shell:before { content: 'Shell Script'; }
+  pre.src-ebnf2ps:before { content: 'ebfn2ps'; }
+  /* additional language identifiers per "defun org-babel-execute"
+       in ob-*.el */
+  pre.src-cpp:before  { content: 'C++'; }
+  pre.src-abc:before  { content: 'ABC'; }
+  pre.src-coq:before  { content: 'Coq'; }
+  pre.src-groovy:before  { content: 'Groovy'; }
+  /* additional language identifiers from org-babel-shell-names in
+     ob-shell.el: ob-shell is the only babel language using a lambda to put
+     the execution function name together. */
+  pre.src-bash:before  { content: 'bash'; }
+  pre.src-csh:before  { content: 'csh'; }
+  pre.src-ash:before  { content: 'ash'; }
+  pre.src-dash:before  { content: 'dash'; }
+  pre.src-ksh:before  { content: 'ksh'; }
+  pre.src-mksh:before  { content: 'mksh'; }
+  pre.src-posh:before  { content: 'posh'; }
+  /* Additional Emacs modes also supported by the LaTeX listings package */
+  pre.src-ada:before { content: 'Ada'; }
+  pre.src-asm:before { content: 'Assembler'; }
+  pre.src-caml:before { content: 'Caml'; }
+  pre.src-delphi:before { content: 'Delphi'; }
+  pre.src-html:before { content: 'HTML'; }
+  pre.src-idl:before { content: 'IDL'; }
+  pre.src-mercury:before { content: 'Mercury'; }
+  pre.src-metapost:before { content: 'MetaPost'; }
+  pre.src-modula-2:before { content: 'Modula-2'; }
+  pre.src-pascal:before { content: 'Pascal'; }
+  pre.src-ps:before { content: 'PostScript'; }
+  pre.src-prolog:before { content: 'Prolog'; }
+  pre.src-simula:before { content: 'Simula'; }
+  pre.src-tcl:before { content: 'tcl'; }
+  pre.src-tex:before { content: 'TeX'; }
+  pre.src-plain-tex:before { content: 'Plain TeX'; }
+  pre.src-verilog:before { content: 'Verilog'; }
+  pre.src-vhdl:before { content: 'VHDL'; }
+  pre.src-xml:before { content: 'XML'; }
+  pre.src-nxml:before { content: 'XML'; }
+  /* add a generic configuration mode; LaTeX export needs an additional
+     (add-to-list 'org-latex-listings-langs '(conf " ")) in .emacs */
+  pre.src-conf:before { content: 'Configuration File'; }
+
+  table { border-collapse:collapse; }
+  caption.t-above { caption-side: top; }
+  caption.t-bottom { caption-side: bottom; }
+  td, th { vertical-align:top;  }
+  th.org-right  { text-align: center;  }
+  th.org-left   { text-align: center;   }
+  th.org-center { text-align: center; }
+  td.org-right  { text-align: right;  }
+  td.org-left   { text-align: left;   }
+  td.org-center { text-align: center; }
+  dt { font-weight: bold; }
+  .footpara { display: inline; }
+  .footdef  { margin-bottom: 1em; }
+  .figure { padding: 1em; }
+  .figure p { text-align: center; }
+  .equation-container {
+    display: table;
+    text-align: center;
+    width: 100%;
+  }
+  .equation {
+    vertical-align: middle;
+  }
+  .equation-label {
+    display: table-cell;
+    text-align: right;
+    vertical-align: middle;
+  }
+  .inlinetask {
+    padding: 10px;
+    border: 2px solid gray;
+    margin: 10px;
+    background: #ffffcc;
+  }
+  #org-div-home-and-up
+   { text-align: right; font-size: 70%; white-space: nowrap; }
+  textarea { overflow-x: auto; }
+  .linenr { font-size: smaller }
+  .code-highlighted { background-color: #ffff00; }
+  .org-info-js_info-navigation { border-style: none; }
+  #org-info-js_console-label
+    { font-size: 10px; font-weight: bold; white-space: nowrap; }
+  .org-info-js_search-highlight
+    { background-color: #ffff00; color: #000000; font-weight: bold; }
+  .org-svg { }
+</style>
+<style type="text/css">
+/******************************************************
+* I copied these styles from markdotto.com, who is
+* the creator of bootstrap, and I also did some
+* modification. Thanks Mark for the beautiful theme,
+* so I reserved the @mdo sign below.
+*****************************************************/
+
+/*
+__
+__                  /\ \
+/'_`\_    ___ ___    \_\ \    ___
+/'/'_` \ /' __` __`\  /'_` \  / __`\
+/\ \ \L\ \/\ \/\ \/\ \/\ \L\ \/\ \L\ \
+\ \ `\__,_\ \_\ \_\ \_\ \___,_\ \____/
+\ `\_____\\/_/\/_/\/_/\/__,_ /\/___/
+`\/_____/
+
+*/
+
+
+
+/* Body resets
+-------------------------------------------------- */
+
+* {
+-webkit-box-sizing:  border-box;
+-moz-box-sizing:  border-box;
+box-sizing:  border-box;
+}
+html, body {
+margin:  0;
+padding:  0;
+}
+html {
+font-size:  62.5%;
+}
+body {
+padding:  20px;
+font-family:  Menlo, Monaco, monospace;
+font-size:  14px;
+line-height:  1.5;
+color:  #666;
+background-color:  #fff;
+}
+p {
+margin:  0 0 20px;
+}
+h1, h2, h3 {
+position:  relative;
+margin:  30px 0 20px;
+font-size:  18px;
+font-weight:  bold;
+line-height:  1.1;
+color:  #111;
+text-rendering:  optimizeLegibility;
+}
+h1:before, h2:before, h3:before {
+position:  absolute;
+top:  auto;
+color:  #ccc;
+display:  none;
+}
+h1:before {
+content:  "";
+left:  -1.25em;
+}
+h2:before {
+content:  "*";
+left:  -2em;
+}
+h3:before {
+content:  "**";
+left:  -2.5em;
+}
+i, em, b, strong {
+padding-left:  .1em;
+padding-right:  .1em;
+}
+b, strong {
+font-weight:  bold;
+color:  #333;
+}
+b:before, b: after, strong:before, strong: after {
+content:  "*";
+}
+i:before, i: after, em:before, em: after {
+content:  "/";
+}
+hr {
+margin:  0;
+border:  0;
+}
+hr: after {
+display:  block;
+margin:  20px 0;
+content:  "----------------------------------------------------------------";
+color:  #ccc;
+}
+ul, ol {
+padding:  0;
+margin:  0 0 20px;
+}
+code, pre {
+font-family:  Menlo, Monaco, Consolas, "Courier New", monospace;
+}
+code {
+color:  #d14;
+}
+code:before, code: after {
+content:  "=";
+color:  #ccc;
+}
+pre {
+display:  block;
+margin:  0 0 14px;
+padding:  15px;
+border-radius:  3px 3px 3px 3px;
+font-size:  18px;
+line-height:  28px;
+background-color:  #f5f5f5;
+white-space:  pre;
+white-space:  pre-wrap;
+word-break:  break-all;
+word-wrap:  break-word;
+}
+blockquote {
+padding:  0 0 0 20px;
+margin:  0 30px 20px -22.5px;
+color:  #999;
+border-left:  8px solid #e5e5e5;
+}
+blockquote p: last-child {
+margin-bottom:  0;
+}
+img {
+display:  block;
+margin:  0;
+border-radius:  5px;
+}
+a {
+font-weight:  inherit;
+line-height:  inherit;
+color:  #000;
+text-decoration:  none;
+}
+sup a:before {
+content:  "[";
+}
+sup a: after {
+content:  "]";
+}
+a: hover {
+text-decoration:  underline;
+}
+table {
+line-height:  2.5;
+margin-bottom:  15px;
+max-width:  100%;
+width:  100%;
+}
+table td, table th {
+padding:  0 15px;
+}
+table th.left, table td.left {
+text-align:  left;
+}
+table th.right, table td.right {
+text-align:  right;
+}
+/******************************************************/
+/* body */
+body {
+margin:  0 auto;
+max-width:  770px;
+}
+/* head */
+.masthead {
+color:  #888;
+}
+.masthead: after {
+display:  block;
+content:  '----------------------------------------------------------------';
+margin:  10px 0;
+color:  #ccc;
+}
+.masthead a {
+color:  #333;
+}
+.masthead ul {
+list-style:  none;
+}
+.masthead li {
+display:  inline-block;
+}
+.masthead li + li:before {
+display:  inline-block;
+content:  "\00B7 \00a0";
+color:  #ccc;
+}
+/* searchform*/
+#searchform {
+position:  absolute;
+top:  54px;
+right:  30.4%;
+}
+#searchform #s {
+background:  url("/media/img/search.png") no-repeat 5px 6px;
+box-shadow:  inset 0 1px 1px rgba(0,0,0,0.1);
+border:  1px solid #ddd;
+border-radius:  2px;
+-moz-border-radius:  2px;
+width:  90px;
+height:  30px;
+line-height:  12px;
+padding:  4px 10px 4px 28px;
+
+-webkit-transition-duration:  400ms;
+-webkit-transition-property:  width, background;
+-webkit-transition-timing-function:  ease;
+-moz-transition-duration:  400ms;
+-moz-transition-property:  width, background;
+-moz-transition-timing-function:  ease;
+-o-transition-duration:  400ms;
+-o-transition-property:  width, background;
+-o-transition-timing-function:  ease;
+}
+#searchform #s: focus {
+background-color:  #f9f9f9;
+width:  160px;
+}
+.masthead img.avatar {
+position:  relative;
+float:  right;
+margin-top:  -100px;
+margin-bottom:  -100%;
+margin-right:  10%;
+width:  200px;
+background-color:  #fff;
+}
+/* post */
+.post {
+position:  relative;
+}
+.post: after {
+display:  block;
+content:  "----------------------------------------------------------------";
+color:  #ccc;
+}
+.post img {
+max-width:  100%;
+}
+.post li {
+list-style:  none outside none;
+}
+.post ul > li:before {
+content:  "- ";
+margin-left:  -1.25em;
+color:  #ccc;
+}
+.post ol {
+counter-reset:  o-list;
+}
+.post ol > li:before {
+content:  counter(o-list) ") ";
+counter-increment:  o-list;
+margin-left:  -1.85em;
+color:  #ccc;
+}
+
+/* special for li in pre */
+.post pre li {
+list-style-type:  decimal;
+}
+
+.post pre li:before {
+display:  none;
+}
+
+/* meta info */
+.post-info {
+display:  inline-block;
+margin:  -10px 0 -10px;
+color:  #999;
+}
+.post-info + .post-info:before {
+content:  "\2223 \00a0";
+}
+.post-meta: after {
+content:  "----------------------------------------------------------------";
+display:  block;
+margin-top:  -1px;
+color:  #ccc;
+}
+
+/* table of content */
+#table-of-contents {
+position:  fixed;
+right:  0em;
+top:  0em;
+border: 1px solid #e1e1e8;
+-webkit-box-shadow:  0 0 1em #777777;
+-moz-box-shadow:  0 0 1em #777777;
+-webkit-border-bottom-left-radius:  5px;
+-moz-border-radius-bottomleft:  5px;
+text-align:  center;
+/* ensure doesn't flow off the screen when expanded */
+max-height:  80%;
+overflow:  auto;
+z-index:  200;
+}
+
+#table-of-contents h2 {
+max-width:  20em;
+font-weight:  normal;
+padding-left:  0.5em;
+padding-top:  0.05em;
+padding-bottom:  0.05em;
+}
+
+#table-of-contents ul {
+margin-left:  14pt;
+margin-bottom:  10pt;
+padding:  0
+}
+
+#table-of-contents li {
+padding:  0;
+margin:  1px;
+list-style:  none;
+}
+
+#table-of-contents ul>: first-child {
+color:  blue;
+}
+
+#table-of-contents #text-table-of-contents {
+display:  none;
+text-align:  left;
+}
+
+#table-of-contents: hover #text-table-of-contents {
+display:  block;
+padding:  0.5em;
+margin-top:  -1.5em;
+}
+
+/* footer */
+.footer {
+margin:  80px 0 0;
+text-align:  center;
+font-size:  15px;
+color:  #999;
+}
+.footer > p {
+margin:  0;
+line-height:  1.5;
+}
+.footpara {
+display:  inline;
+}
+
+/* Responsive
+-------------------------------------------------- */
+
+@media (min-width:  768px) {
+/* Increase body padding and font-sizes */
+body {
+padding:  30px;
+font-size:  18px;
+line-height:  1.75;
+}
+h1:before, h2:before, h3:before {
+display:  inline;
+}
+}
+
+@media (min-width:  1024px) {
+body {
+padding:  30px;
+}
+}
+</style>
+<script type="text/javascript">
+document.addEventListener('DOMContentLoaded',function() {
+document.getElementById("table-of-contents").onclick = function() {
+var elem = document.getElementById("text-table-of-contents");
+elem.style.display = elem.style.display == "block" ? "none" : "block";
+}
+});
+
+var url = document.location.href;
+var orgsource = url.substring(0, url.lastIndexOf("."))+".org.html";
+function show_org_source(){
+document.location.href = orgsource;
+}
+</script>
+</head>
+<body>
+<div id="content" class="content">
+<h1 class="title">Gitleaks</h1>
+<div id="table-of-contents" role="doc-toc">
+<h2>Table of Contents</h2>
+<div id="text-table-of-contents" role="doc-toc">
+<ul>
+<li><a href="#org141ffa2">1. Qué es Gitleaks</a>
+<ul>
+<li><a href="#orgded662d">1.1. ¿Qué hacer si Gitleaks detecta algo?</a></li>
+<li><a href="#org6b63fdb">1.2. Beneficios de usar Gitleaks en el equipo</a></li>
+</ul>
+</li>
+<li><a href="#orgc867faf">2. Uso</a>
+<ul>
+<li><a href="#org3d14088">2.1. Automatización con GitHub Actions</a></li>
+<li><a href="#orga94566e">2.2. Uso Local (Pre-Commit)</a>
+<ul>
+<li><a href="#org70ae6c4">2.2.1. Instalación</a></li>
+<li><a href="#org9404b6e">2.2.2. Escaneo manual</a></li>
+</ul>
+</li>
+<li><a href="#org6ef581a">2.3. Falsos positivos</a></li>
+</ul>
+</li>
+<li><a href="#orgb055674">3. Referencias</a></li>
+</ul>
+</div>
+</div>
+<p>
+Implementaremos una serie de técnicas para mejorar la seguridad de
+nuestro código evitando que se filtren secretos mediante Gitleaks
+(<a href="https://github.com/gitleaks/gitleaks-action">https://github.com/gitleaks/gitleaks-action</a>).
+</p>
+
+<ul class="org-ul">
+<li>Automatizaremos mediante un <i>Git Action</i> su funcionamiento.</li>
+<li>Lo ejecutaremos antes de hacer un commit en local.</li>
+<li>Lo configuraremos (si es necesario) para evitar falsos positivos y
+reconocer secretos.</li>
+</ul>
+
+<p>
+Documenta su uso en tu repositorio, mostrando como funciona.
+</p>
+<div id="outline-container-org141ffa2" class="outline-2">
+<h2 id="org141ffa2"><span class="section-number-2">1.</span> Qué es Gitleaks</h2>
+<div class="outline-text-2" id="text-1">
+<p>
+Gitleaks es una herramienta multiplataforma de <b>Análisis de Código
+Estático</b> (SAST) de código abierto, diseñada específicamente para
+detectar contraseñas pasadas, claves API y tokens en repositorios Git.
+</p>
+
+<p>
+Analiza el repositorio local o remoto mediante expresiones regulares
+(regex) predefinidas o personalizadas y entropía de cadenas para
+identificar patrones que parezcan secretos subidos por error.
+</p>
+
+<p>
+Puede ejecutarse localmente como un <i>hook</i> de pre-commit (bloqueando
+la creación del commit en la propia máquina del desarrollador si
+detecta un secreto) o integrarse en el <i>pipeline</i> de CI/CD para
+rechazar un <i>push</i> que contenga información sensible.
+</p>
+</div>
+<div id="outline-container-orgded662d" class="outline-3">
+<h3 id="orgded662d"><span class="section-number-3">1.1.</span> ¿Qué hacer si Gitleaks detecta algo?</h3>
+<div class="outline-text-3" id="text-1-1">
+<p>
+Si la herramienta lanza una alerta, el flujo de trabajo debe ser:
+</p>
+
+<dl class="org-dl">
+<dt>Invalidar el secreto</dt><dd>Cambiar la contraseña o revocar el API Key
+inmediatamente. Borrar el commit no es suficiente, el secreto ya
+debe considerarse comprometido.</dd>
+
+<dt>Limpiar el historial</dt><dd>Si es estrictamente necesario borrar el
+rastro, se deben usar herramientas como git filter-repo o el BFG
+Repo-Cleaner.</dd>
+</dl>
+</div>
+</div>
+<div id="outline-container-org6b63fdb" class="outline-3">
+<h3 id="org6b63fdb"><span class="section-number-3">1.2.</span> Beneficios de usar Gitleaks en el equipo</h3>
+<div class="outline-text-3" id="text-1-2">
+<dl class="org-dl">
+<dt>Evita multas y filtraciones</dt><dd>Previene el acceso no autorizado a
+infraestructura cloud (como AWS o Azure).</dd>
+
+<dt>Educación</dt><dd>Los desarrolladores aprenden a usar variables de
+entorno o gestores de secretos (como GitHub Secrets) en lugar de
+hardcodear credenciales.</dd>
+
+<dt>Auditoría</dt><dd>Deja un registro de que el equipo sigue estándares de
+seguridad en el ciclo de vida de desarrollo.</dd>
+</dl>
+</div>
+</div>
+</div>
+<div id="outline-container-orgc867faf" class="outline-2">
+<h2 id="orgc867faf"><span class="section-number-2">2.</span> Uso</h2>
+<div class="outline-text-2" id="text-2">
+</div>
+<div id="outline-container-org3d14088" class="outline-3">
+<h3 id="org3d14088"><span class="section-number-3">2.1.</span> Automatización con GitHub Actions</h3>
+<div class="outline-text-3" id="text-2-1">
+<p>
+La forma más robusta de asegurar que ningún secreto llegue a la rama
+principal (<i>main</i>). Puedes usar la acción oficial de Gitleaks.
+</p>
+
+<div class="org-src-container">
+<pre class="src src-yaml" id="org109c0d4">name: gitleaks
+on:
+  pull_request:
+  push:
+    branches: [main]
+jobs:
+  scan:
+    name: gitleaks
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0 # Importante para escanear todo el historial
+      - uses: gitleaks/gitleaks-action@v2
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+</pre>
+</div>
+
+<p>
+Haz una prueba poniendo un secreto en el repositorio y documenta como
+la <i>Action</i> ha funcionado.
+</p>
+</div>
+</div>
+<div id="outline-container-orga94566e" class="outline-3">
+<h3 id="orga94566e"><span class="section-number-3">2.2.</span> Uso Local (Pre-Commit)</h3>
+<div class="outline-text-3" id="text-2-2">
+<p>
+Lo ideal es detectar el secreto antes de que salga de la computadora
+del desarrollador.
+</p>
+</div>
+<div id="outline-container-org70ae6c4" class="outline-4">
+<h4 id="org70ae6c4"><span class="section-number-4">2.2.1.</span> Instalación</h4>
+<div class="outline-text-4" id="text-2-2-1">
+<p>
+Leer:
+</p>
+
+<ul class="org-ul">
+<li><a href="https://github.com/gitleaks/gitleaks#pre-commit">https://github.com/gitleaks/gitleaks#pre-commit</a></li>
+<li><a href="https://github.com/gitleaks/gitleaks#creating-a-baseline">https://github.com/gitleaks/gitleaks#creating-a-baseline</a></li>
+<li><a href="https://github.com/gitleaks/gitleaks#pre-commit-hook">https://github.com/gitleaks/gitleaks#pre-commit-hook</a></li>
+</ul>
+</div>
+</div>
+<div id="outline-container-org9404b6e" class="outline-4">
+<h4 id="org9404b6e"><span class="section-number-4">2.2.2.</span> Escaneo manual</h4>
+<div class="outline-text-4" id="text-2-2-2">
+<p>
+Ejecuta este comando en la raíz de tu proyecto para revisar todo el
+historial:
+</p>
+
+<pre class="example">
+gitleaks detect --verbose
+</pre>
+
+
+<p>
+Incorpora esta funcionalidad a tu proyecto de forma local para no
+"ensuciar" el historial. Documenta su funcionamiento.
+</p>
+</div>
+</div>
+</div>
+<div id="outline-container-org6ef581a" class="outline-3">
+<h3 id="org6ef581a"><span class="section-number-3">2.3.</span> Falsos positivos</h3>
+<div class="outline-text-3" id="text-2-3">
+<p>
+A veces, Gitleaks puede dar "falsos positivos" (detectar algo que
+parece un secreto pero no lo es). Para gestionar esto, crea un
+archivo <code>.gitleaks.toml</code> en la raíz:
+</p>
+
+<dl class="org-dl">
+<dt>Allowlist</dt><dd>Puedes definir huellas digitales específicas o archivos
+que deben ser ignorados.</dd>
+
+<dt>Reglas propias</dt><dd>Si tu empresa usa un formato de token específicas
+(ej. CORP<sub>ID</sub><sub>12345</sub>), puedes añadir una expresión regular para que
+Gitleaks lo busque específicamente.</dd>
+
+<dt>Añadir al Allowlist</dt><dd>Solo si estás 100% seguro de que es un falso
+positivo.</dd>
+</dl>
+
+<div class="org-src-container">
+<label class="org-src-name"><span class="listing-number">Listing 1: </span>Extracto de <code>.gitleaks.toml</code> <a href="https://gist.github.com/boyter/48942e5bcf9eed3cd3ed5f8ad413920f">https://gist.github.com/boyter/48942e5bcf9eed3cd3ed5f8ad413920f</a></label><pre class="src src-toml"># This is the default gitleaks configuration file.
+# Rules and allowlists are defined within this file.
+# Rules instruct gitleaks on what should be considered a secret.
+# Allowlists instruct gitleaks on what is allowed, i.e. not a secret.
+title = "gitleaks config"
+
+[allowlist]
+description = "global allow lists"
+regexes = [
+  '''219-09-9999''',
+  '''078-05-1120''',
+  '''(9[0-9]{2}|666)-\d{2}-\d{4}''',
+]
+paths = [
+  '''gitleaks.toml''',
+  '''(.*?)(jpg|gif|doc|pdf|bin|svg|socket)$''',
+  '''(go.mod|go.sum)$''',
+  '''vendor''',
+]
+[[rules]]
+description = "Discord API key"
+id = "discord-api-token"
+regex = '''(?i)(?:discord)(?:[0-9a-z\-_\t .]{0,20})(?:[\s|']|[\s|"]){0,3}(?:=|&gt;|:=|\|\|:|&lt;=|=&gt;|:)(?:'|\"|\s|=|\x60){0,5}([a-f0-9]{64})(?:['|\"|\n|\r|\s|\x60]|$)'''
+secretGroup = 1
+keywords = [
+  "discord",
+]
+</pre>
+</div>
+
+<p>
+Configura si es necesario un <code>.gitleaks.toml</code> para tu proyecto
+evitando falsos positivos o instruyendo al programa sobre cómo
+reconocer un secreto.
+</p>
+</div>
+</div>
+</div>
+<div id="outline-container-orgb055674" class="outline-2">
+<h2 id="orgb055674"><span class="section-number-2">3.</span> Referencias</h2>
+<div class="outline-text-2" id="text-3">
+<ul class="org-ul">
+<li><a href="https://github.com/gitleaks/gitleaks">https://github.com/gitleaks/gitleaks</a></li>
+<li><a href="https://medium.com/@ibm_ptc_security/securing-your-repositories-with-gitleaks-and-pre-commit-27691eca478d">https://medium.com/@ibm_ptc_security/securing-your-repositories-with-gitleaks-and-pre-commit-27691eca478d</a></li>
+</ul>
+</div>
+</div>
+</div>
+<div id="postamble" class="status">
+<p class="author">Author: Fernando Raya</p>
+<p class="date">Created: 2026-04-20 lun 13:31</p>
+<p class="validation"><a href="https://validator.w3.org/check?uri=referer">Validate</a></p>
+</div>
+</body>
+</html>

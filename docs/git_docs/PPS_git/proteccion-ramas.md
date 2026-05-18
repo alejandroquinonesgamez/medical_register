@@ -98,7 +98,7 @@ Opciones adicionales habituales en PPS:
 
 2. **Flujo correcto**: crear rama, abrir PR hacia la rama protegida, esperar checks verdes y aprobación, fusionar desde la UI (o con *merge queue* si aplica).
 
-3. **Capturas sugeridas** (sin datos personales de terceros): configuración de la regla; PR bloqueado por checks; PR bloqueado por falta de revisión; PR listo para merge.
+3. **Evidencias gráficas**: ver §5 (capturas en `docs/git_docs/img/PPS_git/proteccion-ramas/`).
 
 ---
 
@@ -106,6 +106,55 @@ Opciones adicionales habituales en PPS:
 
 - **Gitleaks / Semgrep**: si sus workflows publican checks con nombre estable, pueden formar parte de los *status checks* obligatorios.  
 - **GitHub Secret scanning / Push protection**: son políticas a nivel de código y seguridad, no sustituyen la revisión humana ni los tests.
+
+---
+
+## 5. Evidencias (entrega) — Apartado 2: protección de ramas
+
+Material gráfico del ejercicio, almacenado en `docs/git_docs/img/PPS_git/proteccion-ramas/`.
+
+### 5.1. Regla de protección en `dev` (`medical_register`)
+
+Configuración en **Settings → Branches** del backend: PR obligatorio, aprobaciones, *status checks* y check **`build`** (*Build and Deploy Sphinx Docs*).
+
+| Captura | Contenido |
+|---------|-----------|
+| `regla-backend-dev1.png` | Vista general de la regla / opciones de protección |
+| `regla-backend-dev2.png` | Detalle de revisiones y comprobaciones |
+| `regla-backend-dev3.png` | *Status checks* requeridos (incl. `build`) |
+
+![Regla de protección en dev (1/3)](../img/PPS_git/proteccion-ramas/regla-backend-dev1.png)
+
+![Regla de protección en dev (2/3)](../img/PPS_git/proteccion-ramas/regla-backend-dev2.png)
+
+![Regla de protección en dev (3/3)](../img/PPS_git/proteccion-ramas/regla-backend-dev3.png)
+
+### 5.2. Status check `build` en Pull Request
+
+Pull Request hacia la rama **`dev`**: el workflow de documentación ejecuta el job **`build`** y aparece en la sección **Checks** del PR.
+
+![Checks del PR: job build en verde](../img/PPS_git/proteccion-ramas/pr-checks-build.png)
+
+### 5.3. Push directo a rama protegida (`medical_register_apk` · `main`)
+
+Intento de `git push origin main` sin pasar por PR cuando la rama **`main`** está protegida: GitHub rechaza la actualización.
+
+![Push a main rechazado por rama protegida](../img/PPS_git/proteccion-ramas/push-rechazado-android.png)
+
+> **Nota**: si en algún momento el push directo a `main` fue aceptado (p. ej. antes de activar la regla o con permisos de bypass), puede quedar constancia en `push-aceptado-android.png` como contraste; la evidencia principal del control es el **rechazo** una vez activada la protección.
+
+![Push a main aceptado (referencia / antes de protección o sin regla)](../img/PPS_git/proteccion-ramas/push-aceptado-android.png)
+
+### 5.4. Resumen de hitos
+
+| # | Hito | Estado | Captura |
+|---|------|--------|---------|
+| 1 | Regla en `dev` con PR + approvals + check `build` | ✅ | `regla-backend-dev1.png` … `regla-backend-dev3.png` |
+| 2 | Check `build` en PR a `dev` | ✅ | `pr-checks-build.png` |
+| 3 | Push directo a `main` (Android) bloqueado | ✅ | `push-rechazado-android.png` |
+| 4 | PR bloqueado / listo para merge (capturas dedicadas) | Opcional | `pr-bloqueado.png` / `pr-listo-merge.png` — ver [`pasos.md`](pasos.md) **§9.3** |
+
+**Guía operativa**: [`pasos.md`](pasos.md) §2.
 
 ---
 
