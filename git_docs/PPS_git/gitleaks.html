@@ -480,8 +480,8 @@ gitleaks<span class="w"> </span>detect<span class="w"> </span>--verbose
 <td><p><a class="reference download internal" download="" href="../../_downloads/1ce06fa701e5f7192516713facc59950/action-fallo.png"><span class="xref download myst"><code class="docutils literal notranslate"><span class="pre">../img/PPS_git/gitleaks/action-fallo.png</span></code></span></a></p></td>
 </tr>
 <tr class="row-odd"><td><p>4</p></td>
-<td><p>(Opcional) Run verde tras <code class="docutils literal notranslate"><span class="pre">git</span> <span class="pre">rm</span></code> de la carpeta demo</p></td>
-<td><p><code class="docutils literal notranslate"><span class="pre">action-ok-tras-limpieza.png</span></code> — guía paso a paso: <a class="reference internal" href="pasos.html"><span class="std std-doc"><code class="docutils literal notranslate"><span class="pre">pasos.md</span></code></span></a> <strong>§9.1</strong></p></td>
+<td><p>Run verde tras eliminar la carpeta demo (<code class="docutils literal notranslate"><span class="pre">git</span> <span class="pre">rm</span></code> de <code class="docutils literal notranslate"><span class="pre">_demo_gitleaks</span></code>)</p></td>
+<td><p><a class="reference download internal" download="" href="../../_downloads/61988842745feaf0cbc6063fee71d9b6/action-ok-tras-limpieza.png"><span class="xref download myst"><code class="docutils literal notranslate"><span class="pre">../img/PPS_git/gitleaks/action-ok-tras-limpieza.png</span></code></span></a></p></td>
 </tr>
 </tbody>
 </table>
@@ -489,6 +489,7 @@ gitleaks<span class="w"> </span>detect<span class="w"> </span>--verbose
 <p><img alt="PR: check gitleaks en verde" src="../../_images/action-verde-setup.png" /></p>
 <p><img alt="Run gitleaks: sin fugas" src="../../_images/action-verde-setup-detail.png" /></p>
 <p><img alt="Run gitleaks: detección de secreto (fallo esperado)" src="../../_images/action-fallo.png" /></p>
+<p><img alt="Run gitleaks tras limpiar demo (sin fugas)" src="../../_images/action-ok-tras-limpieza.png" /></p>
 <p><strong>Flujo documentado</strong>: integración en CI → prueba negativa (fallo) → limpieza y revocación de credenciales de prueba si se usó un PAT real.</p>
 <p><strong>Guía operativa</strong>: <a class="reference internal" href="pasos.html"><span class="std std-doc"><code class="docutils literal notranslate"><span class="pre">pasos.md</span></code></span></a> §3.</p>
 <hr class="docutils" />

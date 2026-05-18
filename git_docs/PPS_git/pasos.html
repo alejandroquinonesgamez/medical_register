@@ -384,18 +384,18 @@ git<span class="w"> </span>config<span class="w"> </span>commit.gpgsign<span cla
 </tr>
 <tr class="row-odd"><td><p>3</p></td>
 <td><p><code class="docutils literal notranslate"><span class="pre">gitleaks.md</span></code></p></td>
-<td><p>✅ Evidencias en §9</p></td>
-<td><p>Limpiar demo + opc. <code class="docutils literal notranslate"><span class="pre">action-ok-tras-limpieza.png</span></code></p></td>
+<td><p>✅ Evidencias en §9 (incl. limpieza)</p></td>
+<td><p>—</p></td>
 </tr>
 <tr class="row-even"><td><p>4</p></td>
 <td><p><code class="docutils literal notranslate"><span class="pre">github.md</span></code></p></td>
 <td><p>✅ Evidencias en §5</p></td>
-<td><p>Revocar PAT; borrar <code class="docutils literal notranslate"><span class="pre">_demo_github</span></code> si queda en local</p></td>
+<td><p>—</p></td>
 </tr>
 <tr class="row-odd"><td><p>5</p></td>
 <td><p><code class="docutils literal notranslate"><span class="pre">semgrep.md</span></code></p></td>
 <td><p>✅ Evidencias en §9</p></td>
-<td><p>Opc.: <code class="docutils literal notranslate"><span class="pre">action-fallo.png</span></code> si quieres CI en rojo</p></td>
+<td><p>—</p></td>
 </tr>
 </tbody>
 </table>
@@ -975,7 +975,7 @@ git<span class="w"> </span>push<span class="w"> </span>origin<span class="w"> </
 </tbody>
 </table>
 </div>
-<p><strong>Bloque PPS Git (documentación)</strong>: apartados 0–5 cerrados. Solo quedan capturas <strong>opcionales</strong> (§9 abajo).</p>
+<p><strong>Bloque PPS Git (documentación)</strong>: apartados 0–5 <strong>cerrados</strong> para entrega (§9).</p>
 </section>
 <hr class="docutils" />
 <section id="estructura-sugerida-de-capturas">
@@ -994,12 +994,10 @@ git<span class="w"> </span>push<span class="w"> </span>origin<span class="w"> </
 │   ├── action-verde-setup.png
 │   ├── action-verde-setup-detail.png
 │   ├── action-fallo.png
-│   └── action-ok-tras-limpieza.png   # opcional
+│   └── action-ok-tras-limpieza.png
 ├── github/                      # ✅ apartado 4
 │   ├── options-enabled.png
 │   └── push-rejected.png
-│   ├── alerta-abierta.png       # opcional
-│   └── alerta-cerrada.png       # opcional
 └── semgrep/                     # ✅ apartado 5
     ├── scan-auto.png
     ├── deteccion-vuln.png
@@ -1007,7 +1005,6 @@ git<span class="w"> </span>push<span class="w"> </span>origin<span class="w"> </
     ├── action-verde.png
     ├── cloud-proyecto.png
     └── cloud-proyecto2.png
-    └── action-fallo.png         # opcional (CI rojo con demo)
 </pre></div>
 </div>
 <p>(<code class="docutils literal notranslate"><span class="pre">GPG_created.png</span></code> sigue en <code class="docutils literal notranslate"><span class="pre">docs/git_docs/img/GPG/</span></code>.)</p>
@@ -1016,8 +1013,8 @@ git<span class="w"> </span>push<span class="w"> </span>origin<span class="w"> </
 </div></blockquote>
 </section>
 <hr class="docutils" />
-<section id="resumen-global-capturas-opcionales-y-cierre-de-entrega">
-<h2>9. Resumen global — capturas opcionales y cierre de entrega<a class="headerlink" href="#resumen-global-capturas-opcionales-y-cierre-de-entrega" title="Link to this heading">¶</a></h2>
+<section id="cierre-de-entrega-estado-final">
+<h2>9. Cierre de entrega — estado final<a class="headerlink" href="#cierre-de-entrega-estado-final" title="Link to this heading">¶</a></h2>
 <section id="estado-actual-minimo-exigible-ya-cubierto">
 <h3>9.0. Estado actual (mínimo exigible ya cubierto)<a class="headerlink" href="#estado-actual-minimo-exigible-ya-cubierto" title="Link to this heading">¶</a></h3>
 <div class="table-wrapper colwidths-auto docutils container">
@@ -1043,7 +1040,7 @@ git<span class="w"> </span>push<span class="w"> </span>origin<span class="w"> </
 </tr>
 <tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">gitleaks.md</span></code></p></td>
 <td><p>§9</p></td>
-<td><p>3 PNG en <code class="docutils literal notranslate"><span class="pre">gitleaks/</span></code></p></td>
+<td><p>4 PNG en <code class="docutils literal notranslate"><span class="pre">gitleaks/</span></code></p></td>
 </tr>
 <tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">github.md</span></code></p></td>
 <td><p>§5</p></td>
@@ -1056,7 +1053,30 @@ git<span class="w"> </span>push<span class="w"> </span>origin<span class="w"> </
 </tbody>
 </table>
 </div>
-<p>Las subsecciones <strong>9.1–9.4</strong> explican cómo obtener capturas <strong>opcionales</strong> que refuerzan la memoria. Si no las haces, la entrega sigue siendo válida con lo de la tabla anterior.</p>
+<p>Capturas <strong>no</strong> exigidas explícitamente en los HTML y <strong>omitidas</strong> a propósito (sin dejar tareas pendientes en los informes):</p>
+<div class="table-wrapper colwidths-auto docutils container">
+<table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Captura omitida</p></th>
+<th class="head"><p>Motivo</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">github/alerta-abierta.png</span></code>, <code class="docutils literal notranslate"><span class="pre">alerta-cerrada.png</span></code></p></td>
+<td><p>Push bloqueado (GH013); PAT de prueba caducado/revocado; no hay alerta en reposo</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">proteccion-ramas/pr-bloqueado.png</span></code>, <code class="docutils literal notranslate"><span class="pre">pr-listo-merge.png</span></code></p></td>
+<td><p>Redundante con regla + <code class="docutils literal notranslate"><span class="pre">pr-checks-build</span></code> + push rechazado</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">semgrep/action-fallo.png</span></code></p></td>
+<td><p>Redundante con <code class="docutils literal notranslate"><span class="pre">vuln-scan.png</span></code> + <code class="docutils literal notranslate"><span class="pre">action-verde.png</span></code></p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<p>Captura <strong>añadida</strong> tras el ciclo gitleaks: <code class="docutils literal notranslate"><span class="pre">gitleaks/action-ok-tras-limpieza.png</span></code> (integrada en <code class="docutils literal notranslate"><span class="pre">gitleaks.md</span></code> §9).</p>
+<details>
+<summary>Guía histórica: cómo obtener capturas opcionales (solo referencia)</summary>
 <p><strong>Preparación común</strong> (ejecutar una vez por sesión):</p>
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="nb">export</span><span class="w"> </span><span class="nv">PPS_BACKEND</span><span class="o">=</span><span class="s2">&quot;/home/alejandro/DriveLocal/alejandro/Ciberseguridad/PPS - Puesta a Producción Segura/Aplicación Médica&quot;</span>
 <span class="nb">export</span><span class="w"> </span><span class="nv">PPS_ANDROID</span><span class="o">=</span><span class="s2">&quot;/home/alejandro/DriveLocal/alejandro/Ciberseguridad/PPS - Puesta a Producción Segura/medical_register_android&quot;</span>
@@ -1436,33 +1456,7 @@ git<span class="w"> </span>status
 </pre></div>
 </div>
 <p><strong>Android</strong> (<code class="docutils literal notranslate"><span class="pre">medical_register_apk</span></code>): no mezcles en el mismo commit del backend; las capturas GPG/protección Android ya están en sus rutas bajo <code class="docutils literal notranslate"><span class="pre">docs/git_docs/img/PPS_git/</span></code>.</p>
-</section>
-<hr class="docutils" />
-<section id="indice-rapido-de-capturas-opcionales">
-<h3>9.6. Índice rápido de capturas opcionales<a class="headerlink" href="#indice-rapido-de-capturas-opcionales" title="Link to this heading">¶</a></h3>
-<div class="table-wrapper colwidths-auto docutils container">
-<table class="docutils align-default">
-<thead>
-<tr class="row-odd"><th class="head"><p>Fichero</p></th>
-<th class="head"><p>Sección detallada</p></th>
-</tr>
-</thead>
-<tbody>
-<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">gitleaks/action-ok-tras-limpieza.png</span></code></p></td>
-<td><p>§9.1</p></td>
-</tr>
-<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">github/alerta-abierta.png</span></code>, <code class="docutils literal notranslate"><span class="pre">alerta-cerrada.png</span></code></p></td>
-<td><p>§9.2</p></td>
-</tr>
-<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">proteccion-ramas/pr-bloqueado.png</span></code>, <code class="docutils literal notranslate"><span class="pre">pr-listo-merge.png</span></code></p></td>
-<td><p>§9.3</p></td>
-</tr>
-<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">semgrep/action-fallo.png</span></code></p></td>
-<td><p>§9.4</p></td>
-</tr>
-</tbody>
-</table>
-</div>
+</details>
 <hr class="docutils" />
 <p><strong>Autores</strong>: Alejandro Quiñones Gámez &amp; Adrián Bertos Gómez</p>
 <p><strong>Asignatura</strong>: PPS — Puesta a Producción Segura</p>
@@ -1555,7 +1549,7 @@ git<span class="w"> </span>status
 <li><a class="reference internal" href="#plantilla-evidencias-entrega-para-cada-md">6. Plantilla «Evidencias (entrega)» para cada <code class="docutils literal notranslate"><span class="pre">.md</span></code></a></li>
 <li><a class="reference internal" href="#resumen-que-falta-por-documento">7. Resumen: qué falta por documento</a></li>
 <li><a class="reference internal" href="#estructura-sugerida-de-capturas">8. Estructura sugerida de capturas</a></li>
-<li><a class="reference internal" href="#resumen-global-capturas-opcionales-y-cierre-de-entrega">9. Resumen global — capturas opcionales y cierre de entrega</a><ul>
+<li><a class="reference internal" href="#cierre-de-entrega-estado-final">9. Cierre de entrega — estado final</a><ul>
 <li><a class="reference internal" href="#estado-actual-minimo-exigible-ya-cubierto">9.0. Estado actual (mínimo exigible ya cubierto)</a></li>
 <li><a class="reference internal" href="#gitleaks-action-ok-tras-limpieza-png-opcional">9.1. Gitleaks — <code class="docutils literal notranslate"><span class="pre">action-ok-tras-limpieza.png</span></code> (opcional)</a></li>
 <li><a class="reference internal" href="#github-secret-scanning-alerta-abierta-png-y-alerta-cerrada-png-opcional">9.2. GitHub Secret scanning — <code class="docutils literal notranslate"><span class="pre">alerta-abierta.png</span></code> y <code class="docutils literal notranslate"><span class="pre">alerta-cerrada.png</span></code> (opcional)</a><ul>
@@ -1569,7 +1563,6 @@ git<span class="w"> </span>status
 </ul>
 </li>
 <li><a class="reference internal" href="#limpieza-obligatoria-antes-de-entregar-fusionar">9.5. Limpieza obligatoria antes de entregar / fusionar</a></li>
-<li><a class="reference internal" href="#indice-rapido-de-capturas-opcionales">9.6. Índice rápido de capturas opcionales</a></li>
 </ul>
 </li>
 </ul>

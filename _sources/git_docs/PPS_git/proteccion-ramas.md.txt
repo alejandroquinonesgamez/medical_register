@@ -152,7 +152,7 @@ Intento de `git push origin main` sin pasar por PR cuando la rama **`main`** est
 | 1 | Regla en `dev` con PR + approvals + check `build` | ✅ | `regla-backend-dev1.png` … `regla-backend-dev3.png` |
 | 2 | Check `build` en PR a `dev` | ✅ | `pr-checks-build.png` |
 | 3 | Push directo a `main` (Android) bloqueado | ✅ | `push-rechazado-android.png` |
-| 4 | PR bloqueado / listo para merge (capturas dedicadas) | Opcional | `pr-bloqueado.png` / `pr-listo-merge.png` — ver [`pasos.md`](pasos.md) **§9.3** |
+| 4 | PR bloqueado / listo para merge (capturas dedicadas) | No incluido | La evidencia del enunciado queda cubierta con la regla en `dev` (§5.1), el check **`build`** en PR (`pr-checks-build.png`) y el push directo bloqueado en Android (`push-rechazado-android.png`). |
 
 **Guía operativa**: [`pasos.md`](pasos.md) §2.
 
