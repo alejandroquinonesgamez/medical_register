@@ -6,7 +6,7 @@
 <link rel="index" title="Index" href="../../genindex.html"><link rel="search" title="Search" href="../../search.html">
 
     <!-- Generated with Sphinx 8.1.3 and Furo 2025.12.19 -->
-        <title>Protección de ramas (Branch protection rules) - Medical Register 0.1.0 documentation</title>
+        <title>Gitleaks — Escaneo de secretos en Git y CI - Medical Register 0.1.0 documentation</title>
       <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=d111a655" />
     <link rel="stylesheet" type="text/css" href="../../_static/styles/furo.css?v=7bdb33bb" />
     <link rel="stylesheet" type="text/css" href="../../_static/styles/furo-extensions.css?v=8dab3a3b" />
@@ -239,7 +239,7 @@
         </a>
         <div class="content-icon-container">
           <div class="view-this-page">
-  <a class="muted-link" href="../../_sources/git_docs/PPS_git/proteccion-ramas.md.txt" title="View this page">
+  <a class="muted-link" href="../../_sources/git_docs/PPS_git/gitleaks.md.txt" title="View this page">
     <svg><use href="#svg-eye"></use></svg>
     <span class="visually-hidden">View this page</span>
   </a>
@@ -257,16 +257,13 @@
           </label>
         </div>
         <article role="main" id="furo-main-content">
-          <section id="proteccion-de-ramas-branch-protection-rules">
-<h1>Protección de ramas (Branch protection rules)<a class="headerlink" href="#proteccion-de-ramas-branch-protection-rules" title="Link to this heading">¶</a></h1>
+          <section id="gitleaks-escaneo-de-secretos-en-git-y-ci">
+<h1>Gitleaks — Escaneo de secretos en Git y CI<a class="headerlink" href="#gitleaks-escaneo-de-secretos-en-git-y-ci" title="Link to this heading">¶</a></h1>
 <p><strong>Autores</strong>: Alejandro Quiñones Gámez &amp; Adrián Bertos Gómez</p>
 <p><strong>Asignatura</strong>: PPS — Puesta a Producción Segura</p>
 <p><strong>Curso</strong>: Curso de Especialización en Ciberseguridad en Tecnologías de la Información</p>
 <p><strong>Centro</strong>: IES Zaidín-Vergeles</p>
-<p><strong>Enunciado</strong>: <code class="docutils literal notranslate"><span class="pre">docs/git_docs/PPS_git/proteccion-ramas.html</span></code> (Fernando Raya, 2026-04-20)</p>
-<blockquote>
-<div><p><strong>Nota (evidencia)</strong>: en <code class="docutils literal notranslate"><span class="pre">medical_register</span></code>, la rama <code class="docutils literal notranslate"><span class="pre">dev</span></code> exige el <em>status check</em> <code class="docutils literal notranslate"><span class="pre">build</span></code> (workflow <em>Build and Deploy Sphinx Docs</em>) antes de fusionar.</p>
-</div></blockquote>
+<p><strong>Enunciado</strong>: <code class="docutils literal notranslate"><span class="pre">docs/git_docs/PPS_git/gitleaks.html</span></code> (Fernando Raya, 2026-04-20)</p>
 <hr class="docutils" />
 <section id="repositorios-de-este-trabajo-espacio-de-trabajo-pps">
 <h2>Repositorios de este trabajo (espacio de trabajo PPS)<a class="headerlink" href="#repositorios-de-este-trabajo-espacio-de-trabajo-pps" title="Link to this heading">¶</a></h2>
@@ -293,200 +290,212 @@
 </tbody>
 </table>
 </div>
-<p>Las reglas de protección se configuran <strong>en GitHub</strong>, en el repositorio remoto que corresponda (<code class="docutils literal notranslate"><span class="pre">medical_register_apk</span></code> y/o <code class="docutils literal notranslate"><span class="pre">medical_register</span></code>). El ejemplo de push directo bloqueado (§3.3) debe usar la <strong>rama que hayáis protegido</strong> (<code class="docutils literal notranslate"><span class="pre">main</span></code> en Android, <code class="docutils literal notranslate"><span class="pre">dev</span></code> o <code class="docutils literal notranslate"><span class="pre">main</span></code> en el backend).</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="c1"># Ejemplo: push directo a main en el cliente Android (debe fallar si main está protegida)</span>
-<span class="nb">cd</span><span class="w"> </span><span class="s2">&quot;/home/alejandro/DriveLocal/alejandro/Ciberseguridad/PPS - Puesta a Producción Segura/medical_register_android&quot;</span>
-git<span class="w"> </span>push<span class="w"> </span>origin<span class="w"> </span>main
+<p>El workflow de ejemplo del §4 conviene añadirlo en el repo donde tengáis CI (normalmente el <strong>backend</strong>). Escaneo local: ejecutar <code class="docutils literal notranslate"><span class="pre">gitleaks</span> <span class="pre">detect</span></code> desde la raíz de cada clone tras <code class="docutils literal notranslate"><span class="pre">cd</span></code> a la ruta correspondiente.</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="nb">cd</span><span class="w"> </span><span class="s2">&quot;/home/alejandro/DriveLocal/alejandro/Ciberseguridad/PPS - Puesta a Producción Segura/Aplicación Médica&quot;</span>
+gitleaks<span class="w"> </span>detect<span class="w"> </span>--verbose
 </pre></div>
 </div>
 </section>
 <hr class="docutils" />
-<section id="introduccion">
-<h2>1. Introducción<a class="headerlink" href="#introduccion" title="Link to this heading">¶</a></h2>
-<p>Las <strong>reglas de protección de ramas</strong> en GitHub (o equivalentes en GitLab: <em>Protected branches</em>) imponen restricciones sobre ramas críticas (<code class="docutils literal notranslate"><span class="pre">main</span></code>, <code class="docutils literal notranslate"><span class="pre">master</span></code>, <code class="docutils literal notranslate"><span class="pre">release/*</span></code>, etc.). El enunciado pide activar <strong>revisiones obligatorias</strong> y <strong>comprobaciones de estado</strong> (<em>status checks</em>) en la rama principal, y documentar el comportamiento <strong>sin</strong> necesidad de capturar datos sensibles del repositorio.</p>
-<p>Documentación oficial:</p>
+<section id="que-es-gitleaks">
+<h2>1. Qué es Gitleaks<a class="headerlink" href="#que-es-gitleaks" title="Link to this heading">¶</a></h2>
+<p><a class="reference external" href="https://github.com/gitleaks/gitleaks">Gitleaks</a> es una herramienta de código abierto orientada a <strong>detectar secretos</strong> (contraseñas, claves API, tokens) en repositorios Git. Combina reglas basadas en <strong>expresiones regulares</strong> con heurísticas de <strong>entropía</strong> para reducir ruido.</p>
+<p>Encaja en la categoría amplia de análisis estático orientado a seguridad; se puede ejecutar:</p>
 <ul class="simple">
-<li><p><a class="reference external" href="https://docs.github.com/en/repositories/configuring-branches-and-merges-in-your-repository/managing-protected-branches/about-protected-branches">About protected branches</a></p></li>
-<li><p><a class="reference external" href="https://docs.github.com/en/repositories/configuring-branches-and-merges-in-your-repository/managing-protected-branches/managing-a-branch-protection-rule">Managing a branch protection rule</a></p></li>
+<li><p>En <strong>local</strong> (incluido hook <em>pre-commit</em>) para no ensuciar el historial.</p></li>
+<li><p>En <strong>CI/CD</strong> (p. ej. GitHub Actions) para rechazar merges o pushes con fugas.</p></li>
+</ul>
+<p>Referencias del enunciado:</p>
+<ul class="simple">
+<li><p><a class="reference external" href="https://github.com/gitleaks/gitleaks#pre-commit">gitleaks — Pre-commit</a></p></li>
+<li><p><a class="reference external" href="https://github.com/gitleaks/gitleaks#creating-a-baseline">Creating a baseline</a></p></li>
+<li><p><a class="reference external" href="https://github.com/gitleaks/gitleaks#pre-commit-hook">Pre-commit hook</a></p></li>
+<li><p><a class="reference external" href="https://github.com/gitleaks/gitleaks-action">gitleaks-action</a></p></li>
 </ul>
 </section>
 <hr class="docutils" />
-<section id="caracteristicas-resumen-del-enunciado">
-<h2>2. Características (resumen del enunciado)<a class="headerlink" href="#caracteristicas-resumen-del-enunciado" title="Link to this heading">¶</a></h2>
+<section id="si-gitleaks-detecta-algo">
+<h2>2. Si Gitleaks detecta algo<a class="headerlink" href="#si-gitleaks-detecta-algo" title="Link to this heading">¶</a></h2>
 <div class="table-wrapper colwidths-auto docutils container">
 <table class="docutils align-default">
 <thead>
-<tr class="row-odd"><th class="head"><p>Característica</p></th>
-<th class="head"><p>Efecto</p></th>
-</tr>
-</thead>
-<tbody>
-<tr class="row-even"><td><p><strong>Evitar modificaciones directas</strong></p></td>
-<td><p>Impide <code class="docutils literal notranslate"><span class="pre">git</span> <span class="pre">push</span></code> directo a la rama protegida; los cambios entran vía <strong>Pull Request</strong> (o <em>merge queue</em> si está habilitada).</p></td>
-</tr>
-<tr class="row-odd"><td><p><strong>Revisiones obligatorias</strong></p></td>
-<td><p>Exige uno o más <strong>aprobaciones</strong> de revisores antes de fusionar (<em>code review</em>).</p></td>
-</tr>
-<tr class="row-even"><td><p><strong>Status checks</strong></p></td>
-<td><p>Exige que jobs de CI (tests, Gitleaks, build de docs, etc.) finalicen en <strong>éxito</strong> antes de habilitar el merge.</p></td>
-</tr>
-</tbody>
-</table>
-</div>
-</section>
-<hr class="docutils" />
-<section id="actividad-configuracion-recomendada-en-github">
-<h2>3. Actividad: configuración recomendada en GitHub<a class="headerlink" href="#actividad-configuracion-recomendada-en-github" title="Link to this heading">¶</a></h2>
-<p>Ruta típica en el repositorio:</p>
-<p><strong>Settings → Branches → Branch protection rules → Add rule</strong> (o <em>Add branch protection rule</em>).</p>
-<section id="ambito-de-la-regla">
-<h3>3.1. Ámbito de la regla<a class="headerlink" href="#ambito-de-la-regla" title="Link to this heading">¶</a></h3>
-<ul class="simple">
-<li><p><strong>Branch name pattern</strong>: la rama que uséis como principal en <strong>ese</strong> remoto. En <strong><code class="docutils literal notranslate"><span class="pre">medical_register_apk</span></code></strong> suele ser <code class="docutils literal notranslate"><span class="pre">main</span></code>; en <strong><code class="docutils literal notranslate"><span class="pre">medical_register</span></code></strong> (backend) el trabajo cotidiano suele estar en <code class="docutils literal notranslate"><span class="pre">dev</span></code> (ajusta el patrón a <code class="docutils literal notranslate"><span class="pre">dev</span></code> si protegéis esa rama en lugar de <code class="docutils literal notranslate"><span class="pre">main</span></code>).</p></li>
-</ul>
-</section>
-<section id="opciones-minimas-alineadas-con-el-enunciado">
-<h3>3.2. Opciones mínimas alineadas con el enunciado<a class="headerlink" href="#opciones-minimas-alineadas-con-el-enunciado" title="Link to this heading">¶</a></h3>
-<ol class="arabic simple">
-<li><p><strong>Require a pull request before merging</strong></p>
-<ul class="simple">
-<li><p>Activar <strong>Require approvals</strong> (al menos <strong>1</strong> en equipos pequeños; más en producción).</p></li>
-<li><p>Opcional: <em>Dismiss stale pull request approvals when new commits are pushed</em>.</p></li>
-</ul>
-</li>
-<li><p><strong>Require status checks to pass before merging</strong></p>
-<ul class="simple">
-<li><p>Activar <strong>Require branches to be up to date before merging</strong> (recomendado).</p></li>
-<li><p>En el buscador de checks, seleccionar los jobs que ya existan en el repo, por ejemplo los definidos en <code class="docutils literal notranslate"><span class="pre">.github/workflows/coverage.yml</span></code> y <code class="docutils literal notranslate"><span class="pre">build-docs.yml</span></code> (los nombres exactos aparecen en la pestaña <strong>Actions</strong> tras una ejecución).</p></li>
-</ul>
-</li>
-<li><p><strong>Do not allow bypassing the above settings</strong></p>
-<ul class="simple">
-<li><p>Desactivar bypass para administradores si la política del curso lo exige (así la regla aplica a todos).</p></li>
-</ul>
-</li>
-</ol>
-<p>Opciones adicionales habituales en PPS:</p>
-<ul class="simple">
-<li><p><strong>Require conversation resolution before merging</strong> (cerrar todos los hilos de comentario).</p></li>
-<li><p><strong>Require linear history</strong> (evita merge commits si se prefiere <em>rebase</em>/<em>squash</em>).</p></li>
-<li><p><strong>Lock branch</strong> solo en situaciones excepcionales (congelación de release).</p></li>
-</ul>
-</section>
-<section id="como-documentar-el-funcionamiento">
-<h3>3.3. Cómo documentar el funcionamiento<a class="headerlink" href="#como-documentar-el-funcionamiento" title="Link to this heading">¶</a></h3>
-<ol class="arabic">
-<li><p><strong>Intento de push directo</strong> (debe fallar). Sustituye rama y ruta según el repo que estés probando (<code class="docutils literal notranslate"><span class="pre">main</span></code> en Android, <code class="docutils literal notranslate"><span class="pre">dev</span></code> en el backend si es la rama protegida):</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="nb">cd</span><span class="w"> </span><span class="s2">&quot;/home/alejandro/DriveLocal/alejandro/Ciberseguridad/PPS - Puesta a Producción Segura/medical_register_android&quot;</span>
-git<span class="w"> </span>checkout<span class="w"> </span>main
-git<span class="w"> </span>pull<span class="w"> </span>origin<span class="w"> </span>main
-<span class="nb">echo</span><span class="w"> </span><span class="s2">&quot;# test&quot;</span><span class="w"> </span>&gt;&gt;<span class="w"> </span>README.md
-git<span class="w"> </span>commit<span class="w"> </span>-am<span class="w"> </span><span class="s2">&quot;chore: demo proteccion rama&quot;</span>
-git<span class="w"> </span>push<span class="w"> </span>origin<span class="w"> </span>main
-</pre></div>
-</div>
-<p>Resultado esperado: <code class="docutils literal notranslate"><span class="pre">remote:</span> <span class="pre">error:</span> <span class="pre">GH006:</span> <span class="pre">Protected</span> <span class="pre">branch</span> <span class="pre">update</span> <span class="pre">failed...</span></code> o mensaje equivalente de GitHub indicando que la rama está protegida.</p>
-</li>
-<li><p><strong>Flujo correcto</strong>: crear rama, abrir PR hacia la rama protegida, esperar checks verdes y aprobación, fusionar desde la UI (o con <em>merge queue</em> si aplica).</p></li>
-<li><p><strong>Evidencias gráficas</strong>: ver §5 (capturas en <code class="docutils literal notranslate"><span class="pre">docs/git_docs/img/PPS_git/proteccion-ramas/</span></code>).</p></li>
-</ol>
-</section>
-</section>
-<hr class="docutils" />
-<section id="relacion-con-otros-ejercicios-pps">
-<h2>4. Relación con otros ejercicios PPS<a class="headerlink" href="#relacion-con-otros-ejercicios-pps" title="Link to this heading">¶</a></h2>
-<ul class="simple">
-<li><p><strong>Gitleaks / Semgrep</strong>: si sus workflows publican checks con nombre estable, pueden formar parte de los <em>status checks</em> obligatorios.</p></li>
-<li><p><strong>GitHub Secret scanning / Push protection</strong>: son políticas a nivel de código y seguridad, no sustituyen la revisión humana ni los tests.</p></li>
-</ul>
-</section>
-<hr class="docutils" />
-<section id="evidencias-entrega-apartado-2-proteccion-de-ramas">
-<h2>5. Evidencias (entrega) — Apartado 2: protección de ramas<a class="headerlink" href="#evidencias-entrega-apartado-2-proteccion-de-ramas" title="Link to this heading">¶</a></h2>
-<p>Material gráfico del ejercicio, almacenado en <code class="docutils literal notranslate"><span class="pre">docs/git_docs/img/PPS_git/proteccion-ramas/</span></code>.</p>
-<section id="regla-de-proteccion-en-dev-medical-register">
-<h3>5.1. Regla de protección en <code class="docutils literal notranslate"><span class="pre">dev</span></code> (<code class="docutils literal notranslate"><span class="pre">medical_register</span></code>)<a class="headerlink" href="#regla-de-proteccion-en-dev-medical-register" title="Link to this heading">¶</a></h3>
-<p>Configuración en <strong>Settings → Branches</strong> del backend: PR obligatorio, aprobaciones, <em>status checks</em> y check <strong><code class="docutils literal notranslate"><span class="pre">build</span></code></strong> (<em>Build and Deploy Sphinx Docs</em>).</p>
-<div class="table-wrapper colwidths-auto docutils container">
-<table class="docutils align-default">
-<thead>
-<tr class="row-odd"><th class="head"><p>Captura</p></th>
-<th class="head"><p>Contenido</p></th>
-</tr>
-</thead>
-<tbody>
-<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">regla-backend-dev1.png</span></code></p></td>
-<td><p>Vista general de la regla / opciones de protección</p></td>
-</tr>
-<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">regla-backend-dev2.png</span></code></p></td>
-<td><p>Detalle de revisiones y comprobaciones</p></td>
-</tr>
-<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">regla-backend-dev3.png</span></code></p></td>
-<td><p><em>Status checks</em> requeridos (incl. <code class="docutils literal notranslate"><span class="pre">build</span></code>)</p></td>
-</tr>
-</tbody>
-</table>
-</div>
-<p><img alt="Regla de protección en dev (1/3)" src="../../_images/regla-backend-dev1.png" /></p>
-<p><img alt="Regla de protección en dev (2/3)" src="../../_images/regla-backend-dev2.png" /></p>
-<p><img alt="Regla de protección en dev (3/3)" src="../../_images/regla-backend-dev3.png" /></p>
-</section>
-<section id="status-check-build-en-pull-request">
-<h3>5.2. Status check <code class="docutils literal notranslate"><span class="pre">build</span></code> en Pull Request<a class="headerlink" href="#status-check-build-en-pull-request" title="Link to this heading">¶</a></h3>
-<p>Pull Request hacia la rama <strong><code class="docutils literal notranslate"><span class="pre">dev</span></code></strong>: el workflow de documentación ejecuta el job <strong><code class="docutils literal notranslate"><span class="pre">build</span></code></strong> y aparece en la sección <strong>Checks</strong> del PR.</p>
-<p><img alt="Checks del PR: job build en verde" src="../../_images/pr-checks-build.png" /></p>
-</section>
-<section id="push-directo-a-rama-protegida-medical-register-apk-main">
-<h3>5.3. Push directo a rama protegida (<code class="docutils literal notranslate"><span class="pre">medical_register_apk</span></code> · <code class="docutils literal notranslate"><span class="pre">main</span></code>)<a class="headerlink" href="#push-directo-a-rama-protegida-medical-register-apk-main" title="Link to this heading">¶</a></h3>
-<p>Intento de <code class="docutils literal notranslate"><span class="pre">git</span> <span class="pre">push</span> <span class="pre">origin</span> <span class="pre">main</span></code> sin pasar por PR cuando la rama <strong><code class="docutils literal notranslate"><span class="pre">main</span></code></strong> está protegida: GitHub rechaza la actualización.</p>
-<p><img alt="Push a main rechazado por rama protegida" src="../../_images/push-rechazado-android.png" /></p>
-<blockquote>
-<div><p><strong>Nota</strong>: si en algún momento el push directo a <code class="docutils literal notranslate"><span class="pre">main</span></code> fue aceptado (p. ej. antes de activar la regla o con permisos de bypass), puede quedar constancia en <code class="docutils literal notranslate"><span class="pre">push-aceptado-android.png</span></code> como contraste; la evidencia principal del control es el <strong>rechazo</strong> una vez activada la protección.</p>
-</div></blockquote>
-<p><img alt="Push a main aceptado (referencia / antes de protección o sin regla)" src="../../_images/push-aceptado-android.png" /></p>
-</section>
-<section id="resumen-de-hitos">
-<h3>5.4. Resumen de hitos<a class="headerlink" href="#resumen-de-hitos" title="Link to this heading">¶</a></h3>
-<div class="table-wrapper colwidths-auto docutils container">
-<table class="docutils align-default">
-<thead>
-<tr class="row-odd"><th class="head"><p>#</p></th>
-<th class="head"><p>Hito</p></th>
-<th class="head"><p>Estado</p></th>
-<th class="head"><p>Captura</p></th>
+<tr class="row-odd"><th class="head"><p>Paso</p></th>
+<th class="head"><p>Acción</p></th>
 </tr>
 </thead>
 <tbody>
 <tr class="row-even"><td><p>1</p></td>
-<td><p>Regla en <code class="docutils literal notranslate"><span class="pre">dev</span></code> con PR + approvals + check <code class="docutils literal notranslate"><span class="pre">build</span></code></p></td>
-<td><p>✅</p></td>
-<td><p><code class="docutils literal notranslate"><span class="pre">regla-backend-dev1.png</span></code> … <code class="docutils literal notranslate"><span class="pre">regla-backend-dev3.png</span></code></p></td>
+<td><p><strong>Invalidar</strong> el secreto en el origen (rotación / revocación). Un <code class="docutils literal notranslate"><span class="pre">git</span> <span class="pre">revert</span></code> o borrar el archivo <strong>no</strong> borra el compromiso si ya hubo push.</p></td>
 </tr>
 <tr class="row-odd"><td><p>2</p></td>
-<td><p>Check <code class="docutils literal notranslate"><span class="pre">build</span></code> en PR a <code class="docutils literal notranslate"><span class="pre">dev</span></code></p></td>
-<td><p>✅</p></td>
-<td><p><code class="docutils literal notranslate"><span class="pre">pr-checks-build.png</span></code></p></td>
+<td><p><strong>Eliminar</strong> el secreto del historial si llegó al remoto compartido (<code class="docutils literal notranslate"><span class="pre">git</span> <span class="pre">filter-repo</span></code>, BFG Repo-Cleaner), siguiendo la política del equipo.</p></td>
 </tr>
 <tr class="row-even"><td><p>3</p></td>
-<td><p>Push directo a <code class="docutils literal notranslate"><span class="pre">main</span></code> (Android) bloqueado</p></td>
-<td><p>✅</p></td>
-<td><p><code class="docutils literal notranslate"><span class="pre">push-rechazado-android.png</span></code></p></td>
-</tr>
-<tr class="row-odd"><td><p>4</p></td>
-<td><p>PR bloqueado / listo para merge (capturas dedicadas)</p></td>
-<td><p>Opcional</p></td>
-<td><p><code class="docutils literal notranslate"><span class="pre">pr-bloqueado.png</span></code> / <code class="docutils literal notranslate"><span class="pre">pr-listo-merge.png</span></code> — ver <a class="reference internal" href="pasos.html"><span class="std std-doc"><code class="docutils literal notranslate"><span class="pre">pasos.md</span></code></span></a> <strong>§9.3</strong></p></td>
+<td><p>Añadir patrones a <code class="docutils literal notranslate"><span class="pre">.gitignore</span></code> / gestores de secretos y <strong>reglas</strong> en CI para que no vuelva a ocurrir.</p></td>
 </tr>
 </tbody>
 </table>
 </div>
-<p><strong>Guía operativa</strong>: <a class="reference internal" href="pasos.html"><span class="std std-doc"><code class="docutils literal notranslate"><span class="pre">pasos.md</span></code></span></a> §2.</p>
+</section>
+<hr class="docutils" />
+<section id="beneficios-en-equipo">
+<h2>3. Beneficios en equipo<a class="headerlink" href="#beneficios-en-equipo" title="Link to this heading">¶</a></h2>
+<ul class="simple">
+<li><p>Reduce riesgo legal y operativo (filtraciones a nube pública).</p></li>
+<li><p>Educa a usar variables de entorno y <strong>GitHub Secrets</strong> en lugar de literales.</p></li>
+<li><p>Deja <strong>auditoría</strong> de que el pipeline exige escaneo.</p></li>
+</ul>
+</section>
+<hr class="docutils" />
+<section id="automatizacion-con-github-actions">
+<h2>4. Automatización con GitHub Actions<a class="headerlink" href="#automatizacion-con-github-actions" title="Link to this heading">¶</a></h2>
+<p>El enunciado propone un workflow mínimo. Adaptación recomendada para este monorepo (<code class="docutils literal notranslate"><span class="pre">.github/workflows/gitleaks.yml</span></code>):</p>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">gitleaks</span>
+
+<span class="nt">on</span><span class="p">:</span>
+<span class="w">  </span><span class="nt">pull_request</span><span class="p">:</span>
+<span class="w">  </span><span class="nt">push</span><span class="p">:</span>
+<span class="w">    </span><span class="nt">branches</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="nv">main</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="nv">master</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="nv">dev</span><span class="p p-Indicator">]</span>
+
+<span class="nt">jobs</span><span class="p">:</span>
+<span class="w">  </span><span class="nt">scan</span><span class="p">:</span>
+<span class="w">    </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">gitleaks</span>
+<span class="w">    </span><span class="nt">runs-on</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">ubuntu-latest</span>
+<span class="w">    </span><span class="nt">steps</span><span class="p">:</span>
+<span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">uses</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">actions/checkout@v4</span>
+<span class="w">        </span><span class="nt">with</span><span class="p">:</span>
+<span class="w">          </span><span class="nt">fetch-depth</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">0</span>
+<span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">uses</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">gitleaks/gitleaks-action@v2</span>
+<span class="w">        </span><span class="nt">env</span><span class="p">:</span>
+<span class="w">          </span><span class="nt">GITHUB_TOKEN</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">${{ secrets.GITHUB_TOKEN }}</span>
+</pre></div>
+</div>
+<p><strong><code class="docutils literal notranslate"><span class="pre">fetch-depth:</span> <span class="pre">0</span></code></strong> es importante para que el escaneo pueda inspeccionar el historial completo en ramas largas.</p>
+<section id="actividad-probar-con-un-secreto-de-laboratorio">
+<h3>4.1. Actividad: probar con un secreto de laboratorio<a class="headerlink" href="#actividad-probar-con-un-secreto-de-laboratorio" title="Link to this heading">¶</a></h3>
+<ol class="arabic simple">
+<li><p>Crear una rama <code class="docutils literal notranslate"><span class="pre">chore/gitleaks-demo</span></code>.</p></li>
+<li><p>Añadir un fichero con un token <strong>ficticio pero con formato</strong> reconocible (o un PAT de GitHub de práctica revocable).</p></li>
+<li><p>Abrir PR y ver el job <strong>fallar</strong> con el informe de Gitleaks.</p></li>
+<li><p>Documentar captura del log y el listado de hallazgos.</p></li>
+<li><p>Borrar el secreto del commit y cerrar la PR sin fusionar (o fusionar solo tras limpieza).</p></li>
+</ol>
+</section>
+</section>
+<hr class="docutils" />
+<section id="uso-local">
+<h2>5. Uso local<a class="headerlink" href="#uso-local" title="Link to this heading">¶</a></h2>
+<section id="instalacion">
+<h3>5.1. Instalación<a class="headerlink" href="#instalacion" title="Link to this heading">¶</a></h3>
+<p>Según plataforma: binario desde <a class="reference external" href="https://github.com/gitleaks/gitleaks/releases">releases</a>, paquete del sistema o <code class="docutils literal notranslate"><span class="pre">go</span> <span class="pre">install</span></code>. Para <em>pre-commit</em>, seguir la sección <em>Pre-commit</em> del README oficial.</p>
+</section>
+<section id="escaneo-manual">
+<h3>5.2. Escaneo manual<a class="headerlink" href="#escaneo-manual" title="Link to this heading">¶</a></h3>
+<p>En la raíz del repositorio:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>gitleaks<span class="w"> </span>detect<span class="w"> </span>--verbose
+</pre></div>
+</div>
+<p>Opciones útiles:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">--no-git</span></code>: escanear solo el árbol de trabajo.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">--redact</span></code>: ocultar fragmentos sensibles en el log al compartir salida.</p></li>
+</ul>
+</section>
+<section id="integracion-pre-commit">
+<h3>5.3. Integración <em>pre-commit</em><a class="headerlink" href="#integracion-pre-commit" title="Link to this heading">¶</a></h3>
+<p>Añadir el hook oficial del README de Gitleaks al <code class="docutils literal notranslate"><span class="pre">.pre-commit-config.yaml</span></code> del proyecto para que <strong>antes</strong> de crear el commit se ejecute <code class="docutils literal notranslate"><span class="pre">gitleaks</span> <span class="pre">protect</span></code> (modo <em>staged</em>) o la variante recomendada en la documentación vigente.</p>
+</section>
+</section>
+<hr class="docutils" />
+<section id="falsos-positivos-y-gitleaks-toml">
+<h2>6. Falsos positivos y <code class="docutils literal notranslate"><span class="pre">.gitleaks.toml</span></code><a class="headerlink" href="#falsos-positivos-y-gitleaks-toml" title="Link to this heading">¶</a></h2>
+<p>Cuando una cadena legítima coincide con una regla, se puede:</p>
+<ul class="simple">
+<li><p>Añadir <strong>allowlist</strong> global (<code class="docutils literal notranslate"><span class="pre">paths</span></code>, <code class="docutils literal notranslate"><span class="pre">regexes</span></code>, huellas).</p></li>
+<li><p>Definir <strong>reglas propias</strong> para secretos internos concretos.</p></li>
+<li><p>Usar <strong>baseline</strong> para congelar hallazgos históricos conocidos mientras se remedia por fases (ver documentación <em>Creating a baseline</em>).</p></li>
+</ul>
+<p>Extracto ilustrativo del enunciado (no copiar ciegamente: ajustar a las reglas reales del proyecto):</p>
+<div class="highlight-toml notranslate"><div class="highlight"><pre><span></span><span class="n">title</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;gitleaks config&quot;</span>
+
+<span class="k">[allowlist]</span>
+<span class="n">description</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;global allow lists&quot;</span>
+<span class="n">regexes</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">[</span>
+<span class="w">  </span><span class="s1">&#39;&#39;&#39;219-09-9999&#39;&#39;&#39;</span><span class="p">,</span>
+<span class="p">]</span>
+<span class="n">paths</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">[</span>
+<span class="w">  </span><span class="s1">&#39;&#39;&#39;\.md$&#39;&#39;&#39;</span><span class="p">,</span>
+<span class="p">]</span>
+
+<span class="k">[[rules]]</span>
+<span class="n">description</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;Discord API key&quot;</span>
+<span class="n">id</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;discord-api-token&quot;</span>
+<span class="n">regex</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s1">&#39;&#39;&#39;(?i)(?:discord)(?:[0-9a-z\-_\t .]{0,20})(?:[\s|&#39;]|[\s|&quot;]){0,3}(?:=|&gt;|:=|\|\|:|&lt;=|=&gt;|:)(?:&#39;|\&quot;|\s|=|\x60){0,5}([a-f0-9]{64})(?:[&#39;|\&quot;|\n|\r|\s|\x60]|$)&#39;&#39;&#39;</span>
+<span class="n">secretGroup</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">1</span>
+<span class="n">keywords</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">[</span><span class="s2">&quot;discord&quot;</span><span class="p">]</span>
+</pre></div>
+</div>
+<p><strong>Buena práctica</strong>: solo allowlistear tras revisar el hallazgo y con <strong>justificación</strong> en el mensaje de commit o en la documentación del equipo.</p>
+</section>
+<hr class="docutils" />
+<section id="lecturas-adicionales">
+<h2>7. Lecturas adicionales<a class="headerlink" href="#lecturas-adicionales" title="Link to this heading">¶</a></h2>
+<ul class="simple">
+<li><p><a class="reference external" href="https://medium.com/&#64;ibm_ptc_security/securing-your-repositories-with-gitleaks-and-pre-commit-27691eca478d">Securing your repositories with Gitleaks and pre-commit</a> (IBM)</p></li>
+</ul>
+</section>
+<hr class="docutils" />
+<section id="implementacion-en-medical-register">
+<h2>8. Implementación en <code class="docutils literal notranslate"><span class="pre">medical_register</span></code><a class="headerlink" href="#implementacion-en-medical-register" title="Link to this heading">¶</a></h2>
+<p>Workflow desplegado en <a class="reference internal" href="#../../../.github/workflows/gitleaks.yml"><span class="xref myst"><code class="docutils literal notranslate"><span class="pre">.github/workflows/gitleaks.yml</span></code></span></a>:</p>
+<ul class="simple">
+<li><p>Disparadores: <code class="docutils literal notranslate"><span class="pre">pull_request</span></code>, <code class="docutils literal notranslate"><span class="pre">push</span></code>, <code class="docutils literal notranslate"><span class="pre">workflow_dispatch</span></code>.</p></li>
+<li><p>Instalación de Gitleaks CLI con <strong><code class="docutils literal notranslate"><span class="pre">--exit-code</span> <span class="pre">1</span></code></strong> (el job falla si hay hallazgos).</p></li>
+<li><p>Si existe la carpeta de demo <code class="docutils literal notranslate"><span class="pre">docs/git_docs/PPS_git/_demo_gitleaks/</span></code>, escaneo directo con <code class="docutils literal notranslate"><span class="pre">--no-git</span></code> (útil para reproducir el fallo en re-runs).</p></li>
+</ul>
+<p>Rama de trabajo de la práctica: <code class="docutils literal notranslate"><span class="pre">pps/gitleaks-setup</span></code> → PR a <code class="docutils literal notranslate"><span class="pre">dev</span></code>.</p>
+</section>
+<hr class="docutils" />
+<section id="evidencias-entrega-apartado-3-gitleaks">
+<h2>9. Evidencias (entrega) — Apartado 3: Gitleaks<a class="headerlink" href="#evidencias-entrega-apartado-3-gitleaks" title="Link to this heading">¶</a></h2>
+<div class="table-wrapper colwidths-auto docutils container">
+<table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>#</p></th>
+<th class="head"><p>Qué demuestra</p></th>
+<th class="head"><p>Fichero</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>1</p></td>
+<td><p>PR con check <strong>gitleaks</strong> en verde (sin secreto en el diff)</p></td>
+<td><p><a class="reference download internal" download="" href="../../_downloads/72d5a6e3886c52b1ac8fb236931df5f4/action-verde-setup.png"><span class="xref download myst"><code class="docutils literal notranslate"><span class="pre">../img/PPS_git/gitleaks/action-verde-setup.png</span></code></span></a></p></td>
+</tr>
+<tr class="row-odd"><td><p>2</p></td>
+<td><p>Detalle del run: <strong>No leaks detected</strong> / job <code class="docutils literal notranslate"><span class="pre">gitleaks</span></code> correcto</p></td>
+<td><p><a class="reference download internal" download="" href="../../_downloads/1cdca73a5de0ce37c0152ca38303a032/action-verde-setup-detail.png"><span class="xref download myst"><code class="docutils literal notranslate"><span class="pre">../img/PPS_git/gitleaks/action-verde-setup-detail.png</span></code></span></a></p></td>
+</tr>
+<tr class="row-even"><td><p>3</p></td>
+<td><p>Run en <strong>rojo</strong> tras PAT ficticio en <code class="docutils literal notranslate"><span class="pre">_demo_gitleaks/leak.txt</span></code> (regla <code class="docutils literal notranslate"><span class="pre">github-pat</span></code>)</p></td>
+<td><p><a class="reference download internal" download="" href="../../_downloads/1ce06fa701e5f7192516713facc59950/action-fallo.png"><span class="xref download myst"><code class="docutils literal notranslate"><span class="pre">../img/PPS_git/gitleaks/action-fallo.png</span></code></span></a></p></td>
+</tr>
+<tr class="row-odd"><td><p>4</p></td>
+<td><p>(Opcional) Run verde tras <code class="docutils literal notranslate"><span class="pre">git</span> <span class="pre">rm</span></code> de la carpeta demo</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">action-ok-tras-limpieza.png</span></code> — guía paso a paso: <a class="reference internal" href="pasos.html"><span class="std std-doc"><code class="docutils literal notranslate"><span class="pre">pasos.md</span></code></span></a> <strong>§9.1</strong></p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<p><img alt="PR: check gitleaks en verde" src="../../_images/action-verde-setup.png" /></p>
+<p><img alt="Run gitleaks: sin fugas" src="../../_images/action-verde-setup-detail.png" /></p>
+<p><img alt="Run gitleaks: detección de secreto (fallo esperado)" src="../../_images/action-fallo.png" /></p>
+<p><strong>Flujo documentado</strong>: integración en CI → prueba negativa (fallo) → limpieza y revocación de credenciales de prueba si se usó un PAT real.</p>
+<p><strong>Guía operativa</strong>: <a class="reference internal" href="pasos.html"><span class="std std-doc"><code class="docutils literal notranslate"><span class="pre">pasos.md</span></code></span></a> §3.</p>
 <hr class="docutils" />
 <p><strong>Autores</strong>: Alejandro Quiñones Gámez &amp; Adrián Bertos Gómez</p>
 <p><strong>Asignatura</strong>: PPS — Puesta a Producción Segura</p>
 <p><strong>Curso</strong>: Curso de Especialización en Ciberseguridad en Tecnologías de la Información</p>
 <p><strong>Centro</strong>: IES Zaidín-Vergeles</p>
-</section>
 </section>
 </section>
 
@@ -527,24 +536,25 @@ git<span class="w"> </span>push<span class="w"> </span>origin<span class="w"> </
         <div class="toc-tree-container">
           <div class="toc-tree">
             <ul>
-<li><a class="reference internal" href="#">Protección de ramas (Branch protection rules)</a><ul>
+<li><a class="reference internal" href="#">Gitleaks — Escaneo de secretos en Git y CI</a><ul>
 <li><a class="reference internal" href="#repositorios-de-este-trabajo-espacio-de-trabajo-pps">Repositorios de este trabajo (espacio de trabajo PPS)</a></li>
-<li><a class="reference internal" href="#introduccion">1. Introducción</a></li>
-<li><a class="reference internal" href="#caracteristicas-resumen-del-enunciado">2. Características (resumen del enunciado)</a></li>
-<li><a class="reference internal" href="#actividad-configuracion-recomendada-en-github">3. Actividad: configuración recomendada en GitHub</a><ul>
-<li><a class="reference internal" href="#ambito-de-la-regla">3.1. Ámbito de la regla</a></li>
-<li><a class="reference internal" href="#opciones-minimas-alineadas-con-el-enunciado">3.2. Opciones mínimas alineadas con el enunciado</a></li>
-<li><a class="reference internal" href="#como-documentar-el-funcionamiento">3.3. Cómo documentar el funcionamiento</a></li>
+<li><a class="reference internal" href="#que-es-gitleaks">1. Qué es Gitleaks</a></li>
+<li><a class="reference internal" href="#si-gitleaks-detecta-algo">2. Si Gitleaks detecta algo</a></li>
+<li><a class="reference internal" href="#beneficios-en-equipo">3. Beneficios en equipo</a></li>
+<li><a class="reference internal" href="#automatizacion-con-github-actions">4. Automatización con GitHub Actions</a><ul>
+<li><a class="reference internal" href="#actividad-probar-con-un-secreto-de-laboratorio">4.1. Actividad: probar con un secreto de laboratorio</a></li>
 </ul>
 </li>
-<li><a class="reference internal" href="#relacion-con-otros-ejercicios-pps">4. Relación con otros ejercicios PPS</a></li>
-<li><a class="reference internal" href="#evidencias-entrega-apartado-2-proteccion-de-ramas">5. Evidencias (entrega) — Apartado 2: protección de ramas</a><ul>
-<li><a class="reference internal" href="#regla-de-proteccion-en-dev-medical-register">5.1. Regla de protección en <code class="docutils literal notranslate"><span class="pre">dev</span></code> (<code class="docutils literal notranslate"><span class="pre">medical_register</span></code>)</a></li>
-<li><a class="reference internal" href="#status-check-build-en-pull-request">5.2. Status check <code class="docutils literal notranslate"><span class="pre">build</span></code> en Pull Request</a></li>
-<li><a class="reference internal" href="#push-directo-a-rama-protegida-medical-register-apk-main">5.3. Push directo a rama protegida (<code class="docutils literal notranslate"><span class="pre">medical_register_apk</span></code> · <code class="docutils literal notranslate"><span class="pre">main</span></code>)</a></li>
-<li><a class="reference internal" href="#resumen-de-hitos">5.4. Resumen de hitos</a></li>
+<li><a class="reference internal" href="#uso-local">5. Uso local</a><ul>
+<li><a class="reference internal" href="#instalacion">5.1. Instalación</a></li>
+<li><a class="reference internal" href="#escaneo-manual">5.2. Escaneo manual</a></li>
+<li><a class="reference internal" href="#integracion-pre-commit">5.3. Integración <em>pre-commit</em></a></li>
 </ul>
 </li>
+<li><a class="reference internal" href="#falsos-positivos-y-gitleaks-toml">6. Falsos positivos y <code class="docutils literal notranslate"><span class="pre">.gitleaks.toml</span></code></a></li>
+<li><a class="reference internal" href="#lecturas-adicionales">7. Lecturas adicionales</a></li>
+<li><a class="reference internal" href="#implementacion-en-medical-register">8. Implementación en <code class="docutils literal notranslate"><span class="pre">medical_register</span></code></a></li>
+<li><a class="reference internal" href="#evidencias-entrega-apartado-3-gitleaks">9. Evidencias (entrega) — Apartado 3: Gitleaks</a></li>
 </ul>
 </li>
 </ul>

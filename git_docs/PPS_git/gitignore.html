@@ -1,0 +1,725 @@
+<!doctype html>
+<html class="no-js" lang="en" data-content_root="../../">
+  <head><meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <meta name="color-scheme" content="light dark"><meta name="viewport" content="width=device-width, initial-scale=1" />
+<link rel="index" title="Index" href="../../genindex.html"><link rel="search" title="Search" href="../../search.html">
+
+    <!-- Generated with Sphinx 8.1.3 and Furo 2025.12.19 -->
+        <title>.gitignore — Documentación de ambos proyectos - Medical Register 0.1.0 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=d111a655" />
+    <link rel="stylesheet" type="text/css" href="../../_static/styles/furo.css?v=7bdb33bb" />
+    <link rel="stylesheet" type="text/css" href="../../_static/styles/furo-extensions.css?v=8dab3a3b" />
+    
+    
+
+
+<style>
+  body {
+    --color-code-background: #f2f2f2;
+  --color-code-foreground: #1e1e1e;
+  --color-brand-primary: #254F6D;
+  --color-brand-content: #254F6D;
+  
+  }
+  @media not print {
+    body[data-theme="dark"] {
+      --color-code-background: #202020;
+  --color-code-foreground: #d0d0d0;
+  
+    }
+    @media (prefers-color-scheme: dark) {
+      body:not([data-theme="light"]) {
+        --color-code-background: #202020;
+  --color-code-foreground: #d0d0d0;
+  
+      }
+    }
+  }
+</style></head>
+  <body>
+    
+    <script>
+      document.body.dataset.theme = localStorage.getItem("theme") || "auto";
+    </script>
+    
+
+<svg xmlns="http://www.w3.org/2000/svg" style="display: none;">
+  <symbol id="svg-toc" viewBox="0 0 24 24">
+    <title>Contents</title>
+    <svg stroke="currentColor" fill="currentColor" stroke-width="0" viewBox="0 0 1024 1024">
+      <path d="M408 442h480c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8H408c-4.4 0-8 3.6-8 8v56c0 4.4 3.6 8 8 8zm-8 204c0 4.4 3.6 8 8 8h480c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8H408c-4.4 0-8 3.6-8 8v56zm504-486H120c-4.4 0-8 3.6-8 8v56c0 4.4 3.6 8 8 8h784c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8zm0 632H120c-4.4 0-8 3.6-8 8v56c0 4.4 3.6 8 8 8h784c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8zM115.4 518.9L271.7 642c5.8 4.6 14.4.5 14.4-6.9V388.9c0-7.4-8.5-11.5-14.4-6.9L115.4 505.1a8.74 8.74 0 0 0 0 13.8z"/>
+    </svg>
+  </symbol>
+  <symbol id="svg-menu" viewBox="0 0 24 24">
+    <title>Menu</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather-menu">
+      <line x1="3" y1="12" x2="21" y2="12"></line>
+      <line x1="3" y1="6" x2="21" y2="6"></line>
+      <line x1="3" y1="18" x2="21" y2="18"></line>
+    </svg>
+  </symbol>
+  <symbol id="svg-arrow-right" viewBox="0 0 24 24">
+    <title>Expand</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather-chevron-right">
+      <polyline points="9 18 15 12 9 6"></polyline>
+    </svg>
+  </symbol>
+  <symbol id="svg-sun" viewBox="0 0 24 24">
+    <title>Light mode</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round" class="feather-sun">
+      <circle cx="12" cy="12" r="5"></circle>
+      <line x1="12" y1="1" x2="12" y2="3"></line>
+      <line x1="12" y1="21" x2="12" y2="23"></line>
+      <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+      <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+      <line x1="1" y1="12" x2="3" y2="12"></line>
+      <line x1="21" y1="12" x2="23" y2="12"></line>
+      <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+      <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+    </svg>
+  </symbol>
+  <symbol id="svg-moon" viewBox="0 0 24 24">
+    <title>Dark mode</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round" class="icon-tabler-moon">
+      <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+      <path d="M12 3c.132 0 .263 0 .393 0a7.5 7.5 0 0 0 7.92 12.446a9 9 0 1 1 -8.313 -12.454z" />
+    </svg>
+  </symbol>
+  <symbol id="svg-sun-with-moon" viewBox="0 0 24 24">
+    <title>Auto light/dark, in light mode</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round"
+      class="icon-custom-derived-from-feather-sun-and-tabler-moon">
+      <path style="opacity: 50%" d="M 5.411 14.504 C 5.471 14.504 5.532 14.504 5.591 14.504 C 3.639 16.319 4.383 19.569 6.931 20.352 C 7.693 20.586 8.512 20.551 9.25 20.252 C 8.023 23.207 4.056 23.725 2.11 21.184 C 0.166 18.642 1.702 14.949 4.874 14.536 C 5.051 14.512 5.231 14.5 5.411 14.5 L 5.411 14.504 Z"/>
+      <line x1="14.5" y1="3.25" x2="14.5" y2="1.25"/>
+      <line x1="14.5" y1="15.85" x2="14.5" y2="17.85"/>
+      <line x1="10.044" y1="5.094" x2="8.63" y2="3.68"/>
+      <line x1="19" y1="14.05" x2="20.414" y2="15.464"/>
+      <line x1="8.2" y1="9.55" x2="6.2" y2="9.55"/>
+      <line x1="20.8" y1="9.55" x2="22.8" y2="9.55"/>
+      <line x1="10.044" y1="14.006" x2="8.63" y2="15.42"/>
+      <line x1="19" y1="5.05" x2="20.414" y2="3.636"/>
+      <circle cx="14.5" cy="9.55" r="3.6"/>
+    </svg>
+  </symbol>
+  <symbol id="svg-moon-with-sun" viewBox="0 0 24 24">
+    <title>Auto light/dark, in dark mode</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round"
+      class="icon-custom-derived-from-feather-sun-and-tabler-moon">
+      <path d="M 8.282 7.007 C 8.385 7.007 8.494 7.007 8.595 7.007 C 5.18 10.184 6.481 15.869 10.942 17.24 C 12.275 17.648 13.706 17.589 15 17.066 C 12.851 22.236 5.91 23.143 2.505 18.696 C -0.897 14.249 1.791 7.786 7.342 7.063 C 7.652 7.021 7.965 7 8.282 7 L 8.282 7.007 Z"/>
+      <line style="opacity: 50%" x1="18" y1="3.705" x2="18" y2="2.5"/>
+      <line style="opacity: 50%" x1="18" y1="11.295" x2="18" y2="12.5"/>
+      <line style="opacity: 50%" x1="15.316" y1="4.816" x2="14.464" y2="3.964"/>
+      <line style="opacity: 50%" x1="20.711" y1="10.212" x2="21.563" y2="11.063"/>
+      <line style="opacity: 50%" x1="14.205" y1="7.5" x2="13.001" y2="7.5"/>
+      <line style="opacity: 50%" x1="21.795" y1="7.5" x2="23" y2="7.5"/>
+      <line style="opacity: 50%" x1="15.316" y1="10.184" x2="14.464" y2="11.036"/>
+      <line style="opacity: 50%" x1="20.711" y1="4.789" x2="21.563" y2="3.937"/>
+      <circle style="opacity: 50%" cx="18" cy="7.5" r="2.169"/>
+    </svg>
+  </symbol>
+  <symbol id="svg-pencil" viewBox="0 0 24 24">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round" class="icon-tabler-pencil-code">
+      <path d="M4 20h4l10.5 -10.5a2.828 2.828 0 1 0 -4 -4l-10.5 10.5v4" />
+      <path d="M13.5 6.5l4 4" />
+      <path d="M20 21l2 -2l-2 -2" />
+      <path d="M17 17l-2 2l2 2" />
+    </svg>
+  </symbol>
+  <symbol id="svg-eye" viewBox="0 0 24 24">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round" class="icon-tabler-eye-code">
+      <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+      <path d="M10 12a2 2 0 1 0 4 0a2 2 0 0 0 -4 0" />
+      <path
+        d="M11.11 17.958c-3.209 -.307 -5.91 -2.293 -8.11 -5.958c2.4 -4 5.4 -6 9 -6c3.6 0 6.6 2 9 6c-.21 .352 -.427 .688 -.647 1.008" />
+      <path d="M20 21l2 -2l-2 -2" />
+      <path d="M17 17l-2 2l2 2" />
+    </svg>
+  </symbol>
+</svg>
+
+<input type="checkbox" class="sidebar-toggle" name="__navigation" id="__navigation" aria-label="Toggle site navigation sidebar">
+<input type="checkbox" class="sidebar-toggle" name="__toc" id="__toc" aria-label="Toggle table of contents sidebar">
+<label class="overlay sidebar-overlay" for="__navigation"></label>
+<label class="overlay toc-overlay" for="__toc"></label>
+
+<a class="skip-to-content muted-link" href="#furo-main-content">Skip to content</a>
+
+
+
+<div class="page">
+  <header class="mobile-header">
+    <div class="header-left">
+      <label class="nav-overlay-icon" for="__navigation">
+        <span class="icon"><svg><use href="#svg-menu"></use></svg></span>
+      </label>
+    </div>
+    <div class="header-center">
+      <a href="../../index.html"><div class="brand">Medical Register 0.1.0 documentation</div></a>
+    </div>
+    <div class="header-right">
+      <div class="theme-toggle-container theme-toggle-header">
+        <button class="theme-toggle" aria-label="Toggle Light / Dark / Auto color theme">
+          <svg class="theme-icon-when-auto-light"><use href="#svg-sun-with-moon"></use></svg>
+          <svg class="theme-icon-when-auto-dark"><use href="#svg-moon-with-sun"></use></svg>
+          <svg class="theme-icon-when-dark"><use href="#svg-moon"></use></svg>
+          <svg class="theme-icon-when-light"><use href="#svg-sun"></use></svg>
+        </button>
+      </div>
+      <label class="toc-overlay-icon toc-header-icon" for="__toc">
+        <span class="icon"><svg><use href="#svg-toc"></use></svg></span>
+      </label>
+    </div>
+  </header>
+  <aside class="sidebar-drawer">
+    <div class="sidebar-container">
+      
+      <div class="sidebar-sticky"><a class="sidebar-brand" href="../../index.html">
+  
+  
+</a><form class="sidebar-search-container" method="get" action="../../search.html" role="search">
+  <input class="sidebar-search" placeholder="Search" name="q" aria-label="Search">
+  <input type="hidden" name="check_keywords" value="yes">
+  <input type="hidden" name="area" value="default">
+</form>
+<div id="searchbox"></div><div class="sidebar-scroll"><div class="sidebar-tree">
+  <p class="caption" role="heading"><span class="caption-text">Contenido:</span></p>
+<ul>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../../INDICE_DOCUMENTACION.html">Indice de Documentacion</a><input aria-label="Toggle navigation of Indice de Documentacion" class="toctree-checkbox" id="toctree-checkbox-1" name="toctree-checkbox-1" role="switch" type="checkbox"/><label for="toctree-checkbox-1"><span class="icon"><svg><use href="#svg-arrow-right"></use></svg></span></label><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../manual.html">Manual de Usuario - Registro Personal de Peso e IMC</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../requeriments.html">Requerimientos Funcionales</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../SEGURIDAD.html">Seguridad: documentación</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../INFORME_SEGURIDAD.html">Informe de Análisis de Seguridad - Aplicación Médica</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../JWT_RBAC_Integracion.html">Gestión de Sesiones con JWT y Control de Acceso RBAC</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../IMPLEMENTACION_WSTG_BIDIRECCIONAL.html">Implementación Completa: Integración Bidireccional Automática WSTG Tracker ↔ DefectDojo</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../FLUJO_GENERACION_INFORME_ASVS.html">Flujo de Generación del Informe ASVS 4.0.3</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../mockups/MOCKUPS.html">Mockups y Diagramas</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../seguridad/01-validacion-entradas.html">Validación y sanitización de entradas</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../seguridad/02-autenticacion-contrasenas.html">Autenticación y contraseñas</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../seguridad/03-sesiones-csrf.html">Sesiones seguras y protección CSRF</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../seguridad/04-headers-https.html">Headers de seguridad y HTTPS</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../seguridad/05-rate-limiting-y-config.html">Rate limiting y configuración centralizada</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../seguridad/06-waf-modsecurity.html">WAF: ModSecurity v3 + OWASP Core Rule Set (CRS)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../defectdojo/DEFECTDOJO_CONFIGURACION.html">Configuración de DefectDojo</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../defectdojo/DEFECTDOJO_CREDENTIALS.html">Credenciales de DefectDojo</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../defectdojo/DEFECTDOJO_DATABASE.html">Gestión de Base de Datos de DefectDojo</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../defectdojo/DEFECTDOJO_INTEGRATION.html">Integración de DefectDojo</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../defectdojo/DEFECTDOJO_FLUJO_CREACION_RESOLUCION.html">Flujo de Creación y Resolución de Findings en DefectDojo</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../defectdojo/DEFECTDOJO_FLUJO_IMPLEMENTADO.html">Flujo de Creación → Resolución Implementado en DefectDojo</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../defectdojo/ANALISIS_CWE_699.html">Análisis de Seguridad según CWE-699</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../defectdojo/ESTADO_ACTUAL_CWE_699.html">Estado Actual del Programa - Análisis CWE-699</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../defectdojo/MAKE_ALL_USO.html">Uso de <code class="docutils literal notranslate"><span class="pre">make</span> <span class="pre">update</span></code> - Flujo Completo de DefectDojo</a></li>
+</ul>
+</li>
+</ul>
+
+</div>
+</div>
+
+      </div>
+      
+    </div>
+  </aside>
+  <div class="main">
+    <div class="content">
+      <div class="article-container">
+        <a href="#" class="back-to-top muted-link">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+            <path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8v12z"></path>
+          </svg>
+          <span>Back to top</span>
+        </a>
+        <div class="content-icon-container">
+          <div class="view-this-page">
+  <a class="muted-link" href="../../_sources/git_docs/PPS_git/gitignore.md.txt" title="View this page">
+    <svg><use href="#svg-eye"></use></svg>
+    <span class="visually-hidden">View this page</span>
+  </a>
+</div>
+<div class="theme-toggle-container theme-toggle-content">
+            <button class="theme-toggle" aria-label="Toggle Light / Dark / Auto color theme">
+              <svg class="theme-icon-when-auto-light"><use href="#svg-sun-with-moon"></use></svg>
+              <svg class="theme-icon-when-auto-dark"><use href="#svg-moon-with-sun"></use></svg>
+              <svg class="theme-icon-when-dark"><use href="#svg-moon"></use></svg>
+              <svg class="theme-icon-when-light"><use href="#svg-sun"></use></svg>
+            </button>
+          </div>
+          <label class="toc-overlay-icon toc-content-icon" for="__toc">
+            <span class="icon"><svg><use href="#svg-toc"></use></svg></span>
+          </label>
+        </div>
+        <article role="main" id="furo-main-content">
+          <section id="gitignore-documentacion-de-ambos-proyectos">
+<h1>.gitignore — Documentación de ambos proyectos<a class="headerlink" href="#gitignore-documentacion-de-ambos-proyectos" title="Link to this heading">¶</a></h1>
+<p><strong>Autores</strong>: Alejandro Quiñones Gámez &amp; Adrián Bertos Gómez</p>
+<p><strong>Asignatura</strong>: PPS — Puesta a Producción Segura</p>
+<p><strong>Curso</strong>: Curso de Especialización en Ciberseguridad en Tecnologías de la Información</p>
+<p><strong>Centro</strong>: IES Zaidín-Vergeles</p>
+<hr class="docutils" />
+<section id="introduccion">
+<h2>1. Introducción<a class="headerlink" href="#introduccion" title="Link to this heading">¶</a></h2>
+<p>El archivo <code class="docutils literal notranslate"><span class="pre">.gitignore</span></code> es un fichero de texto plano, ubicado en la raíz del
+repositorio, que indica a Git qué rutas (archivos o directorios) debe ignorar
+intencionadamente y, por tanto, no incluir en el control de versiones.</p>
+<p>Su correcta configuración es una <strong>medida preventiva de seguridad de primer nivel</strong>
+para evitar exponer en el repositorio remoto:</p>
+<ul class="simple">
+<li><p>Credenciales, claves privadas o tokens (<code class="docutils literal notranslate"><span class="pre">.env</span></code>, <code class="docutils literal notranslate"><span class="pre">*.jks</span></code>, <code class="docutils literal notranslate"><span class="pre">*.keystore</span></code>, <code class="docutils literal notranslate"><span class="pre">keystore.properties</span></code>).</p></li>
+<li><p>Configuración local que difiere entre máquinas de desarrollo (<code class="docutils literal notranslate"><span class="pre">local.properties</span></code>, <code class="docutils literal notranslate"><span class="pre">.idea/</span></code>).</p></li>
+<li><p>Artefactos compilados (<code class="docutils literal notranslate"><span class="pre">build/</span></code>, <code class="docutils literal notranslate"><span class="pre">node_modules/</span></code>, <code class="docutils literal notranslate"><span class="pre">__pycache__/</span></code>, <code class="docutils literal notranslate"><span class="pre">*.apk</span></code>, <code class="docutils literal notranslate"><span class="pre">*.aab</span></code>).</p></li>
+<li><p>Datos persistentes de servicios locales (volúmenes de Docker, dumps de BD).</p></li>
+<li><p>Archivos temporales del IDE o del sistema operativo (<code class="docutils literal notranslate"><span class="pre">.DS_Store</span></code>, <code class="docutils literal notranslate"><span class="pre">*.swp</span></code>, <code class="docutils literal notranslate"><span class="pre">Thumbs.db</span></code>).</p></li>
+</ul>
+<blockquote>
+<div><p>⚠️ <strong>Inconveniente</strong>: <code class="docutils literal notranslate"><span class="pre">.gitignore</span></code> es una medida <strong>manual y local</strong>. Si un desarrollador
+añade un fichero antes de que esté ignorado, o lo fuerza con <code class="docutils literal notranslate"><span class="pre">git</span> <span class="pre">add</span> <span class="pre">-f</span></code>, el secreto
+se subirá igualmente al repositorio remoto. Por eso debe complementarse con otras
+capas (pre-commit hooks, escáneres de secretos como gitleaks/trufflehog y revisión
+en CI/CD).</p>
+</div></blockquote>
+<p>A continuación se documentan los <code class="docutils literal notranslate"><span class="pre">.gitignore</span></code> de los dos proyectos de la asignatura
+<strong>PPS — Puesta a Producción Segura</strong>.</p>
+</section>
+<hr class="docutils" />
+<section id="proyecto-1-medical-register-android-cliente-android">
+<h2>2. Proyecto 1: <code class="docutils literal notranslate"><span class="pre">medical_register_android</span></code> (cliente Android)<a class="headerlink" href="#proyecto-1-medical-register-android-cliente-android" title="Link to this heading">¶</a></h2>
+<p><strong>Tipo de proyecto</strong>: aplicación Android nativa (Kotlin + Gradle, Android Studio).</p>
+<p><strong>Base usada</strong>: plantilla oficial de GitHub para Android
+(<a class="reference external" href="https://github.com/github/gitignore/blob/main/Android.gitignore">github/gitignore/Android.gitignore</a>),
+ampliada con reglas específicas del proyecto (claves de firma, capturas de evidencia
+del MSTG-RESILIENCE no referenciadas en el informe final, claves de cuenta de servicio
+de Play Integrity, etc.).</p>
+<section id="contenido-completo">
+<h3>2.1. Contenido completo<a class="headerlink" href="#contenido-completo" title="Link to this heading">¶</a></h3>
+<div class="highlight-1:48:.gitignore notranslate"><div class="highlight"><pre><span></span>*.iml
+.gradle
+/local.properties
+/.idea
+.DS_Store
+/build
+/captures
+.externalNativeBuild
+.cxx
+local.properties
+/app/build
+/app/release
+*.apk
+*.aab
+*.idsig
+*.jks
+*.keystore
+keystore.properties
+_backup_20260428/
+.kotlin/
+
+# Claves de cuenta de servicio (Play Integrity); nunca en el repositorio
+docs/img/MSTG_RESILIENCE_20260430/play-integrity-sa.json
+
+# Material local de apoyo (no versionar)
+docs/Capturas.md
+docs/MSTG_RESILIENCE.md
+docs/MSTG_RESILIENCE.pdf
+scripts/generate_mstg_resilience_pdf.sh
+
+# Transcripciones junto a capturas (no referenciadas en el informe)
+docs/img/MSTG_RESILIENCE_20260430/*.txt
+
+# Capturas legacy no referenciadas en docs/MSTG_RESILIENCE.md
+docs/img/MSTG_RESILIENCE/PPS_2_1.png
+docs/img/MSTG_RESILIENCE/PPS_2_1_2.png
+docs/img/MSTG_RESILIENCE/PPS_2_2_1_1.png
+docs/img/MSTG_RESILIENCE/PPS_2_2_1_2.png
+docs/img/MSTG_RESILIENCE/PPS_APK_DEBUG_APKSIGNER_SHA256.png
+docs/img/MSTG_RESILIENCE/PPS_APK_RELEASE_APKSIGNER_SHA256_2.png
+docs/img/MSTG_RESILIENCE/PPS_Debugging_Attach_Passed.png
+docs/img/MSTG_RESILIENCE/PPS_KEYSTORE_RELEASE_CREATION_2.png
+docs/img/MSTG_RESILIENCE/PPS_RES3_APK_RESIGN.png
+docs/img/MSTG_RESILIENCE/PPS_RES3_ATTACKER_KEYSTORE_1.png
+docs/img/MSTG_RESILIENCE/PPS_RES3_ATTACKER_KEYSTORE_2.png
+docs/img/MSTG_RESILIENCE/PPS_RES3_ROOT_STRICT_cmd.png
+docs/img/MSTG_RESILIENCE/PPS_RES5_UX_BLOQUEO.png
+</pre></div>
+</div>
+</section>
+<section id="justificacion-por-bloques">
+<h3>2.2. Justificación por bloques<a class="headerlink" href="#justificacion-por-bloques" title="Link to this heading">¶</a></h3>
+<div class="table-wrapper colwidths-auto docutils container">
+<table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Patrón</p></th>
+<th class="head"><p>Motivo de ignorarlo</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">*.iml</span></code>, <code class="docutils literal notranslate"><span class="pre">/.idea</span></code>, <code class="docutils literal notranslate"><span class="pre">.DS_Store</span></code></p></td>
+<td><p>Configuración local del IDE (IntelliJ/Android Studio) y metadatos de macOS. Cambian entre máquinas y no aportan al código.</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">.gradle</span></code>, <code class="docutils literal notranslate"><span class="pre">/build</span></code>, <code class="docutils literal notranslate"><span class="pre">/app/build</span></code>, <code class="docutils literal notranslate"><span class="pre">/captures</span></code>, <code class="docutils literal notranslate"><span class="pre">.externalNativeBuild</span></code>, <code class="docutils literal notranslate"><span class="pre">.cxx</span></code>, <code class="docutils literal notranslate"><span class="pre">.kotlin/</span></code></p></td>
+<td><p>Artefactos generados por la build de Gradle/Kotlin/NDK. Se regeneran en cada compilación.</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">/local.properties</span></code>, <code class="docutils literal notranslate"><span class="pre">local.properties</span></code></p></td>
+<td><p>Contiene rutas locales (p. ej. <code class="docutils literal notranslate"><span class="pre">sdk.dir</span></code>) que dependen de cada máquina; además puede contener credenciales en algunos templates.</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">/app/release</span></code>, <code class="docutils literal notranslate"><span class="pre">*.apk</span></code>, <code class="docutils literal notranslate"><span class="pre">*.aab</span></code>, <code class="docutils literal notranslate"><span class="pre">*.idsig</span></code></p></td>
+<td><p>Binarios firmados / artefactos de release. No se versionan: se publican como release o se generan en CI.</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">*.jks</span></code>, <code class="docutils literal notranslate"><span class="pre">*.keystore</span></code>, <code class="docutils literal notranslate"><span class="pre">keystore.properties</span></code></p></td>
+<td><p><strong>Críticos</strong>: contienen claves privadas de firma de la APK/AAB y sus contraseñas. Su filtración permitiría a un atacante firmar APKs maliciosas que se harían pasar por la aplicación legítima. Ver <code class="docutils literal notranslate"><span class="pre">keystore.properties.example</span></code> para la plantilla pública.</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">_backup_20260428/</span></code></p></td>
+<td><p>Copia de seguridad puntual del código previo a una refactorización. No debe versionarse.</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">docs/img/MSTG_RESILIENCE_20260430/play-integrity-sa.json</span></code></p></td>
+<td><p><strong>Crítico</strong>: clave JSON de cuenta de servicio de Google Cloud para consultar el API de Play Integrity. Nunca debe subirse.</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">docs/Capturas.md</span></code>, <code class="docutils literal notranslate"><span class="pre">docs/MSTG_RESILIENCE.md</span></code>, <code class="docutils literal notranslate"><span class="pre">docs/MSTG_RESILIENCE.pdf</span></code>, <code class="docutils literal notranslate"><span class="pre">scripts/generate_mstg_resilience_pdf.sh</span></code></p></td>
+<td><p>Material de trabajo local (borradores intermedios y scripts auxiliares de generación de PDF). El informe definitivo entregado es <code class="docutils literal notranslate"><span class="pre">docs/MSTG_RESILIENCE_INFORME.md</span></code> (y su PDF).</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">docs/img/MSTG_RESILIENCE_20260430/*.txt</span></code></p></td>
+<td><p>Transcripciones de terminal exportadas junto a las capturas; no se referencian directamente en el informe.</p></td>
+</tr>
+<tr class="row-odd"><td><p>Lista de PNG legacy bajo <code class="docutils literal notranslate"><span class="pre">docs/img/MSTG_RESILIENCE/</span></code></p></td>
+<td><p>Capturas antiguas reemplazadas por nuevas evidencias en la carpeta <code class="docutils literal notranslate"><span class="pre">MSTG_RESILIENCE_20260430/</span></code>; se mantienen en local pero no se publican.</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+</section>
+<section id="patrones-de-seguridad-relevantes">
+<h3>2.3. Patrones de seguridad relevantes<a class="headerlink" href="#patrones-de-seguridad-relevantes" title="Link to this heading">¶</a></h3>
+<p>Los patrones más sensibles desde el punto de vista de <strong>seguridad</strong> son:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">*.jks</span></code> / <code class="docutils literal notranslate"><span class="pre">*.keystore</span></code>: bloquean cualquier almacén de claves Java (firma de APKs).</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">keystore.properties</span></code>: bloquea las contraseñas del keystore.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">play-integrity-sa.json</span></code>: bloquea la clave de servicio de Google Cloud.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">local.properties</span></code>: evita filtrar rutas locales (potencialmente con tokens del SDK).</p></li>
+</ul>
+<blockquote>
+<div><p>El repositorio publica únicamente las plantillas <code class="docutils literal notranslate"><span class="pre">keystore.properties.example</span></code> para
+que cualquier desarrollador pueda reconstruir su configuración local sin acceso a las
+claves originales.</p>
+</div></blockquote>
+</section>
+</section>
+<hr class="docutils" />
+<section id="proyecto-2-aplicacion-medica-backend-flask-docker">
+<h2>3. Proyecto 2: <code class="docutils literal notranslate"><span class="pre">Aplicación</span> <span class="pre">Médica</span></code> (backend Flask + Docker)<a class="headerlink" href="#proyecto-2-aplicacion-medica-backend-flask-docker" title="Link to this heading">¶</a></h2>
+<p><strong>Tipo de proyecto</strong>: backend en Python (Flask) con frontend Node, contenerizado con
+Docker Compose (PostgreSQL, Redis, ModSecurity/WAF, DefectDojo).</p>
+<p><strong>Base usada</strong>: combinación de las plantillas oficiales de GitHub para
+<a class="reference external" href="https://github.com/github/gitignore/blob/main/Python.gitignore">Python</a> y
+<a class="reference external" href="https://github.com/github/gitignore/blob/main/Node.gitignore">Node</a>, más reglas
+específicas del despliegue Docker y de la entrega académica.</p>
+<section id="id1">
+<h3>3.1. Contenido completo<a class="headerlink" href="#id1" title="Link to this heading">¶</a></h3>
+<div class="highlight-1:59:.gitignore notranslate"><div class="highlight"><pre><span></span># Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+venv/
+env/
+ENV/
+instance/
+
+# Node
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Testing
+.pytest_cache/
+.coverage
+htmlcov/
+*.cover
+.hypothesis/
+
+# IDEs
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+
+# PDFs locales
+u03.deteccion.correccion.vulnerabilidades.web.pdf
+
+# Docker data directories (datos persistentes)
+data/postgres/
+data/redis/
+data/defectdojo/
+data/waf/
+data/*.db
+!data/.gitkeep
+
+# Artefactos de Windows
+nul
+
+# Database dumps (excepto el dump inicial que está en el repositorio)
+data/*_db_dump.sql
+*.sql
+!data/defectdojo_db_initial.sql
+
+# Archivo .env (se crea automáticamente desde docker-compose.env.example)
+.env
+
+# Carpeta de entrega (documentos y enlaces de entregas académicas; no subir a GitHub)
+entrega/
+</pre></div>
+</div>
+</section>
+<section id="id2">
+<h3>3.2. Justificación por bloques<a class="headerlink" href="#id2" title="Link to this heading">¶</a></h3>
+<div class="table-wrapper colwidths-auto docutils container">
+<table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Bloque</p></th>
+<th class="head"><p>Motivo de ignorarlo</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><strong>Python</strong> (<code class="docutils literal notranslate"><span class="pre">__pycache__/</span></code>, <code class="docutils literal notranslate"><span class="pre">*.py[cod]</span></code>, <code class="docutils literal notranslate"><span class="pre">*$py.class</span></code>, <code class="docutils literal notranslate"><span class="pre">*.so</span></code>, <code class="docutils literal notranslate"><span class="pre">.Python</span></code>, <code class="docutils literal notranslate"><span class="pre">venv/</span></code>, <code class="docutils literal notranslate"><span class="pre">env/</span></code>, <code class="docutils literal notranslate"><span class="pre">ENV/</span></code>, <code class="docutils literal notranslate"><span class="pre">instance/</span></code>)</p></td>
+<td><p>Bytecode compilado, extensiones nativas, entornos virtuales y carpeta <code class="docutils literal notranslate"><span class="pre">instance/</span></code> de Flask (puede contener BD SQLite con datos locales).</p></td>
+</tr>
+<tr class="row-odd"><td><p><strong>Node</strong> (<code class="docutils literal notranslate"><span class="pre">node_modules/</span></code>, <code class="docutils literal notranslate"><span class="pre">npm-debug.log*</span></code>, <code class="docutils literal notranslate"><span class="pre">yarn-debug.log*</span></code>, <code class="docutils literal notranslate"><span class="pre">yarn-error.log*</span></code>)</p></td>
+<td><p>Dependencias instaladas (reproducibles vía <code class="docutils literal notranslate"><span class="pre">package-lock.json</span></code>) y logs de errores del gestor de paquetes.</p></td>
+</tr>
+<tr class="row-even"><td><p><strong>Testing</strong> (<code class="docutils literal notranslate"><span class="pre">.pytest_cache/</span></code>, <code class="docutils literal notranslate"><span class="pre">.coverage</span></code>, <code class="docutils literal notranslate"><span class="pre">htmlcov/</span></code>, <code class="docutils literal notranslate"><span class="pre">*.cover</span></code>, <code class="docutils literal notranslate"><span class="pre">.hypothesis/</span></code>)</p></td>
+<td><p>Cachés y artefactos de cobertura generados al ejecutar la suite de tests.</p></td>
+</tr>
+<tr class="row-odd"><td><p><strong>IDEs</strong> (<code class="docutils literal notranslate"><span class="pre">.vscode/</span></code>, <code class="docutils literal notranslate"><span class="pre">.idea/</span></code>, <code class="docutils literal notranslate"><span class="pre">*.swp</span></code>, <code class="docutils literal notranslate"><span class="pre">*.swo</span></code>, <code class="docutils literal notranslate"><span class="pre">*~</span></code>)</p></td>
+<td><p>Configuración de editor (VS Code, IntelliJ) y ficheros temporales de Vim.</p></td>
+</tr>
+<tr class="row-even"><td><p><strong>OS</strong> (<code class="docutils literal notranslate"><span class="pre">.DS_Store</span></code>, <code class="docutils literal notranslate"><span class="pre">Thumbs.db</span></code>)</p></td>
+<td><p>Metadatos del Finder de macOS y de Windows Explorer.</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">u03.deteccion.correccion.vulnerabilidades.web.pdf</span></code></p></td>
+<td><p>Material del curso descargado localmente; no procede subirlo al repo.</p></td>
+</tr>
+<tr class="row-even"><td><p><strong>Docker data</strong> (<code class="docutils literal notranslate"><span class="pre">data/postgres/</span></code>, <code class="docutils literal notranslate"><span class="pre">data/redis/</span></code>, <code class="docutils literal notranslate"><span class="pre">data/defectdojo/</span></code>, <code class="docutils literal notranslate"><span class="pre">data/waf/</span></code>, <code class="docutils literal notranslate"><span class="pre">data/*.db</span></code>) con excepción <code class="docutils literal notranslate"><span class="pre">!data/.gitkeep</span></code></p></td>
+<td><p>Volúmenes persistentes de los contenedores: bases de datos con datos reales (incluidos potenciales <strong>datos médicos PII</strong>), cachés de Redis, datos de DefectDojo y logs del WAF. Se conserva <code class="docutils literal notranslate"><span class="pre">.gitkeep</span></code> para preservar la estructura de carpetas.</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">nul</span></code></p></td>
+<td><p>Artefacto creado en Windows al redirigir salida a <code class="docutils literal notranslate"><span class="pre">nul</span></code> (equivalente a <code class="docutils literal notranslate"><span class="pre">/dev/null</span></code>).</p></td>
+</tr>
+<tr class="row-even"><td><p><strong>Database dumps</strong> (<code class="docutils literal notranslate"><span class="pre">data/*_db_dump.sql</span></code>, <code class="docutils literal notranslate"><span class="pre">*.sql</span></code>) con excepción <code class="docutils literal notranslate"><span class="pre">!data/defectdojo_db_initial.sql</span></code></p></td>
+<td><p>Volcados completos de las BD reales del entorno, que pueden contener credenciales y datos personales. Solo se publica el dump inicial de DefectDojo, necesario para arrancar el contenedor con su configuración base.</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">.env</span></code></p></td>
+<td><p><strong>Crítico</strong>: contiene credenciales de la BD, claves JWT, contraseñas de admin, secretos del WAF, etc. Se publica únicamente la plantilla <code class="docutils literal notranslate"><span class="pre">docker-compose.env.example</span></code>.</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">entrega/</span></code></p></td>
+<td><p>Carpeta con documentos y enlaces de las entregas académicas (correos al profesor, archivos firmados, capturas privadas). No debe ser pública.</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+</section>
+<section id="id3">
+<h3>3.3. Patrones de seguridad relevantes<a class="headerlink" href="#id3" title="Link to this heading">¶</a></h3>
+<p>Los patrones más sensibles desde el punto de vista de <strong>seguridad</strong> son:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">.env</span></code>: bloquea <strong>todas</strong> las credenciales del despliegue (BD, JWT, admin, WAF).</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">data/postgres/</span></code>, <code class="docutils literal notranslate"><span class="pre">data/*.db</span></code>, <code class="docutils literal notranslate"><span class="pre">data/*_db_dump.sql</span></code>, <code class="docutils literal notranslate"><span class="pre">*.sql</span></code>: bloquean datos
+reales y dumps de PostgreSQL, que pueden contener <strong>historias clínicas y datos
+personales</strong> (PHI/PII) protegidos por LOPDGDD/RGPD.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">data/defectdojo/</span></code>: contiene la base de datos de DefectDojo con la lista
+completa de vulnerabilidades detectadas, incluyendo CVEs internos.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">instance/</span></code>: carpeta de Flask que puede contener BD SQLite con datos locales.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">entrega/</span></code>: bloquea documentación con datos personales del alumno y del profesor.</p></li>
+</ul>
+<blockquote>
+<div><p>El proyecto publica las plantillas <code class="docutils literal notranslate"><span class="pre">docker-compose.env.example</span></code> y
+<code class="docutils literal notranslate"><span class="pre">requirements*.txt</span></code> para que cualquier desarrollador pueda reconstruir el entorno
+sin acceso a los secretos.</p>
+</div></blockquote>
+</section>
+</section>
+<hr class="docutils" />
+<section id="comparativa-rapida-entre-ambos-gitignore">
+<h2>4. Comparativa rápida entre ambos <code class="docutils literal notranslate"><span class="pre">.gitignore</span></code><a class="headerlink" href="#comparativa-rapida-entre-ambos-gitignore" title="Link to this heading">¶</a></h2>
+<div class="table-wrapper colwidths-auto docutils container">
+<table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Aspecto</p></th>
+<th class="head"><p><code class="docutils literal notranslate"><span class="pre">medical_register_android</span></code></p></th>
+<th class="head"><p><code class="docutils literal notranslate"><span class="pre">Aplicación</span> <span class="pre">Médica</span></code></p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>Plantilla base</p></td>
+<td><p>GitHub · Android</p></td>
+<td><p>GitHub · Python + Node</p></td>
+</tr>
+<tr class="row-odd"><td><p>Artefactos de build ignorados</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">build/</span></code>, <code class="docutils literal notranslate"><span class="pre">app/build/</span></code>, <code class="docutils literal notranslate"><span class="pre">app/release/</span></code>, <code class="docutils literal notranslate"><span class="pre">.gradle/</span></code>, <code class="docutils literal notranslate"><span class="pre">.kotlin/</span></code>, <code class="docutils literal notranslate"><span class="pre">.cxx/</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">__pycache__/</span></code>, <code class="docutils literal notranslate"><span class="pre">*.py[cod]</span></code>, <code class="docutils literal notranslate"><span class="pre">*.so</span></code>, <code class="docutils literal notranslate"><span class="pre">node_modules/</span></code></p></td>
+</tr>
+<tr class="row-even"><td><p>Entornos / configuración local</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">local.properties</span></code>, <code class="docutils literal notranslate"><span class="pre">.idea/</span></code>, <code class="docutils literal notranslate"><span class="pre">*.iml</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">venv/</span></code>, <code class="docutils literal notranslate"><span class="pre">env/</span></code>, <code class="docutils literal notranslate"><span class="pre">instance/</span></code>, <code class="docutils literal notranslate"><span class="pre">.vscode/</span></code>, <code class="docutils literal notranslate"><span class="pre">.idea/</span></code></p></td>
+</tr>
+<tr class="row-odd"><td><p>Secretos críticos</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">*.jks</span></code>, <code class="docutils literal notranslate"><span class="pre">*.keystore</span></code>, <code class="docutils literal notranslate"><span class="pre">keystore.properties</span></code>, <code class="docutils literal notranslate"><span class="pre">play-integrity-sa.json</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">.env</span></code>, dumps SQL, volúmenes de BD</p></td>
+</tr>
+<tr class="row-even"><td><p>Binarios finales</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">*.apk</span></code>, <code class="docutils literal notranslate"><span class="pre">*.aab</span></code>, <code class="docutils literal notranslate"><span class="pre">*.idsig</span></code></p></td>
+<td><p>(n/a; los artefactos viven como imágenes Docker)</p></td>
+</tr>
+<tr class="row-odd"><td><p>Datos persistentes</p></td>
+<td><p>(n/a; cliente sin BD local)</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">data/postgres/</span></code>, <code class="docutils literal notranslate"><span class="pre">data/redis/</span></code>, <code class="docutils literal notranslate"><span class="pre">data/defectdojo/</span></code>, <code class="docutils literal notranslate"><span class="pre">data/waf/</span></code></p></td>
+</tr>
+<tr class="row-even"><td><p>Material académico / interno</p></td>
+<td><p>Capturas legacy, borradores <code class="docutils literal notranslate"><span class="pre">.md</span></code>/<code class="docutils literal notranslate"><span class="pre">.pdf</span></code>, scripts auxiliares</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">entrega/</span></code>, PDFs del curso</p></td>
+</tr>
+<tr class="row-odd"><td><p>Plantillas públicas equivalentes</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">keystore.properties.example</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">docker-compose.env.example</span></code></p></td>
+</tr>
+<tr class="row-even"><td><p>Excepciones con <code class="docutils literal notranslate"><span class="pre">!</span></code></p></td>
+<td><p>(ninguna)</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">!data/.gitkeep</span></code>, <code class="docutils literal notranslate"><span class="pre">!data/defectdojo_db_initial.sql</span></code></p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<section id="observaciones">
+<h3>4.1. Observaciones<a class="headerlink" href="#observaciones" title="Link to this heading">¶</a></h3>
+<ol class="arabic simple">
+<li><p><strong>Ambos proyectos protegen sus credenciales</strong> con patrones específicos
+(<code class="docutils literal notranslate"><span class="pre">*.jks</span></code>, <code class="docutils literal notranslate"><span class="pre">keystore.properties</span></code>, <code class="docutils literal notranslate"><span class="pre">.env</span></code>), y en ambos casos se proporciona una
+plantilla pública (<code class="docutils literal notranslate"><span class="pre">*.example</span></code>) para que el repositorio sea reproducible sin
+exponer secretos.</p></li>
+<li><p><strong>El proyecto backend hace uso de la sintaxis <code class="docutils literal notranslate"><span class="pre">!</span></code> para forzar la inclusión</strong>
+de ciertos archivos que, de otro modo, quedarían ignorados por una regla más
+amplia (p. ej. <code class="docutils literal notranslate"><span class="pre">!data/.gitkeep</span></code> dentro de <code class="docutils literal notranslate"><span class="pre">data/...</span></code> o
+<code class="docutils literal notranslate"><span class="pre">!data/defectdojo_db_initial.sql</span></code> frente a <code class="docutils literal notranslate"><span class="pre">*.sql</span></code>).</p></li>
+<li><p><strong>El proyecto Android añade reglas de “higiene documental”</strong>: ignora capturas
+legacy y borradores intermedios para mantener limpio el repositorio público,
+conservando solo las evidencias referenciadas en el informe final
+(<code class="docutils literal notranslate"><span class="pre">docs/MSTG_RESILIENCE_INFORME.md</span></code>).</p></li>
+<li><p><strong>Limitaciones</strong>: como se indicó en la introducción, <code class="docutils literal notranslate"><span class="pre">.gitignore</span></code> no protege
+frente a <code class="docutils literal notranslate"><span class="pre">git</span> <span class="pre">add</span> <span class="pre">-f</span></code> ni frente a archivos añadidos antes de que existiese la
+regla correspondiente. En este proyecto se complementa con:</p>
+<ul class="simple">
+<li><p>Hook <code class="docutils literal notranslate"><span class="pre">pre-commit</span></code> con escaneo de secretos.</p></li>
+<li><p>Pipeline de CI/CD que ejecuta <code class="docutils literal notranslate"><span class="pre">gitleaks</span></code> sobre la historia del repositorio.</p></li>
+<li><p>Revisión manual antes de cada release.</p></li>
+</ul>
+</li>
+</ol>
+</section>
+</section>
+<hr class="docutils" />
+<section id="validacion">
+<h2>5. Validación<a class="headerlink" href="#validacion" title="Link to this heading">¶</a></h2>
+<p>Para verificar que un fichero está siendo correctamente ignorado se puede usar:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>git<span class="w"> </span>check-ignore<span class="w"> </span>-v<span class="w"> </span>&lt;ruta/al/fichero&gt;
+</pre></div>
+</div>
+<p>Si la regla aplica, Git devolverá la línea del <code class="docutils literal notranslate"><span class="pre">.gitignore</span></code> responsable. Por ejemplo:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>$<span class="w"> </span>git<span class="w"> </span>check-ignore<span class="w"> </span>-v<span class="w"> </span>keystore.properties
+.gitignore:18:keystore.properties<span class="w">	</span>keystore.properties
+
+$<span class="w"> </span>git<span class="w"> </span>check-ignore<span class="w"> </span>-v<span class="w"> </span>.env
+.gitignore:56:.env<span class="w">	</span>.env
+</pre></div>
+</div>
+<hr class="docutils" />
+<p><strong>Autores</strong>: Alejandro Quiñones Gámez &amp; Adrián Bertos Gómez</p>
+<p><strong>Asignatura</strong>: PPS — Puesta a Producción Segura</p>
+<p><strong>Curso</strong>: Curso de Especialización en Ciberseguridad en Tecnologías de la Información</p>
+<p><strong>Centro</strong>: IES Zaidín-Vergeles</p>
+</section>
+</section>
+
+        </article>
+      </div>
+      <footer>
+        
+        <div class="related-pages">
+          
+          
+        </div>
+        <div class="bottom-of-page">
+          <div class="left-details">
+            <div class="copyright">
+                Copyright &#169; 2025, PumukyDev &amp; Alejandro Quiñones
+            </div>
+            Made with <a href="https://www.sphinx-doc.org/">Sphinx</a> and <a class="muted-link" href="https://pradyunsg.me">@pradyunsg</a>'s
+            
+            <a href="https://github.com/pradyunsg/furo">Furo</a>
+            
+          </div>
+          <div class="right-details">
+            
+          </div>
+        </div>
+        
+      </footer>
+    </div>
+    <aside class="toc-drawer">
+      
+      
+      <div class="toc-sticky toc-scroll">
+        <div class="toc-title-container">
+          <span class="toc-title">
+            On this page
+          </span>
+        </div>
+        <div class="toc-tree-container">
+          <div class="toc-tree">
+            <ul>
+<li><a class="reference internal" href="#">.gitignore — Documentación de ambos proyectos</a><ul>
+<li><a class="reference internal" href="#introduccion">1. Introducción</a></li>
+<li><a class="reference internal" href="#proyecto-1-medical-register-android-cliente-android">2. Proyecto 1: <code class="docutils literal notranslate"><span class="pre">medical_register_android</span></code> (cliente Android)</a><ul>
+<li><a class="reference internal" href="#contenido-completo">2.1. Contenido completo</a></li>
+<li><a class="reference internal" href="#justificacion-por-bloques">2.2. Justificación por bloques</a></li>
+<li><a class="reference internal" href="#patrones-de-seguridad-relevantes">2.3. Patrones de seguridad relevantes</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#proyecto-2-aplicacion-medica-backend-flask-docker">3. Proyecto 2: <code class="docutils literal notranslate"><span class="pre">Aplicación</span> <span class="pre">Médica</span></code> (backend Flask + Docker)</a><ul>
+<li><a class="reference internal" href="#id1">3.1. Contenido completo</a></li>
+<li><a class="reference internal" href="#id2">3.2. Justificación por bloques</a></li>
+<li><a class="reference internal" href="#id3">3.3. Patrones de seguridad relevantes</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#comparativa-rapida-entre-ambos-gitignore">4. Comparativa rápida entre ambos <code class="docutils literal notranslate"><span class="pre">.gitignore</span></code></a><ul>
+<li><a class="reference internal" href="#observaciones">4.1. Observaciones</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#validacion">5. Validación</a></li>
+</ul>
+</li>
+</ul>
+
+          </div>
+        </div>
+      </div>
+      
+      
+    </aside>
+  </div>
+</div><script src="../../_static/documentation_options.js?v=01f34227"></script>
+    <script src="../../_static/doctools.js?v=9bcbadda"></script>
+    <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../_static/scripts/furo.js?v=46bd48cc"></script>
+    </body>
+</html>

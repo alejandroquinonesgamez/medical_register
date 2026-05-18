@@ -1,0 +1,606 @@
+<!doctype html>
+<html class="no-js" lang="en" data-content_root="../../">
+  <head><meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <meta name="color-scheme" content="light dark"><meta name="viewport" content="width=device-width, initial-scale=1" />
+<link rel="index" title="Index" href="../../genindex.html"><link rel="search" title="Search" href="../../search.html">
+
+    <!-- Generated with Sphinx 8.1.3 and Furo 2025.12.19 -->
+        <title>GitHub — Secret Scanning y Push Protection - Medical Register 0.1.0 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=d111a655" />
+    <link rel="stylesheet" type="text/css" href="../../_static/styles/furo.css?v=7bdb33bb" />
+    <link rel="stylesheet" type="text/css" href="../../_static/styles/furo-extensions.css?v=8dab3a3b" />
+    
+    
+
+
+<style>
+  body {
+    --color-code-background: #f2f2f2;
+  --color-code-foreground: #1e1e1e;
+  --color-brand-primary: #254F6D;
+  --color-brand-content: #254F6D;
+  
+  }
+  @media not print {
+    body[data-theme="dark"] {
+      --color-code-background: #202020;
+  --color-code-foreground: #d0d0d0;
+  
+    }
+    @media (prefers-color-scheme: dark) {
+      body:not([data-theme="light"]) {
+        --color-code-background: #202020;
+  --color-code-foreground: #d0d0d0;
+  
+      }
+    }
+  }
+</style></head>
+  <body>
+    
+    <script>
+      document.body.dataset.theme = localStorage.getItem("theme") || "auto";
+    </script>
+    
+
+<svg xmlns="http://www.w3.org/2000/svg" style="display: none;">
+  <symbol id="svg-toc" viewBox="0 0 24 24">
+    <title>Contents</title>
+    <svg stroke="currentColor" fill="currentColor" stroke-width="0" viewBox="0 0 1024 1024">
+      <path d="M408 442h480c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8H408c-4.4 0-8 3.6-8 8v56c0 4.4 3.6 8 8 8zm-8 204c0 4.4 3.6 8 8 8h480c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8H408c-4.4 0-8 3.6-8 8v56zm504-486H120c-4.4 0-8 3.6-8 8v56c0 4.4 3.6 8 8 8h784c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8zm0 632H120c-4.4 0-8 3.6-8 8v56c0 4.4 3.6 8 8 8h784c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8zM115.4 518.9L271.7 642c5.8 4.6 14.4.5 14.4-6.9V388.9c0-7.4-8.5-11.5-14.4-6.9L115.4 505.1a8.74 8.74 0 0 0 0 13.8z"/>
+    </svg>
+  </symbol>
+  <symbol id="svg-menu" viewBox="0 0 24 24">
+    <title>Menu</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather-menu">
+      <line x1="3" y1="12" x2="21" y2="12"></line>
+      <line x1="3" y1="6" x2="21" y2="6"></line>
+      <line x1="3" y1="18" x2="21" y2="18"></line>
+    </svg>
+  </symbol>
+  <symbol id="svg-arrow-right" viewBox="0 0 24 24">
+    <title>Expand</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather-chevron-right">
+      <polyline points="9 18 15 12 9 6"></polyline>
+    </svg>
+  </symbol>
+  <symbol id="svg-sun" viewBox="0 0 24 24">
+    <title>Light mode</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round" class="feather-sun">
+      <circle cx="12" cy="12" r="5"></circle>
+      <line x1="12" y1="1" x2="12" y2="3"></line>
+      <line x1="12" y1="21" x2="12" y2="23"></line>
+      <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+      <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+      <line x1="1" y1="12" x2="3" y2="12"></line>
+      <line x1="21" y1="12" x2="23" y2="12"></line>
+      <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+      <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+    </svg>
+  </symbol>
+  <symbol id="svg-moon" viewBox="0 0 24 24">
+    <title>Dark mode</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round" class="icon-tabler-moon">
+      <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+      <path d="M12 3c.132 0 .263 0 .393 0a7.5 7.5 0 0 0 7.92 12.446a9 9 0 1 1 -8.313 -12.454z" />
+    </svg>
+  </symbol>
+  <symbol id="svg-sun-with-moon" viewBox="0 0 24 24">
+    <title>Auto light/dark, in light mode</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round"
+      class="icon-custom-derived-from-feather-sun-and-tabler-moon">
+      <path style="opacity: 50%" d="M 5.411 14.504 C 5.471 14.504 5.532 14.504 5.591 14.504 C 3.639 16.319 4.383 19.569 6.931 20.352 C 7.693 20.586 8.512 20.551 9.25 20.252 C 8.023 23.207 4.056 23.725 2.11 21.184 C 0.166 18.642 1.702 14.949 4.874 14.536 C 5.051 14.512 5.231 14.5 5.411 14.5 L 5.411 14.504 Z"/>
+      <line x1="14.5" y1="3.25" x2="14.5" y2="1.25"/>
+      <line x1="14.5" y1="15.85" x2="14.5" y2="17.85"/>
+      <line x1="10.044" y1="5.094" x2="8.63" y2="3.68"/>
+      <line x1="19" y1="14.05" x2="20.414" y2="15.464"/>
+      <line x1="8.2" y1="9.55" x2="6.2" y2="9.55"/>
+      <line x1="20.8" y1="9.55" x2="22.8" y2="9.55"/>
+      <line x1="10.044" y1="14.006" x2="8.63" y2="15.42"/>
+      <line x1="19" y1="5.05" x2="20.414" y2="3.636"/>
+      <circle cx="14.5" cy="9.55" r="3.6"/>
+    </svg>
+  </symbol>
+  <symbol id="svg-moon-with-sun" viewBox="0 0 24 24">
+    <title>Auto light/dark, in dark mode</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round"
+      class="icon-custom-derived-from-feather-sun-and-tabler-moon">
+      <path d="M 8.282 7.007 C 8.385 7.007 8.494 7.007 8.595 7.007 C 5.18 10.184 6.481 15.869 10.942 17.24 C 12.275 17.648 13.706 17.589 15 17.066 C 12.851 22.236 5.91 23.143 2.505 18.696 C -0.897 14.249 1.791 7.786 7.342 7.063 C 7.652 7.021 7.965 7 8.282 7 L 8.282 7.007 Z"/>
+      <line style="opacity: 50%" x1="18" y1="3.705" x2="18" y2="2.5"/>
+      <line style="opacity: 50%" x1="18" y1="11.295" x2="18" y2="12.5"/>
+      <line style="opacity: 50%" x1="15.316" y1="4.816" x2="14.464" y2="3.964"/>
+      <line style="opacity: 50%" x1="20.711" y1="10.212" x2="21.563" y2="11.063"/>
+      <line style="opacity: 50%" x1="14.205" y1="7.5" x2="13.001" y2="7.5"/>
+      <line style="opacity: 50%" x1="21.795" y1="7.5" x2="23" y2="7.5"/>
+      <line style="opacity: 50%" x1="15.316" y1="10.184" x2="14.464" y2="11.036"/>
+      <line style="opacity: 50%" x1="20.711" y1="4.789" x2="21.563" y2="3.937"/>
+      <circle style="opacity: 50%" cx="18" cy="7.5" r="2.169"/>
+    </svg>
+  </symbol>
+  <symbol id="svg-pencil" viewBox="0 0 24 24">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round" class="icon-tabler-pencil-code">
+      <path d="M4 20h4l10.5 -10.5a2.828 2.828 0 1 0 -4 -4l-10.5 10.5v4" />
+      <path d="M13.5 6.5l4 4" />
+      <path d="M20 21l2 -2l-2 -2" />
+      <path d="M17 17l-2 2l2 2" />
+    </svg>
+  </symbol>
+  <symbol id="svg-eye" viewBox="0 0 24 24">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round" class="icon-tabler-eye-code">
+      <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+      <path d="M10 12a2 2 0 1 0 4 0a2 2 0 0 0 -4 0" />
+      <path
+        d="M11.11 17.958c-3.209 -.307 -5.91 -2.293 -8.11 -5.958c2.4 -4 5.4 -6 9 -6c3.6 0 6.6 2 9 6c-.21 .352 -.427 .688 -.647 1.008" />
+      <path d="M20 21l2 -2l-2 -2" />
+      <path d="M17 17l-2 2l2 2" />
+    </svg>
+  </symbol>
+</svg>
+
+<input type="checkbox" class="sidebar-toggle" name="__navigation" id="__navigation" aria-label="Toggle site navigation sidebar">
+<input type="checkbox" class="sidebar-toggle" name="__toc" id="__toc" aria-label="Toggle table of contents sidebar">
+<label class="overlay sidebar-overlay" for="__navigation"></label>
+<label class="overlay toc-overlay" for="__toc"></label>
+
+<a class="skip-to-content muted-link" href="#furo-main-content">Skip to content</a>
+
+
+
+<div class="page">
+  <header class="mobile-header">
+    <div class="header-left">
+      <label class="nav-overlay-icon" for="__navigation">
+        <span class="icon"><svg><use href="#svg-menu"></use></svg></span>
+      </label>
+    </div>
+    <div class="header-center">
+      <a href="../../index.html"><div class="brand">Medical Register 0.1.0 documentation</div></a>
+    </div>
+    <div class="header-right">
+      <div class="theme-toggle-container theme-toggle-header">
+        <button class="theme-toggle" aria-label="Toggle Light / Dark / Auto color theme">
+          <svg class="theme-icon-when-auto-light"><use href="#svg-sun-with-moon"></use></svg>
+          <svg class="theme-icon-when-auto-dark"><use href="#svg-moon-with-sun"></use></svg>
+          <svg class="theme-icon-when-dark"><use href="#svg-moon"></use></svg>
+          <svg class="theme-icon-when-light"><use href="#svg-sun"></use></svg>
+        </button>
+      </div>
+      <label class="toc-overlay-icon toc-header-icon" for="__toc">
+        <span class="icon"><svg><use href="#svg-toc"></use></svg></span>
+      </label>
+    </div>
+  </header>
+  <aside class="sidebar-drawer">
+    <div class="sidebar-container">
+      
+      <div class="sidebar-sticky"><a class="sidebar-brand" href="../../index.html">
+  
+  
+</a><form class="sidebar-search-container" method="get" action="../../search.html" role="search">
+  <input class="sidebar-search" placeholder="Search" name="q" aria-label="Search">
+  <input type="hidden" name="check_keywords" value="yes">
+  <input type="hidden" name="area" value="default">
+</form>
+<div id="searchbox"></div><div class="sidebar-scroll"><div class="sidebar-tree">
+  <p class="caption" role="heading"><span class="caption-text">Contenido:</span></p>
+<ul>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../../INDICE_DOCUMENTACION.html">Indice de Documentacion</a><input aria-label="Toggle navigation of Indice de Documentacion" class="toctree-checkbox" id="toctree-checkbox-1" name="toctree-checkbox-1" role="switch" type="checkbox"/><label for="toctree-checkbox-1"><span class="icon"><svg><use href="#svg-arrow-right"></use></svg></span></label><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../manual.html">Manual de Usuario - Registro Personal de Peso e IMC</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../requeriments.html">Requerimientos Funcionales</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../SEGURIDAD.html">Seguridad: documentación</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../INFORME_SEGURIDAD.html">Informe de Análisis de Seguridad - Aplicación Médica</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../JWT_RBAC_Integracion.html">Gestión de Sesiones con JWT y Control de Acceso RBAC</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../IMPLEMENTACION_WSTG_BIDIRECCIONAL.html">Implementación Completa: Integración Bidireccional Automática WSTG Tracker ↔ DefectDojo</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../FLUJO_GENERACION_INFORME_ASVS.html">Flujo de Generación del Informe ASVS 4.0.3</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../mockups/MOCKUPS.html">Mockups y Diagramas</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../seguridad/01-validacion-entradas.html">Validación y sanitización de entradas</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../seguridad/02-autenticacion-contrasenas.html">Autenticación y contraseñas</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../seguridad/03-sesiones-csrf.html">Sesiones seguras y protección CSRF</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../seguridad/04-headers-https.html">Headers de seguridad y HTTPS</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../seguridad/05-rate-limiting-y-config.html">Rate limiting y configuración centralizada</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../seguridad/06-waf-modsecurity.html">WAF: ModSecurity v3 + OWASP Core Rule Set (CRS)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../defectdojo/DEFECTDOJO_CONFIGURACION.html">Configuración de DefectDojo</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../defectdojo/DEFECTDOJO_CREDENTIALS.html">Credenciales de DefectDojo</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../defectdojo/DEFECTDOJO_DATABASE.html">Gestión de Base de Datos de DefectDojo</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../defectdojo/DEFECTDOJO_INTEGRATION.html">Integración de DefectDojo</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../defectdojo/DEFECTDOJO_FLUJO_CREACION_RESOLUCION.html">Flujo de Creación y Resolución de Findings en DefectDojo</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../defectdojo/DEFECTDOJO_FLUJO_IMPLEMENTADO.html">Flujo de Creación → Resolución Implementado en DefectDojo</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../defectdojo/ANALISIS_CWE_699.html">Análisis de Seguridad según CWE-699</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../defectdojo/ESTADO_ACTUAL_CWE_699.html">Estado Actual del Programa - Análisis CWE-699</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../defectdojo/MAKE_ALL_USO.html">Uso de <code class="docutils literal notranslate"><span class="pre">make</span> <span class="pre">update</span></code> - Flujo Completo de DefectDojo</a></li>
+</ul>
+</li>
+</ul>
+
+</div>
+</div>
+
+      </div>
+      
+    </div>
+  </aside>
+  <div class="main">
+    <div class="content">
+      <div class="article-container">
+        <a href="#" class="back-to-top muted-link">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+            <path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8v12z"></path>
+          </svg>
+          <span>Back to top</span>
+        </a>
+        <div class="content-icon-container">
+          <div class="view-this-page">
+  <a class="muted-link" href="../../_sources/git_docs/PPS_git/github.md.txt" title="View this page">
+    <svg><use href="#svg-eye"></use></svg>
+    <span class="visually-hidden">View this page</span>
+  </a>
+</div>
+<div class="theme-toggle-container theme-toggle-content">
+            <button class="theme-toggle" aria-label="Toggle Light / Dark / Auto color theme">
+              <svg class="theme-icon-when-auto-light"><use href="#svg-sun-with-moon"></use></svg>
+              <svg class="theme-icon-when-auto-dark"><use href="#svg-moon-with-sun"></use></svg>
+              <svg class="theme-icon-when-dark"><use href="#svg-moon"></use></svg>
+              <svg class="theme-icon-when-light"><use href="#svg-sun"></use></svg>
+            </button>
+          </div>
+          <label class="toc-overlay-icon toc-content-icon" for="__toc">
+            <span class="icon"><svg><use href="#svg-toc"></use></svg></span>
+          </label>
+        </div>
+        <article role="main" id="furo-main-content">
+          <section id="github-secret-scanning-y-push-protection">
+<h1>GitHub — Secret Scanning y Push Protection<a class="headerlink" href="#github-secret-scanning-y-push-protection" title="Link to this heading">¶</a></h1>
+<p><strong>Autores</strong>: Alejandro Quiñones Gámez &amp; Adrián Bertos Gómez</p>
+<p><strong>Asignatura</strong>: PPS — Puesta a Producción Segura</p>
+<p><strong>Curso</strong>: Curso de Especialización en Ciberseguridad en Tecnologías de la Información</p>
+<p><strong>Centro</strong>: IES Zaidín-Vergeles</p>
+<p><strong>Enunciado</strong>: <code class="docutils literal notranslate"><span class="pre">docs/git_docs/PPS_git/github.html</span></code> (Fernando Raya, 2026-04-20)</p>
+<hr class="docutils" />
+<section id="repositorios-de-este-trabajo-espacio-de-trabajo-pps">
+<h2>Repositorios de este trabajo (espacio de trabajo PPS)<a class="headerlink" href="#repositorios-de-este-trabajo-espacio-de-trabajo-pps" title="Link to this heading">¶</a></h2>
+<p>Las pruebas de GitHub (secret scanning, push protection, reglas de rama, Actions) se documentan sobre los <strong>dos clones</strong> del curso:</p>
+<div class="table-wrapper colwidths-auto docutils container">
+<table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Proyecto</p></th>
+<th class="head"><p>Ruta local</p></th>
+<th class="head"><p>Remoto <code class="docutils literal notranslate"><span class="pre">origin</span></code> (SSH)</p></th>
+<th class="head"><p>Rama habitual</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>Cliente Android (APK)</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">/home/alejandro/DriveLocal/alejandro/Ciberseguridad/PPS</span> <span class="pre">-</span> <span class="pre">Puesta</span> <span class="pre">a</span> <span class="pre">Producción</span> <span class="pre">Segura/medical_register_android</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">git&#64;github.com:alejandroquinonesgamez/medical_register_apk.git</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">main</span></code></p></td>
+</tr>
+<tr class="row-odd"><td><p>Backend <em>Aplicación Médica</em></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">/home/alejandro/DriveLocal/alejandro/Ciberseguridad/PPS</span> <span class="pre">-</span> <span class="pre">Puesta</span> <span class="pre">a</span> <span class="pre">Producción</span> <span class="pre">Segura/Aplicación</span> <span class="pre">Médica</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">git&#64;github.com:alejandroquinonesgamez/medical_register.git</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">dev</span></code></p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<p>Fijar o comprobar el remoto del Android (equivalente a tu flujo habitual):</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="nb">cd</span><span class="w"> </span><span class="s2">&quot;/home/alejandro/DriveLocal/alejandro/Ciberseguridad/PPS - Puesta a Producción Segura/medical_register_android&quot;</span>
+git<span class="w"> </span>remote<span class="w"> </span>set-url<span class="w"> </span>origin<span class="w"> </span>git@github.com:alejandroquinonesgamez/medical_register_apk.git
+git<span class="w"> </span>remote<span class="w"> </span>-v
+git<span class="w"> </span>push<span class="w"> </span>origin<span class="w"> </span>main
+</pre></div>
+</div>
+<p>Backend (documentación y workflows en este árbol):</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="nb">cd</span><span class="w"> </span><span class="s2">&quot;/home/alejandro/DriveLocal/alejandro/Ciberseguridad/PPS - Puesta a Producción Segura/Aplicación Médica&quot;</span>
+git<span class="w"> </span>remote<span class="w"> </span>-v
+git<span class="w"> </span>push<span class="w"> </span>origin<span class="w"> </span>dev
+</pre></div>
+</div>
+<blockquote>
+<div><p>Cada repositorio en GitHub tiene su propia pestaña <strong>Settings</strong> / <strong>Security</strong>; repite la configuración en <code class="docutils literal notranslate"><span class="pre">medical_register_apk</span></code> y en <code class="docutils literal notranslate"><span class="pre">medical_register</span></code> si la práctica lo exige en ambos.</p>
+</div></blockquote>
+</section>
+<hr class="docutils" />
+<section id="introduccion">
+<h2>1. Introducción<a class="headerlink" href="#introduccion" title="Link to this heading">¶</a></h2>
+<p>En el desarrollo moderno, la filtración accidental de credenciales es un riesgo crítico. GitHub ofrece dos mecanismos nativos complementarios:</p>
+<div class="table-wrapper colwidths-auto docutils container">
+<table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Mecanismo</p></th>
+<th class="head"><p>Momento</p></th>
+<th class="head"><p>Objetivo</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><strong>Secret scanning</strong></p></td>
+<td><p>Tras el código ya en el remoto</p></td>
+<td><p>Detectar secretos <em>en reposo</em>, alertar y (con proveedores asociados) facilitar la revocación.</p></td>
+</tr>
+<tr class="row-odd"><td><p><strong>Push protection</strong></p></td>
+<td><p>En el <code class="docutils literal notranslate"><span class="pre">git</span> <span class="pre">push</span></code></p></td>
+<td><p><strong>Bloquear</strong> antes de que el secreto entre en el historial público o compartido.</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<p>Este documento resume la teoría del enunciado y propone una <strong>resolución práctica</strong> documentable: activación, gestión de alertas, simulación controlada de fuga y prueba de bloqueo en push.</p>
+<p>Referencias oficiales:</p>
+<ul class="simple">
+<li><p><a class="reference external" href="https://docs.github.com/en/code-security/secret-scanning/about-secret-scanning">About secret scanning</a></p></li>
+<li><p><a class="reference external" href="https://docs.github.com/es/code-security/tutorials/remediate-leaked-secrets/remediating-a-leaked-secret">Remediating a leaked secret</a></p></li>
+<li><p><a class="reference external" href="https://docs.github.com/en/code-security/how-tos/secure-your-secrets/prevent-future-leaks/enabling-push-protection-for-your-repository">Enabling push protection for your repository</a></p></li>
+</ul>
+</section>
+<hr class="docutils" />
+<section id="secret-scanning-escaneo-de-secretos">
+<h2>2. Secret scanning (escaneo de secretos)<a class="headerlink" href="#secret-scanning-escaneo-de-secretos" title="Link to this heading">¶</a></h2>
+<section id="que-hace">
+<h3>2.1. Qué hace<a class="headerlink" href="#que-hace" title="Link to this heading">¶</a></h3>
+<p>GitHub analiza el contenido del repositorio (incluido el historial en los planes que lo permiten) buscando patrones de <strong>más de doscientos proveedores</strong> (AWS, Google Cloud, Stripe, OpenAI, etc.). En repositorios <strong>públicos</strong> suele estar activo de forma predeterminada y es gratuito. En <strong>privados</strong>, puede requerir activación manual o políticas de organización / Enterprise.</p>
+<p>Si el token pertenece a un proveedor colaborador, GitHub puede notificar al proveedor para que <strong>revoque o invalide</strong> el secreto, reduciendo la ventana de abuso.</p>
+</section>
+<section id="gestion-de-alertas">
+<h3>2.2. Gestión de alertas<a class="headerlink" href="#gestion-de-alertas" title="Link to this heading">¶</a></h3>
+<p>Cuando se detecta un posible secreto ya presente en el repo, la alerta se puede cerrar de tres maneras (según el enunciado):</p>
+<div class="table-wrapper colwidths-auto docutils container">
+<table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Cierre</p></th>
+<th class="head"><p>Cuándo usarlo</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><strong>Resolved as real secret</strong></p></td>
+<td><p>Era material real: se revoca/rotación de credencial y se limpia el código (y el historial si hace falta).</p></td>
+</tr>
+<tr class="row-odd"><td><p><strong>Used in tests</strong></p></td>
+<td><p>Es un valor ficticio usado solo en pruebas (idealmente con patrones que no colisionen con producción).</p></td>
+</tr>
+<tr class="row-even"><td><p><strong>False positive</strong></p></td>
+<td><p>El patrón coincide pero no es un secreto (p. ej. un identificador con formato parecido).</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+</section>
+<section id="actividad-simular-una-filtracion-y-remediar-entorno-seguro">
+<h3>2.3. Actividad: simular una filtración y remediar (entorno seguro)<a class="headerlink" href="#actividad-simular-una-filtracion-y-remediar-entorno-seguro" title="Link to this heading">¶</a></h3>
+<p><strong>No</strong> uses una clave real de producción. El procedimiento documentable es:</p>
+<ol class="arabic simple">
+<li><p><strong>Preparar un token de prueba revocable</strong><br />
+Por ejemplo, un Personal Access Token de GitHub con permisos mínimos y caducidad de un día, o un secreto de un servicio de <em>sandbox</em> que puedas invalidar al instante.</p></li>
+<li><p><strong>Introducirlo en una rama de prueba</strong> en un fichero que luego borrarás (p. ej. <code class="docutils literal notranslate"><span class="pre">tmp/leak-demo.txt</span></code>). Haz commit <strong>solo en un fork o repo de práctica</strong>, no en un remoto compartido con datos reales.</p></li>
+<li><p><strong>Comprobar la alerta</strong> en <strong>Security → Secret scanning</strong> (o el nombre equivalente según la UI actual).</p></li>
+<li><p><strong>Remediar</strong> siguiendo la guía oficial <a class="reference external" href="https://docs.github.com/es/code-security/tutorials/remediate-leaked-secrets/remediating-a-leaked-secret">Remediating a leaked secret</a>:</p>
+<ul class="simple">
+<li><p>Revocar el secreto en el origen (GitHub / consola del proveedor).</p></li>
+<li><p>Eliminar el secreto del árbol de trabajo y del historial si ya se hizo push a ramas compartidas (p. ej. <code class="docutils literal notranslate"><span class="pre">git</span> <span class="pre">filter-repo</span></code> o BFG; en ramas no fusionadas puede bastar con borrar la rama remota).</p></li>
+</ul>
+</li>
+<li><p><strong>Cerrar la alerta</strong> en GitHub con el motivo correcto y <strong>documentar</strong> capturas: alerta abierta, revocación en el proveedor, commit de limpieza, alerta cerrada.</p></li>
+</ol>
+<blockquote>
+<div><p>En un repositorio académico sin GitHub Advanced Security en privado, algunas opciones pueden no estar disponibles; en ese caso documenta la limitación y adjunta capturas de la documentación de GitHub sobre qué habilitaría un administrador.</p>
+</div></blockquote>
+</section>
+</section>
+<hr class="docutils" />
+<section id="push-protection">
+<h2>3. Push protection<a class="headerlink" href="#push-protection" title="Link to this heading">¶</a></h2>
+<section id="diferencia-respecto-al-escaneo-clasico">
+<h3>3.1. Diferencia respecto al escaneo clásico<a class="headerlink" href="#diferencia-respecto-al-escaneo-clasico" title="Link to this heading">¶</a></h3>
+<p>El escaneo <em>reactivo</em> encuentra el problema cuando el secreto <strong>ya está</strong> en el remoto. <strong>Push protection</strong> intercepta el <code class="docutils literal notranslate"><span class="pre">git</span> <span class="pre">push</span></code> en los servidores de GitHub, analiza los cambios y <strong>rechaza</strong> el envío si detecta un patrón de alta confianza.</p>
+<p>Flujo resumido:</p>
+<ol class="arabic simple">
+<li><p><strong>Escaneo</strong> de los blobs que se intentan subir.</p></li>
+<li><p><strong>Detección</strong> de coincidencias con patrones de proveedores o (en Enterprise) patrones personalizados.</p></li>
+<li><p><strong>Bloqueo</strong> del push con mensaje en la terminal y enlace para gestionar la incidencia.</p></li>
+</ol>
+</section>
+<section id="tipos-de-proteccion">
+<h3>3.2. Tipos de protección<a class="headerlink" href="#tipos-de-proteccion" title="Link to this heading">¶</a></h3>
+<ul class="simple">
+<li><p><strong>Partner patterns</strong>: patrones validados con proveedores (alta confianza).</p></li>
+<li><p><strong>Custom patterns</strong> (GitHub Enterprise): expresiones regulares propias de la organización (tokens internos, prefijos corporativos, etc.).</p></li>
+</ul>
+</section>
+<section id="bypass-y-auditoria">
+<h3>3.3. Bypass y auditoría<a class="headerlink" href="#bypass-y-auditoria" title="Link to this heading">¶</a></h3>
+<p>Si el bloqueo es un falso positivo o un secreto de test, la interfaz o la CLI permiten indicar el motivo, por ejemplo:</p>
+<ul class="simple">
+<li><p><em>Used in tests</em></p></li>
+<li><p><em>False positive</em></p></li>
+<li><p><em>Will fix later</em> (desaconsejado salvo excepción, queda trazabilidad)</p></li>
+</ul>
+<p>Cada bypass genera <strong>registro</strong> para administración: alertas en <strong>Security → Secret scanning</strong> como <em>Bypassed</em>, notificaciones por email, etc.</p>
+</section>
+<section id="beneficios-resumen-del-enunciado">
+<h3>3.4. Beneficios (resumen del enunciado)<a class="headerlink" href="#beneficios-resumen-del-enunciado" title="Link to this heading">¶</a></h3>
+<ul class="simple">
+<li><p><strong>Prevención real</strong>: el secreto no llega al servidor.</p></li>
+<li><p><strong>Ahorro de tiempo</strong>: evita horas de limpieza de historial.</p></li>
+<li><p><strong>Cultura de seguridad</strong>: feedback inmediato al desarrollador.</p></li>
+<li><p><strong>Cumplimiento</strong>: evidencia de control sobre credenciales (SOC 2, ISO 27001, etc.).</p></li>
+</ul>
+</section>
+<section id="actividad-habilitar-push-protection-y-documentar-una-prueba">
+<h3>3.5. Actividad: habilitar Push protection y documentar una prueba<a class="headerlink" href="#actividad-habilitar-push-protection-y-documentar-una-prueba" title="Link to this heading">¶</a></h3>
+<ol class="arabic simple">
+<li><p>En el repositorio: <strong>Settings → Advanced Security</strong> (o <em>Code security and analysis</em>).</p></li>
+<li><p>Activar <strong>Secret Protection</strong> y <strong>Push protection</strong> según <a class="reference external" href="https://docs.github.com/en/code-security/how-tos/secure-your-secrets/prevent-future-leaks/enabling-push-protection-for-your-repository">Enabling push protection for your repository</a>.</p></li>
+<li><p>Crear un <strong>PAT de prueba</strong> (caducidad 1 día) y un commit con el token en un fichero de demo.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">git</span> <span class="pre">push</span></code> debe ser <strong>rechazado</strong> (<code class="docutils literal notranslate"><span class="pre">GH013</span></code>, <em>Push cannot contain secrets</em>).</p></li>
+<li><p>Revocar el PAT, eliminar el fichero del commit y no usar <em>bypass</em> en producción.</p></li>
+</ol>
+<section id="pat-de-prueba-permisos-minimos">
+<h4>PAT de prueba: permisos mínimos<a class="headerlink" href="#pat-de-prueba-permisos-minimos" title="Link to this heading">¶</a></h4>
+<p>El token <strong>no se usa</strong> para llamar a la API; solo debe tener formato válido (<code class="docutils literal notranslate"><span class="pre">ghp_...</span></code> o <code class="docutils literal notranslate"><span class="pre">github_pat_...</span></code>) para que Push protection lo detecte.</p>
+<div class="table-wrapper colwidths-auto docutils container">
+<table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Tipo de token</p></th>
+<th class="head"><p>Scopes / permisos recomendados</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><strong>Fine-grained</strong></p></td>
+<td><p>Repositorio solo <code class="docutils literal notranslate"><span class="pre">medical_register</span></code>; caducidad <strong>1 día</strong>; permisos mínimos (p. ej. <strong>Metadata: Read-only</strong>) o sin permisos de contenido</p></td>
+</tr>
+<tr class="row-odd"><td><p><strong>Classic</strong></p></td>
+<td><p><strong>Ningún scope</strong> marcado; caducidad <strong>1 día</strong></p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<p>Tras la demo: <strong>revocar</strong> el PAT en <em>Developer settings → Personal access tokens</em>.</p>
+</section>
+<section id="comandos-usados-en-medical-register">
+<h4>Comandos usados en <code class="docutils literal notranslate"><span class="pre">medical_register</span></code><a class="headerlink" href="#comandos-usados-en-medical-register" title="Link to this heading">¶</a></h4>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="nb">cd</span><span class="w"> </span><span class="s2">&quot;</span><span class="nv">$PPS_BACKEND</span><span class="s2">&quot;</span>
+git<span class="w"> </span>checkout<span class="w"> </span>dev<span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span>git<span class="w"> </span>pull<span class="w"> </span>origin<span class="w"> </span>dev
+git<span class="w"> </span>checkout<span class="w"> </span>-b<span class="w"> </span>pps/github-push-protection-demo
+
+mkdir<span class="w"> </span>-p<span class="w"> </span>docs/git_docs/PPS_git/_demo_github
+<span class="nb">printf</span><span class="w"> </span><span class="s1">&#39;%s\n&#39;</span><span class="w"> </span><span class="s1">&#39;ghp_...&#39;</span><span class="w"> </span>&gt;<span class="w"> </span>docs/git_docs/PPS_git/_demo_github/leak.txt<span class="w">   </span><span class="c1"># PAT real de prueba</span>
+
+git<span class="w"> </span>add<span class="w"> </span>docs/git_docs/PPS_git/_demo_github/leak.txt
+git<span class="w"> </span>commit<span class="w"> </span>--no-gpg-sign<span class="w"> </span>-m<span class="w"> </span><span class="s2">&quot;test(PPS): demo push protection con PAT real&quot;</span>
+git<span class="w"> </span>push<span class="w"> </span>-u<span class="w"> </span>origin<span class="w"> </span>pps/github-push-protection-demo
+</pre></div>
+</div>
+<p>Resultado esperado en terminal: <code class="docutils literal notranslate"><span class="pre">GH013</span></code>, <em>GITHUB PUSH PROTECTION</em>, <em>GitHub Personal Access Token</em>, ruta <code class="docutils literal notranslate"><span class="pre">docs/git_docs/PPS_git/_demo_github/leak.txt</span></code>.</p>
+</section>
+</section>
+</section>
+<hr class="docutils" />
+<section id="relacion-con-los-proyectos-del-espacio-de-trabajo">
+<h2>4. Relación con los proyectos del espacio de trabajo<a class="headerlink" href="#relacion-con-los-proyectos-del-espacio-de-trabajo" title="Link to this heading">¶</a></h2>
+<ul class="simple">
+<li><p><strong>Backend</strong> (<code class="docutils literal notranslate"><span class="pre">medical_register</span></code>, rama <code class="docutils literal notranslate"><span class="pre">dev</span></code>): en <code class="docutils literal notranslate"><span class="pre">.github/workflows/</span></code> existen <code class="docutils literal notranslate"><span class="pre">coverage.yml</span></code> y <code class="docutils literal notranslate"><span class="pre">build-docs.yml</span></code>. La protección de ramas (véase <code class="docutils literal notranslate"><span class="pre">proteccion-ramas.md</span></code>) puede exigir que esos checks pasen antes de fusionar.</p></li>
+<li><p><strong>Android</strong> (<code class="docutils literal notranslate"><span class="pre">medical_register_apk</span></code>, rama <code class="docutils literal notranslate"><span class="pre">main</span></code>): si añades Actions allí, los nombres de los checks aparecerán en la UI de GitHub de ese repo.</p></li>
+</ul>
+<p>Push protection y Secret scanning son independientes de los <em>status checks</em> (secretos frente a calidad de código).</p>
+</section>
+<hr class="docutils" />
+<section id="evidencias-entrega-apartado-4-github">
+<h2>5. Evidencias (entrega) — Apartado 4: GitHub<a class="headerlink" href="#evidencias-entrega-apartado-4-github" title="Link to this heading">¶</a></h2>
+<p>Repositorio: <strong><code class="docutils literal notranslate"><span class="pre">alejandroquinonesgamez/medical_register</span></code></strong>. Rama de prueba: <code class="docutils literal notranslate"><span class="pre">pps/github-push-protection-demo</span></code>.</p>
+<div class="table-wrapper colwidths-auto docutils container">
+<table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>#</p></th>
+<th class="head"><p>Qué demuestra</p></th>
+<th class="head"><p>Fichero</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>1</p></td>
+<td><p>Secret Protection y Push protection <strong>activados</strong></p></td>
+<td><p><a class="reference download internal" download="" href="../../_downloads/801ff32e35c044fee0284b34e30eb37a/options-enabled.png"><span class="xref download myst"><code class="docutils literal notranslate"><span class="pre">../img/PPS_git/github/options-enabled.png</span></code></span></a></p></td>
+</tr>
+<tr class="row-odd"><td><p>2</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">git</span> <span class="pre">push</span></code> <strong>rechazado</strong> (<code class="docutils literal notranslate"><span class="pre">GH013</span></code>, PAT en <code class="docutils literal notranslate"><span class="pre">leak.txt</span></code>)</p></td>
+<td><p><a class="reference download internal" download="" href="../../_downloads/65210814a647abe17cb754382ff5ea98/push-rejected.png"><span class="xref download myst"><code class="docutils literal notranslate"><span class="pre">../img/PPS_git/github/push-rejected.png</span></code></span></a></p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<p><img alt="Secret Protection y Push protection habilitados" src="../../_images/options-enabled.png" /></p>
+<p><img alt="Push rechazado por GitHub Push Protection (GH013)" src="../../_images/push-rejected.png" /></p>
+<p><strong>Interpretación</strong>: GitHub impidió que el PAT entrara en el historial remoto. La remediación correcta es <strong>rotar/revocar</strong> el token (aunque el push fallara, si se creó un PAT real debe revocarse) y <strong>no</strong> subir el secreto; borrar <code class="docutils literal notranslate"><span class="pre">leak.txt</span></code> del commit local antes de un push limpio.</p>
+<p><strong>Alertas en Security (opcional)</strong>: capturas <code class="docutils literal notranslate"><span class="pre">alerta-abierta.png</span></code> / <code class="docutils literal notranslate"><span class="pre">alerta-cerrada.png</span></code> — guía detallada en <a class="reference internal" href="pasos.html"><span class="std std-doc"><code class="docutils literal notranslate"><span class="pre">pasos.md</span></code></span></a> <strong>§9.2</strong> (caso push bloqueado vs alerta en reposo).</p>
+<p><strong>Guía operativa</strong>: <a class="reference internal" href="pasos.html"><span class="std std-doc"><code class="docutils literal notranslate"><span class="pre">pasos.md</span></code></span></a> §4.</p>
+<hr class="docutils" />
+<p><strong>Autores</strong>: Alejandro Quiñones Gámez &amp; Adrián Bertos Gómez</p>
+<p><strong>Asignatura</strong>: PPS — Puesta a Producción Segura</p>
+<p><strong>Curso</strong>: Curso de Especialización en Ciberseguridad en Tecnologías de la Información</p>
+<p><strong>Centro</strong>: IES Zaidín-Vergeles</p>
+</section>
+</section>
+
+        </article>
+      </div>
+      <footer>
+        
+        <div class="related-pages">
+          
+          
+        </div>
+        <div class="bottom-of-page">
+          <div class="left-details">
+            <div class="copyright">
+                Copyright &#169; 2025, PumukyDev &amp; Alejandro Quiñones
+            </div>
+            Made with <a href="https://www.sphinx-doc.org/">Sphinx</a> and <a class="muted-link" href="https://pradyunsg.me">@pradyunsg</a>'s
+            
+            <a href="https://github.com/pradyunsg/furo">Furo</a>
+            
+          </div>
+          <div class="right-details">
+            
+          </div>
+        </div>
+        
+      </footer>
+    </div>
+    <aside class="toc-drawer">
+      
+      
+      <div class="toc-sticky toc-scroll">
+        <div class="toc-title-container">
+          <span class="toc-title">
+            On this page
+          </span>
+        </div>
+        <div class="toc-tree-container">
+          <div class="toc-tree">
+            <ul>
+<li><a class="reference internal" href="#">GitHub — Secret Scanning y Push Protection</a><ul>
+<li><a class="reference internal" href="#repositorios-de-este-trabajo-espacio-de-trabajo-pps">Repositorios de este trabajo (espacio de trabajo PPS)</a></li>
+<li><a class="reference internal" href="#introduccion">1. Introducción</a></li>
+<li><a class="reference internal" href="#secret-scanning-escaneo-de-secretos">2. Secret scanning (escaneo de secretos)</a><ul>
+<li><a class="reference internal" href="#que-hace">2.1. Qué hace</a></li>
+<li><a class="reference internal" href="#gestion-de-alertas">2.2. Gestión de alertas</a></li>
+<li><a class="reference internal" href="#actividad-simular-una-filtracion-y-remediar-entorno-seguro">2.3. Actividad: simular una filtración y remediar (entorno seguro)</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#push-protection">3. Push protection</a><ul>
+<li><a class="reference internal" href="#diferencia-respecto-al-escaneo-clasico">3.1. Diferencia respecto al escaneo clásico</a></li>
+<li><a class="reference internal" href="#tipos-de-proteccion">3.2. Tipos de protección</a></li>
+<li><a class="reference internal" href="#bypass-y-auditoria">3.3. Bypass y auditoría</a></li>
+<li><a class="reference internal" href="#beneficios-resumen-del-enunciado">3.4. Beneficios (resumen del enunciado)</a></li>
+<li><a class="reference internal" href="#actividad-habilitar-push-protection-y-documentar-una-prueba">3.5. Actividad: habilitar Push protection y documentar una prueba</a><ul>
+<li><a class="reference internal" href="#pat-de-prueba-permisos-minimos">PAT de prueba: permisos mínimos</a></li>
+<li><a class="reference internal" href="#comandos-usados-en-medical-register">Comandos usados en <code class="docutils literal notranslate"><span class="pre">medical_register</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a class="reference internal" href="#relacion-con-los-proyectos-del-espacio-de-trabajo">4. Relación con los proyectos del espacio de trabajo</a></li>
+<li><a class="reference internal" href="#evidencias-entrega-apartado-4-github">5. Evidencias (entrega) — Apartado 4: GitHub</a></li>
+</ul>
+</li>
+</ul>
+
+          </div>
+        </div>
+      </div>
+      
+      
+    </aside>
+  </div>
+</div><script src="../../_static/documentation_options.js?v=01f34227"></script>
+    <script src="../../_static/doctools.js?v=9bcbadda"></script>
+    <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../_static/scripts/furo.js?v=46bd48cc"></script>
+    </body>
+</html>
