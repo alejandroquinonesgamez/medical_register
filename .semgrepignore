@@ -1,0 +1,6 @@
+# Evidencias y demos PPS (no escanear documentación de ejercicios)
+docs/git_docs/PPS_git/_demo_gitleaks/
+docs/git_docs/PPS_git/_demo_github/
+
+# Tests: datos sintéticos que pueden disparar reglas genéricas de secretos
+tests/

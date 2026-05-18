@@ -1,0 +1,6 @@
+rules:
+  - id: flask-debug-true
+    pattern: app.run(..., debug=True, ...)
+    message: "No usar debug=True en código fusionado; usar configuración de entorno."
+    languages: [python]
+    severity: WARNING

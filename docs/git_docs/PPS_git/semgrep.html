@@ -1,0 +1,880 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
+<head>
+<!-- 2026-04-22 mié 16:39 -->
+<meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Semgrep</title>
+<meta name="author" content="Fernando Raya" />
+<meta name="generator" content="Org Mode" />
+<style type="text/css">
+  #content { max-width: 60em; margin: auto; }
+  .title  { text-align: center;
+             margin-bottom: .2em; }
+  .subtitle { text-align: center;
+              font-size: medium;
+              font-weight: bold;
+              margin-top:0; }
+  .todo   { font-family: monospace; color: red; }
+  .done   { font-family: monospace; color: green; }
+  .priority { font-family: monospace; color: orange; }
+  .tag    { background-color: #eee; font-family: monospace;
+            padding: 2px; font-size: 80%; font-weight: normal; }
+  .timestamp { color: #bebebe; }
+  .timestamp-kwd { color: #5f9ea0; }
+  .org-right  { margin-left: auto; margin-right: 0px;  text-align: right; }
+  .org-left   { margin-left: 0px;  margin-right: auto; text-align: left; }
+  .org-center { margin-left: auto; margin-right: auto; text-align: center; }
+  .underline { text-decoration: underline; }
+  #postamble p, #preamble p { font-size: 90%; margin: .2em; }
+  p.verse { margin-left: 3%; }
+  pre {
+    border: 1px solid #e6e6e6;
+    border-radius: 3px;
+    background-color: #f2f2f2;
+    padding: 8pt;
+    font-family: monospace;
+    overflow: auto;
+    margin: 1.2em;
+  }
+  pre.src {
+    position: relative;
+    overflow: auto;
+  }
+  pre.src:before {
+    display: none;
+    position: absolute;
+    top: -8px;
+    right: 12px;
+    padding: 3px;
+    color: #555;
+    background-color: #f2f2f299;
+  }
+  pre.src:hover:before { display: inline; margin-top: 14px;}
+  /* Languages per Org manual */
+  pre.src-asymptote:before { content: 'Asymptote'; }
+  pre.src-awk:before { content: 'Awk'; }
+  pre.src-authinfo::before { content: 'Authinfo'; }
+  pre.src-C:before { content: 'C'; }
+  /* pre.src-C++ doesn't work in CSS */
+  pre.src-clojure:before { content: 'Clojure'; }
+  pre.src-css:before { content: 'CSS'; }
+  pre.src-D:before { content: 'D'; }
+  pre.src-ditaa:before { content: 'ditaa'; }
+  pre.src-dot:before { content: 'Graphviz'; }
+  pre.src-calc:before { content: 'Emacs Calc'; }
+  pre.src-emacs-lisp:before { content: 'Emacs Lisp'; }
+  pre.src-fortran:before { content: 'Fortran'; }
+  pre.src-gnuplot:before { content: 'gnuplot'; }
+  pre.src-haskell:before { content: 'Haskell'; }
+  pre.src-hledger:before { content: 'hledger'; }
+  pre.src-java:before { content: 'Java'; }
+  pre.src-js:before { content: 'Javascript'; }
+  pre.src-latex:before { content: 'LaTeX'; }
+  pre.src-ledger:before { content: 'Ledger'; }
+  pre.src-lisp:before { content: 'Lisp'; }
+  pre.src-lilypond:before { content: 'Lilypond'; }
+  pre.src-lua:before { content: 'Lua'; }
+  pre.src-matlab:before { content: 'MATLAB'; }
+  pre.src-mscgen:before { content: 'Mscgen'; }
+  pre.src-ocaml:before { content: 'Objective Caml'; }
+  pre.src-octave:before { content: 'Octave'; }
+  pre.src-org:before { content: 'Org mode'; }
+  pre.src-oz:before { content: 'OZ'; }
+  pre.src-plantuml:before { content: 'Plantuml'; }
+  pre.src-processing:before { content: 'Processing.js'; }
+  pre.src-python:before { content: 'Python'; }
+  pre.src-R:before { content: 'R'; }
+  pre.src-ruby:before { content: 'Ruby'; }
+  pre.src-sass:before { content: 'Sass'; }
+  pre.src-scheme:before { content: 'Scheme'; }
+  pre.src-screen:before { content: 'Gnu Screen'; }
+  pre.src-sed:before { content: 'Sed'; }
+  pre.src-sh:before { content: 'shell'; }
+  pre.src-sql:before { content: 'SQL'; }
+  pre.src-sqlite:before { content: 'SQLite'; }
+  /* additional languages in org.el's org-babel-load-languages alist */
+  pre.src-forth:before { content: 'Forth'; }
+  pre.src-io:before { content: 'IO'; }
+  pre.src-J:before { content: 'J'; }
+  pre.src-makefile:before { content: 'Makefile'; }
+  pre.src-maxima:before { content: 'Maxima'; }
+  pre.src-perl:before { content: 'Perl'; }
+  pre.src-picolisp:before { content: 'Pico Lisp'; }
+  pre.src-scala:before { content: 'Scala'; }
+  pre.src-shell:before { content: 'Shell Script'; }
+  pre.src-ebnf2ps:before { content: 'ebfn2ps'; }
+  /* additional language identifiers per "defun org-babel-execute"
+       in ob-*.el */
+  pre.src-cpp:before  { content: 'C++'; }
+  pre.src-abc:before  { content: 'ABC'; }
+  pre.src-coq:before  { content: 'Coq'; }
+  pre.src-groovy:before  { content: 'Groovy'; }
+  /* additional language identifiers from org-babel-shell-names in
+     ob-shell.el: ob-shell is the only babel language using a lambda to put
+     the execution function name together. */
+  pre.src-bash:before  { content: 'bash'; }
+  pre.src-csh:before  { content: 'csh'; }
+  pre.src-ash:before  { content: 'ash'; }
+  pre.src-dash:before  { content: 'dash'; }
+  pre.src-ksh:before  { content: 'ksh'; }
+  pre.src-mksh:before  { content: 'mksh'; }
+  pre.src-posh:before  { content: 'posh'; }
+  /* Additional Emacs modes also supported by the LaTeX listings package */
+  pre.src-ada:before { content: 'Ada'; }
+  pre.src-asm:before { content: 'Assembler'; }
+  pre.src-caml:before { content: 'Caml'; }
+  pre.src-delphi:before { content: 'Delphi'; }
+  pre.src-html:before { content: 'HTML'; }
+  pre.src-idl:before { content: 'IDL'; }
+  pre.src-mercury:before { content: 'Mercury'; }
+  pre.src-metapost:before { content: 'MetaPost'; }
+  pre.src-modula-2:before { content: 'Modula-2'; }
+  pre.src-pascal:before { content: 'Pascal'; }
+  pre.src-ps:before { content: 'PostScript'; }
+  pre.src-prolog:before { content: 'Prolog'; }
+  pre.src-simula:before { content: 'Simula'; }
+  pre.src-tcl:before { content: 'tcl'; }
+  pre.src-tex:before { content: 'TeX'; }
+  pre.src-plain-tex:before { content: 'Plain TeX'; }
+  pre.src-verilog:before { content: 'Verilog'; }
+  pre.src-vhdl:before { content: 'VHDL'; }
+  pre.src-xml:before { content: 'XML'; }
+  pre.src-nxml:before { content: 'XML'; }
+  /* add a generic configuration mode; LaTeX export needs an additional
+     (add-to-list 'org-latex-listings-langs '(conf " ")) in .emacs */
+  pre.src-conf:before { content: 'Configuration File'; }
+
+  table { border-collapse:collapse; }
+  caption.t-above { caption-side: top; }
+  caption.t-bottom { caption-side: bottom; }
+  td, th { vertical-align:top;  }
+  th.org-right  { text-align: center;  }
+  th.org-left   { text-align: center;   }
+  th.org-center { text-align: center; }
+  td.org-right  { text-align: right;  }
+  td.org-left   { text-align: left;   }
+  td.org-center { text-align: center; }
+  dt { font-weight: bold; }
+  .footpara { display: inline; }
+  .footdef  { margin-bottom: 1em; }
+  .figure { padding: 1em; }
+  .figure p { text-align: center; }
+  .equation-container {
+    display: table;
+    text-align: center;
+    width: 100%;
+  }
+  .equation {
+    vertical-align: middle;
+  }
+  .equation-label {
+    display: table-cell;
+    text-align: right;
+    vertical-align: middle;
+  }
+  .inlinetask {
+    padding: 10px;
+    border: 2px solid gray;
+    margin: 10px;
+    background: #ffffcc;
+  }
+  #org-div-home-and-up
+   { text-align: right; font-size: 70%; white-space: nowrap; }
+  textarea { overflow-x: auto; }
+  .linenr { font-size: smaller }
+  .code-highlighted { background-color: #ffff00; }
+  .org-info-js_info-navigation { border-style: none; }
+  #org-info-js_console-label
+    { font-size: 10px; font-weight: bold; white-space: nowrap; }
+  .org-info-js_search-highlight
+    { background-color: #ffff00; color: #000000; font-weight: bold; }
+  .org-svg { }
+</style>
+<style type="text/css">
+/******************************************************
+* I copied these styles from markdotto.com, who is
+* the creator of bootstrap, and I also did some
+* modification. Thanks Mark for the beautiful theme,
+* so I reserved the @mdo sign below.
+*****************************************************/
+
+/*
+__
+__                  /\ \
+/'_`\_    ___ ___    \_\ \    ___
+/'/'_` \ /' __` __`\  /'_` \  / __`\
+/\ \ \L\ \/\ \/\ \/\ \/\ \L\ \/\ \L\ \
+\ \ `\__,_\ \_\ \_\ \_\ \___,_\ \____/
+\ `\_____\\/_/\/_/\/_/\/__,_ /\/___/
+`\/_____/
+
+*/
+
+
+
+/* Body resets
+-------------------------------------------------- */
+
+* {
+-webkit-box-sizing:  border-box;
+-moz-box-sizing:  border-box;
+box-sizing:  border-box;
+}
+html, body {
+margin:  0;
+padding:  0;
+}
+html {
+font-size:  62.5%;
+}
+body {
+padding:  20px;
+font-family:  Menlo, Monaco, monospace;
+font-size:  14px;
+line-height:  1.5;
+color:  #666;
+background-color:  #fff;
+}
+p {
+margin:  0 0 20px;
+}
+h1, h2, h3 {
+position:  relative;
+margin:  30px 0 20px;
+font-size:  18px;
+font-weight:  bold;
+line-height:  1.1;
+color:  #111;
+text-rendering:  optimizeLegibility;
+}
+h1:before, h2:before, h3:before {
+position:  absolute;
+top:  auto;
+color:  #ccc;
+display:  none;
+}
+h1:before {
+content:  "";
+left:  -1.25em;
+}
+h2:before {
+content:  "*";
+left:  -2em;
+}
+h3:before {
+content:  "**";
+left:  -2.5em;
+}
+i, em, b, strong {
+padding-left:  .1em;
+padding-right:  .1em;
+}
+b, strong {
+font-weight:  bold;
+color:  #333;
+}
+b:before, b: after, strong:before, strong: after {
+content:  "*";
+}
+i:before, i: after, em:before, em: after {
+content:  "/";
+}
+hr {
+margin:  0;
+border:  0;
+}
+hr: after {
+display:  block;
+margin:  20px 0;
+content:  "----------------------------------------------------------------";
+color:  #ccc;
+}
+ul, ol {
+padding:  0;
+margin:  0 0 20px;
+}
+code, pre {
+font-family:  Menlo, Monaco, Consolas, "Courier New", monospace;
+}
+code {
+color:  #d14;
+}
+code:before, code: after {
+content:  "=";
+color:  #ccc;
+}
+pre {
+display:  block;
+margin:  0 0 14px;
+padding:  15px;
+border-radius:  3px 3px 3px 3px;
+font-size:  18px;
+line-height:  28px;
+background-color:  #f5f5f5;
+white-space:  pre;
+white-space:  pre-wrap;
+word-break:  break-all;
+word-wrap:  break-word;
+}
+blockquote {
+padding:  0 0 0 20px;
+margin:  0 30px 20px -22.5px;
+color:  #999;
+border-left:  8px solid #e5e5e5;
+}
+blockquote p: last-child {
+margin-bottom:  0;
+}
+img {
+display:  block;
+margin:  0;
+border-radius:  5px;
+}
+a {
+font-weight:  inherit;
+line-height:  inherit;
+color:  #000;
+text-decoration:  none;
+}
+sup a:before {
+content:  "[";
+}
+sup a: after {
+content:  "]";
+}
+a: hover {
+text-decoration:  underline;
+}
+table {
+line-height:  2.5;
+margin-bottom:  15px;
+max-width:  100%;
+width:  100%;
+}
+table td, table th {
+padding:  0 15px;
+}
+table th.left, table td.left {
+text-align:  left;
+}
+table th.right, table td.right {
+text-align:  right;
+}
+/******************************************************/
+/* body */
+body {
+margin:  0 auto;
+max-width:  770px;
+}
+/* head */
+.masthead {
+color:  #888;
+}
+.masthead: after {
+display:  block;
+content:  '----------------------------------------------------------------';
+margin:  10px 0;
+color:  #ccc;
+}
+.masthead a {
+color:  #333;
+}
+.masthead ul {
+list-style:  none;
+}
+.masthead li {
+display:  inline-block;
+}
+.masthead li + li:before {
+display:  inline-block;
+content:  "\00B7 \00a0";
+color:  #ccc;
+}
+/* searchform*/
+#searchform {
+position:  absolute;
+top:  54px;
+right:  30.4%;
+}
+#searchform #s {
+background:  url("/media/img/search.png") no-repeat 5px 6px;
+box-shadow:  inset 0 1px 1px rgba(0,0,0,0.1);
+border:  1px solid #ddd;
+border-radius:  2px;
+-moz-border-radius:  2px;
+width:  90px;
+height:  30px;
+line-height:  12px;
+padding:  4px 10px 4px 28px;
+
+-webkit-transition-duration:  400ms;
+-webkit-transition-property:  width, background;
+-webkit-transition-timing-function:  ease;
+-moz-transition-duration:  400ms;
+-moz-transition-property:  width, background;
+-moz-transition-timing-function:  ease;
+-o-transition-duration:  400ms;
+-o-transition-property:  width, background;
+-o-transition-timing-function:  ease;
+}
+#searchform #s: focus {
+background-color:  #f9f9f9;
+width:  160px;
+}
+.masthead img.avatar {
+position:  relative;
+float:  right;
+margin-top:  -100px;
+margin-bottom:  -100%;
+margin-right:  10%;
+width:  200px;
+background-color:  #fff;
+}
+/* post */
+.post {
+position:  relative;
+}
+.post: after {
+display:  block;
+content:  "----------------------------------------------------------------";
+color:  #ccc;
+}
+.post img {
+max-width:  100%;
+}
+.post li {
+list-style:  none outside none;
+}
+.post ul > li:before {
+content:  "- ";
+margin-left:  -1.25em;
+color:  #ccc;
+}
+.post ol {
+counter-reset:  o-list;
+}
+.post ol > li:before {
+content:  counter(o-list) ") ";
+counter-increment:  o-list;
+margin-left:  -1.85em;
+color:  #ccc;
+}
+
+/* special for li in pre */
+.post pre li {
+list-style-type:  decimal;
+}
+
+.post pre li:before {
+display:  none;
+}
+
+/* meta info */
+.post-info {
+display:  inline-block;
+margin:  -10px 0 -10px;
+color:  #999;
+}
+.post-info + .post-info:before {
+content:  "\2223 \00a0";
+}
+.post-meta: after {
+content:  "----------------------------------------------------------------";
+display:  block;
+margin-top:  -1px;
+color:  #ccc;
+}
+
+/* table of content */
+#table-of-contents {
+position:  fixed;
+right:  0em;
+top:  0em;
+border: 1px solid #e1e1e8;
+-webkit-box-shadow:  0 0 1em #777777;
+-moz-box-shadow:  0 0 1em #777777;
+-webkit-border-bottom-left-radius:  5px;
+-moz-border-radius-bottomleft:  5px;
+text-align:  center;
+/* ensure doesn't flow off the screen when expanded */
+max-height:  80%;
+overflow:  auto;
+z-index:  200;
+}
+
+#table-of-contents h2 {
+max-width:  20em;
+font-weight:  normal;
+padding-left:  0.5em;
+padding-top:  0.05em;
+padding-bottom:  0.05em;
+}
+
+#table-of-contents ul {
+margin-left:  14pt;
+margin-bottom:  10pt;
+padding:  0
+}
+
+#table-of-contents li {
+padding:  0;
+margin:  1px;
+list-style:  none;
+}
+
+#table-of-contents ul>: first-child {
+color:  blue;
+}
+
+#table-of-contents #text-table-of-contents {
+display:  none;
+text-align:  left;
+}
+
+#table-of-contents: hover #text-table-of-contents {
+display:  block;
+padding:  0.5em;
+margin-top:  -1.5em;
+}
+
+/* footer */
+.footer {
+margin:  80px 0 0;
+text-align:  center;
+font-size:  15px;
+color:  #999;
+}
+.footer > p {
+margin:  0;
+line-height:  1.5;
+}
+.footpara {
+display:  inline;
+}
+
+/* Responsive
+-------------------------------------------------- */
+
+@media (min-width:  768px) {
+/* Increase body padding and font-sizes */
+body {
+padding:  30px;
+font-size:  18px;
+line-height:  1.75;
+}
+h1:before, h2:before, h3:before {
+display:  inline;
+}
+}
+
+@media (min-width:  1024px) {
+body {
+padding:  30px;
+}
+}
+</style>
+<script type="text/javascript">
+document.addEventListener('DOMContentLoaded',function() {
+document.getElementById("table-of-contents").onclick = function() {
+var elem = document.getElementById("text-table-of-contents");
+elem.style.display = elem.style.display == "block" ? "none" : "block";
+}
+});
+
+var url = document.location.href;
+var orgsource = url.substring(0, url.lastIndexOf("."))+".org.html";
+function show_org_source(){
+document.location.href = orgsource;
+}
+</script>
+</head>
+<body>
+<div id="content" class="content">
+<h1 class="title">Semgrep</h1>
+<div id="table-of-contents" role="doc-toc">
+<h2>Table of Contents</h2>
+<div id="text-table-of-contents" role="doc-toc">
+<ul>
+<li><a href="#orgc2b026f">1. Introducción</a></li>
+<li><a href="#orgdccc18b">2. ¿Qué es Semgrep?</a>
+<ul>
+<li><a href="#orgfb49bb2">2.1. Utilidad y Ventajas</a></li>
+</ul>
+</li>
+<li><a href="#orgc9e71e4">3. Escaneos manuales</a></li>
+<li><a href="#orgfa77d1a">4. Escaneos gestionados (<i>managed scans</i>)</a></li>
+<li><a href="#org6bcfd9b">5. Ejemplos de utilización</a>
+<ul>
+<li><a href="#orgaeabb30">5.1. Escaneo Ad-hoc</a></li>
+<li><a href="#org48a8c9c">5.2. Uso de Reglas Específicas</a></li>
+<li><a href="#orgd67588b">5.3. Creación de Reglas Personalizadas</a></li>
+<li><a href="#org77fc2fe">5.4. Integración en CI/CD</a></li>
+</ul>
+</li>
+<li><a href="#org2999c78">6. Actividad Práctica</a>
+<ul>
+<li><a href="#org8bd5c7f">6.1. Vulnerabilidad</a></li>
+<li><a href="#org3da6163">6.2. Reglas personalizadas</a></li>
+</ul>
+</li>
+</ul>
+</div>
+</div>
+<div id="outline-container-orgc2b026f" class="outline-2">
+<h2 id="orgc2b026f"><span class="section-number-2">1.</span> Introducción</h2>
+<div class="outline-text-2" id="text-1">
+<p>
+Esta actividad tiene como objetivo comprender qué es <a href="https://semgrep.dev/">Semgrep</a>, por qué
+es una herramienta esencial en el ecosistema de DevSecOps y cómo
+implementarla en un flujo de trabajo real.
+</p>
+</div>
+</div>
+<div id="outline-container-orgdccc18b" class="outline-2">
+<h2 id="orgdccc18b"><span class="section-number-2">2.</span> ¿Qué es Semgrep?</h2>
+<div class="outline-text-2" id="text-2">
+<p>
+Semgrep (Semantic Grep) es una herramienta de análisis estático de
+código (SAST) de código abierto. A diferencia de un <i>grep</i> tradicional
+que busca cadenas de texto planas, Semgrep entiende la <b>estructura
+sintáctica</b> del código (el Árbol de Sintaxis Abstracta o AST).
+</p>
+
+<p>
+Esta herramienta tiene tanta funcionalidad que se solapa con
+otras. Por ejemplo, Semgrep puede buscar secretos o buscar problemas
+en la cadena de suministro (y por supuesto tiene IA).
+</p>
+</div>
+<div id="outline-container-orgfb49bb2" class="outline-3">
+<h3 id="orgfb49bb2"><span class="section-number-3">2.1.</span> Utilidad y Ventajas</h3>
+<div class="outline-text-3" id="text-2-1">
+<dl class="org-dl">
+<dt>Detección de vulnerabilidades</dt><dd>Encuentra patrones inseguros (como
+inyecciones SQL o uso de funciones obsoletas).</dd>
+
+<dt>Cumplimiento de estándares</dt><dd>Asegura que el equipo siga las mejores
+prácticas de codificación.</dd>
+
+<dt>Personalización</dt><dd>Permite escribir reglas propias en segundos
+usando una sintaxis que se parece al código real.</dd>
+
+<dt>Velocidad</dt><dd>Es extremadamente rápido comparado con herramientas
+SAST tradicionales.</dd>
+</dl>
+</div>
+</div>
+</div>
+<div id="outline-container-orgc9e71e4" class="outline-2">
+<h2 id="orgc9e71e4"><span class="section-number-2">3.</span> Escaneos manuales</h2>
+<div class="outline-text-2" id="text-3">
+<ul class="org-ul">
+<li>Seguiremos las instrucciones de <a href="https://semgrep.dev/docs/getting-started/quickstart">Quickstart</a> en su página web. Con
+esta opción podremos utilizar la herramienta de línea de comandos
+para escanear el proyecto, una vez que nos hemos autenticado en la
+plataforma de Semgrep con nuestro usuario de Github o Gitlab.</li>
+
+<li>En caso de no tener cuenta de Github o Gitlab seguiremos las
+instrucciones <a href="https://semgrep.dev/docs/getting-started/quickstart">Scan your project</a>.</li>
+</ul>
+</div>
+</div>
+<div id="outline-container-orgfa77d1a" class="outline-2">
+<h2 id="orgfa77d1a"><span class="section-number-2">4.</span> Escaneos gestionados (<i>managed scans</i>)</h2>
+<div class="outline-text-2" id="text-4">
+<p>
+Los análisis gestionados de Semgrep permiten ejecutar análisis de
+Semgrep sin necesidad de configurar ni mantener una infraestructura
+propia. Proporcionan una forma sencilla y escalable de analizar el
+código en busca de vulnerabilidades de seguridad, problemas de calidad
+y otros inconvenientes, sin tener que configurar ni mantener
+configuraciones independientes para cada proyecto.
+</p>
+
+<p>
+Nuestro código tiene que estar los repositorios de:
+</p>
+
+<ul class="org-ul">
+<li>Bitbucket</li>
+<li>Github</li>
+<li>Gitlab</li>
+<li>Azure</li>
+</ul>
+
+<p>
+Para configurar los escaneos necesitamos:
+</p>
+
+<ul class="org-ul">
+<li>Cuenta en la organización (por ejemplo Github)</li>
+<li>Seguir las <a href="https://semgrep.dev/docs/getting-started/quickstart-managed-scans#add-projects-to-semgrep-managed-scans">instrucciones para escaneos gestionados</a></li>
+</ul>
+</div>
+</div>
+<div id="outline-container-org6bcfd9b" class="outline-2">
+<h2 id="org6bcfd9b"><span class="section-number-2">5.</span> Ejemplos de utilización</h2>
+<div class="outline-text-2" id="text-5">
+<p>
+Semgrep se puede utilizar de tres formas principales:
+</p>
+</div>
+<div id="outline-container-orgaeabb30" class="outline-3">
+<h3 id="orgaeabb30"><span class="section-number-3">5.1.</span> Escaneo Ad-hoc</h3>
+<div class="outline-text-3" id="text-5-1">
+<p>
+Ideal para una revisión rápida de un directorio.
+</p>
+
+<div class="org-src-container">
+<pre class="src src-bash">semgrep scan --config auto
+</pre>
+</div>
+
+<p>
+El flag <code>--config auto</code> busca reglas recomendadas por la comunidad
+para los lenguajes detectados en tu carpeta.
+</p>
+</div>
+</div>
+<div id="outline-container-org48a8c9c" class="outline-3">
+<h3 id="org48a8c9c"><span class="section-number-3">5.2.</span> Uso de Reglas Específicas</h3>
+<div class="outline-text-3" id="text-5-2">
+<p>
+Si solo quieres buscar vulnerabilidades web en un proyecto Python:
+</p>
+
+<div class="org-src-container">
+<pre class="src src-bash">semgrep scan --config <span style="color: #3548cf;">"p/python"</span> --config <span style="color: #3548cf;">"p/owasp-top-10"</span>
+</pre>
+</div>
+</div>
+</div>
+<div id="outline-container-orgd67588b" class="outline-3">
+<h3 id="orgd67588b"><span class="section-number-3">5.3.</span> Creación de Reglas Personalizadas</h3>
+<div class="outline-text-3" id="text-5-3">
+<p>
+Imagina que quieres prohibir el uso de <code>print()</code> en producción. Puedes
+crear un archivo <code>my-rule.yaml</code>:
+</p>
+
+<div class="org-src-container">
+<pre class="src src-yaml"><span style="color: #005e8b;">rules</span>:
+  - <span style="color: #005e8b;">id</span>: no-print-in-prod
+    <span style="color: #005e8b;">patterns</span>:
+      - <span style="color: #005e8b;">pattern</span>: print(...)
+    <span style="color: #005e8b;">message</span>: <span style="color: #3548cf;">"No uses print() en el c&#243;digo final. Usa un logger."</span>
+    <span style="color: #005e8b;">languages</span>: [python]
+    <span style="color: #005e8b;">severity</span>: WARNING
+</pre>
+</div>
+</div>
+</div>
+<div id="outline-container-org77fc2fe" class="outline-3">
+<h3 id="org77fc2fe"><span class="section-number-3">5.4.</span> Integración en CI/CD</h3>
+<div class="outline-text-3" id="text-5-4">
+<p>
+Seguiremos las instrucciones de <a href="https://semgrep.dev/docs/deployment/add-semgrep-to-ci">añadir semgrep al CI</a>. Esto suele ser
+añadir al pipeline de GitHub Actions un fichero
+<code>.github/workflows/semgrep.yml</code>:
+</p>
+
+<div class="org-src-container">
+<pre class="src src-yaml"><span style="color: #595959; font-style: italic;"># </span><span style="color: #595959; font-style: italic;">Name of this GitHub Actions workflow.
+</span><span style="color: #005e8b;">name</span>: Semgrep
+
+<span style="color: #0000b0;">on</span>:
+  <span style="color: #595959; font-style: italic;"># </span><span style="color: #595959; font-style: italic;">Scan changed files in PRs (diff-aware scanning):
+</span>  <span style="color: #005e8b;">pull_request</span>: {}
+  <span style="color: #595959; font-style: italic;"># </span><span style="color: #595959; font-style: italic;">Scan on-demand through GitHub Actions interface:
+</span>  <span style="color: #005e8b;">workflow_dispatch</span>: {}
+  <span style="color: #595959; font-style: italic;"># </span><span style="color: #595959; font-style: italic;">Scan mainline branches if there are changes to .github/workflows/semgrep.yml:
+</span>  <span style="color: #005e8b;">push</span>:
+    <span style="color: #005e8b;">branches</span>:
+      - main
+      - master
+    <span style="color: #005e8b;">paths</span>:
+      - .github/workflows/semgrep.yml
+  <span style="color: #595959; font-style: italic;"># </span><span style="color: #595959; font-style: italic;">Schedule the CI job (this method uses cron syntax):
+</span>  <span style="color: #005e8b;">schedule</span>:
+    - <span style="color: #005e8b;">cron</span>: <span style="color: #3548cf;">'20 17 * * *'</span> <span style="color: #595959; font-style: italic;"># </span><span style="color: #595959; font-style: italic;">Sets Semgrep to scan every day at 17:20 UTC.
+</span>    <span style="color: #595959; font-style: italic;"># </span><span style="color: #595959; font-style: italic;">It is recommended to change the schedule to a random time.
+</span>
+<span style="color: #005e8b;">permissions</span>:
+  <span style="color: #005e8b;">contents</span>: read
+
+<span style="color: #005e8b;">jobs</span>:
+  <span style="color: #005e8b;">semgrep</span>:
+    <span style="color: #595959; font-style: italic;"># </span><span style="color: #595959; font-style: italic;">User definable name of this GitHub Actions job.
+</span>    <span style="color: #005e8b;">name</span>: semgrep/ci
+    <span style="color: #595959; font-style: italic;"># </span><span style="color: #595959; font-style: italic;">If you are self-hosting, change the following `runs-on` value:
+</span>    <span style="color: #005e8b;">runs-on</span>: ubuntu-latest
+
+    <span style="color: #005e8b;">container</span>:
+      <span style="color: #595959; font-style: italic;"># </span><span style="color: #595959; font-style: italic;">A Docker image with Semgrep installed. Do not change this.
+</span>      <span style="color: #005e8b;">image</span>: semgrep/semgrep
+
+    <span style="color: #595959; font-style: italic;"># </span><span style="color: #595959; font-style: italic;">Skip any PR created by dependabot to avoid permission issues:
+</span>    <span style="color: #005e8b;">if</span>: (github.actor <span style="color: #005f5f;">!=</span> <span style="color: #3548cf;">'dependabot[bot]'</span>)
+
+    <span style="color: #005e8b;">steps</span>:
+      <span style="color: #595959; font-style: italic;"># </span><span style="color: #595959; font-style: italic;">Fetch project source with GitHub Actions Checkout. Use either v3 or v4.
+</span>      - <span style="color: #005e8b;">uses</span>: actions/checkout@v4
+      <span style="color: #595959; font-style: italic;"># </span><span style="color: #595959; font-style: italic;">Run the "semgrep ci" command on the command line of the docker image.
+</span>      - <span style="color: #005e8b;">run</span>: semgrep ci
+        <span style="color: #005e8b;">env</span>:
+          <span style="color: #595959; font-style: italic;"># </span><span style="color: #595959; font-style: italic;">Connect to Semgrep AppSec Platform through your SEMGREP_APP_TOKEN.
+</span>          <span style="color: #595959; font-style: italic;"># </span><span style="color: #595959; font-style: italic;">Generate a token from Semgrep AppSec Platform &gt; Settings
+</span>          <span style="color: #595959; font-style: italic;"># </span><span style="color: #595959; font-style: italic;">and add it to your GitHub secrets.
+</span>          <span style="color: #005e8b;">SEMGREP_APP_TOKEN</span>: ${{ secrets.SEMGREP_APP_TOKEN }}
+</pre>
+</div>
+
+<p>
+Fíjate que tendrás que crear un token e introducirlo en los secretos
+del repositorio. Puede que la versión gratuita no tenga esta
+funcionalidad activada (paga $$).
+</p>
+</div>
+</div>
+</div>
+<div id="outline-container-org2999c78" class="outline-2">
+<h2 id="org2999c78"><span class="section-number-2">6.</span> Actividad Práctica</h2>
+<div class="outline-text-2" id="text-6">
+<p>
+Integra Semgrep en tu proyecto y documenta su uso. Date de alta en
+Semgrep y añade tu proyecto. Prueba las distintas opciones que tienes gratis.
+</p>
+</div>
+<div id="outline-container-org8bd5c7f" class="outline-3">
+<h3 id="org8bd5c7f"><span class="section-number-3">6.1.</span> Vulnerabilidad</h3>
+<div class="outline-text-3" id="text-6-1">
+<p>
+Prueba a introducir alguna vulnerabilidad. Documenta su detección
+(puede que tengas que desactivar otras protecciones que ya tengas de
+otras actividades).
+</p>
+</div>
+</div>
+<div id="outline-container-org3da6163" class="outline-3">
+<h3 id="org3da6163"><span class="section-number-3">6.2.</span> Reglas personalizadas</h3>
+<div class="outline-text-3" id="text-6-2">
+<p>
+Crea alguna regla personalizada, si no se te ocurre ninguna utiliza la
+idea de <code>print</code>, pero seguro que se te ocurre alguna mejor. O puedes
+desactivar el escaneo de ciertos directorios.
+</p>
+</div>
+</div>
+</div>
+</div>
+<div id="postamble" class="status">
+<p class="author">Author: Fernando Raya</p>
+<p class="date">Created: 2026-04-22 mié 16:39</p>
+<p class="validation"><a href="https://validator.w3.org/check?uri=referer">Validate</a></p>
+</div>
+</body>
+</html>

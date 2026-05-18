@@ -1,0 +1,28 @@
+name: Semgrep
+
+on:
+  pull_request:
+  push:
+    branches: [dev]
+  workflow_dispatch:
+
+jobs:
+  semgrep:
+    name: semgrep
+    runs-on: ubuntu-latest
+    container:
+      image: semgrep/semgrep
+    steps:
+      - uses: actions/checkout@v4
+      - name: Reglas personalizadas del repo (app/)
+        run: semgrep scan --config semgrep-rules/ app/ --error
+      # Escaneo amplio (auto / OWASP): ejecutar en local y documentar capturas.
+      # En PR con app/_semgrep_demo_vuln.py el job siguiente debe fallar (evidencia).
+      - name: OWASP en fichero demo (si existe en el PR)
+        if: hashFiles('app/_semgrep_demo_vuln.py') != ''
+        run: |
+          semgrep scan \
+            --config "p/python" \
+            --config "p/owasp-top-ten" \
+            app/_semgrep_demo_vuln.py \
+            --error

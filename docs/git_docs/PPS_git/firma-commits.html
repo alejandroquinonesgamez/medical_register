@@ -1,0 +1,832 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
+<head>
+<!-- 2026-04-20 lun 13:43 -->
+<meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Firma de commits</title>
+<meta name="author" content="Fernando Raya" />
+<meta name="generator" content="Org Mode" />
+<style type="text/css">
+  #content { max-width: 60em; margin: auto; }
+  .title  { text-align: center;
+             margin-bottom: .2em; }
+  .subtitle { text-align: center;
+              font-size: medium;
+              font-weight: bold;
+              margin-top:0; }
+  .todo   { font-family: monospace; color: red; }
+  .done   { font-family: monospace; color: green; }
+  .priority { font-family: monospace; color: orange; }
+  .tag    { background-color: #eee; font-family: monospace;
+            padding: 2px; font-size: 80%; font-weight: normal; }
+  .timestamp { color: #bebebe; }
+  .timestamp-kwd { color: #5f9ea0; }
+  .org-right  { margin-left: auto; margin-right: 0px;  text-align: right; }
+  .org-left   { margin-left: 0px;  margin-right: auto; text-align: left; }
+  .org-center { margin-left: auto; margin-right: auto; text-align: center; }
+  .underline { text-decoration: underline; }
+  #postamble p, #preamble p { font-size: 90%; margin: .2em; }
+  p.verse { margin-left: 3%; }
+  pre {
+    border: 1px solid #e6e6e6;
+    border-radius: 3px;
+    background-color: #f2f2f2;
+    padding: 8pt;
+    font-family: monospace;
+    overflow: auto;
+    margin: 1.2em;
+  }
+  pre.src {
+    position: relative;
+    overflow: auto;
+  }
+  pre.src:before {
+    display: none;
+    position: absolute;
+    top: -8px;
+    right: 12px;
+    padding: 3px;
+    color: #555;
+    background-color: #f2f2f299;
+  }
+  pre.src:hover:before { display: inline; margin-top: 14px;}
+  /* Languages per Org manual */
+  pre.src-asymptote:before { content: 'Asymptote'; }
+  pre.src-awk:before { content: 'Awk'; }
+  pre.src-authinfo::before { content: 'Authinfo'; }
+  pre.src-C:before { content: 'C'; }
+  /* pre.src-C++ doesn't work in CSS */
+  pre.src-clojure:before { content: 'Clojure'; }
+  pre.src-css:before { content: 'CSS'; }
+  pre.src-D:before { content: 'D'; }
+  pre.src-ditaa:before { content: 'ditaa'; }
+  pre.src-dot:before { content: 'Graphviz'; }
+  pre.src-calc:before { content: 'Emacs Calc'; }
+  pre.src-emacs-lisp:before { content: 'Emacs Lisp'; }
+  pre.src-fortran:before { content: 'Fortran'; }
+  pre.src-gnuplot:before { content: 'gnuplot'; }
+  pre.src-haskell:before { content: 'Haskell'; }
+  pre.src-hledger:before { content: 'hledger'; }
+  pre.src-java:before { content: 'Java'; }
+  pre.src-js:before { content: 'Javascript'; }
+  pre.src-latex:before { content: 'LaTeX'; }
+  pre.src-ledger:before { content: 'Ledger'; }
+  pre.src-lisp:before { content: 'Lisp'; }
+  pre.src-lilypond:before { content: 'Lilypond'; }
+  pre.src-lua:before { content: 'Lua'; }
+  pre.src-matlab:before { content: 'MATLAB'; }
+  pre.src-mscgen:before { content: 'Mscgen'; }
+  pre.src-ocaml:before { content: 'Objective Caml'; }
+  pre.src-octave:before { content: 'Octave'; }
+  pre.src-org:before { content: 'Org mode'; }
+  pre.src-oz:before { content: 'OZ'; }
+  pre.src-plantuml:before { content: 'Plantuml'; }
+  pre.src-processing:before { content: 'Processing.js'; }
+  pre.src-python:before { content: 'Python'; }
+  pre.src-R:before { content: 'R'; }
+  pre.src-ruby:before { content: 'Ruby'; }
+  pre.src-sass:before { content: 'Sass'; }
+  pre.src-scheme:before { content: 'Scheme'; }
+  pre.src-screen:before { content: 'Gnu Screen'; }
+  pre.src-sed:before { content: 'Sed'; }
+  pre.src-sh:before { content: 'shell'; }
+  pre.src-sql:before { content: 'SQL'; }
+  pre.src-sqlite:before { content: 'SQLite'; }
+  /* additional languages in org.el's org-babel-load-languages alist */
+  pre.src-forth:before { content: 'Forth'; }
+  pre.src-io:before { content: 'IO'; }
+  pre.src-J:before { content: 'J'; }
+  pre.src-makefile:before { content: 'Makefile'; }
+  pre.src-maxima:before { content: 'Maxima'; }
+  pre.src-perl:before { content: 'Perl'; }
+  pre.src-picolisp:before { content: 'Pico Lisp'; }
+  pre.src-scala:before { content: 'Scala'; }
+  pre.src-shell:before { content: 'Shell Script'; }
+  pre.src-ebnf2ps:before { content: 'ebfn2ps'; }
+  /* additional language identifiers per "defun org-babel-execute"
+       in ob-*.el */
+  pre.src-cpp:before  { content: 'C++'; }
+  pre.src-abc:before  { content: 'ABC'; }
+  pre.src-coq:before  { content: 'Coq'; }
+  pre.src-groovy:before  { content: 'Groovy'; }
+  /* additional language identifiers from org-babel-shell-names in
+     ob-shell.el: ob-shell is the only babel language using a lambda to put
+     the execution function name together. */
+  pre.src-bash:before  { content: 'bash'; }
+  pre.src-csh:before  { content: 'csh'; }
+  pre.src-ash:before  { content: 'ash'; }
+  pre.src-dash:before  { content: 'dash'; }
+  pre.src-ksh:before  { content: 'ksh'; }
+  pre.src-mksh:before  { content: 'mksh'; }
+  pre.src-posh:before  { content: 'posh'; }
+  /* Additional Emacs modes also supported by the LaTeX listings package */
+  pre.src-ada:before { content: 'Ada'; }
+  pre.src-asm:before { content: 'Assembler'; }
+  pre.src-caml:before { content: 'Caml'; }
+  pre.src-delphi:before { content: 'Delphi'; }
+  pre.src-html:before { content: 'HTML'; }
+  pre.src-idl:before { content: 'IDL'; }
+  pre.src-mercury:before { content: 'Mercury'; }
+  pre.src-metapost:before { content: 'MetaPost'; }
+  pre.src-modula-2:before { content: 'Modula-2'; }
+  pre.src-pascal:before { content: 'Pascal'; }
+  pre.src-ps:before { content: 'PostScript'; }
+  pre.src-prolog:before { content: 'Prolog'; }
+  pre.src-simula:before { content: 'Simula'; }
+  pre.src-tcl:before { content: 'tcl'; }
+  pre.src-tex:before { content: 'TeX'; }
+  pre.src-plain-tex:before { content: 'Plain TeX'; }
+  pre.src-verilog:before { content: 'Verilog'; }
+  pre.src-vhdl:before { content: 'VHDL'; }
+  pre.src-xml:before { content: 'XML'; }
+  pre.src-nxml:before { content: 'XML'; }
+  /* add a generic configuration mode; LaTeX export needs an additional
+     (add-to-list 'org-latex-listings-langs '(conf " ")) in .emacs */
+  pre.src-conf:before { content: 'Configuration File'; }
+
+  table { border-collapse:collapse; }
+  caption.t-above { caption-side: top; }
+  caption.t-bottom { caption-side: bottom; }
+  td, th { vertical-align:top;  }
+  th.org-right  { text-align: center;  }
+  th.org-left   { text-align: center;   }
+  th.org-center { text-align: center; }
+  td.org-right  { text-align: right;  }
+  td.org-left   { text-align: left;   }
+  td.org-center { text-align: center; }
+  dt { font-weight: bold; }
+  .footpara { display: inline; }
+  .footdef  { margin-bottom: 1em; }
+  .figure { padding: 1em; }
+  .figure p { text-align: center; }
+  .equation-container {
+    display: table;
+    text-align: center;
+    width: 100%;
+  }
+  .equation {
+    vertical-align: middle;
+  }
+  .equation-label {
+    display: table-cell;
+    text-align: right;
+    vertical-align: middle;
+  }
+  .inlinetask {
+    padding: 10px;
+    border: 2px solid gray;
+    margin: 10px;
+    background: #ffffcc;
+  }
+  #org-div-home-and-up
+   { text-align: right; font-size: 70%; white-space: nowrap; }
+  textarea { overflow-x: auto; }
+  .linenr { font-size: smaller }
+  .code-highlighted { background-color: #ffff00; }
+  .org-info-js_info-navigation { border-style: none; }
+  #org-info-js_console-label
+    { font-size: 10px; font-weight: bold; white-space: nowrap; }
+  .org-info-js_search-highlight
+    { background-color: #ffff00; color: #000000; font-weight: bold; }
+  .org-svg { }
+</style>
+<style type="text/css">
+/******************************************************
+* I copied these styles from markdotto.com, who is
+* the creator of bootstrap, and I also did some
+* modification. Thanks Mark for the beautiful theme,
+* so I reserved the @mdo sign below.
+*****************************************************/
+
+/*
+__
+__                  /\ \
+/'_`\_    ___ ___    \_\ \    ___
+/'/'_` \ /' __` __`\  /'_` \  / __`\
+/\ \ \L\ \/\ \/\ \/\ \/\ \L\ \/\ \L\ \
+\ \ `\__,_\ \_\ \_\ \_\ \___,_\ \____/
+\ `\_____\\/_/\/_/\/_/\/__,_ /\/___/
+`\/_____/
+
+*/
+
+
+
+/* Body resets
+-------------------------------------------------- */
+
+* {
+-webkit-box-sizing:  border-box;
+-moz-box-sizing:  border-box;
+box-sizing:  border-box;
+}
+html, body {
+margin:  0;
+padding:  0;
+}
+html {
+font-size:  62.5%;
+}
+body {
+padding:  20px;
+font-family:  Menlo, Monaco, monospace;
+font-size:  14px;
+line-height:  1.5;
+color:  #666;
+background-color:  #fff;
+}
+p {
+margin:  0 0 20px;
+}
+h1, h2, h3 {
+position:  relative;
+margin:  30px 0 20px;
+font-size:  18px;
+font-weight:  bold;
+line-height:  1.1;
+color:  #111;
+text-rendering:  optimizeLegibility;
+}
+h1:before, h2:before, h3:before {
+position:  absolute;
+top:  auto;
+color:  #ccc;
+display:  none;
+}
+h1:before {
+content:  "";
+left:  -1.25em;
+}
+h2:before {
+content:  "*";
+left:  -2em;
+}
+h3:before {
+content:  "**";
+left:  -2.5em;
+}
+i, em, b, strong {
+padding-left:  .1em;
+padding-right:  .1em;
+}
+b, strong {
+font-weight:  bold;
+color:  #333;
+}
+b:before, b: after, strong:before, strong: after {
+content:  "*";
+}
+i:before, i: after, em:before, em: after {
+content:  "/";
+}
+hr {
+margin:  0;
+border:  0;
+}
+hr: after {
+display:  block;
+margin:  20px 0;
+content:  "----------------------------------------------------------------";
+color:  #ccc;
+}
+ul, ol {
+padding:  0;
+margin:  0 0 20px;
+}
+code, pre {
+font-family:  Menlo, Monaco, Consolas, "Courier New", monospace;
+}
+code {
+color:  #d14;
+}
+code:before, code: after {
+content:  "=";
+color:  #ccc;
+}
+pre {
+display:  block;
+margin:  0 0 14px;
+padding:  15px;
+border-radius:  3px 3px 3px 3px;
+font-size:  18px;
+line-height:  28px;
+background-color:  #f5f5f5;
+white-space:  pre;
+white-space:  pre-wrap;
+word-break:  break-all;
+word-wrap:  break-word;
+}
+blockquote {
+padding:  0 0 0 20px;
+margin:  0 30px 20px -22.5px;
+color:  #999;
+border-left:  8px solid #e5e5e5;
+}
+blockquote p: last-child {
+margin-bottom:  0;
+}
+img {
+display:  block;
+margin:  0;
+border-radius:  5px;
+}
+a {
+font-weight:  inherit;
+line-height:  inherit;
+color:  #000;
+text-decoration:  none;
+}
+sup a:before {
+content:  "[";
+}
+sup a: after {
+content:  "]";
+}
+a: hover {
+text-decoration:  underline;
+}
+table {
+line-height:  2.5;
+margin-bottom:  15px;
+max-width:  100%;
+width:  100%;
+}
+table td, table th {
+padding:  0 15px;
+}
+table th.left, table td.left {
+text-align:  left;
+}
+table th.right, table td.right {
+text-align:  right;
+}
+/******************************************************/
+/* body */
+body {
+margin:  0 auto;
+max-width:  770px;
+}
+/* head */
+.masthead {
+color:  #888;
+}
+.masthead: after {
+display:  block;
+content:  '----------------------------------------------------------------';
+margin:  10px 0;
+color:  #ccc;
+}
+.masthead a {
+color:  #333;
+}
+.masthead ul {
+list-style:  none;
+}
+.masthead li {
+display:  inline-block;
+}
+.masthead li + li:before {
+display:  inline-block;
+content:  "\00B7 \00a0";
+color:  #ccc;
+}
+/* searchform*/
+#searchform {
+position:  absolute;
+top:  54px;
+right:  30.4%;
+}
+#searchform #s {
+background:  url("/media/img/search.png") no-repeat 5px 6px;
+box-shadow:  inset 0 1px 1px rgba(0,0,0,0.1);
+border:  1px solid #ddd;
+border-radius:  2px;
+-moz-border-radius:  2px;
+width:  90px;
+height:  30px;
+line-height:  12px;
+padding:  4px 10px 4px 28px;
+
+-webkit-transition-duration:  400ms;
+-webkit-transition-property:  width, background;
+-webkit-transition-timing-function:  ease;
+-moz-transition-duration:  400ms;
+-moz-transition-property:  width, background;
+-moz-transition-timing-function:  ease;
+-o-transition-duration:  400ms;
+-o-transition-property:  width, background;
+-o-transition-timing-function:  ease;
+}
+#searchform #s: focus {
+background-color:  #f9f9f9;
+width:  160px;
+}
+.masthead img.avatar {
+position:  relative;
+float:  right;
+margin-top:  -100px;
+margin-bottom:  -100%;
+margin-right:  10%;
+width:  200px;
+background-color:  #fff;
+}
+/* post */
+.post {
+position:  relative;
+}
+.post: after {
+display:  block;
+content:  "----------------------------------------------------------------";
+color:  #ccc;
+}
+.post img {
+max-width:  100%;
+}
+.post li {
+list-style:  none outside none;
+}
+.post ul > li:before {
+content:  "- ";
+margin-left:  -1.25em;
+color:  #ccc;
+}
+.post ol {
+counter-reset:  o-list;
+}
+.post ol > li:before {
+content:  counter(o-list) ") ";
+counter-increment:  o-list;
+margin-left:  -1.85em;
+color:  #ccc;
+}
+
+/* special for li in pre */
+.post pre li {
+list-style-type:  decimal;
+}
+
+.post pre li:before {
+display:  none;
+}
+
+/* meta info */
+.post-info {
+display:  inline-block;
+margin:  -10px 0 -10px;
+color:  #999;
+}
+.post-info + .post-info:before {
+content:  "\2223 \00a0";
+}
+.post-meta: after {
+content:  "----------------------------------------------------------------";
+display:  block;
+margin-top:  -1px;
+color:  #ccc;
+}
+
+/* table of content */
+#table-of-contents {
+position:  fixed;
+right:  0em;
+top:  0em;
+border: 1px solid #e1e1e8;
+-webkit-box-shadow:  0 0 1em #777777;
+-moz-box-shadow:  0 0 1em #777777;
+-webkit-border-bottom-left-radius:  5px;
+-moz-border-radius-bottomleft:  5px;
+text-align:  center;
+/* ensure doesn't flow off the screen when expanded */
+max-height:  80%;
+overflow:  auto;
+z-index:  200;
+}
+
+#table-of-contents h2 {
+max-width:  20em;
+font-weight:  normal;
+padding-left:  0.5em;
+padding-top:  0.05em;
+padding-bottom:  0.05em;
+}
+
+#table-of-contents ul {
+margin-left:  14pt;
+margin-bottom:  10pt;
+padding:  0
+}
+
+#table-of-contents li {
+padding:  0;
+margin:  1px;
+list-style:  none;
+}
+
+#table-of-contents ul>: first-child {
+color:  blue;
+}
+
+#table-of-contents #text-table-of-contents {
+display:  none;
+text-align:  left;
+}
+
+#table-of-contents: hover #text-table-of-contents {
+display:  block;
+padding:  0.5em;
+margin-top:  -1.5em;
+}
+
+/* footer */
+.footer {
+margin:  80px 0 0;
+text-align:  center;
+font-size:  15px;
+color:  #999;
+}
+.footer > p {
+margin:  0;
+line-height:  1.5;
+}
+.footpara {
+display:  inline;
+}
+
+/* Responsive
+-------------------------------------------------- */
+
+@media (min-width:  768px) {
+/* Increase body padding and font-sizes */
+body {
+padding:  30px;
+font-size:  18px;
+line-height:  1.75;
+}
+h1:before, h2:before, h3:before {
+display:  inline;
+}
+}
+
+@media (min-width:  1024px) {
+body {
+padding:  30px;
+}
+}
+</style>
+<script type="text/javascript">
+document.addEventListener('DOMContentLoaded',function() {
+document.getElementById("table-of-contents").onclick = function() {
+var elem = document.getElementById("text-table-of-contents");
+elem.style.display = elem.style.display == "block" ? "none" : "block";
+}
+});
+
+var url = document.location.href;
+var orgsource = url.substring(0, url.lastIndexOf("."))+".org.html";
+function show_org_source(){
+document.location.href = orgsource;
+}
+</script>
+</head>
+<body>
+<div id="content" class="content">
+<h1 class="title">Firma de commits</h1>
+<div id="table-of-contents" role="doc-toc">
+<h2>Table of Contents</h2>
+<div id="text-table-of-contents" role="doc-toc">
+<ul>
+<li><a href="#org004785a">1. Introducción</a></li>
+<li><a href="#org3552595">2. Generar una llave GPG</a>
+<ul>
+<li><a href="#orgcb1122e">2.1. Instalar GPG:</a></li>
+<li><a href="#org51fb725">2.2. Generar el par de llaves</a></li>
+</ul>
+</li>
+<li><a href="#orgddeed99">3. Obtener el ID de tu llave</a></li>
+<li><a href="#orgf1c5c72">4. Configurar Git para usar tu llave</a></li>
+<li><a href="#org6c1b699">5. Añadir la llave pública a GitHub</a>
+<ul>
+<li><a href="#org47e8f95">5.1. Exportar la llave:</a></li>
+<li><a href="#org1d18d17">5.2. Pegarla en GitHub:</a></li>
+</ul>
+</li>
+<li><a href="#orge6f2175">6. Firmar commits</a></li>
+<li><a href="#org17d6b82">7. El modo "Vigilante" (Vigilant Mode)</a></li>
+</ul>
+</div>
+</div>
+<p>
+En esta actividad aprenderas a firmar tus commits <b>con una clave
+GPG</b>.
+</p>
+
+<p>
+Documenta la actividad mostrando al final como tus commits aparecen
+firmados en el repositorio.
+</p>
+<div id="outline-container-org004785a" class="outline-2">
+<h2 id="org004785a"><span class="section-number-2">1.</span> Introducción</h2>
+<div class="outline-text-2" id="text-1">
+<p>
+La firma de commits añade una capa de no repudio y autenticación al
+control de versiones utilizando criptografía asimétrica (como GPG, SSH
+o S/MIME). Asegura que el autor del commit es realmente quien dice ser
+y que el contenido no ha sido alterado después de la firma. Sin esto,
+cualquier persona podría configurar su `user.name` y `user.email` como
+"Elon Musk" y Git lo aceptaría sin rechistar.
+</p>
+
+<dl class="org-dl">
+<dt>Identidad verificada</dt><dd>Es trivial configurar un cliente de Git
+local para firmar con un correo electrónico y nombre arbitrario para
+intentar hacer pasar un código malicioso como si lo hubiera aportado
+otra persona (suplantación de identidad). Al firmar
+criptográficamente el commit con tu clave privada, garantizas
+matemáticamente que eres tú realmente el autor.</dd>
+
+<dt>Integridad</dt><dd>La firma asegura también que el contenido del commit
+no ha sido alterado desde que fue transmitido. Plataformas como
+GitHub muestran visualmente un distintivo verde "Verified" en los
+commits que tienen una firma válida, aumentando en gran medida la
+confianza en la línea de código base.</dd>
+</dl>
+</div>
+</div>
+<div id="outline-container-org3552595" class="outline-2">
+<h2 id="org3552595"><span class="section-number-2">2.</span> Generar una llave GPG</h2>
+<div class="outline-text-2" id="text-2">
+<p>
+El estándar más común para firmar en Git es GPG (GNU Privacy Guard).
+</p>
+</div>
+<div id="outline-container-orgcb1122e" class="outline-3">
+<h3 id="orgcb1122e"><span class="section-number-3">2.1.</span> Instalar GPG:</h3>
+<div class="outline-text-3" id="text-2-1">
+<p>
+En macOS:
+</p>
+
+<pre class="example">
+brew install gpg2
+</pre>
+
+
+<p>
+En Windows:
+</p>
+
+<p>
+Desinstala Windows e instala algo mejor o descarga GPG4Win.
+</p>
+
+<p>
+Linux (suele venir instalado):
+</p>
+
+<pre class="example">
+sudo apt install gnupg
+</pre>
+</div>
+</div>
+<div id="outline-container-org51fb725" class="outline-3">
+<h3 id="org51fb725"><span class="section-number-3">2.2.</span> Generar el par de llaves</h3>
+<div class="outline-text-3" id="text-2-2">
+<pre class="example">
+gpg --full-generate-key
+</pre>
+
+
+<p>
+Elige la opción por defecto, un tamaño de 4096 bits y que no caduque
+(o ponle una fecha de expiración).
+</p>
+</div>
+</div>
+</div>
+<div id="outline-container-orgddeed99" class="outline-2">
+<h2 id="orgddeed99"><span class="section-number-2">3.</span> Obtener el ID de tu llave</h2>
+<div class="outline-text-2" id="text-3">
+<pre class="example">
+gpg --list-secret-keys --keyid-format=LONG
+</pre>
+
+
+<div class="org-src-container">
+<pre class="src src-nil">/home/fraya/.gnupg/pubring.kbx
+------------------------------
+sec   ed25519/CF07E6A6005C1E55 2026-04-16 [SC] [caduca: 2035-04-14]
+      CDD2FF18C1C3E8194CC711F0CF06E6A6005C1E55
+uid              [  absoluta ] Fernando Raya (IES Zaidín-Vergeles) &lt;fraya@ieszaidinvergeles.org&gt;
+ssb   cv25519/756902B776EC435E 2026-04-16 [E] [caduca: 2035-04-14]
+</pre>
+</div>
+
+<p>
+El ID es <code>CF07E6A6005C1E55</code>.
+</p>
+</div>
+</div>
+<div id="outline-container-orgf1c5c72" class="outline-2">
+<h2 id="orgf1c5c72"><span class="section-number-2">4.</span> Configurar Git para usar tu llave</h2>
+<div class="outline-text-2" id="text-4">
+<p>
+Ahora debes decirle a Git qué llave debe usar para firmar tus commits.
+</p>
+
+<div class="org-src-container">
+<pre class="src src-bash"><span style="color: #595959; font-style: italic;"># </span><span style="color: #595959; font-style: italic;">Configura el ID de tu llave
+</span>git config --global user.signingkey CF07E6A6005C1E55
+
+<span style="color: #595959; font-style: italic;"># </span><span style="color: #595959; font-style: italic;">(Opcional) Configura Git para que firme TODOS los commits autom&#225;ticamente
+</span>git config --global commit.gpgsign true
+</pre>
+</div>
+</div>
+</div>
+<div id="outline-container-org6c1b699" class="outline-2">
+<h2 id="org6c1b699"><span class="section-number-2">5.</span> Añadir la llave pública a GitHub</h2>
+<div class="outline-text-2" id="text-5">
+<p>
+Para que GitHub muestre el badge de "Verified", necesita conocer tu
+llave pública.
+</p>
+</div>
+<div id="outline-container-org47e8f95" class="outline-3">
+<h3 id="org47e8f95"><span class="section-number-3">5.1.</span> Exportar la llave:</h3>
+<div class="outline-text-3" id="text-5-1">
+<pre class="example">
+gpg --armor --export 3AA5C34371567BD2
+</pre>
+
+
+<p>
+Copia todo el bloque de texto que empieza con
+</p>
+
+<pre class="example">
+-----BEGIN PGP PUBLIC KEY BLOCK-----
+</pre>
+</div>
+</div>
+<div id="outline-container-org1d18d17" class="outline-3">
+<h3 id="org1d18d17"><span class="section-number-3">5.2.</span> Pegarla en GitHub:</h3>
+<div class="outline-text-3" id="text-5-2">
+<p>
+Ve a <i>Settings</i> &gt; <i>SSH and GPG keys</i> &gt; <i>New GPG key</i>. Pega el bloque
+de texto y guarda.
+</p>
+</div>
+</div>
+</div>
+<div id="outline-container-orge6f2175" class="outline-2">
+<h2 id="orge6f2175"><span class="section-number-2">6.</span> Firmar commits</h2>
+<div class="outline-text-2" id="text-6">
+<p>
+Si no activaste la firma automática en el paso 2, debes añadir el flag
+<code>-S</code> al hacer el commit:
+</p>
+
+<pre class="example">
+git commit -S -m "Mi mensaje de commit seguro"
+</pre>
+
+
+<p>
+Git te pedirá la contraseña que configuraste al generar la llave GPG.
+</p>
+</div>
+</div>
+<div id="outline-container-org17d6b82" class="outline-2">
+<h2 id="org17d6b82"><span class="section-number-2">7.</span> El modo "Vigilante" (Vigilant Mode)</h2>
+<div class="outline-text-2" id="text-7">
+<p>
+GitHub tiene una opción avanzada en la configuración de seguridad
+llamada <i>Vigilant Mode</i>.
+</p>
+
+<dl class="org-dl">
+<dt>Sin Vigilant Mode</dt><dd>GitHub solo pone el badge "Verified" a los
+commits firmados. Los no firmados aparecen normales.</dd>
+
+<dt>Con Vigilant Mode</dt><dd>GitHub marca los commits firmados como "Verified"
+pero los que no están firmados (o están mal firmados) aparecen con
+un badge de "Unverified".</dd>
+</dl>
+
+<p>
+Esto es extremadamente útil para equipos de alto perfil, ya que hace
+que cualquier commit sospechoso resalte inmediatamente.
+</p>
+</div>
+</div>
+</div>
+<div id="postamble" class="status">
+<p class="author">Author: Fernando Raya</p>
+<p class="date">Created: 2026-04-20 lun 13:43</p>
+<p class="validation"><a href="https://validator.w3.org/check?uri=referer">Validate</a></p>
+</div>
+</body>
+</html>

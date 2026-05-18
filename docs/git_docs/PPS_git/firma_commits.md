@@ -6,7 +6,34 @@
 > repositorios de la asignatura y demostrar que GitHub muestra el badge
 > **"Verified"** en los commits firmados.
 >
-> **Ubicación:** `docs/git_docs/firma_commits.md` (repositorio *Aplicación Médica*).
+> **Ubicación:** `docs/git_docs/PPS_git/firma_commits.md` (repositorio *Aplicación Médica*).
+
+**Autores**: Alejandro Quiñones Gámez & Adrián Bertos Gómez
+
+**Asignatura**: PPS — Puesta a Producción Segura
+
+**Curso**: Curso de Especialización en Ciberseguridad en Tecnologías de la Información
+
+**Centro**: IES Zaidín-Vergeles
+
+---
+
+## Repositorios de este trabajo (espacio de trabajo PPS)
+
+| Proyecto | Ruta local | Remoto `origin` (SSH) | Rama habitual |
+|---|---|---|---|
+| Cliente Android | `/home/alejandro/DriveLocal/alejandro/Ciberseguridad/PPS - Puesta a Producción Segura/medical_register_android` | `git@github.com:alejandroquinonesgamez/medical_register_apk.git` | `main` |
+| Backend | `/home/alejandro/DriveLocal/alejandro/Ciberseguridad/PPS - Puesta a Producción Segura/Aplicación Médica` | `git@github.com:alejandroquinonesgamez/medical_register.git` | `dev` |
+
+Si el remoto del Android no apunta al repo de la APK:
+
+```bash
+cd "/home/alejandro/DriveLocal/alejandro/Ciberseguridad/PPS - Puesta a Producción Segura/medical_register_android"
+git remote set-url origin git@github.com:alejandroquinonesgamez/medical_register_apk.git
+git remote -v
+```
+
+---
 
 ## 1. Introducción
 
@@ -35,13 +62,13 @@ Este documento recoge **paso a paso** la configuración realizada en los dos
 proyectos de la asignatura, incluyendo la salida real de cada comando como
 evidencia:
 
-- `medical_register_android` (cliente Android Kotlin/Gradle, repo activo).
-- `Aplicación Médica` (backend Flask + Docker).
+- Cliente Android: directorio `medical_register_android` → remoto GitHub **`medical_register_apk`**.
+- Backend: directorio `Aplicación Médica` → remoto GitHub **`medical_register`**.
 
 > **Nota (2026-05-14):** la documentación del `.gitignore` de ambos proyectos
-> vive solo en `docs/gitignore.md` de este repositorio; no forma parte de la
+> vive solo en `docs/gitignore.md` del backend; no forma parte de la
 > configuración GPG, pero conviene tenerlo claro al entregar la práctica.
-> Este informe de firma GPG y sus capturas viven bajo `docs/git_docs/`.
+> Este informe de firma GPG y sus capturas viven bajo `docs/git_docs/PPS_git/`.
 
 ## 2. Estado inicial
 
@@ -433,10 +460,12 @@ Una vez subida la clave pública a GitHub (§6), basta con hacer `git push` en
 ambos repos:
 
 ```bash
-# medical_register_android
+# Cliente Android → GitHub medical_register_apk (rama main)
+cd "/home/alejandro/DriveLocal/alejandro/Ciberseguridad/PPS - Puesta a Producción Segura/medical_register_android"
 git push origin main
 
-# Aplicación Médica
+# Backend → GitHub medical_register (rama dev)
+cd "/home/alejandro/DriveLocal/alejandro/Ciberseguridad/PPS - Puesta a Producción Segura/Aplicación Médica"
 git push origin dev
 ```
 
@@ -451,25 +480,19 @@ GPG key ID: 54B736719B025729
 
 ### 8.1. Evidencia visual (capturas)
 
-En este repositorio se incluye al menos la siguiente captura en
-`docs/git_docs/img/GPG/`:
+Las capturas se almacenan bajo `docs/git_docs/img/` (ver también §11).
 
-| Archivo | Contenido |
+| Archivo | Qué demuestra |
 |---|---|
-| `GPG_created.png` | Evidencia de la clave GPG en GitHub (pantalla **Settings → SSH and GPG keys** o equivalente). |
+| `img/GPG/GPG_created.png` | Clave GPG pública registrada en la cuenta GitHub (**Settings → SSH and GPG keys**). |
+| `img/PPS_git/GPG/verified_android.png` | Commit en el remoto **`medical_register_apk`** (rama `main`) con badge **Verified**. |
+| `img/PPS_git/GPG/verified_appmedica.png` | Commit en el remoto **`medical_register`** (rama `dev`) con badge **Verified**. |
 
-![Clave GPG en GitHub](img/GPG/GPG_created.png)
+![Clave GPG en GitHub](../img/GPG/GPG_created.png)
 
-**Opcional** (si quieres completar el informe con más pruebas), guarda también:
+![Commit Verified — medical_register_apk (Android)](../img/PPS_git/GPG/verified_android.png)
 
-| Archivo sugerido | Descripción |
-|---|---|
-| `verified_android.png` | Vista de un commit en `medical_register_apk` con badge **Verified**. |
-| `verified_appmedica.png` | Vista de un commit en `medical_register` con badge **Verified**. |
-
-Si aún no has hecho push, el repositorio local sigue siendo válido como
-prueba criptográfica: `git log --show-signature` debe mostrar
-`gpg: Firma correcta` y `%G? = G` en los commits recientes.
+![Commit Verified — medical_register (backend)](../img/PPS_git/GPG/verified_appmedica.png)
 
 ## 9. Buenas prácticas y "Vigilant Mode"
 
@@ -485,6 +508,10 @@ automation → SSH and GPG keys → Flag unsigned commits as unverified**
 
 Se recomienda **activarlo** en cuentas de alto perfil (mantenedores,
 profesores, alumnos que entregan código).
+
+En esta entrega se ha activado y queda documentado en la captura siguiente.
+
+![Vigilant Mode activado en la cuenta GitHub](../img/PPS_git/GPG/vigilant-mode.png)
 
 ### Limitaciones de la firma de commits
 
@@ -507,10 +534,37 @@ profesores, alumnos que entregan código).
 | 3. Config Git | `git config --global user.signingkey 54B736719B025729` + `commit.gpgsign true` | | ✅ |
 | 4. Commit Android | `git commit -m "docs: añadir gitignore.md ..."` | commit `4f4c9f5` con `%G? = G` | ✅ |
 | 5. Commit App Médica | `git commit -m "docs: añadir gitignore.md ..."` | commit `65fc9cc` con `%G? = G` | ✅ |
-| 6. Subir clave a GitHub | UI web *Settings → SSH and GPG keys* | Captura `docs/git_docs/img/GPG/GPG_created.png` | ✅ (evidencia en repo) |
-| 7. Push y verificación | `git push` + badge **Verified** en la web | Comprueba en GitHub tras `git push`; opcional: añadir `verified_*.png` | ⏳ / opcional |
+| 6. Subir clave a GitHub | UI web *Settings → SSH and GPG keys* | `img/GPG/GPG_created.png` | ✅ |
+| 7. Push y verificación en GitHub | `git push` + commit en la UI | `verified_android.png`, `verified_appmedica.png` | ✅ |
+| 8. Vigilant Mode | Cuenta GitHub → *Flag unsigned commits as unverified* | `img/PPS_git/GPG/vigilant-mode.png` | ✅ |
 
 ---
 
-**Autor**: Alejandro Cánovas Sánchez · **Asignatura**: PPS — Puesta a
-Producción Segura · **Ejercicio**: Firma de commits (Fernando Raya, 2026-04-20)
+## 11. Evidencias (entrega) — Apartado 1: firma de commits
+
+Resumen de material gráfico incluido en el repositorio del backend (*Aplicación Médica*), enlazado desde este informe.
+
+| # | Evidencia | Repositorio / ámbito | Ruta del fichero |
+|---|-----------|----------------------|------------------|
+| 1 | Clave GPG asociada a la cuenta | Cuenta GitHub | [`../img/GPG/GPG_created.png`](../img/GPG/GPG_created.png) |
+| 2 | Commit firmado visible en remoto | `alejandroquinonesgamez/medical_register_apk` · rama `main` | [`../img/PPS_git/GPG/verified_android.png`](../img/PPS_git/GPG/verified_android.png) |
+| 3 | Commit firmado visible en remoto | `alejandroquinonesgamez/medical_register` · rama `dev` | [`../img/PPS_git/GPG/verified_appmedica.png`](../img/PPS_git/GPG/verified_appmedica.png) |
+| 4 | Vigilant Mode | Cuenta GitHub | [`../img/PPS_git/GPG/vigilant-mode.png`](../img/PPS_git/GPG/vigilant-mode.png) |
+
+**Complemento local** (sin captura): verificación con `git log --show-signature` y `%G? = G` en los commits firmados (§7 y tabla anterior).
+
+**Guía operativa**: [`pasos.md`](pasos.md) §1.
+
+**Documentos relacionados (PPS Git)**: [`github.md`](github.md), [`gitleaks.md`](gitleaks.md), [`proteccion-ramas.md`](proteccion-ramas.md), [`semgrep.md`](semgrep.md), [`gitignore.md`](gitignore.md).
+
+---
+
+**Autores**: Alejandro Quiñones Gámez & Adrián Bertos Gómez
+
+**Asignatura**: PPS — Puesta a Producción Segura
+
+**Curso**: Curso de Especialización en Ciberseguridad en Tecnologías de la Información
+
+**Centro**: IES Zaidín-Vergeles
+
+**Ejercicio**: Firma de commits (Fernando Raya, 2026-04-20)
