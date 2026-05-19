@@ -96,4 +96,4 @@ Si alguna de estas validaciones falla, la aplicación mostrará un mensaje de er
 
 Aquí puedes ver un resumen del funcionamiento mediante un diagrama.
 
-![user manual mermaid](./mockups/user-manual.png)
+![user manual mermaid](https://raw.githubusercontent.com/alejandroquinonesgamez/medical_register/dev/docs/mockups/user-manual.png)

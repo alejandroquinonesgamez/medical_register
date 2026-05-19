@@ -363,7 +363,7 @@ Para comprobar después que GitHub ya tiene la clave:
 gh api user/gpg_keys --jq '.[] | {name: .name, key_id: .key_id, emails: .emails}'
 ```
 
-![Clave GPG en GitHub](../img/GPG/GPG_created.png)
+![Clave GPG en GitHub](https://raw.githubusercontent.com/alejandroquinonesgamez/medical_register/dev/docs/git_docs/img/GPG/GPG_created.png)
 
 ## 7. Hacer commits firmados
 
@@ -413,7 +413,7 @@ f56b28e N docs: regenerar MSTG_RESILIENCE.pdf (Pandoc + xelatex)
 
 El commit `4f4c9f5` pasa de `N` (sin firma) a **`G`** (firma válida).
 
-![Commit Verified — medical_register_apk (rama `main`)](../img/PPS_git/GPG/verified_android.png)
+![Commit Verified — medical_register_apk (rama `main`)](https://raw.githubusercontent.com/alejandroquinonesgamez/medical_register/dev/docs/git_docs/img/PPS_git/GPG/verified_android.png)
 
 ### 7.2. Commit firmado en `medical_register`
 
@@ -459,7 +459,7 @@ dae5bf3 N chore: normalizar permisos de scripts
 
 El commit `65fc9cc` también queda con **`G`**.
 
-![Commit Verified — medical_register (rama `dev`)](../img/PPS_git/GPG/verified_appmedica.png)
+![Commit Verified — medical_register (rama `dev`)](https://raw.githubusercontent.com/alejandroquinonesgamez/medical_register/dev/docs/git_docs/img/PPS_git/GPG/verified_appmedica.png)
 
 ## 8. Push a GitHub y badge "Verified"
 
@@ -504,7 +504,7 @@ profesores, alumnos que entregan código).
 
 En esta entrega se ha activado y queda documentado en la captura siguiente.
 
-![Vigilant Mode activado en la cuenta GitHub](../img/PPS_git/GPG/vigilant-mode.png)
+![Vigilant Mode activado en la cuenta GitHub](https://raw.githubusercontent.com/alejandroquinonesgamez/medical_register/dev/docs/git_docs/img/PPS_git/GPG/vigilant-mode.png)
 
 ### Limitaciones de la firma de commits
 

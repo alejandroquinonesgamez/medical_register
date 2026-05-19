@@ -6,7 +6,7 @@ Esta sección contiene los mockups y diagramas del proyecto.
 
 Diagrama de flujo que muestra el proceso de uso de la aplicación, desde el registro inicial hasta la consulta de estadísticas.
 
-![Diagrama de Flujo del Manual de Usuario](user-manual.png)
+![Diagrama de Flujo del Manual de Usuario](https://raw.githubusercontent.com/alejandroquinonesgamez/medical_register/dev/docs/mockups/user-manual.png)
 
 ### Descripción
 

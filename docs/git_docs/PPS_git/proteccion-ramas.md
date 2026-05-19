@@ -81,11 +81,11 @@ Opciones adicionales habituales en PPS:
 
 En **`medical_register`** (backend) se configuró la regla sobre la rama **`dev`**: PR obligatorio, aprobaciones y *status check* **`build`** (*Build and Deploy Sphinx Docs*):
 
-![Regla de protección en dev (1/3)](../img/PPS_git/proteccion-ramas/regla-backend-dev1.png)
+![Regla de protección en dev (1/3)](https://raw.githubusercontent.com/alejandroquinonesgamez/medical_register/dev/docs/git_docs/img/PPS_git/proteccion-ramas/regla-backend-dev1.png)
 
-![Regla de protección en dev (2/3)](../img/PPS_git/proteccion-ramas/regla-backend-dev2.png)
+![Regla de protección en dev (2/3)](https://raw.githubusercontent.com/alejandroquinonesgamez/medical_register/dev/docs/git_docs/img/PPS_git/proteccion-ramas/regla-backend-dev2.png)
 
-![Regla de protección en dev (3/3)](../img/PPS_git/proteccion-ramas/regla-backend-dev3.png)
+![Regla de protección en dev (3/3)](https://raw.githubusercontent.com/alejandroquinonesgamez/medical_register/dev/docs/git_docs/img/PPS_git/proteccion-ramas/regla-backend-dev3.png)
 
 ### 3.3. Cómo documentar el funcionamiento
 
@@ -104,17 +104,17 @@ En **`medical_register`** (backend) se configuró la regla sobre la rama **`dev`
 
    En **`medical_register_apk`** (rama **`main`** protegida):
 
-   ![Push a main rechazado por rama protegida](../img/PPS_git/proteccion-ramas/push-rechazado-android.png)
+   ![Push a main rechazado por rama protegida](https://raw.githubusercontent.com/alejandroquinonesgamez/medical_register/dev/docs/git_docs/img/PPS_git/proteccion-ramas/push-rechazado-android.png)
 
    > Si en algún momento el push directo a `main` fue aceptado (antes de activar la regla o con bypass), puede quedar `push-aceptado-android.png` como contraste; la evidencia principal es el **rechazo** con la regla activa.
 
-   ![Push a main aceptado (referencia / antes de protección o sin regla)](../img/PPS_git/proteccion-ramas/push-aceptado-android.png)
+   ![Push a main aceptado (referencia / antes de protección o sin regla)](https://raw.githubusercontent.com/alejandroquinonesgamez/medical_register/dev/docs/git_docs/img/PPS_git/proteccion-ramas/push-aceptado-android.png)
 
 2. **Flujo correcto**: crear rama, abrir PR hacia la rama protegida, esperar checks verdes y aprobación, fusionar desde la UI (o con *merge queue* si aplica).
 
    Pull Request hacia **`dev`** en el backend: el job **`build`** aparece en verde en **Checks**:
 
-   ![Checks del PR: job build en verde](../img/PPS_git/proteccion-ramas/pr-checks-build.png)
+   ![Checks del PR: job build en verde](https://raw.githubusercontent.com/alejandroquinonesgamez/medical_register/dev/docs/git_docs/img/PPS_git/proteccion-ramas/pr-checks-build.png)
 
    No se incluyen capturas dedicadas de PR bloqueado / listo para merge: la evidencia del enunciado queda cubierta con la regla en `dev` (§3.2), el check **`build`** en PR y el push directo bloqueado en Android.
 
