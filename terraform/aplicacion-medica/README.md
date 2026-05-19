@@ -3,7 +3,7 @@
 Este directorio automatiza:
 
 1. **Terraform**: crea una VM Debian (cloud-init) en Proxmox. Con **`deployment_mode = "full"`** (por defecto) la VM queda dimensionada para **Docker Compose completo** (waf + web + perfil **DefectDojo** en Ansible): **16 GB RAM, 6 vCPU, 80G** de disco, salvo overrides en `terraform.tfvars`. Con **`minimal`** los presets son **8 GB / 4 vCPU / 50G** (solo waf + web).
-2. **Ansible**: instala Docker Engine + plugin Compose v2, crea la red externa `proxy-network` (obligatoria según [docker-compose.yml](../../docker-compose.yml)), sincroniza el repositorio y ejecuta `docker compose up -d --build`. El **despliegue completo** del compose (incluido DefectDojo) se activa con la variable **`medical_compose_profiles`** (véase `ansible/extra_vars.full.example.yml` y [Ansible.md](terraform/docs/Ansible.md)).
+2. **Ansible**: instala Docker Engine + plugin Compose v2, crea la red externa `proxy-network` (obligatoria según [docker-compose.yml](../../docker-compose.yml)), sincroniza el repositorio y ejecuta `docker compose up -d --build`. El **despliegue completo** del compose (incluido DefectDojo) se activa con la variable **`medical_compose_profiles`** (véase `ansible/extra_vars.full.example.yml` y [Ansible.md](ansible/docs/Ansible.md)).
 
 ## Requisitos previos
 
@@ -98,7 +98,7 @@ ansible-playbook site.yml -e @extra_vars.yml \
 ```
 
 Documentación detallada, tabla de perfiles y advertencias (perfil `local`, recursos):
-**[Ansible.md](terraform/docs/Ansible.md)** (sección 2 y 2.5).
+**[Ansible.md](ansible/docs/Ansible.md)** (sección 2 y 2.5).
 
 ## Qué hace Ansible (resumen fiel al repo)
 

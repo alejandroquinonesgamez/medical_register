@@ -38,6 +38,6 @@ output "effective_vm_sizing" {
 }
 
 output "ansible_full_stack_hint" {
-  description = "Sugerencia para levantar DefectDojo en la misma VM (requiere RAM suficiente; ver docs/Ansible.md e Informe.md en el directorio aplicacion-medica)"
+  description = "Sugerencia para levantar DefectDojo en la misma VM (requiere RAM suficiente; ver ansible/docs/Ansible.md e Informe.md en aplicacion-medica)"
   value       = "Pasar medical_compose_profiles: [defectdojo] (extra_vars o -e JSON). Copia ansible/extra_vars.full.example.yml."
 }

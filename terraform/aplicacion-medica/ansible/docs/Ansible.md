@@ -20,8 +20,7 @@ que configura la **VM ya creada por Terraform** (Proxmox): instala **Docker Engi
 A continuación se explica **qué hace cada rol y cada fichero relevante**, cómo se
 controlan los **perfiles** de Compose (`medical_compose_profiles`), qué queda
 ejecutándose por defecto y cómo validar el despliegue. El aprovisionamiento de la VM
-está en **[Informe.md](../../Informe.md)**. Las capturas enlazadas más abajo están en la
-subcarpeta **`img/`**; las figuras usan enlaces **`raw.githubusercontent.com`** (rama **`dev`**) para vista previa fuera del repo.
+está en **[Informe.md](../../Informe.md)**. Las capturas enlazan a PNG publicados en **`terraform/docs/img/`** del repo (misma ruta en **rama `dev`** en GitHub); los `![](…)` usan **`raw.githubusercontent.com`** para vista previa fuera del clon.
 
 ### 1.1. Qué es Ansible (resumen operativo)
 
@@ -76,7 +75,7 @@ en la VM: solo **SSH** y Python en el remoto (el intérprete se descubre al hace
 **Resumen — despliegue completo (PPS):** en Terraform, **`deployment_mode = "full"`**
 dimensiona la VM para soportar **DefectDojo** además de **waf** y **web**. En Ansible,
 hay que definir **`medical_compose_profiles: [defectdojo]`** (plantilla
-[`extra_vars.full.example.yml`](../../terraform/aplicacion-medica/ansible/extra_vars.full.example.yml).
+[`extra_vars.full.example.yml`](../extra_vars.full.example.yml).
 Sin ese perfil, el playbook levanta solo **`web`** + **`waf`**.
 
 ### 2.1. Mecanismo (orden real de ejecución)
@@ -255,8 +254,8 @@ Sin la colección, el módulo **`synchronize`** no está disponible.
 
 1. Crear **`inventory.ini`** (IP, usuario, clave SSH entrecomillada si la ruta tiene espacios).
 2. Crear **`extra_vars.yml`** (no versionado):
-   - Solo API+WAF: copia [`extra_vars.example.yml`](../../terraform/aplicacion-medica/ansible/extra_vars.example.yml) y rellena `medical_app_source`.
-   - **Completo** con DefectDojo: copia [`extra_vars.full.example.yml`](../../terraform/aplicacion-medica/ansible/extra_vars.full.example.yml) y ajusta la ruta.
+   - Solo API+WAF: copia [`extra_vars.example.yml`](../extra_vars.example.yml) y rellena `medical_app_source`.
+   - **Completo** con DefectDojo: copia [`extra_vars.full.example.yml`](../extra_vars.full.example.yml) y ajusta la ruta.
 3. Ejecutar:
 
 ```bash

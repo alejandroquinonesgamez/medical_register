@@ -20,7 +20,7 @@ Este paquete cumple lo pedido para la parte **Terraform** de la práctica:
 | **Documentación** que demuestre el **despliegue correcto** | §2.1 (captura en Proxmox con hardware), §5 (plan y salidas `terraform output` / sizing efectivo). Las figuras enlazan a imágenes en GitHub (`raw.githubusercontent.com`, rama `dev`). |
 | **Justificación** de **memoria** y **disco** (y CPU acoplada al modo de despliegue) | §2.2: presets `full` vs `minimal` (RAM, vCPU, disco) y cómo los **overrides** en `terraform.tfvars` sustituyen al preset. |
 
-El aprovisionamiento de **Docker** y **Compose** en la VM se describe en **[terraform/docs/Ansible.md](terraform/docs/Ansible.md)**. Las figuras enlazan a **`raw.githubusercontent.com`** (rama **`dev`**, repo **`medical_register`**) para que se vean al abrir el `.md` fuera del clon; en el **ZIP de entrega** las mismas rutas siguen funcionando con conexión a Internet.
+El aprovisionamiento de **Docker** y **Compose** en la VM se describe en **[Ansible.md](https://raw.githubusercontent.com/alejandroquinonesgamez/medical_register/dev/terraform/aplicacion-medica/ansible/docs/Ansible.md)** (rama **`dev`**, repo **`medical_register`**). Las figuras de este informe y ese enlace usan **`raw.githubusercontent.com`** para que funcionen al abrir el `.md` **desde el ZIP de entrega** (solo contiene `terraform/` + este informe) con conexión a Internet.
 
 ---
 
@@ -37,7 +37,7 @@ código (Proxmox asigna el siguiente ID libre).
 A continuación se detalla **qué aplica `terraform apply` en el hipervisor**, cómo se
 eligen **RAM, CPU y disco** (`deployment_mode` y `locals.tf`), qué variables existen y
 cómo validar la configuración. La instalación de **Docker** y **`docker compose`** en
-la VM corresponde a **[terraform/docs/Ansible.md](terraform/docs/Ansible.md)**.
+la VM corresponde a **[Ansible.md](https://raw.githubusercontent.com/alejandroquinonesgamez/medical_register/dev/terraform/aplicacion-medica/ansible/docs/Ansible.md)**.
 
 ### 1.1. Qué es Terraform (resumen operativo)
 
@@ -193,7 +193,7 @@ terraform output ansible_inventory_line
 
 En el **monorepo** del curso la ruta equivalente es `terraform/aplicacion-medica/terraform/`.
 
-Siguiente paso: inventario y playbook en **[terraform/docs/Ansible.md](terraform/docs/Ansible.md)**.
+Siguiente paso: inventario y playbook en **[Ansible.md](https://raw.githubusercontent.com/alejandroquinonesgamez/medical_register/dev/terraform/aplicacion-medica/ansible/docs/Ansible.md)**.
 
 ---
 
@@ -255,7 +255,7 @@ existe `terraform.tfvars`, también `plan` (contacta la API).
 | Estado | `terraform.tfstate` (local; sensible). | Sin estado; idempotencia por módulos. |
 | “Despliegue completo” app | Dimensiona con `deployment_mode` + perfiles vía doc. | `medical_compose_profiles` (ej. `defectdojo`). |
 
-Las capturas anteriores enlazan desde **§2.1** y **§5** (imágenes servidas desde GitHub). La comprobación HTTP en **`:5001`** documenta el stack ya aprovisionado por Ansible (véase **[terraform/docs/Ansible.md](terraform/docs/Ansible.md)**).
+Las capturas anteriores enlazan desde **§2.1** y **§5** (imágenes servidas desde GitHub). La comprobación HTTP en **`:5001`** documenta el stack ya aprovisionado por Ansible (véase **[Ansible.md](https://raw.githubusercontent.com/alejandroquinonesgamez/medical_register/dev/terraform/aplicacion-medica/ansible/docs/Ansible.md)**).
 
 ---
 

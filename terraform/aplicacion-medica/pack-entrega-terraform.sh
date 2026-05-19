@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # Genera terraform-aplicacion-medica-entrega.zip en la raíz del repo Aplicación Médica:
 #   Informe.md                    (raíz del ZIP)
-#   terraform/                    (módulo .tf + docs/)
+#   terraform/                    (solo módulo .tf + docs/img; sin Ansible ni Ansible.md)
 set -euo pipefail
 AM="$(cd "$(dirname "$0")" && pwd)"
 BASE="$(cd "$AM/../.." && pwd)"
@@ -23,6 +23,9 @@ def skip(p: Path) -> bool:
     if not p.is_file():
         return True
     rel = p.relative_to(tf)
+    # No incluir documentación Ansible en la entrega Terraform (defensivo).
+    if rel.name == "Ansible.md":
+        return True
     if ".terraform" in rel.parts:
         return True
     if p.name in exclude_names:
