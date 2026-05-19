@@ -1,0 +1,10 @@
+# Ejemplo: despliegue COMPLETO (waf + web + perfil defectdojo en docker compose).
+# Copiar a extra_vars.yml (no versionar), ajustar medical_app_source y ejecutar:
+#   ansible-playbook site.yml -i inventory.ini -e @extra_vars.yml
+#
+# Requisitos: VM dimensionada con Terraform deployment_mode = "full" (16 GB RAM / 6 vCPU / 80G por defecto).
+# Si la VM es más pequeña, usa solo waf+web (medical_compose_profiles: [] o omite la clave).
+
+medical_app_source: "/ruta/absoluta/al/repo/Aplicación Médica"
+medical_compose_profiles:
+  - defectdojo

@@ -1,0 +1,5 @@
+- name: Provision Python Flask application on Debian 13
+  hosts: flask
+  become: true
+  roles:
+    - flask_app

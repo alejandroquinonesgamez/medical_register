@@ -1,0 +1,402 @@
+#+TITLE: Pipelines en Jenkins
+#+STARTUP: indent
+#+EMAIL: <fraya@ieszaidinvergeles.org>
+#+LANG: es
+#+SETUPFILE: ~/Plantillas/white_clean.theme
+
+* Objetivos
+
+Intentaremos proporcionar una base para trabajar con Jenkins
+Pipelines, permitiendo a los desarrolladores y especialistas en DevOps
+automatizar sus flujos de trabajo de manera eficiente.
+
+- Dominar la sintaxis básica de los pipelines (Declarativa y
+  Scripted).
+
+- Aprender a crear y gestionar pipelines de diversa complejidad.
+
+- Comprender la importancia de la segmentación en etapas y el uso de
+  variables de entorno.
+
+- Conocer las herramientas y plugins esenciales para la gestión de
+  flujos de trabajo.
+
+* Definición
+
+Un Pipeline en Jenkins es un conjunto de plugins que permite la
+implementación e integración de flujos de entrega continua
+(/Continuous Delivery/) en Jenkins. Se define mediante un archivo de
+texto llamado ~Jenkinsfile~, que se versiona junto con el código
+fuente.
+
+* Estructura de un Pipeline
+
+La organización lógica es fundamental para que el proceso de CI/CD sea
+transparente y fácil de depurar. Tenemos /etapas/ que se dividen en
+/pasos/.
+
+** Etapas (Stages)
+
+Las etapas representan los bloques lógicos del flujo de
+trabajo. Segmentar el pipeline en etapas (ej. /Build/, /Test/,
+/Deploy/) permite identificar rápidamente en qué punto ha fallado un
+proceso.
+
+** Pasos (Steps)
+
+Dentro de cada etapa se definen los pasos. Un paso es una tarea
+individual que le indica a Jenkins qué hacer (ej. ejecutar un comando
+de shell, invocar un script de Python, o publicar un artefacto).
+
+** Variables de Entorno
+
+Para que un pipeline sea reutilizable en diferentes entornos
+(Desarrollo, QA, Producción), se utilizan variables de entorno. Estas
+permiten parametrizar rutas, credenciales y nombres de servidores sin
+modificar el código del pipeline.
+
+- Variables integradas :: Como ~BUILD_ID~ o ~JOB_NAME~.
+
+- Variables personalizadas :: Definidas en el bloque ~environment~.
+
+* Sintaxis
+
+Jenkins ofrece dos formas de escribir el código del pipeline:
+declarativo o guionizado (/scripted/).
+
+** Pipeline Declarativo
+
+Es el estándar más moderno y recomendado. Utiliza una sintaxis más
+estructurada y rígida, lo que facilita la lectura y el
+mantenimiento. Declaramos /qué/ queremos, pero no /cómo/.
+
+#+caption: Ejemplo de pipeline declarativo
+#+BEGIN_SRC groovy
+  pipeline {
+    agent any
+    stages {
+        stage('Example') {
+            steps {
+                echo 'Hola Mundo'
+            }
+        }
+    }
+  }
+#+END_SRC
+
+El Pipeline declarativo es una evolución sobre el modelo original
+(/scripted/), diseñado para simplificar la creación de flujos de CI/CD
+mediante un modelo de "configuración como código" más estricto.
+
+*** Características principales
+
+- Abstracción del "cómo" :: A diferencia del modelo imperativo, el
+  usuario define el estado final deseado. Jenkins se encarga de la
+  lógica subyacente para alcanzar ese estado.
+
+- Validación sintáctica :: Al tener una estructura rígida, Jenkins
+  puede validar el archivo completo antes de iniciar la ejecución,
+  detectando errores de sintaxis tempranamente.
+
+- Estructura bloque-directiva :: Todo debe estar contenido dentro del
+  bloque raíz ~pipeline { ... }~.
+
+*** Componentes clave de la sintaxis
+
+Para entender mejor el ejemplo, desglosamos sus directivas
+fundamentales:
+
+**** El bloque pipeline
+
+Es el contenedor obligatorio que encierra toda la definición del
+flujo. Sin este bloque, Jenkins no reconocerá el archivo como un
+pipeline declarativo.
+
+**** El agente (agent)
+
+Define dónde se ejecutará el pipeline. Jenkins utiliza una
+arquitectura de /Controlador/ y /Agentes/ (anteriormente llamada
+maestro-esclavo). El controlador gestiona la orquestación, pero el
+trabajo pesado (compilar código, ejecutar tests, mover archivos) se
+delega a los agentes.
+
+Esto permite:
+
+- Asignación de recursos :: Permite decidir si el pipeline corre en el
+  servidor principal, en una máquina virtual específica o dentro de un
+  contenedor.
+
+- Aislamiento del entorno :: Puedes definir que un pipeline de Python
+  corra en una máquina con Python 3.11 y uno de Java en otra con el
+  JDK 17, sin que se mezclen.
+
+- Gestión del Workspace :: El agent se encarga de crear un espacio de
+  trabajo (una carpeta) y descargar el código fuente allí
+  automáticamente.
+
+Los valores principales son:
+
+- ~agent any:~ :: Ejecuta en cualquier nodo disponible.
+
+- ~agent none:~ :: Útil si quieres definir un agente diferente para
+  cada etapa (~stage~).
+
+#+begin_src groovy
+    pipeline {
+      agent none
+      stages {
+        stage('Build en Linux') {
+            agent { label 'linux-server' }
+            steps { echo 'Compilando...' }
+        }
+        stage('Test en Windows') {
+            agent { label 'windows-10' }
+            steps { echo 'Testeando...' }
+        }
+      }
+    }
+#+end_src
+
+- ~agent { docker { ... } }:~ :: Permite ejecutar el pipeline dentro
+  de un contenedor específico.
+
+#+begin_src groovy
+  agent {
+    docker {
+        image 'maven:3.9.3-eclipse-temurin-17'
+        label 'my-defined-label'
+        args  '-v /tmp:/tmp'
+    }
+  }  
+#+end_src
+
+  Hay más posibilidades /node/, /kubernetes/, etc. Ver referencia.
+  
+**** Etapas (stages)
+
+Es el contenedor de todas las fases del ciclo de vida. Permite
+visualizar el progreso en herramientas como Blue Ocean.
+
+**** Pasos (steps)
+
+Ubicados dentro de un ~stage~, representan las tareas granulares
+(ejecutar un script, enviar un email, subir un artefacto).
+
+Mostremos un ejemplo que incluye manejo de errores y variables:
+
+#+caption: Ejemplo ampliado
+#+BEGIN_SRC groovy
+pipeline {
+  agent any
+
+  environment {
+    DEPLOY_ENV = 'staging'
+  }
+
+  stages {
+    stage('Build') {
+        steps {
+            echo "Compilando para el entorno: ${env.DEPLOY_ENV}"
+            sh './gradlew build'
+        }
+    }
+    stage('Test') {
+        steps {
+            sh './gradlew test'
+        }
+    }
+  }
+
+  post {
+    always {
+        echo 'Limpiando el espacio de trabajo...'
+    }
+    failure {
+        echo 'El pipeline ha fallado. Enviando notificación...'
+    }
+  }
+}
+#+END_SRC
+
+** Pipeline Basado en Scripts (Scripted)
+
+Utiliza un subconjunto del lenguaje [[https://groovy-lang.org/][Groovy]].  Ofrece una flexibilidad
+casi ilimitada y un control total sobre el flujo lógico, pero a costa
+de una mayor complejidad y una curva de aprendizaje más alta.
+
+#+BEGIN_SRC groovy
+node {
+    stage('Example') {
+        echo 'Hola Mundo desde Scripted'
+    }
+}
+#+END_SRC
+
+* Creación y Gestión
+
+El enfoque moderno de Jenkins se basa en el concepto de "Pipeline as
+Code".
+
+** El archivo Jenkinsfile
+
+El pipeline se define en un archivo llamado ~Jenkinsfile~ ubicado en
+la raíz del repositorio. Esto permite que el flujo de CI/CD sea
+auditado y versionado como cualquier otra parte del software.
+
+#+caption: Ejemplo de /Jenkinsfile/
+#+begin_src groovy
+pipeline {
+    // Define que el pipeline puede ejecutarse en cualquier nodo disponible
+    agent any
+
+    environment {
+        APP_NAME = "mi-proyecto-web"
+        DEPLOY_ENV = "staging"
+    }
+
+    stages {
+        stage('Checkout') {
+            steps {
+                echo 'Descargando código del repositorio...'
+                checkout scm
+            }
+        }
+
+        stage('Build') {
+            steps {
+                echo 'Compilando la aplicación...'
+                // Ejemplo para un proyecto Node.js
+                sh 'npm install'
+            }
+        }
+
+        stage('Test') {
+            steps {
+                echo 'Ejecutando pruebas unitarias...'
+                sh 'npm test'
+            }
+        }
+
+        stage('Deploy') {
+            steps {
+                echo "Desplegando en el entorno de ${env.DEPLOY_ENV}..."
+                sh './deploy.sh'
+            }
+        }
+    }
+
+    post {
+        always {
+            echo 'Limpiando el espacio de trabajo...'
+        }
+        success {
+            echo '¡El Pipeline se ejecutó correctamente!'
+        }
+        failure {
+            echo 'Hubo un error en el Pipeline. Revisar logs.'
+        }
+    }
+}
+#+end_src
+
+** Automatización y Detección
+
+Jenkins puede configurarse para monitorizar el repositorio mediante
+/Webhooks/ o /Polling/. Al detectar un nuevo commit, Jenkins descarga
+el código, lee el Jenkinsfile y ejecuta las etapas definidas
+automáticamente.
+
+*** Mecanismos de Activación (Triggers)
+
+**** Webhooks (El método "Push")
+
+Es la opción recomendada. En lugar de que Jenkins pregunte, el
+repositorio (GitHub, GitLab, Bitbucket) le envía una notificación a
+Jenkins en tiempo real.
+
+- Velocidad :: Instantánea. El pipeline comienza segundos después del
+  ~git push~.
+
+- Eficiencia :: No consume recursos innecesarios; Jenkins solo trabaja
+  cuando hay algo que hacer.
+
+- Configuración :: Requiere que el servidor de Jenkins sea accesible
+  por el servicio de Git (o usar un túnel/proxy). Este es nuestro
+  principal problema si trabajamos con el Proxmox del instituto, no
+  podemos acceder desde fuera (aunque existen soluciones como
+  /ZeroTier One/).
+
+Podemos seguir el tutorial de Raúl Prieto Fernández en cómo crear un
+webhook entre GH y Jenkins [[3][(Ref:3)]] para realizarlo. También tenemos
+otra referencia [[4][(Ref:4)]] en inglés.
+
+**** Polling SCM (El método "Pull")
+
+Jenkins revisa el repositorio cada cierto tiempo (por ejemplo, cada 5
+minutos) para ver si hay commits nuevos.
+
+- Velocidad :: Retrasada. Si el polling es cada 5 minutos y haces un
+  commit justo después de una revisión, esperarás casi 5 minutos para
+  iniciar. Esto va en contra del ideal de CI/CD pero podemos hacer
+  unas sentadillas mientras.
+
+- Eficiencia :: Costosa. Si tienes 100 proyectos revisando cada
+  minuto, saturarás el servidor incluso si nadie está programando.
+
+- Uso ideal :: Solo cuando Jenkins está detrás de un firewall estricto
+  que impide recibir conexiones externas. Nuestra solución en el
+  instituto.
+
+Podemos seguir el artículo de "The Server Side" [[5][(Ref:5)]] para
+implementar el método /pull/.
+
+*** El Ciclo de Ejecución Automática
+
+Una vez que Jenkins recibe la señal (vía Webhook o Polling), se inicia
+un flujo lógico interno:
+
+1. Asignación de Nodo (Executor): Jenkins busca un "agente" libre que
+   cumpla con los requisitos definidos en el agent del Jenkinsfile.
+
+2. Checkout (Clonación): Se descarga el código fuente en un directorio
+   temporal llamado Workspace.
+
+3. Lectura del Jenkinsfile: Jenkins analiza el archivo. Si hay un
+   error de sintaxis en el código Groovy, el pipeline fallará
+   inmediatamente antes de ejecutar cualquier comando.
+
+4. Ejecución de Etapas (Stages): Se ejecutan los pasos en orden. Si
+   una etapa falla (por ejemplo, un test no pasa), el pipeline suele
+   detenerse para evitar que código defectuoso llegue a producción.
+
+5. Feedback: Jenkins actualiza el estado del commit en la interfaz de
+   Git.
+
+** Herramientas de Gestión
+
+- Interfaz Web (Clásica) :: Permite configurar jobs, visualizar logs y
+  gestionar nodos.
+
+- Blue Ocean :: Proporciona una visualización moderna e intuitiva del
+  estado de las etapas.
+
+- CLI de Jenkins :: Permite gestionar tareas desde la línea de
+  comandos para usuarios avanzados.
+
+** Buenas Prácticas
+
+- Divide y vencerás :: Mantén las etapas claras y granulares.
+
+- Uso de agentes :: Define dónde debe ejecutarse cada tarea para
+  optimizar recursos.
+
+- Gestión de credenciales :: Nunca escribas contraseñas en el
+  Jenkinsfile; utiliza el almacén de credenciales de Jenkins.
+
+* Referencias
+
+1. <<1>> https://groovy-lang.org/
+2. <<2>> https://www.jenkins.io/doc/book/pipeline/syntax/
+3. <<3>> https://www.raulprietofernandez.net/blog/devops/como-crear-un-webhook-entre-github-y-jenkins
+4. <<4>> https://dev.to/oliverjumpertz/setting-up-jenkins-to-handle-github-pull-requests-5bjc
+5. <<5>> https://www.theserverside.com/blog/Coffee-Talk-Java-News-Stories-and-Opinions/Jenkins-with-GitHub-Integration-Guide

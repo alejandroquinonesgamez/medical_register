@@ -1,0 +1,12 @@
+#!/bin/bash
+# Generado por Ansible — no editar a mano en la VM (regenerar con playbook).
+set -euo pipefail
+cd "{{ medical_app_deploy_path }}"
+export COMPOSE_DOCKER_CLI_BUILD=0
+export DOCKER_BUILDKIT=0
+export COMPOSE_PROJECT_NAME="{{ medical_compose_project_name }}"
+{% if medical_compose_profiles | default([]) | length > 0 %}
+docker compose{% for p in medical_compose_profiles %} --profile {{ p }}{% endfor %} up -d --build
+{% else %}
+docker compose up -d --build
+{% endif %}

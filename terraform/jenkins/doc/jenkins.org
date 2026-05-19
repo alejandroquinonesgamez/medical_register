@@ -1,0 +1,30 @@
+#+TITLE: Jenkins
+#+STARTUP: indent
+#+EMAIL: <fraya@ieszaidinvergeles.org>
+#+LANG: es
+#+SETUPFILE: ~/Plantillas/white_clean.theme
+
+#+caption: Jenkins Logo
+#+attr_html: :width 128px :align center :alt Jenkins Logo
+[[./images/jenkins_logo_icon_170552.png]]
+
+* [[file:./introduccion.org][Introducción]]
+
+En [[file:./introduccion.org][Introducción]] se tratan: Conceptos básicos, historia, papel en
+CI/CD, arquitectura, jobs, builds, interfaz de usuario.
+
+* [[file:./pipelines.org][Pipelines]] en Jenkins
+
+En [[file:./pipelines.org][Pipelines]] aprenderemos a definir pipelines, entender su sintaxis,
+gestionar etapas y pasos, y configurar pipelines parametrizables.
+
+* Integración de Jenkins con Git
+
+Configuración de webhooks en GitHub, tokens de autenticación,
+configuración de jobs en Jenkins, ejemplos de pipelines.
+
+* Ejercicio Práctico
+
+Aplicar lo aprendido para configurar un pipeline funcional que
+interactúe con GitHub.
+

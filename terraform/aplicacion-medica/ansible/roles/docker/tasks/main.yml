@@ -1,0 +1,67 @@
+---
+# Igual que terraform/jenkins/ansible/roles/docker (Docker CE + Compose plugin v2).
+- name: Update apt cache
+  ansible.builtin.apt:
+    update_cache: true
+    cache_valid_time: 3600
+
+- name: Install required Debian packages
+  ansible.builtin.apt:
+    name:
+      - ca-certificates
+    state: present
+    update_cache: false
+
+- name: Ensure apt keyrings directory exists
+  ansible.builtin.file:
+    path: /etc/apt/keyrings
+    state: directory
+    mode: "0755"
+
+- name: Comprobar si ya existe la clave GPG de Docker
+  ansible.builtin.stat:
+    path: /etc/apt/keyrings/docker.asc
+  register: docker_apt_key
+
+- name: Install Docker apt key
+  ansible.builtin.get_url:
+    url: https://download.docker.com/linux/debian/gpg
+    dest: /etc/apt/keyrings/docker.asc
+    mode: "0644"
+    timeout: 120
+  register: docker_gpg_download
+  until: docker_gpg_download is succeeded
+  retries: 6
+  delay: 20
+  when: not docker_apt_key.stat.exists or docker_apt_key.stat.size | default(0) < 100
+
+- name: Install Docker repo
+  ansible.builtin.copy:
+    dest: /etc/apt/sources.list.d/docker.sources
+    content: |
+      Types: deb
+      URIs: https://download.docker.com/linux/debian
+      Suites: {{ ansible_distribution_release }}
+      Components: stable
+      Architectures: {{ 'amd64' if ansible_architecture == 'x86_64' else ansible_architecture }}
+      Signed-By: /etc/apt/keyrings/docker.asc
+    owner: root
+    group: root
+    mode: "0644"
+
+- name: Install Docker Engine and Compose plugin
+  ansible.builtin.apt:
+    name:
+      - docker-ce
+      - docker-ce-cli
+      - containerd.io
+      - docker-buildx-plugin
+      - docker-compose-plugin
+    state: present
+    update_cache: true
+
+- name: Ensure docker service is enabled and started
+  ansible.builtin.service:
+    name: docker
+    state: started
+    enabled: true

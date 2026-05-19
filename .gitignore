@@ -33,6 +33,13 @@ htmlcov/
 .DS_Store
 Thumbs.db
 
+# Clave privada SSH del ejemplo docente (solo publicar .pub)
+terraform/git-terraform-ansible-ejemplo-main/src/.ssh/id_ed25519_pps
+
+# Residuos Emacs / copias de seguridad de edición
+.\#*
+\#*\#
+
 # PDFs locales
 u03.deteccion.correccion.vulnerabilidades.web.pdf
 

@@ -14,18 +14,18 @@
 
 ---
 
-## Repositorios de este trabajo (espacio de trabajo PPS)
+## Repositorios de este trabajo
 
-| Proyecto | Ruta local | Remoto `origin` (SSH) | Rama habitual |
+| Proyecto | Repositorio GitHub | Remoto `origin` (SSH) | Rama habitual |
 |---|---|---|---|
-| Cliente Android | `/home/alejandro/DriveLocal/alejandro/Ciberseguridad/PPS - Puesta a Producción Segura/medical_register_android` | `git@github.com:alejandroquinonesgamez/medical_register_apk.git` | `main` |
-| Backend | `/home/alejandro/DriveLocal/alejandro/Ciberseguridad/PPS - Puesta a Producción Segura/Aplicación Médica` | `git@github.com:alejandroquinonesgamez/medical_register.git` | `dev` |
+| Cliente Android | [medical_register_apk](https://github.com/alejandroquinonesgamez/medical_register_apk) | `git@github.com:alejandroquinonesgamez/medical_register_apk.git` | `main` |
+| Backend | [medical_register](https://github.com/alejandroquinonesgamez/medical_register) | `git@github.com:alejandroquinonesgamez/medical_register.git` | `dev` |
 
 Las reglas de protección se configuran **en GitHub**, en el repositorio remoto que corresponda (`medical_register_apk` y/o `medical_register`). El ejemplo de push directo bloqueado (§3.3) debe usar la **rama que hayáis protegido** (`main` en Android, `dev` o `main` en el backend).
 
 ```bash
 # Ejemplo: push directo a main en el cliente Android (debe fallar si main está protegida)
-cd "/home/alejandro/DriveLocal/alejandro/Ciberseguridad/PPS - Puesta a Producción Segura/medical_register_android"
+cd medical_register_apk   # raíz del clone
 git push origin main
 ```
 
@@ -81,12 +81,20 @@ Opciones adicionales habituales en PPS:
 - **Require linear history** (evita merge commits si se prefiere *rebase*/*squash*).  
 - **Lock branch** solo en situaciones excepcionales (congelación de release).
 
+En **`medical_register`** (backend) se configuró la regla sobre la rama **`dev`**: PR obligatorio, aprobaciones y *status check* **`build`** (*Build and Deploy Sphinx Docs*):
+
+![Regla de protección en dev (1/3)](../img/PPS_git/proteccion-ramas/regla-backend-dev1.png)
+
+![Regla de protección en dev (2/3)](../img/PPS_git/proteccion-ramas/regla-backend-dev2.png)
+
+![Regla de protección en dev (3/3)](../img/PPS_git/proteccion-ramas/regla-backend-dev3.png)
+
 ### 3.3. Cómo documentar el funcionamiento
 
-1. **Intento de push directo** (debe fallar). Sustituye rama y ruta según el repo que estés probando (`main` en Android, `dev` en el backend si es la rama protegida):
+1. **Intento de push directo** (debe fallar). Sustituye rama y repositorio según el caso (`main` en Android, `dev` en el backend si es la rama protegida):
 
    ```bash
-   cd "/home/alejandro/DriveLocal/alejandro/Ciberseguridad/PPS - Puesta a Producción Segura/medical_register_android"
+   cd medical_register_apk   # raíz del clone del cliente Android
    git checkout main
    git pull origin main
    echo "# test" >> README.md
@@ -96,9 +104,21 @@ Opciones adicionales habituales en PPS:
 
    Resultado esperado: `remote: error: GH006: Protected branch update failed...` o mensaje equivalente de GitHub indicando que la rama está protegida.
 
+   En **`medical_register_apk`** (rama **`main`** protegida):
+
+   ![Push a main rechazado por rama protegida](../img/PPS_git/proteccion-ramas/push-rechazado-android.png)
+
+   > Si en algún momento el push directo a `main` fue aceptado (antes de activar la regla o con bypass), puede quedar `push-aceptado-android.png` como contraste; la evidencia principal es el **rechazo** con la regla activa.
+
+   ![Push a main aceptado (referencia / antes de protección o sin regla)](../img/PPS_git/proteccion-ramas/push-aceptado-android.png)
+
 2. **Flujo correcto**: crear rama, abrir PR hacia la rama protegida, esperar checks verdes y aprobación, fusionar desde la UI (o con *merge queue* si aplica).
 
-3. **Evidencias gráficas**: ver §5 (capturas en `docs/git_docs/img/PPS_git/proteccion-ramas/`).
+   Pull Request hacia **`dev`** en el backend: el job **`build`** aparece en verde en **Checks**:
+
+   ![Checks del PR: job build en verde](../img/PPS_git/proteccion-ramas/pr-checks-build.png)
+
+   No se incluyen capturas dedicadas de PR bloqueado / listo para merge: la evidencia del enunciado queda cubierta con la regla en `dev` (§3.2), el check **`build`** en PR y el push directo bloqueado en Android.
 
 ---
 
@@ -106,55 +126,6 @@ Opciones adicionales habituales en PPS:
 
 - **Gitleaks / Semgrep**: si sus workflows publican checks con nombre estable, pueden formar parte de los *status checks* obligatorios.  
 - **GitHub Secret scanning / Push protection**: son políticas a nivel de código y seguridad, no sustituyen la revisión humana ni los tests.
-
----
-
-## 5. Evidencias (entrega) — Apartado 2: protección de ramas
-
-Material gráfico del ejercicio, almacenado en `docs/git_docs/img/PPS_git/proteccion-ramas/`.
-
-### 5.1. Regla de protección en `dev` (`medical_register`)
-
-Configuración en **Settings → Branches** del backend: PR obligatorio, aprobaciones, *status checks* y check **`build`** (*Build and Deploy Sphinx Docs*).
-
-| Captura | Contenido |
-|---------|-----------|
-| `regla-backend-dev1.png` | Vista general de la regla / opciones de protección |
-| `regla-backend-dev2.png` | Detalle de revisiones y comprobaciones |
-| `regla-backend-dev3.png` | *Status checks* requeridos (incl. `build`) |
-
-![Regla de protección en dev (1/3)](../img/PPS_git/proteccion-ramas/regla-backend-dev1.png)
-
-![Regla de protección en dev (2/3)](../img/PPS_git/proteccion-ramas/regla-backend-dev2.png)
-
-![Regla de protección en dev (3/3)](../img/PPS_git/proteccion-ramas/regla-backend-dev3.png)
-
-### 5.2. Status check `build` en Pull Request
-
-Pull Request hacia la rama **`dev`**: el workflow de documentación ejecuta el job **`build`** y aparece en la sección **Checks** del PR.
-
-![Checks del PR: job build en verde](../img/PPS_git/proteccion-ramas/pr-checks-build.png)
-
-### 5.3. Push directo a rama protegida (`medical_register_apk` · `main`)
-
-Intento de `git push origin main` sin pasar por PR cuando la rama **`main`** está protegida: GitHub rechaza la actualización.
-
-![Push a main rechazado por rama protegida](../img/PPS_git/proteccion-ramas/push-rechazado-android.png)
-
-> **Nota**: si en algún momento el push directo a `main` fue aceptado (p. ej. antes de activar la regla o con permisos de bypass), puede quedar constancia en `push-aceptado-android.png` como contraste; la evidencia principal del control es el **rechazo** una vez activada la protección.
-
-![Push a main aceptado (referencia / antes de protección o sin regla)](../img/PPS_git/proteccion-ramas/push-aceptado-android.png)
-
-### 5.4. Resumen de hitos
-
-| # | Hito | Estado | Captura |
-|---|------|--------|---------|
-| 1 | Regla en `dev` con PR + approvals + check `build` | ✅ | `regla-backend-dev1.png` … `regla-backend-dev3.png` |
-| 2 | Check `build` en PR a `dev` | ✅ | `pr-checks-build.png` |
-| 3 | Push directo a `main` (Android) bloqueado | ✅ | `push-rechazado-android.png` |
-| 4 | PR bloqueado / listo para merge (capturas dedicadas) | No incluido | La evidencia del enunciado queda cubierta con la regla en `dev` (§5.1), el check **`build`** en PR (`pr-checks-build.png`) y el push directo bloqueado en Android (`push-rechazado-android.png`). |
-
-**Guía operativa**: [`pasos.md`](pasos.md) §2.
 
 ---
 

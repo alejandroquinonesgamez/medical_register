@@ -12,28 +12,29 @@
 
 ---
 
-## Repositorios de este trabajo (espacio de trabajo PPS)
+## Repositorios de este trabajo
 
-Las pruebas de GitHub (secret scanning, push protection, reglas de rama, Actions) se documentan sobre los **dos clones** del curso:
+Las pruebas de GitHub (secret scanning, push protection, reglas de rama, Actions) se documentan sobre los **dos repositorios** del curso:
 
-| Proyecto | Ruta local | Remoto `origin` (SSH) | Rama habitual |
+| Proyecto | Repositorio GitHub | Remoto `origin` (SSH) | Rama habitual |
 |---|---|---|---|
-| Cliente Android (APK) | `/home/alejandro/DriveLocal/alejandro/Ciberseguridad/PPS - Puesta a Producción Segura/medical_register_android` | `git@github.com:alejandroquinonesgamez/medical_register_apk.git` | `main` |
-| Backend *Aplicación Médica* | `/home/alejandro/DriveLocal/alejandro/Ciberseguridad/PPS - Puesta a Producción Segura/Aplicación Médica` | `git@github.com:alejandroquinonesgamez/medical_register.git` | `dev` |
+| Cliente Android (APK) | [medical_register_apk](https://github.com/alejandroquinonesgamez/medical_register_apk) | `git@github.com:alejandroquinonesgamez/medical_register_apk.git` | `main` |
+| Backend | [medical_register](https://github.com/alejandroquinonesgamez/medical_register) | `git@github.com:alejandroquinonesgamez/medical_register.git` | `dev` |
 
-Fijar o comprobar el remoto del Android (equivalente a tu flujo habitual):
+Fijar o comprobar el remoto del Android:
 
 ```bash
-cd "/home/alejandro/DriveLocal/alejandro/Ciberseguridad/PPS - Puesta a Producción Segura/medical_register_android"
+git clone git@github.com:alejandroquinonesgamez/medical_register_apk.git
+cd medical_register_apk
 git remote set-url origin git@github.com:alejandroquinonesgamez/medical_register_apk.git
 git remote -v
 git push origin main
 ```
 
-Backend (documentación y workflows en este árbol):
+Backend (documentación y workflows en este repositorio):
 
 ```bash
-cd "/home/alejandro/DriveLocal/alejandro/Ciberseguridad/PPS - Puesta a Producción Segura/Aplicación Médica"
+# Raíz del clone de medical_register
 git remote -v
 git push origin dev
 ```
@@ -138,7 +139,10 @@ Cada bypass genera **registro** para administración: alertas en **Security → 
 ### 3.5. Actividad: habilitar Push protection y documentar una prueba
 
 1. En el repositorio: **Settings → Advanced Security** (o *Code security and analysis*).  
-2. Activar **Secret Protection** y **Push protection** según [Enabling push protection for your repository](https://docs.github.com/en/code-security/how-tos/secure-your-secrets/prevent-future-leaks/enabling-push-protection-for-your-repository).  
+2. Activar **Secret Protection** y **Push protection** según [Enabling push protection for your repository](https://docs.github.com/en/code-security/how-tos/secure-your-secrets/prevent-future-leaks/enabling-push-protection-for-your-repository).
+
+   ![Secret Protection y Push protection habilitados](../img/PPS_git/github/options-enabled.png)
+
 3. Crear un **PAT de prueba** (caducidad 1 día) y un commit con el token en un fichero de demo.  
 4. `git push` debe ser **rechazado** (`GH013`, *Push cannot contain secrets*).  
 5. Revocar el PAT, eliminar el fichero del commit y no usar *bypass* en producción.
@@ -157,7 +161,7 @@ Tras la demo: **revocar** el PAT en *Developer settings → Personal access toke
 #### Comandos usados en `medical_register`
 
 ```bash
-cd "$PPS_BACKEND"
+# Raíz del clone de medical_register
 git checkout dev && git pull origin dev
 git checkout -b pps/github-push-protection-demo
 
@@ -171,6 +175,14 @@ git push -u origin pps/github-push-protection-demo
 
 Resultado esperado en terminal: `GH013`, *GITHUB PUSH PROTECTION*, *GitHub Personal Access Token*, ruta `docs/git_docs/PPS_git/_demo_github/leak.txt`.
 
+![Push rechazado por GitHub Push Protection (GH013)](../img/PPS_git/github/push-rejected.png)
+
+Repositorio de la prueba: **`alejandroquinonesgamez/medical_register`**. Rama: `pps/github-push-protection-demo`.
+
+GitHub impidió que el PAT entrara en el historial remoto (**GH013**). La remediación correcta es **revocar** el token de prueba (aunque el push fallara) y no confiar en borrar el fichero local sin rotación.
+
+Con *push protection* activo el secreto **no llega al remoto**, por lo que **no** suele generarse alerta en *Secret scanning*. No se aportan capturas `alerta-abierta` / `alerta-cerrada`: la evidencia del control es la configuración (paso 2) y el rechazo del push. El PAT de prueba usado en la demo **caducó o fue revocado** tras el ejercicio.
+
 ---
 
 ## 4. Relación con los proyectos del espacio de trabajo
@@ -179,27 +191,6 @@ Resultado esperado en terminal: `GH013`, *GITHUB PUSH PROTECTION*, *GitHub Perso
 - **Android** (`medical_register_apk`, rama `main`): si añades Actions allí, los nombres de los checks aparecerán en la UI de GitHub de ese repo.
 
 Push protection y Secret scanning son independientes de los *status checks* (secretos frente a calidad de código).
-
----
-
-## 5. Evidencias (entrega) — Apartado 4: GitHub
-
-Repositorio: **`alejandroquinonesgamez/medical_register`**. Rama de prueba: `pps/github-push-protection-demo`.
-
-| # | Qué demuestra | Fichero |
-|---|---------------|---------|
-| 1 | Secret Protection y Push protection **activados** | [`../img/PPS_git/github/options-enabled.png`](../img/PPS_git/github/options-enabled.png) |
-| 2 | `git push` **rechazado** (`GH013`, PAT en `leak.txt`) | [`../img/PPS_git/github/push-rejected.png`](../img/PPS_git/github/push-rejected.png) |
-
-![Secret Protection y Push protection habilitados](../img/PPS_git/github/options-enabled.png)
-
-![Push rechazado por GitHub Push Protection (GH013)](../img/PPS_git/github/push-rejected.png)
-
-**Interpretación**: GitHub impidió que el PAT entrara en el historial remoto (**GH013**). La remediación correcta es **revocar** el token de prueba (aunque el push fallara) y no confiar en borrar el fichero local sin rotación.
-
-**Alertas en Security**: con *push protection* activo el secreto **no llega al remoto**, por lo que **no** suele generarse alerta en *Secret scanning*. No se aportan capturas `alerta-abierta` / `alerta-cerrada`: la evidencia del control es `push-rejected.png` más la configuración en `options-enabled.png`, conforme al flujo del enunciado cuando el bloqueo en `git push` funciona. El PAT de prueba usado en la demo **caducó o fue revocado** tras el ejercicio; no se creó uno nuevo.
-
-**Guía operativa**: [`pasos.md`](pasos.md) §4.
 
 ---
 

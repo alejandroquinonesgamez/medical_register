@@ -1,0 +1,174 @@
+#+TITLE: Primera parte: Git y Github
+#+STARTUP: indent
+#+EMAIL: <fraya@ieszaidinvergeles.org>
+#+LANG: es
+#+SETUPFILE: ~/Plantillas/white_clean.theme
+
+Crearemos un proyecto básico con una aplicación web escrita en [[https://www.python.org/][Python]]
+con el framework [[https://flask.palletsprojects.com/en/stable][Flask]].
+
+* Introducción
+
+Por si has estado viviendo en la cueva de Bin-Laden (que Alá lo tenga
+en su misericordia), voy a hacer una pequeña introducción sobre las
+herramientas que vamos a utilizar:
+
+- Python :: El lenguaje con más futuro.
+- Flask :: maneja la lógica del negocio.
+- GUnicorn :: permite múltiples usuarios simultáneos (algo que el
+  servidor interno de Flask no hace bien).
+- Nginx :: se encarga de la seguridad, el buffering y de servir
+  archivos estáticos (como imágenes o CSS) mucho más rápido que
+  Python.
+
+El diagrama de nuestra aplicación quedaría algo así:
+
+#+begin_src
+  -----       -------       ----------       -------
+ | Usr | --> | Nginx | --> | GUnicorn | --> | Flask |
+  -----       -------       ----------       -------
+#+end_src
+
+** Python
+
+Python es un lenguaje de programación de alto nivel, interpretado y de
+propósito general, que se ha consolidado como uno de los pilares del
+desarrollo de software moderno gracias a su sintaxis clara y legible,
+muy cercana al lenguaje humano.
+
+Personalmente no me gusta, pero hay cosas peores.
+
+** Flask
+
+Flask es un /micro-framework/ de Python diseñado para facilitar el
+desarrollo de aplicaciones web de forma rápida y con un código
+minimalista.
+
+A diferencia de frameworks más robustos y restrictivos como Django,
+Flask se define por su flexibilidad y ligereza, ya que no incluye por
+defecto una capa de abstracción de base de datos o validación de
+formularios, permitiendo que el desarrollador elija las herramientas
+que mejor se adapten a su proyecto.
+
+Su estructura basada en el estándar [[https://es.wikipedia.org/wiki/WSGI][WSGI]] y el motor de plantillas
+[[https://jinja.palletsprojects.com/en/stable/][Jinja2]] lo convierte en la opción predilecta para crear desde
+prototipos sencillos y microservicios hasta aplicaciones web
+escalables y APIs RESTful.
+
+** Gunicorn
+
+[[https://gunicorn.org/][GUnicorn]] (Green Unicorn) es un servidor /WSGI/ para Python con un
+modelo de trabajadores pre-fork, diseñado para servir aplicaciones web
+en entornos de producción de manera eficiente.
+
+Su función principal es actuar como un intermediario que traduce las
+peticiones HTTP provenientes de un servidor web (como Nginx) en
+llamadas que Flask o Django puedan entender, permitiendo manejar
+múltiples solicitudes simultáneas mediante la creación de procesos
+independientes.
+
+Es ampliamente valorado por ser extremadamente ligero, fácil de
+configurar y por su gran estabilidad, convirtiéndose en el estándar de
+la industria para desplegar aplicaciones Python en contenedores o
+servidores Linux.
+
+** Nginx
+
+Nginx es un servidor web de alto rendimiento que también funciona como
+/proxy inverso/, equilibrador de carga y caché HTTP.
+
+Se distingue por su arquitectura orientada a eventos, lo que le
+permite manejar miles de conexiones simultáneas con un consumo de
+memoria extremadamente bajo, superando en eficiencia a servidores
+tradicionales basados en procesos como Apache.
+
+* La aplicación
+
+Crearemos un directorio llamado ~git-terraform-ansible~ y dentro
+tendremos la siguiente estructura:
+
+#+begin_src sh :results output
+tree ..
+#+end_src
+
+#+RESULTS:
+#+begin_example
+..
+├── doc
+│   └── git.org
+├── LICENSE
+├── README.md
+└── src
+    ├── app
+    │   ├── app.py
+    │   └── requirements.txt
+    └── nginx
+        └── flask_app
+
+5 directories, 6 files
+#+end_example
+
+** Servidor web en Flask
+
+Un servidor web minimalista.
+
+#+INCLUDE: "../src/app/app.py" src python
+
+Podemos incluir un fichero ~.gitignore~ en el directorio ~src/~
+específico para Python.
+
+#+INCLUDE: "../src/app/.gitignore" src
+
+** Dependencias (requirements.txt)
+
+#+INCLUDE: "../src/app/requirements.txt" src
+
+** Configuración de Nginx
+
+Nginx actuará como proxy inverso, recibiendo las peticiones en el
+puerto 80 y pasándolas a Gunicorn. Crearemo un archivo que irá en
+~/etc/nginx/sites-available/flask_app~:
+
+#+INCLUDE: "../src/nginx/flask_app" src nginx
+
+Más adelante habrá que poner la IP o el dominio.
+
+* Control de versiones
+
+** Crea un repositorio en Github
+
+Crea un repositorio llamado ~git-terraform-ansible-ejemplo~ en Github.
+
+** Controla el proyecto con Git
+
+Creamos el nuevo repositorio dentro de nuestra carpeta
+~git-terraform-ansible-ejemplo~:
+
+#+begin_src bash
+  git init
+#+end_src
+
+** Añadir los cambios
+
+Controlamos los ficheros bajo git
+
+#+begin_src bash
+  git add .
+  git commit -m "Revisión inicial"
+#+end_src
+
+** Conectar el repositorio local y el remoto
+
+Conectamos el directorio al repositorio:
+
+#+begin_src bash
+  git remote add origin <link SSH del repositorio>
+#+end_src
+
+** Actualizar el repositorio remoto
+
+Subimos los cambios:
+
+#+begin_src bash
+  git push -u origin main
+#+end_src

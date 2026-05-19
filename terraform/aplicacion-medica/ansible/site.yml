@@ -1,0 +1,7 @@
+---
+- name: Despliegue Aplicación Médica (Docker) en VM Proxmox
+  hosts: medical
+  become: true
+  roles:
+    - docker
+    - medical_compose

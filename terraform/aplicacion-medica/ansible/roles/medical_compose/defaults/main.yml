@@ -1,0 +1,13 @@
+---
+# Ruta en la VM donde vive el árbol del proyecto (mismo layout que el repo).
+medical_app_deploy_path: /opt/aplicacion-medica
+
+# Nombre de proyecto Compose (Makefile / docker-compose.env.example).
+medical_compose_project_name: medical_register
+
+# Perfiles opcionales de docker-compose.yml (ej. defectdojo). Lista vacía = solo waf+web.
+medical_compose_profiles: []
+
+# Valores recomendados en servidor (ver docker-compose.yml servicio web).
+medical_flask_env: production
+medical_app_supervisor: "0"

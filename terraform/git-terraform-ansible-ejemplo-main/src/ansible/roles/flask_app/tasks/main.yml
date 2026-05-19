@@ -1,0 +1,95 @@
+---
+- name: Update apt cache
+  ansible.builtin.apt:
+    update_cache: yes
+    cache_valid_time: 3600
+
+- name: Install required Debian packages
+  ansible.builtin.apt:
+    name:
+      - python3
+      - python3-venv
+      - python3-pip
+      - nginx
+    state: present
+    update_cache: false
+
+- name: Ensure flask application user exists
+  ansible.builtin.user:
+    name: flask
+    group: www-data
+    shell: /usr/sbin/nologin
+    system: yes
+    create_home: no
+
+- name: Create application directory
+  ansible.builtin.file:
+    path: /opt/flask_app
+    state: directory
+    owner: flask
+    group: www-data
+    mode: '0755'
+
+- name: Copy Flask app files
+  ansible.builtin.copy:
+    src: "{{ item.src }}"
+    dest: "{{ item.dest }}"
+    owner: flask
+    group: www-data
+    mode: '0644'
+  loop:
+    - { src: "{{ playbook_dir }}/../app/app.py", dest: "/opt/flask_app/app.py" }
+    - { src: "{{ playbook_dir }}/../app/requirements.txt", dest: "/opt/flask_app/requirements.txt" }
+
+- name: Create Python virtual environment
+  ansible.builtin.command:
+    cmd: python3 -m venv /opt/flask_app/venv
+    creates: /opt/flask_app/venv/bin/python
+
+- name: Install Python requirements in virtualenv
+  ansible.builtin.command:
+    cmd: /opt/flask_app/venv/bin/pip install -r /opt/flask_app/requirements.txt
+    creates: /opt/flask_app/venv/bin/gunicorn
+
+- name: Create systemd service for Flask app
+  ansible.builtin.template:
+    src: flask.service.j2
+    dest: /etc/systemd/system/flask.service
+    owner: root
+    group: root
+    mode: '0644'
+
+- name: Copy Nginx site configuration
+  ansible.builtin.copy:
+    src: "{{ playbook_dir }}/../nginx/flask_app"
+    dest: /etc/nginx/sites-available/flask_app
+    owner: root
+    group: root
+    mode: '0644'
+
+- name: Enable Nginx site
+  ansible.builtin.file:
+    src: /etc/nginx/sites-available/flask_app
+    dest: /etc/nginx/sites-enabled/flask_app
+    state: link
+
+- name: Disable default Nginx site
+  ansible.builtin.file:
+    path: /etc/nginx/sites-enabled/default
+    state: absent
+
+- name: Reload systemd manager configuration
+  ansible.builtin.systemd:
+    daemon_reload: yes
+
+- name: Ensure Flask app service is enabled and started
+  ansible.builtin.service:
+    name: flask
+    state: started
+    enabled: yes
+
+- name: Ensure Nginx is enabled and restarted
+  ansible.builtin.service:
+    name: nginx
+    state: restarted
+    enabled: yes

@@ -1,0 +1,5 @@
+# Copiar a inventory.ini y ajustar ansible_host tras `terraform apply`
+# (o usar la salida ansible_inventory_line).
+
+[medical]
+medical-vm ansible_host=192.168.0.80 ansible_user=admin ansible_ssh_private_key_file=~/.ssh/id_ed25519

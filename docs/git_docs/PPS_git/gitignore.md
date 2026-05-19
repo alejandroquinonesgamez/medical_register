@@ -36,7 +36,7 @@ A continuación se documentan los `.gitignore` de los dos proyectos de la asigna
 
 ---
 
-## 2. Proyecto 1: `medical_register_android` (cliente Android)
+## 2. Proyecto 1: `medical_register_apk` (cliente Android)
 
 **Tipo de proyecto**: aplicación Android nativa (Kotlin + Gradle, Android Studio).
 
@@ -128,7 +128,7 @@ Los patrones más sensibles desde el punto de vista de **seguridad** son:
 
 ---
 
-## 3. Proyecto 2: `Aplicación Médica` (backend Flask + Docker)
+## 3. Proyecto 2: `medical_register` (backend Flask + Docker)
 
 **Tipo de proyecto**: backend en Python (Flask) con frontend Node, contenerizado con
 Docker Compose (PostgreSQL, Redis, ModSecurity/WAF, DefectDojo).
@@ -239,7 +239,7 @@ Los patrones más sensibles desde el punto de vista de **seguridad** son:
 
 ## 4. Comparativa rápida entre ambos `.gitignore`
 
-| Aspecto | `medical_register_android` | `Aplicación Médica` |
+| Aspecto | `medical_register_apk` | `medical_register` |
 |---|---|---|
 | Plantilla base | GitHub · Android | GitHub · Python + Node |
 | Artefactos de build ignorados | `build/`, `app/build/`, `app/release/`, `.gradle/`, `.kotlin/`, `.cxx/` | `__pycache__/`, `*.py[cod]`, `*.so`, `node_modules/` |

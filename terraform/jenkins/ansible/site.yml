@@ -1,0 +1,6 @@
+- name: Provision for Jenkins on Debian 13
+  hosts: jenkins
+  become: true
+  roles:
+    - jenkins_server
+    - docker

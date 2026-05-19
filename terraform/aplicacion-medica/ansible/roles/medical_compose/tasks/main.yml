@@ -1,0 +1,120 @@
+---
+# medical_app_source = ruta ABSOLUTA en la máquina que ejecuta ansible al raíz del repo "Aplicación Médica".
+# Si la ruta lleva espacios, no uses -e clave=valor en shell: usa JSON o un fichero YAML:
+#   ansible-playbook site.yml -e '{"medical_app_source":"/ruta/con espacios/Aplicación Médica"}'
+#   ansible-playbook site.yml -e @extra_vars.yml   # ver extra_vars.example.yml
+
+- name: Comprobar variable medical_app_source
+  ansible.builtin.assert:
+    that:
+      - medical_app_source is defined
+      - medical_app_source | length > 0
+    fail_msg: >-
+      Indica la ruta al repositorio con -e medical_app_source=/ruta/absoluta/al/repo
+      o define medical_app_source en group_vars/host_vars.
+
+- name: Instalar rsync (sincronización del árbol del proyecto)
+  ansible.builtin.apt:
+    name: rsync
+    state: present
+    update_cache: false
+
+- name: Crear directorio de despliegue
+  ansible.builtin.file:
+    path: "{{ medical_app_deploy_path }}"
+    state: directory
+    mode: "0755"
+
+- name: Sincronizar código desde el controlador Ansible hacia la VM
+  ansible.posix.synchronize:
+    mode: push
+    src: "{{ (medical_app_source | regex_replace('/$', '')) }}/"
+    dest: "{{ medical_app_deploy_path }}/"
+    delete: false
+    rsync_opts:
+      - "--exclude=.git"
+      - "--exclude=__pycache__"
+      - "--exclude=.venv"
+      - "--exclude=venv"
+      - "--exclude=node_modules"
+      - "--exclude=.terraform"
+      - "--exclude=*.pyc"
+      - "--exclude=.mypy_cache"
+      - "--exclude=.pytest_cache"
+      - "--exclude=.cursor"
+      - "--exclude=.env"
+
+- name: Crear directorios de datos para volúmenes Docker (si no vienen en el rsync)
+  ansible.builtin.file:
+    path: "{{ medical_app_deploy_path }}/{{ item }}"
+    state: directory
+    mode: "0755"
+  loop:
+    - data/waf
+    - data/postgres
+    - data/redis
+    - data/defectdojo/media
+    - data/defectdojo/static
+
+- name: Crear red externa proxy-network (requerida por docker-compose.yml)
+  ansible.builtin.shell: |
+    set -euo pipefail
+    if ! docker network inspect proxy-network >/dev/null 2>&1; then
+      docker network create proxy-network
+    fi
+  args:
+    executable: /bin/bash
+
+- name: Comprobar que existe docker-compose.env.example
+  ansible.builtin.stat:
+    path: "{{ medical_app_deploy_path }}/docker-compose.env.example"
+  register: medical_env_example
+
+- name: Fallar si falta docker-compose.env.example
+  ansible.builtin.fail:
+    msg: "No se encontró docker-compose.env.example en el repo sincronizado."
+  when: not medical_env_example.stat.exists
+
+- name: Inicializar .env desde docker-compose.env.example si no existe
+  ansible.builtin.copy:
+    src: "{{ medical_app_deploy_path }}/docker-compose.env.example"
+    dest: "{{ medical_app_deploy_path }}/.env"
+    remote_src: true
+    force: false
+    mode: "0644"
+
+- name: Ajustar permisos de .env para el contenedor web (appuser debe poder leer /app/.env)
+  ansible.builtin.file:
+    path: "{{ medical_app_deploy_path }}/.env"
+    mode: "0644"
+
+- name: Ajustar variables de entorno para ejecución en VM (bloque idempotente)
+  ansible.builtin.blockinfile:
+    path: "{{ medical_app_deploy_path }}/.env"
+    mode: "0644"
+    marker: "# {mark} ANSIBLE aplicacion-medica"
+    block: |
+      FLASK_ENV={{ medical_flask_env }}
+      APP_SUPERVISOR={{ medical_app_supervisor }}
+
+- name: Asegurar permisos legibles de .env tras blockinfile
+  ansible.builtin.file:
+    path: "{{ medical_app_deploy_path }}/.env"
+    mode: "0644"
+
+- name: Desplegar contenedores (build + up)
+  ansible.builtin.template:
+    src: deploy_compose.sh.j2
+    dest: /usr/local/bin/aplicacion-medica-compose-up.sh
+    owner: root
+    group: root
+    mode: "0755"
+
+- name: Ejecutar despliegue Compose
+  ansible.builtin.command: /usr/local/bin/aplicacion-medica-compose-up.sh
+  register: medical_compose_up
+  changed_when: true
+
+- name: Mostrar salida del despliegue
+  ansible.builtin.debug:
+    var: medical_compose_up.stdout_lines

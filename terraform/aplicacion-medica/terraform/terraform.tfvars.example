@@ -1,0 +1,34 @@
+# Copiar a terraform.tfvars (no versionar; .gitignore lo ignora)
+#
+# --- Despliegue completo (recomendado) -----------------------------------------
+# Dimensiona la VM para waf + web + DefectDojo en la misma máquina (Ansible con
+# medical_compose_profiles: [defectdojo]). Valores por defecto si no pones RAM/disco:
+#   full    -> 16384 MB RAM, 6 vCPU, 80G disco
+#   minimal -> 8192 MB RAM, 4 vCPU, 50G disco (solo API+WAF en Ansible)
+deployment_mode = "full"
+
+# Opcional: forzar RAM/vCPU/disco (>=0, >0 y cadena no vacía ignoran el preset).
+# vm_memory_mb = 20480
+# vm_cores     = 8
+# disk_size    = "100G"
+
+pm_api_url          = "https://192.168.0.10:8006/api2/json"
+pm_tls_insecure     = true
+pm_node             = "pve"
+pm_template         = "debian-13-cloud"
+pm_api_token_id     = "usuario@pam!terraform"
+pm_api_token_secret = "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx"
+pm_pool             = "nombre-pool-proxmox"
+pm_storage          = "local-lvm"
+pm_bridge           = "vmbr0"
+
+vm_name   = "pps-aplicacion-medica"
+ipconfig  = "ip=192.168.0.80/24,gw=192.168.0.1,ip6=dhcp"
+
+ci_user     = "admin"
+ci_password = "CambiarEstaPassword123!"
+
+# Ruta absoluta a la clave pública (Terraform file() no expande ~; rutas relativas dependen del cwd).
+# Ejemplo usando la clave de ejemplo del repo (ajusta la raíz del repo en tu máquina):
+# ssh_key_file = "/home/.../Aplicación Médica/terraform/git-terraform-ansible-ejemplo-main/src/.ssh/id_ed25519_pps.pub"
+ssh_key_file = "/ruta/absoluta/.ssh/id_ed25519.pub"

@@ -1,0 +1,518 @@
+#+TITLE: Ansible
+#+STARTUP: indent
+#+EMAIL: <fraya@ieszaidinvergeles.org>
+#+LANG: es
+#+SETUPFILE: ~/Plantillas/white_clean.theme
+
+* ¿Qué es Ansible?
+
+*Ansible* es un motor de *automatización* de código abierto, potente y
+fácil de usar, que ayuda con la gestión de configuraciones, el
+despliegue de aplicaciones y la automatización de tareas. Su filosofía
+principal es ser minimalista y fiable a través de decisiones de diseño
+clave.
+
+- Herramienta de Provisión :: Actúa principalmente como una
+  herramienta de aprovisionamiento para configurar la
+  infraestructura. Se puede usar para configurar servidores, desplegar
+  aplicaciones y orquestar tareas en muchas máquinas simultáneamente,
+  incluyendo infraestructura en la nube y redes.
+
+- SSH :: Utiliza SSH (/Secure Shell/) como capa de transporte. Los
+  hosts gestionados solo necesitan un servidor SSH, lo que evita
+  instalar agentes de software adicionales. Esta arquitectura /sin
+  agentes/ reduce la complejidad de gestión.
+
+- Idempotente :: Es fundamentalmente /idempotente/. Esto significa que
+  puedes ejecutar el mismo script (/Playbook/) varias veces y el
+  estado final será el mismo, sin efectos secundarios
+  innecesarios. Por ejemplo, si un paquete ya está instalado, Ansible
+  no intentará instalarlo de nuevo.
+
+* Instalación
+
+La instalación es sencilla ya que es una herramienta basada en
+Python. Solo es necesario instalarlo en el /nodo de control/.
+
+: apt install ansible
+
+En sistemas Debian y Ubuntu, es la forma más fácil usando el gestor de
+paquetes /APT/.
+
+Ansible recomienda usar el gestor de paquetes de Python /pipx/.
+
+: apt install pipx
+
+Instalamos Ansible:
+
+: pipx install --include-deps ansible
+
+Útil para obtener la última versión o instalarlo en entornos virtuales
+de Python específicos.
+
+* Beneficios
+
+- Sintaxis fácil de leer (YAML) :: Utiliza YAML, un estándar amigable
+  que permite que los Playbooks sean fáciles de escribir y entender.
+
+- Sin instalación en hosts remotos :: Solo requieren un demonio SSH
+  y Python (2.5 o superior).
+
+- Basado en inserción (Push) :: El nodo de control envía las
+  configuraciones a los hosts remotos, lo que permite un control
+  inmediato.
+
+- Escalabilidad :: Funciona igual de bien para un solo servidor que
+  para grandes infraestructuras.
+
+- Módulos integrados :: Ofrece cientos de módulos integrados para
+  gestionar paquetes, servicios y archivos, abstrayendo la complejidad
+  de los comandos del sistema.
+
+- Ansible Galaxy :: El centro oficial para compartir y reutilizar
+  roles de automatización de la comunidad.
+
+- Capa de abstracción delgada :: Sus comandos se corresponden
+  estrechamente con las acciones reales de administración, facilitando
+  la resolución de problemas.
+
+* Vagrant y Terraform
+
+Entender la diferencia entre Vagrant y Terraform es fundamental
+porque, aunque ambos son creados por HashiCorp y comparten una
+filosofía de "Infraestructura como Código" (IaC), tienen propósitos y
+alcances muy distintos.
+
+Vagrant está diseñado para crear y configurar *entornos de desarrollo
+reproducibles en tu propia computadora*. Levanta máquinas virtuales
+(VM) usando proveedores como VirtualBox o VMware. Un uso típico es
+cuando un desarrollador necesita un entorno Linux específico con bases
+de datos y librerías instaladas dentro de su Windows o Mac.
+
+Terraform es una *herramienta de orquestación de infraestructura a
+gran escala*. No le importa tanto lo que pasa dentro de una sola VM,
+sino cómo se conectan cientos de recursos en la nube. Define y
+gestiona redes, instancias, bases de datos gestionadas (como RDS),
+buckets de almacenamiento y balanceadores de carga. Un ejemplo típico
+sería desplegar una arquitectura completa en AWS, Azure o Google Cloud
+de forma automatizada.
+
+Ambos pueden usar herramientas de provisionamiento como Ansible, Chef
+o Puppet para instalar software. Normalmente Vagrant suele lanzar los
+scripts en cuanto arranca la máquina en local, mientras que Terraform
+deja la infraestructura creada para luego usar otras herramientas.
+
+* Ansible y Vagrant
+
+*Vagrant* crea y gestiona máquinas virtuales, mientras que Ansible se
+utiliza como el /provisionador/ para realizar las configuraciones
+específicas dentro de esas máquinas.
+
+- Vagrant crea la MV :: Vagrant gestiona la configuración inicial, es
+  decir, crea y configura la máquina virtual basándose en un
+  /Vagrantfile/. Esto incluye seleccionar el sistema operativo (/box/)
+  y configurar las direcciones de red.
+
+- Ansible hace la provisión :: Una vez que la MV está ejecutándose,
+  Ansible se usa como un /provisionador/ para realizar las
+  configuraciones específicas /dentro/ de la MV. En este paso es donde
+  instalaría el software necesario, configuras los servicios, y
+  desplieguas una apliación, asegurándose de que el estado interno de
+  la MV se adapte a la especificación deseada.
+  
+** Ejemplo de Configuración del Proyecto
+
+Para ilustrar la integración, una configuración típica de proyecto
+implica inicializar un entorno Vagrant y ponerlo en línea.
+
+*** Configuración de Vagrant
+   
+: mkdir web; cd web
+
+Crean y acceden a un nuevo directorio de proyecto.
+
+: vagrant init -m debian/bookworm64
+
+Crea un archivo ~Vagrantfile~ básico utilizando la imagen Debian
+especificada. La opción /-m/ crea un archivo mínimo.
+
+: vagrant up
+
+Lee el archivo ~Vagrantfile~, descarga la imagen (si es necesario) y
+configura la máquina virtual.
+   
+*** Comprobar Conexión SSH
+
+Para usar Ansible, debes saber cómo conectarte al host remoto (la
+máquina virtual de Vagrant). Vagrant facilita el acceso a esta
+información.
+
+: vagrant ssh-config
+
+Este comando muestra los detalles específicos de la conexión SSH de la
+máquina virtual Vagrant en ejecución. Esto es fundamental, ya que
+Vagrant suele usar un puerto asignado aleatoriamente para su conexión
+SSH, y la clave privada la gestiona internamente.
+
+#+caption: Datos relevantes de conexión
+#+begin_src
+Nombre de host: 127.0.0.1
+Usuario: vagrant
+Puerto: 2222
+Archivo de identidad: /home/fraya/Work/Ansible/web/.vagrant/machines/default/virtualbox/private_key
+#+end_src
+
+La salida proporciona la dirección IP (/HostName/), el nombre de
+usuario (/User/), el puerto dinámico y la ubicación del archivo de
+clave privada SSH (/IdentityFile/) necesario en el nodo de
+control. Estos son los parámetros exactos que Ansible necesita para
+conectarse y autenticarse.
+
+*** Inventario para Vagrant
+
+Se define un archivo ~hosts~ con los parámetros de conexión:
+
+#+caption: Fichero ~hosts~
+#+BEGIN_EXAMPLE
+web ansible_ssh_host=127.0.0.1 ansible_ssh_port=2222 ansible_ssh_user=vagrant ansible_ssh_private_key_file=.vagrant/machines/default/virtualbox/private_key
+#+END_EXAMPLE
+
+Esto define un único host llamado /web/. Las variables subsiguientes
+(con el prefijo /ansible_ssh_/) son parámetros de conexión que indican
+a Ansible cómo acceder al host: la IP, el puerto, el usuario y la ruta
+de la clave privada. Este inventario creado manualmente es la forma
+más sencilla de establecer conectividad con la máquina virtual.
+
+*** Integración de aprovisionamiento
+
+Para evitar el uso de comandos manuales ad hoc, el ~Vagrantfile~ se
+puede configurar para ejecutar automáticamente Playbooks de Ansible
+durante el proceso /vagrant up/.
+
+#+caption: Fichero Vagrantfile
+#+begin_src ruby -n
+  Vagrant.configure("2") do |cfg|
+    cfg.vm.box = "debian/bookworm64"
+    cfg.ssh.insert_key = false
+    cfg.vm.define "web" do |web|
+      web.vm.hostname = "web.test"
+      web.vm.network :private_network, ip: "192.168.57.10"
+      web.vm.provision :ansible do |ansible|
+        ansible.playbook = "web-playbook.yml"
+      end
+    end # web
+  end # Vagrant
+#+end_src
+
+- Línea 2 :: Establece la imagen base y desactiva la inserción de
+  claves. Esto evita que Vagrant reemplace la clave predeterminada no
+  segura, lo cual es útil para las conexiones de Ansible en modo de
+  desarrollo.
+
+- Línea 4 :: Define una máquina llamada /web/, estableciendo su nombre
+  de host y una dirección IP privada estática (/192.168.57.10/).
+
+- Línea 7 :: Incluye un bloque /provision :ansible/. Esto le indica a
+  Vagrant que use Ansible para configurar la máquina virtual.
+
+- Línea 8 :: Fundamentalmente, /ansible.playbook = "web-playbook.yml/
+  especifica el archivo de playbook de Ansible que se ejecutará en la
+  máquina virtual después de su arranque.
+  
+* Ansible y Terraform
+
+- Terraform (el orquestador) :: se encarga de la Infraestructura como
+  Código (IaC). Su trabajo es hablar con los proveedores de nube (AWS,
+  Azure, GCP) para crear los componentes básicos. Crea las redes,
+  subredes, firewalls, instancias de servidores (EC2), bases de datos
+  (RDS) y balanceadores de carga.
+
+- Ansible hace la provisión :: Una vez que la MV está ejecutándose,
+  Ansible se usa como un /provisionador/ para realizar las
+  configuraciones específicas /dentro/ de la MV. En este paso es donde
+  instalaría el software necesario, configuras los servicios, y
+  desplieguas una apliación, asegurándose de que el estado interno de
+  la MV se adapte a la especificación deseada.
+
+Terraform se encargará de pasar la dirección IP de las MV creadas y
+Ansible ejecutará las acciones para aprovisionarla.
+
+* Inventario de Ansible con Terraform
+
+El *Inventario* de Ansible define los hosts que Ansible
+gestionará. Para una conexión ad-hoc, los detalles de conexión
+obtenidos se colocan en un archivo de inventario simple, que suele
+llamarse ~hosts~.
+
+** Inventario básico
+
+Imagina que Terraform acaba de crear dos servidores web y una base de
+datos. Terraform te entrega las IPs a través de sus outputs. Tu
+archivo de inventario de Ansible (/hosts.ini/) se vería así:
+
+#+caption: Fichero hosts.init
+#+begin_src src toml
+[web_servers]
+web01 ansible_host=34.201.10.45
+web02 ansible_host=34.201.10.46
+
+[db_servers]
+db01  ansible_host=10.0.1.15
+
+[all:vars]
+ansible_user=admin
+ansible_ssh_private_key_file=~/.ssh/id_rsa
+#+end_src
+
+** Inventario dinámico
+
+En lugar de copiar y pegar IPs a mano, Ansible tiene plugins de
+inventario que consultan directamente a la nube (AWS, Azure, etc.)
+para ver que creó Terraform basándose en /etiquetas (Tags)/. Esto está
+más allá de la intención del tutorial, pero a continuación pongo un
+ejemplo.
+
+#+caption: Fichero main.tf
+#+begin_src ruby
+  resource "aws_instance" "web" {
+    ami           = "ami-0c55b31ad2c455b55"
+    instance_type = "t2.micro"
+    key_name      = "your-ssh-key-pair"
+
+    tags = {
+      Name = "WebServer"
+      Role = "web_server"
+    }
+  }
+#+end_src
+
+En Ansible utilizando el plugin de AWS podemos buscar instancias que
+tengan el /tag Role igual a web_server/.
+
+** Terraform genera el inventario
+
+Una técnica muy usada para proyectos pequeños es hacer que Terraform
+escriba el archivo de Ansible automáticamente usando el recurso
+/local_file/.
+
+#+caption: Fichero main.tf
+#+begin_src ruby
+resource "local_file" "ansible_inventory" {
+  content  = <<EOT
+[web_servers]
+${aws_instance.servidor_web.public_ip}
+
+[db_servers]
+${aws_instance.db_instance.private_ip}
+EOT
+  filename = "inventory.ini"
+}  
+#+end_src
+
+Esto creará un fichero /inventory.ini/ con los datos.
+
+: ansible-playbook -i inventory.ini site.yml
+
+* Prueba (Comando Ad-hoc)
+
+Una prueba rápida utilizando el módulo ~ping~ integrado es la mejor
+manera de verificar que Ansible puede conectarse y autenticarse con el
+host remoto utilizando el archivo de inventario.
+   
+#+BEGIN_SRC bash
+$ ansible web -i hosts -m ping
+#+END_SRC
+
+Este comando indica a Ansible que se dirija al host /web/, utilice el
+archivo de inventario /-i hosts/ y ejecute el módulo integrado /-m
+ping/. Una respuesta exitosa (por ejemplo, ~SUCCESS => {"changed":
+false, "ping": "pong"}~) confirma que la conexión SSH de Ansible, la
+autenticación y la ejecución remota de Python funcionan correctamente.
+
+* Personalización
+
+** Simplificación con `ansible.cfg`
+
+Se puede crear un archivo `ansible.cfg` para centralizar la ruta del
+inventario, el usuario remoto y la configuración de las llaves,
+evitando repetir flags en la línea de comandos.
+
+** Comandos Ad-hoc
+
+- Módulo command :: Para ejecutar comandos simples como /uptime/.
+
+- Privilegios (become) :: El flag /-b/ permite ejecutar tareas como
+  root (usando /sudo/).
+
+- Gestión de paquetes :: Usar el /módulo apt/ para asegurar que
+  programas como Nginx estén instalados.
+
+** Inventario en formato YAML
+
+El archivo ~inventory.yml~ permite organizar hosts en grupos y asignar
+variables comunes. A continuación te muestro el mismo inventario que
+aparecía antes en formato ~.ini~ en formato ~.yaml~.
+
+#+caption: Fichero ~inventory.yml
+#+begin_src yaml
+  all:
+  vars:
+    ansible_user: admin
+    ansible_ssh_private_key_file: ~/.ssh/id_rsa
+  children:
+    web_servers:
+      hosts:
+        web01:
+          ansible_host: 34.201.10.45
+        web02:
+          ansible_host: 34.201.10.46
+    db_servers:
+      hosts:
+        db01:
+          ansible_host: 10.0.1.15
+#+end_src
+
+* Playbooks
+
+Los *Playbooks* son la parte más importante de Ansible; definen tareas
+secuenciales en archivos YAML para lograr una configuración repetible.
+
+#+BEGIN_SRC bash
+$ ansible-playbook -i inventory.yml web-playbook.yml
+#+END_SRC
+
+** Características principales
+
+- Idempotencia :: Puedes ejecutar el mismo playbook varias veces y el
+  resultado será el mismo, sin realizar cambios si el sistema ya está
+  en el estado deseado.
+
+- Formato YAML :: Utiliza una sintaxis legible para humanos.
+
+- Orden de ejecución :: Las tareas se ejecutan de arriba hacia abajo.
+
+** Componentes de un Playbook
+
+Un Playbook es esencialmente una lista de acciones. Cada acción mapea
+un grupo de hosts con tareas específicas.
+
+#+BEGIN_SRC yaml :tangle web-playbook.yml
+name: Configurar servidor web Apache
+hosts: web_servers
+become: yes  # Ejecutar como sudo
+vars:
+  http_port: 80
+
+tasks:
+
+  - name: Asegurar que Apache esté instalado
+    ansible.builtin.apt:
+      name: apache2
+      state: present
+
+  - name: Iniciar el servicio de Apache
+    ansible.builtin.service:
+
+  - name: apache2
+    state: started
+    enabled: yes
+#+END_SRC
+
+- Hosts y Usuarios :: Define en qué máquinas se ejecutará el play
+  (basado en tu inventario) y con qué privilegios.
+
+- Variables (vars) :: Permiten parametrizar el playbook para que sea
+  reutilizable en diferentes entornos (dev, prod).
+  
+- Tareas (tasks) :: Es el corazón del playbook. Cada tarea utiliza un
+  módulo de Ansible (como apt, copy, service o shell).
+
+- Handlers :: Son tareas especiales que solo se ejecutan si una tarea
+  previa notifica un cambio (por ejemplo, reiniciar un servicio solo
+  si el archivo de configuración cambió).
+
+* Estructura de un proyecto
+
+Cuando los playbooks se vuelven complejos, se recomienda usar Roles,
+que permiten organizar las tareas, variables y archivos en una
+jerarquía de directorios estandarizada:
+
+#+BEGIN_EXAMPLE
+site.yml
+webservers.yml
+dbservers.yml
+roles/
+common/
+webtier/
+dbtier/
+#+END_EXAMPLE
+
+Para estructurar proyectos más reales (grandes) consulta [[https://docs.ansible.com/projects/ansible/latest/tips_tricks/sample_setup.html][Ansible sample setup]].
+
+* Roles
+
+Los Roles son la forma evolucionada de organizar contenido en
+Ansible. Mientras que un Playbook básico es un archivo único (que
+puede volverse enorme y difícil de leer), los roles permiten desglosar
+el código en una estructura de directorios estandarizada y
+reutilizable.
+
+Imagina un rol como un "paquete" autónomo que contiene todo lo
+necesario para realizar una función específica (instalar una base de
+datos, configurar un firewall, etc.).
+
+** Estructura de Directorios de un Rol
+
+La jerarquía de un rol (por ejemplo, un rol llamado apache) se vería así:
+
+#+BEGIN_EXAMPLE
+roles/
+apache/
+├── tasks/            # Tareas principales (main.yml)
+├── handlers/         # Manejadores, como reinicios de servicios
+├── templates/        # Archivos .j2 (Jinja2) con variables
+├── files/            # Archivos estáticos para copiar
+├── vars/             # Variables de alta prioridad
+├── defaults/         # Variables por defecto (baja prioridad)
+├── meta/             # Dependencias y autoría
+└── README.md         # Documentación del rol
+#+END_EXAMPLE
+
+** Por qué usar Roles?
+
+- Reutilización :: Puedes usar el mismo rol de nginx en diez proyectos
+  distintos sin copiar y pegar código.
+
+- Mantenibilidad :: Si necesitas cambiar la configuración de la base
+  de datos, sabes exactamente que debes ir a roles/db/tasks/main.yml.
+
+- Orden :: El playbook principal (site.yml) se vuelve extremadamente
+  limpio, sirviendo solo para llamar a los distintos roles.
+
+** Ejemplo de uso de roles en un Playbook
+    
+#+BEGIN_SRC yaml
+hosts: web_servers
+roles:
+  - common  # Configuración básica (usuarios, updates)
+  - apache  # Instalación y config de web server
+#+END_SRC
+
+* Ansible Galaxy
+
+Los roles son tan potentes que existe una plataforma llamada [[https://galaxy.ansible.com/ui/][Ansible
+Galaxy]]. Es como el "App Store" o el "npm" de Ansible. Puedes descargar
+roles creados por la comunidad (o por empresas como Red Hat, Nginx o
+Docker) e integrarlos en tu infraestructura inmediatamente.
+
+#+BEGIN_SRC bash
+$ ansible-galaxy install geerlingguy.apache
+#+END_SRC
+
+* Referencias
+
+- https://developer.hashicorp.com/validated-patterns/terraform/terraform-integrate-ansible-automation-platform
+- https://scalr.com/learning-center/ultimate-guide-to-using-terraform-with-ansible/
+- https://docs.ansible.com/projects/ansible/latest/installation_guide/intro_installation.html
+- https://docs.ansible.com/projects/ansible/latest/tips_tricks/sample_setup.html
+- https://galaxy.ansible.com/ui/
