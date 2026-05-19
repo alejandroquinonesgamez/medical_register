@@ -1,8 +1,0 @@
-# Copiar a extra_vars.yml (no versionar) o usar: ansible-playbook ... -e @extra_vars.yml
-# Las rutas con espacios deben ir entre comillas en YAML.
-medical_app_source: "/ruta/absoluta/al/repo/Aplicación Médica"
-
-# Opcional: perfiles de docker-compose (lista). Vacío = solo waf + web.
-# medical_compose_profiles:
-#   - defectdojo
-#   # - tests   # junto a defectdojo si hace falta
