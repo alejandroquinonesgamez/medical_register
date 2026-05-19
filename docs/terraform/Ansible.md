@@ -116,6 +116,8 @@ Con el playbook terminado y los contenedores en marcha, abre en el navegador del
 de prácticas `http://<IP_VM>:5001/` (sustituye `<IP_VM>` por la salida de
 `terraform output vm_ip_address`).
 
+> **Nota (evidencias PNG):** las capturas de despliegue de esta sección (`navegador-api-5001.png`, `navegador-defectdojo-8080.png`, `ansible-ping-ok.png`, `ansible-playbook-recap.png`, `docker-ps-waf-web.png`, `curl-api-5001.png`) deben estar en `docs/terraform/img/` **y** en la rama `dev` del repo `medical_register` en GitHub para que los enlaces `raw.githubusercontent.com` respondan. Si el visor muestra imagen rota, falta subir ese fichero al remoto (no se incluyen en el repo hasta generarlas en tu VM).
+
 ![Captura: navegador en el puerto 5001 (API vía WAF)](https://raw.githubusercontent.com/alejandroquinonesgamez/medical_register/dev/docs/terraform/img/navegador-api-5001.png)
 
 ### 2.3. Datos y `.env`
