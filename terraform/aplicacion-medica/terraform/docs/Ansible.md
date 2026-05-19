@@ -20,8 +20,8 @@ que configura la **VM ya creada por Terraform** (Proxmox): instala **Docker Engi
 A continuación se explica **qué hace cada rol y cada fichero relevante**, cómo se
 controlan los **perfiles** de Compose (`medical_compose_profiles`), qué queda
 ejecutándose por defecto y cómo validar el despliegue. El aprovisionamiento de la VM
-está en **[Terraform.md](Terraform.md)**. Las capturas enlazadas más abajo usan la
-carpeta **`docs/terraform/img/`** (rutas relativas `img/…` desde este fichero).
+está en **[Informe.md](../../Informe.md)**. Las capturas enlazadas más abajo están en la
+subcarpeta **`img/`**; las figuras usan enlaces **`raw.githubusercontent.com`** (rama **`dev`**) para vista previa fuera del repo.
 
 ### 1.1. Qué es Ansible (resumen operativo)
 
@@ -116,9 +116,9 @@ Con el playbook terminado y los contenedores en marcha, abre en el navegador del
 de prácticas `http://<IP_VM>:5001/` (sustituye `<IP_VM>` por la salida de
 `terraform output vm_ip_address`).
 
-> **Nota (evidencias PNG):** las capturas de despliegue de esta sección (`navegador-api-5001.png`, `navegador-defectdojo-8080.png`, `ansible-ping-ok.png`, `ansible-playbook-recap.png`, `docker-ps-waf-web.png`, `curl-api-5001.png`) deben estar en `docs/terraform/img/` **y** en la rama `dev` del repo `medical_register` en GitHub para que los enlaces `raw.githubusercontent.com` respondan. Si el visor muestra imagen rota, falta subir ese fichero al remoto (no se incluyen en el repo hasta generarlas en tu VM).
+> **Nota (evidencias PNG):** las capturas (`navegador-api-5001.png`, …) deben existir en **`terraform/docs/img/`** en el repo (y en **rama `dev`** en GitHub) para que los enlaces `raw.githubusercontent.com` respondan. Genera las capturas en tu despliegue y súbelas con esos nombres exactos.
 
-![Captura: navegador en el puerto 5001 (API vía WAF)](https://raw.githubusercontent.com/alejandroquinonesgamez/medical_register/dev/docs/terraform/img/navegador-api-5001.png)
+![Captura: navegador en el puerto 5001 (API vía WAF)](https://raw.githubusercontent.com/alejandroquinonesgamez/medical_register/dev/terraform/aplicacion-medica/terraform/docs/img/navegador-api-5001.png)
 
 ### 2.3. Datos y `.env`
 
@@ -176,7 +176,7 @@ Si levantaste el perfil **`defectdojo`**, la interfaz web del stack suele estar 
 usáis ese perfil, podéis **no** generar esta imagen (el enlace quedará vacío en el
 visor Markdown hasta que exista el fichero).
 
-![Captura: DefectDojo en el puerto 8080](https://raw.githubusercontent.com/alejandroquinonesgamez/medical_register/dev/docs/terraform/img/navegador-defectdojo-8080.png)
+![Captura: DefectDojo en el puerto 8080](https://raw.githubusercontent.com/alejandroquinonesgamez/medical_register/dev/terraform/aplicacion-medica/terraform/docs/img/navegador-defectdojo-8080.png)
 
 ---
 
@@ -270,9 +270,9 @@ ansible-playbook site.yml -i inventory.ini -e @extra_vars.yml
 Ejecuta **`ansible medical -m ping`** y **`ansible-playbook`** como arriba; captura
 **éxito en ping** y el bloque **PLAY RECAP** con `failed=0`.
 
-![Captura: ansible ping al grupo medical](https://raw.githubusercontent.com/alejandroquinonesgamez/medical_register/dev/docs/terraform/img/ansible-ping-ok.png)
+![Captura: ansible ping al grupo medical](https://raw.githubusercontent.com/alejandroquinonesgamez/medical_register/dev/terraform/aplicacion-medica/terraform/docs/img/ansible-ping-ok.png)
 
-![Captura: PLAY RECAP del site.yml](https://raw.githubusercontent.com/alejandroquinonesgamez/medical_register/dev/docs/terraform/img/ansible-playbook-recap.png)
+![Captura: PLAY RECAP del site.yml](https://raw.githubusercontent.com/alejandroquinonesgamez/medical_register/dev/terraform/aplicacion-medica/terraform/docs/img/ansible-playbook-recap.png)
 
 Más detalle operativo: `terraform/aplicacion-medica/README.md`.
 
@@ -301,7 +301,7 @@ flowchart LR
   D --> E
 ```
 
-1. **Terraform** crea la VM (véase [Terraform.md](Terraform.md)).
+1. **Terraform** crea la VM (véase [Informe.md](../../Informe.md)).
 2. **Ansible** instala Docker y levanta el stack (sección **2** de este documento).
 
 ---
@@ -343,9 +343,9 @@ el puerto **5001** del host (servicio `waf`).
 En la misma sesión SSH (o con `ansible medical -m shell`), deja visible el listado de
 **`docker compose ps`** y la línea de **`curl`** con **`HTTP:200`**.
 
-![Captura: docker compose ps (web y waf)](https://raw.githubusercontent.com/alejandroquinonesgamez/medical_register/dev/docs/terraform/img/docker-ps-waf-web.png)
+![Captura: docker compose ps (web y waf)](https://raw.githubusercontent.com/alejandroquinonesgamez/medical_register/dev/terraform/aplicacion-medica/terraform/docs/img/docker-ps-waf-web.png)
 
-![Captura: curl HTTP 200 en el puerto 5001](https://raw.githubusercontent.com/alejandroquinonesgamez/medical_register/dev/docs/terraform/img/curl-api-5001.png)
+![Captura: curl HTTP 200 en el puerto 5001](https://raw.githubusercontent.com/alejandroquinonesgamez/medical_register/dev/terraform/aplicacion-medica/terraform/docs/img/curl-api-5001.png)
 
 ---
 

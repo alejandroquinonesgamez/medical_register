@@ -3,7 +3,7 @@
 Este directorio automatiza:
 
 1. **Terraform**: crea una VM Debian (cloud-init) en Proxmox. Con **`deployment_mode = "full"`** (por defecto) la VM queda dimensionada para **Docker Compose completo** (waf + web + perfil **DefectDojo** en Ansible): **16 GB RAM, 6 vCPU, 80G** de disco, salvo overrides en `terraform.tfvars`. Con **`minimal`** los presets son **8 GB / 4 vCPU / 50G** (solo waf + web).
-2. **Ansible**: instala Docker Engine + plugin Compose v2, crea la red externa `proxy-network` (obligatoria según [docker-compose.yml](../../docker-compose.yml)), sincroniza el repositorio y ejecuta `docker compose up -d --build`. El **despliegue completo** del compose (incluido DefectDojo) se activa con la variable **`medical_compose_profiles`** (véase `ansible/extra_vars.full.example.yml` y [Ansible.md](../../docs/terraform/Ansible.md)).
+2. **Ansible**: instala Docker Engine + plugin Compose v2, crea la red externa `proxy-network` (obligatoria según [docker-compose.yml](../../docker-compose.yml)), sincroniza el repositorio y ejecuta `docker compose up -d --build`. El **despliegue completo** del compose (incluido DefectDojo) se activa con la variable **`medical_compose_profiles`** (véase `ansible/extra_vars.full.example.yml` y [Ansible.md](terraform/docs/Ansible.md)).
 
 ## Requisitos previos
 
@@ -43,7 +43,7 @@ terraform init
 terraform apply
 ```
 
-Tras el `apply`, copia la salida `ansible_inventory_line` o el valor de `vm_ip_address`, y revisa **`effective_vm_sizing`** / **`ansible_full_stack_hint`**.
+Tras el `apply`, copia la salida `ansible_inventory_line` o el valor de `vm_ip_address`, y revisa **`effective_vm_sizing`** / **`ansible_full_stack_hint`**. Documentación detallada del módulo: **[Informe.md](Informe.md)**.
 
 **Notas:**
 
@@ -98,7 +98,7 @@ ansible-playbook site.yml -e @extra_vars.yml \
 ```
 
 Documentación detallada, tabla de perfiles y advertencias (perfil `local`, recursos):
-**[Ansible.md](../../docs/terraform/Ansible.md)** (sección 2 y 2.5).
+**[Ansible.md](terraform/docs/Ansible.md)** (sección 2 y 2.5).
 
 ## Qué hace Ansible (resumen fiel al repo)
 
@@ -121,3 +121,13 @@ El rsync **excluye `.env`** para no machacar secretos en la VM si ya los configu
 ## Secretos (JWT, reCAPTCHA, SQLCipher, etc.)
 
 Edita `.env` **en la VM** bajo `/opt/aplicacion-medica/.env` o pásalos con **Ansible Vault** / variables de entorno en CI antes del playbook; no subas `terraform.tfvars` ni `.env` reales al repositorio.
+
+## ZIP de entrega (Terraform + Informe)
+
+Desde este directorio (`terraform/aplicacion-medica/`):
+
+```bash
+./pack-entrega-terraform.sh
+```
+
+Genera **`terraform-aplicacion-medica-entrega.zip`** en la raíz del repo, con **`Informe.md` en la raíz del ZIP** y el módulo en **`terraform/`** (listo para descomprimir y revisar).

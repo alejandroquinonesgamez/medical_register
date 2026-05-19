@@ -1,4 +1,4 @@
-# Terraform — Infraestructura (VM Proxmox, Aplicación Médica)
+# Informe — Terraform (VM Proxmox, Aplicación Médica)
 
 **Autores**: Alejandro Quiñones Gámez & Adrián Bertos Gómez
 
@@ -10,10 +10,25 @@
 
 ---
 
+## Conformidad con la entrega (PPS)
+
+Este paquete cumple lo pedido para la parte **Terraform** de la práctica:
+
+| Requisito | Dónde se cubre en este informe |
+|---|---|
+| **Proyecto Terraform** que crea la **VM en Proxmox** para el backend (y el resto del stack vía Ansible después) | §1.2 (ficheros `.tf`), §2 (recurso `proxmox_vm_qemu`), y el código en la carpeta **`terraform/`** (`main.tf`, `variables.tf`, etc.). |
+| **Documentación** que demuestre el **despliegue correcto** | §2.1 (captura en Proxmox con hardware), §5 (plan y salidas `terraform output` / sizing efectivo). Las figuras enlazan a imágenes en GitHub (`raw.githubusercontent.com`, rama `dev`). |
+| **Justificación** de **memoria** y **disco** (y CPU acoplada al modo de despliegue) | §2.2: presets `full` vs `minimal` (RAM, vCPU, disco) y cómo los **overrides** en `terraform.tfvars` sustituyen al preset. |
+
+El aprovisionamiento de **Docker** y **Compose** en la VM se describe en **[terraform/docs/Ansible.md](terraform/docs/Ansible.md)**. Las figuras enlazan a **`raw.githubusercontent.com`** (rama **`dev`**, repo **`medical_register`**) para que se vean al abrir el `.md` fuera del clon; en el **ZIP de entrega** las mismas rutas siguen funcionando con conexión a Internet.
+
+---
+
 ## 1. Introducción
 
-Este documento describe el **módulo Terraform** bajo
-`terraform/aplicacion-medica/terraform/`, que crea una **máquina virtual QEMU** en
+Este documento describe el **módulo Terraform** en la subcarpeta **`terraform/`**
+(junto a este informe en el paquete de entrega; en el monorepo del curso:
+`terraform/aplicacion-medica/terraform/`), que crea una **máquina virtual QEMU** en
 **Proxmox** para alojar el despliegue Docker del proyecto **Aplicación Médica**
 (backend Flask, WAF, servicios opcionales como DefectDojo, etc.). Sigue el mismo
 criterio que el ejemplo docente `terraform/jenkins/`, pero **sin `vmid` fijo** en el
@@ -22,9 +37,7 @@ código (Proxmox asigna el siguiente ID libre).
 A continuación se detalla **qué aplica `terraform apply` en el hipervisor**, cómo se
 eligen **RAM, CPU y disco** (`deployment_mode` y `locals.tf`), qué variables existen y
 cómo validar la configuración. La instalación de **Docker** y **`docker compose`** en
-la VM corresponde a **[Ansible.md](Ansible.md)**. Las capturas enlazadas en **§2.1** y
-**§5** deben guardarse en **`docs/terraform/img/`** (rutas relativas `img/…` desde
-este fichero).
+la VM corresponde a **[terraform/docs/Ansible.md](terraform/docs/Ansible.md)**.
 
 ### 1.1. Qué es Terraform (resumen operativo)
 
@@ -109,14 +122,16 @@ La siguiente figura ilustra que la VM existe en el hipervisor y que **memoria, C
 disco** coinciden con lo declarado (preset `deployment_mode` o overrides). Captura
 desde Proxmox (pestaña **Resumen** o **Hardware** de la VM).
 
-![Captura: VM en Proxmox con hardware visible](https://raw.githubusercontent.com/alejandroquinonesgamez/medical_register/dev/docs/terraform/img/proxmox-vm-hardware.png)
+![Captura: VM en Proxmox con hardware visible](https://raw.githubusercontent.com/alejandroquinonesgamez/medical_register/dev/terraform/aplicacion-medica/terraform/docs/img/proxmox-vm-hardware.png)
 
-### 2.2. `deployment_mode` y cálculo en `locals.tf`
+### 2.2. `deployment_mode` y cálculo en `locals.tf` (justificación de RAM y disco)
 
 | `deployment_mode` | Objetivo al combinar con Ansible | Preset si `vm_memory_mb = -1`, `vm_cores = 0`, `disk_size = ""` |
 |---|---|---|
 | **`full`** | Margen para **waf + web + perfil `defectdojo`** en la misma VM | **16384** MiB RAM, **6** vCPU, **80G** disco |
 | **`minimal`** | Solo **waf + web** sin DefectDojo | **8192** MiB RAM, **4** vCPU, **50G** disco |
+
+**Justificación:** el backend en contenedores comparte RAM con el **WAF (nginx + ModSecurity + CRS)**, la **API Gunicorn** y, en modo `full`, **DefectDojo** y dependencias (PostgreSQL/redis/nginx internos del stack), que son **muy sensibles** a memoria insuficiente (OOM, arranques lentos o fallidos). El disco debe albergar imágenes Docker, capas, volúmenes y logs de laboratorio; **80G** en `full` reduce fricción con pulls y datos de DefectDojo, y **50G** en `minimal` es suficiente si solo se despliega API+WAF.
 
 Si en `terraform.tfvars` fijas **`vm_memory_mb` ≥ 0**, **`vm_cores` > 0** o
 **`disk_size`** no vacío, **esos valores sustituyen al preset** (útil para cuotas del
@@ -162,8 +177,10 @@ y usando **IP y nombre de VM distintos** a la VM Jenkins para no solapar recurso
 
 ## 4. Flujo mínimo de uso
 
+Desde la **raíz del ZIP de entrega** (donde está este `Informe.md`):
+
 ```bash
-cd terraform/aplicacion-medica/terraform
+cd terraform
 cp terraform.tfvars.example terraform.tfvars
 # Editar: API, token, pool, storage, bridge, ipconfig, ci_*, ssh_key_file absoluto
 # deployment_mode = "full"   # ya viene en el ejemplo; "minimal" si solo API+WAF
@@ -174,7 +191,9 @@ terraform output effective_vm_sizing
 terraform output ansible_inventory_line
 ```
 
-Siguiente paso: inventario y playbook en **[Ansible.md](Ansible.md)**.
+En el **monorepo** del curso la ruta equivalente es `terraform/aplicacion-medica/terraform/`.
+
+Siguiente paso: inventario y playbook en **[terraform/docs/Ansible.md](terraform/docs/Ansible.md)**.
 
 ---
 
@@ -194,15 +213,20 @@ Siguiente paso: inventario y playbook en **[Ansible.md](Ansible.md)**.
 
 ### 5.2. Comandos
 
+**ZIP de entrega** (`cd terraform`):
+
 ```bash
-cd terraform/aplicacion-medica/terraform
+cd terraform
 terraform init -backend=false
 terraform validate
 ```
 
+**Monorepo** (`cd terraform/aplicacion-medica/terraform`).
+
 Con `terraform.tfvars` y red al hipervisor:
 
 ```bash
+cd terraform   # o la ruta larga en el monorepo
 terraform plan
 terraform apply
 terraform output -json effective_vm_sizing
@@ -214,9 +238,9 @@ Tras `terraform plan`, captura el resumen del plan (cambios o “no changes”).
 `apply`, muestra al menos **`vm_ip_address`** y **`effective_vm_sizing`** con
 `terraform output`.
 
-![Captura: salida de terraform plan](https://raw.githubusercontent.com/alejandroquinonesgamez/medical_register/dev/docs/terraform/img/terraform-plan.png)
+![Captura: salida de terraform plan](https://raw.githubusercontent.com/alejandroquinonesgamez/medical_register/dev/terraform/aplicacion-medica/terraform/docs/img/terraform-plan.png)
 
-![Captura: salida de terraform output (IP y sizing)](https://raw.githubusercontent.com/alejandroquinonesgamez/medical_register/dev/docs/terraform/img/terraform-output-vm.png)
+![Captura: salida de terraform output (IP y sizing)](https://raw.githubusercontent.com/alejandroquinonesgamez/medical_register/dev/terraform/aplicacion-medica/terraform/docs/img/terraform-output-vm.png)
 
 El script `terraform/aplicacion-medica/verify-local.sh` ejecuta `validate` y, si
 existe `terraform.tfvars`, también `plan` (contacta la API).
@@ -231,9 +255,7 @@ existe `terraform.tfvars`, también `plan` (contacta la API).
 | Estado | `terraform.tfstate` (local; sensible). | Sin estado; idempotencia por módulos. |
 | “Despliegue completo” app | Dimensiona con `deployment_mode` + perfiles vía doc. | `medical_compose_profiles` (ej. `defectdojo`). |
 
-Las capturas anteriores enlazan desde **§2.1** y **§5** (ficheros bajo
-**`docs/terraform/img/`**). La comprobación HTTP en **`:5001`** documenta el stack ya
-aprovisionado por Ansible (véase **[Ansible.md](Ansible.md)**).
+Las capturas anteriores enlazan desde **§2.1** y **§5** (imágenes servidas desde GitHub). La comprobación HTTP en **`:5001`** documenta el stack ya aprovisionado por Ansible (véase **[terraform/docs/Ansible.md](terraform/docs/Ansible.md)**).
 
 ---
 
