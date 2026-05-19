@@ -8,8 +8,6 @@
 
 **Centro**: IES Zaidín-Vergeles
 
-**Enunciado**: `docs/git_docs/PPS_git/proteccion-ramas.html` (Fernando Raya, 2026-04-20)
-
 > **Nota (evidencia)**: en `medical_register`, la rama `dev` exige el *status check* `build` (workflow *Build and Deploy Sphinx Docs*) antes de fusionar.
 
 ---
