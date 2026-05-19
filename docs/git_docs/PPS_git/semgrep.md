@@ -8,8 +8,6 @@
 
 **Centro**: IES Zaidín-Vergeles
 
-**Enunciado**: `docs/git_docs/PPS_git/semgrep.html` (Fernando Raya, 2026-04-22)
-
 ---
 
 ## Repositorios de este trabajo

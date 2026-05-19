@@ -8,8 +8,6 @@
 
 **Centro**: IES Zaidín-Vergeles
 
-**Enunciado**: `docs/git_docs/PPS_git/gitleaks.html` (Fernando Raya, 2026-04-20)
-
 ---
 
 ## Repositorios de este trabajo
