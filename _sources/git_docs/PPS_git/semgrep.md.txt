@@ -73,7 +73,7 @@ semgrep scan --config "p/python" --config "p/owasp-top-ten"
 
 Escaneo de `app/` con `--config auto` en este repositorio: **28 ficheros** rastreados por git, **456 reglas** ejecutadas, **9 findings** (todos blocking) en Python, JavaScript y HTML.
 
-![Escaneo auto en app/: 9 findings en 28 ficheros](../img/PPS_git/semgrep/scan-auto.png)
+![Escaneo auto en app/: 9 findings en 28 ficheros](https://raw.githubusercontent.com/alejandroquinonesgamez/medical_register/dev/docs/git_docs/img/PPS_git/semgrep/scan-auto.png)
 
 ---
 
@@ -83,9 +83,9 @@ Permiten ejecutar análisis **sin** montar infraestructura propia. Requieren con
 
 **Prueba en este trabajo**: cuenta en [semgrep.dev](https://semgrep.dev), proyecto **`alejandroquinonesgamez/medical_register`**, rama **`dev`**. Escaneo gestionado **Completed** (~2 min): **29 findings** (22 *Code*, 0 *Secrets*, 7 *Supply Chain*). Detalle de dependencias transitivas en `package-lock.json`:
 
-![Semgrep Cloud: escaneo completado en medical_register (rama dev)](../img/PPS_git/semgrep/cloud-proyecto.png)
+![Semgrep Cloud: escaneo completado en medical_register (rama dev)](https://raw.githubusercontent.com/alejandroquinonesgamez/medical_register/dev/docs/git_docs/img/PPS_git/semgrep/cloud-proyecto.png)
 
-![Semgrep Cloud: findings Supply Chain (package-lock.json)](../img/PPS_git/semgrep/cloud-proyecto2.png)
+![Semgrep Cloud: findings Supply Chain (package-lock.json)](https://raw.githubusercontent.com/alejandroquinonesgamez/medical_register/dev/docs/git_docs/img/PPS_git/semgrep/cloud-proyecto2.png)
 
 ---
 
@@ -171,7 +171,7 @@ jobs:
 
 En este trabajo el workflow corre en el PR `pps/semgrep-vuln-demo` (#1) con resultado **Success** (sin `SEMGREP_APP_TOKEN`; escaneo con reglas del repo):
 
-![GitHub Actions: workflow Semgrep en PR pps/semgrep-vuln-demo (Success)](../img/PPS_git/semgrep/action-verde.png)
+![GitHub Actions: workflow Semgrep en PR pps/semgrep-vuln-demo (Success)](https://raw.githubusercontent.com/alejandroquinonesgamez/medical_register/dev/docs/git_docs/img/PPS_git/semgrep/action-verde.png)
 
 > No se incluye captura de run en rojo en CI: la detección de la vulnerabilidad de prueba se documenta en CLI (`vuln-scan.png`, §7.1), suficiente frente al enunciado.
 
@@ -202,13 +202,13 @@ def buscar_usuario(conn: sqlite3.Connection, user_id: str) -> None:
 
 **Pack OWASP**: el enunciado cita `p/owasp-top-10`; en el registro vigente el id es `p/owasp-top-ten` (`p/owasp-top-10` → HTTP 404).
 
-![Demo SQLi: fichero y comando OWASP/Python en rama pps/semgrep-vuln-demo](../img/PPS_git/semgrep/deteccion-vuln.png)
+![Demo SQLi: fichero y comando OWASP/Python en rama pps/semgrep-vuln-demo](https://raw.githubusercontent.com/alejandroquinonesgamez/medical_register/dev/docs/git_docs/img/PPS_git/semgrep/deteccion-vuln.png)
 
 ```bash
 semgrep scan --config auto app/_semgrep_demo_vuln.py
 ```
 
-![Detección blocking: sqlalchemy-execute-raw-query en línea 7](../img/PPS_git/semgrep/vuln-scan.png)
+![Detección blocking: sqlalchemy-execute-raw-query en línea 7](https://raw.githubusercontent.com/alejandroquinonesgamez/medical_register/dev/docs/git_docs/img/PPS_git/semgrep/vuln-scan.png)
 
 ### 7.2. Regla personalizada y exclusiones
 

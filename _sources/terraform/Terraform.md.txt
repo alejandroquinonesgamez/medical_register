@@ -109,7 +109,7 @@ La siguiente figura ilustra que la VM existe en el hipervisor y que **memoria, C
 disco** coinciden con lo declarado (preset `deployment_mode` o overrides). Captura
 desde Proxmox (pestaña **Resumen** o **Hardware** de la VM).
 
-![Captura: VM en Proxmox con hardware visible](img/proxmox-vm-hardware.png)
+![Captura: VM en Proxmox con hardware visible](https://raw.githubusercontent.com/alejandroquinonesgamez/medical_register/dev/docs/terraform/img/proxmox-vm-hardware.png)
 
 ### 2.2. `deployment_mode` y cálculo en `locals.tf`
 
@@ -214,9 +214,9 @@ Tras `terraform plan`, captura el resumen del plan (cambios o “no changes”).
 `apply`, muestra al menos **`vm_ip_address`** y **`effective_vm_sizing`** con
 `terraform output`.
 
-![Captura: salida de terraform plan](img/terraform-plan.png)
+![Captura: salida de terraform plan](https://raw.githubusercontent.com/alejandroquinonesgamez/medical_register/dev/docs/terraform/img/terraform-plan.png)
 
-![Captura: salida de terraform output (IP y sizing)](img/terraform-output-vm.png)
+![Captura: salida de terraform output (IP y sizing)](https://raw.githubusercontent.com/alejandroquinonesgamez/medical_register/dev/docs/terraform/img/terraform-output-vm.png)
 
 El script `terraform/aplicacion-medica/verify-local.sh` ejecuta `validate` y, si
 existe `terraform.tfvars`, también `plan` (contacta la API).

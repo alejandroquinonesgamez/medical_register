@@ -352,15 +352,15 @@ semgrep<span class="w"> </span>scan<span class="w"> </span>--config<span class="
 <div><p>Los identificadores exactos de los packs en el registro pueden evolucionar; comprobar en <a class="reference external" href="https://semgrep.dev/r">Semgrep Registry</a>. El enunciado HTML cita <code class="docutils literal notranslate"><span class="pre">p/owasp-top-10</span></code>, pero en el registro actual el pack es <strong><code class="docutils literal notranslate"><span class="pre">p/owasp-top-ten</span></code></strong> (<a class="reference external" href="https://semgrep.dev/p/owasp-top-ten">OWASP Top Ten</a>); <code class="docutils literal notranslate"><span class="pre">p/owasp-top-10</span></code> devuelve HTTP 404.</p>
 </div></blockquote>
 <p>Escaneo de <code class="docutils literal notranslate"><span class="pre">app/</span></code> con <code class="docutils literal notranslate"><span class="pre">--config</span> <span class="pre">auto</span></code> en este repositorio: <strong>28 ficheros</strong> rastreados por git, <strong>456 reglas</strong> ejecutadas, <strong>9 findings</strong> (todos blocking) en Python, JavaScript y HTML.</p>
-<p><img alt="Escaneo auto en app/: 9 findings en 28 ficheros" src="../../_images/scan-auto.png" /></p>
+<p><img alt="Escaneo auto en app/: 9 findings en 28 ficheros" src="https://raw.githubusercontent.com/alejandroquinonesgamez/medical_register/dev/docs/git_docs/img/PPS_git/semgrep/scan-auto.png" /></p>
 </section>
 <hr class="docutils" />
 <section id="escaneos-gestionados-managed-scans">
 <h2>4. Escaneos gestionados (<em>managed scans</em>)<a class="headerlink" href="#escaneos-gestionados-managed-scans" title="Link to this heading">¶</a></h2>
 <p>Permiten ejecutar análisis <strong>sin</strong> montar infraestructura propia. Requieren conectar el repositorio (GitHub, GitLab, Bitbucket, Azure DevOps según el enunciado) y seguir el asistente de <strong>managed scans</strong> en la documentación enlazada.</p>
 <p><strong>Prueba en este trabajo</strong>: cuenta en <a class="reference external" href="https://semgrep.dev">semgrep.dev</a>, proyecto <strong><code class="docutils literal notranslate"><span class="pre">alejandroquinonesgamez/medical_register</span></code></strong>, rama <strong><code class="docutils literal notranslate"><span class="pre">dev</span></code></strong>. Escaneo gestionado <strong>Completed</strong> (~2 min): <strong>29 findings</strong> (22 <em>Code</em>, 0 <em>Secrets</em>, 7 <em>Supply Chain</em>). Detalle de dependencias transitivas en <code class="docutils literal notranslate"><span class="pre">package-lock.json</span></code>:</p>
-<p><img alt="Semgrep Cloud: escaneo completado en medical_register (rama dev)" src="../../_images/cloud-proyecto.png" /></p>
-<p><img alt="Semgrep Cloud: findings Supply Chain (package-lock.json)" src="../../_images/cloud-proyecto2.png" /></p>
+<p><img alt="Semgrep Cloud: escaneo completado en medical_register (rama dev)" src="https://raw.githubusercontent.com/alejandroquinonesgamez/medical_register/dev/docs/git_docs/img/PPS_git/semgrep/cloud-proyecto.png" /></p>
+<p><img alt="Semgrep Cloud: findings Supply Chain (package-lock.json)" src="https://raw.githubusercontent.com/alejandroquinonesgamez/medical_register/dev/docs/git_docs/img/PPS_git/semgrep/cloud-proyecto2.png" /></p>
 </section>
 <hr class="docutils" />
 <section id="regla-personalizada-de-ejemplo">
@@ -437,7 +437,7 @@ semgrep<span class="w"> </span>scan<span class="w"> </span>--config<span class="
 <li><p>Ajustar el <code class="docutils literal notranslate"><span class="pre">cron</span></code> a una hora aleatoria distinta para no concentrar carga.</p></li>
 </ol>
 <p>En este trabajo el workflow corre en el PR <code class="docutils literal notranslate"><span class="pre">pps/semgrep-vuln-demo</span></code> (#1) con resultado <strong>Success</strong> (sin <code class="docutils literal notranslate"><span class="pre">SEMGREP_APP_TOKEN</span></code>; escaneo con reglas del repo):</p>
-<p><img alt="GitHub Actions: workflow Semgrep en PR pps/semgrep-vuln-demo (Success)" src="../../_images/action-verde.png" /></p>
+<p><img alt="GitHub Actions: workflow Semgrep en PR pps/semgrep-vuln-demo (Success)" src="https://raw.githubusercontent.com/alejandroquinonesgamez/medical_register/dev/docs/git_docs/img/PPS_git/semgrep/action-verde.png" /></p>
 <blockquote>
 <div><p>No se incluye captura de run en rojo en CI: la detección de la vulnerabilidad de prueba se documenta en CLI (<code class="docutils literal notranslate"><span class="pre">vuln-scan.png</span></code>, §7.1), suficiente frente al enunciado.</p>
 </div></blockquote>
@@ -477,11 +477,11 @@ semgrep<span class="w"> </span>scan<span class="w"> </span>--config<span class="
 </table>
 </div>
 <p><strong>Pack OWASP</strong>: el enunciado cita <code class="docutils literal notranslate"><span class="pre">p/owasp-top-10</span></code>; en el registro vigente el id es <code class="docutils literal notranslate"><span class="pre">p/owasp-top-ten</span></code> (<code class="docutils literal notranslate"><span class="pre">p/owasp-top-10</span></code> → HTTP 404).</p>
-<p><img alt="Demo SQLi: fichero y comando OWASP/Python en rama pps/semgrep-vuln-demo" src="../../_images/deteccion-vuln.png" /></p>
+<p><img alt="Demo SQLi: fichero y comando OWASP/Python en rama pps/semgrep-vuln-demo" src="https://raw.githubusercontent.com/alejandroquinonesgamez/medical_register/dev/docs/git_docs/img/PPS_git/semgrep/deteccion-vuln.png" /></p>
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>semgrep<span class="w"> </span>scan<span class="w"> </span>--config<span class="w"> </span>auto<span class="w"> </span>app/_semgrep_demo_vuln.py
 </pre></div>
 </div>
-<p><img alt="Detección blocking: sqlalchemy-execute-raw-query en línea 7" src="../../_images/vuln-scan.png" /></p>
+<p><img alt="Detección blocking: sqlalchemy-execute-raw-query en línea 7" src="https://raw.githubusercontent.com/alejandroquinonesgamez/medical_register/dev/docs/git_docs/img/PPS_git/semgrep/vuln-scan.png" /></p>
 </section>
 <section id="regla-personalizada-y-exclusiones">
 <h3>7.2. Regla personalizada y exclusiones<a class="headerlink" href="#regla-personalizada-y-exclusiones" title="Link to this heading">¶</a></h3>

@@ -437,7 +437,7 @@ Por ejemplo, un Personal Access Token de GitHub con permisos mínimos y caducida
 <ol class="arabic">
 <li><p>En el repositorio: <strong>Settings → Advanced Security</strong> (o <em>Code security and analysis</em>).</p></li>
 <li><p>Activar <strong>Secret Protection</strong> y <strong>Push protection</strong> según <a class="reference external" href="https://docs.github.com/en/code-security/how-tos/secure-your-secrets/prevent-future-leaks/enabling-push-protection-for-your-repository">Enabling push protection for your repository</a>.</p>
-<p><img alt="Secret Protection y Push protection habilitados" src="../../_images/options-enabled.png" /></p>
+<p><img alt="Secret Protection y Push protection habilitados" src="https://raw.githubusercontent.com/alejandroquinonesgamez/medical_register/dev/docs/git_docs/img/PPS_git/github/options-enabled.png" /></p>
 </li>
 <li><p>Crear un <strong>PAT de prueba</strong> (caducidad 1 día) y un commit con el token en un fichero de demo.</p></li>
 <li><p><code class="docutils literal notranslate"><span class="pre">git</span> <span class="pre">push</span></code> debe ser <strong>rechazado</strong> (<code class="docutils literal notranslate"><span class="pre">GH013</span></code>, <em>Push cannot contain secrets</em>).</p></li>
@@ -480,7 +480,7 @@ git<span class="w"> </span>push<span class="w"> </span>-u<span class="w"> </span
 </pre></div>
 </div>
 <p>Resultado esperado en terminal: <code class="docutils literal notranslate"><span class="pre">GH013</span></code>, <em>GITHUB PUSH PROTECTION</em>, <em>GitHub Personal Access Token</em>, ruta <code class="docutils literal notranslate"><span class="pre">docs/git_docs/PPS_git/_demo_github/leak.txt</span></code>.</p>
-<p><img alt="Push rechazado por GitHub Push Protection (GH013)" src="../../_images/push-rejected.png" /></p>
+<p><img alt="Push rechazado por GitHub Push Protection (GH013)" src="https://raw.githubusercontent.com/alejandroquinonesgamez/medical_register/dev/docs/git_docs/img/PPS_git/github/push-rejected.png" /></p>
 <p>Repositorio de la prueba: <strong><code class="docutils literal notranslate"><span class="pre">alejandroquinonesgamez/medical_register</span></code></strong>. Rama: <code class="docutils literal notranslate"><span class="pre">pps/github-push-protection-demo</span></code>.</p>
 <p>GitHub impidió que el PAT entrara en el historial remoto (<strong>GH013</strong>). La remediación correcta es <strong>revocar</strong> el token de prueba (aunque el push fallara) y no confiar en borrar el fichero local sin rotación.</p>
 <p>Con <em>push protection</em> activo el secreto <strong>no llega al remoto</strong>, por lo que <strong>no</strong> suele generarse alerta en <em>Secret scanning</em>. No se aportan capturas <code class="docutils literal notranslate"><span class="pre">alerta-abierta</span></code> / <code class="docutils literal notranslate"><span class="pre">alerta-cerrada</span></code>: la evidencia del control es la configuración (paso 2) y el rechazo del push. El PAT de prueba usado en la demo <strong>caducó o fue revocado</strong> tras el ejercicio.</p>

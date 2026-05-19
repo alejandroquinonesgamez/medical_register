@@ -481,7 +481,7 @@ VM, <strong>no</strong> copia el repositorio de la aplicación y <strong>no</str
 <p>La siguiente figura ilustra que la VM existe en el hipervisor y que <strong>memoria, CPU y
 disco</strong> coinciden con lo declarado (preset <code class="docutils literal notranslate"><span class="pre">deployment_mode</span></code> o overrides). Captura
 desde Proxmox (pestaña <strong>Resumen</strong> o <strong>Hardware</strong> de la VM).</p>
-<p><img alt="Captura: VM en Proxmox con hardware visible" src="../_images/proxmox-vm-hardware.png" /></p>
+<p><img alt="Captura: VM en Proxmox con hardware visible" src="https://raw.githubusercontent.com/alejandroquinonesgamez/medical_register/dev/docs/terraform/img/proxmox-vm-hardware.png" /></p>
 </section>
 </section>
 <section id="deployment-mode-y-calculo-en-locals-tf">
@@ -657,8 +657,8 @@ terraform<span class="w"> </span>output<span class="w"> </span>-json<span class=
 <p>Tras <code class="docutils literal notranslate"><span class="pre">terraform</span> <span class="pre">plan</span></code>, captura el resumen del plan (cambios o “no changes”). Tras
 <code class="docutils literal notranslate"><span class="pre">apply</span></code>, muestra al menos <strong><code class="docutils literal notranslate"><span class="pre">vm_ip_address</span></code></strong> y <strong><code class="docutils literal notranslate"><span class="pre">effective_vm_sizing</span></code></strong> con
 <code class="docutils literal notranslate"><span class="pre">terraform</span> <span class="pre">output</span></code>.</p>
-<p><img alt="Captura: salida de terraform plan" src="../_images/terraform-plan.png" /></p>
-<p><img alt="Captura: salida de terraform output (IP y sizing)" src="../_images/terraform-output-vm.png" /></p>
+<p><img alt="Captura: salida de terraform plan" src="https://raw.githubusercontent.com/alejandroquinonesgamez/medical_register/dev/docs/terraform/img/terraform-plan.png" /></p>
+<p><img alt="Captura: salida de terraform output (IP y sizing)" src="https://raw.githubusercontent.com/alejandroquinonesgamez/medical_register/dev/docs/terraform/img/terraform-output-vm.png" /></p>
 <p>El script <code class="docutils literal notranslate"><span class="pre">terraform/aplicacion-medica/verify-local.sh</span></code> ejecuta <code class="docutils literal notranslate"><span class="pre">validate</span></code> y, si
 existe <code class="docutils literal notranslate"><span class="pre">terraform.tfvars</span></code>, también <code class="docutils literal notranslate"><span class="pre">plan</span></code> (contacta la API).</p>
 </section>

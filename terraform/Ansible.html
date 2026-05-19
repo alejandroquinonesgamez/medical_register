@@ -458,7 +458,7 @@ servicios <strong>sin</strong> <code class="docutils literal notranslate"><span 
 <p>Con el playbook terminado y los contenedores en marcha, abre en el navegador del PC
 de prácticas <code class="docutils literal notranslate"><span class="pre">http://&lt;IP_VM&gt;:5001/</span></code> (sustituye <code class="docutils literal notranslate"><span class="pre">&lt;IP_VM&gt;</span></code> por la salida de
 <code class="docutils literal notranslate"><span class="pre">terraform</span> <span class="pre">output</span> <span class="pre">vm_ip_address</span></code>).</p>
-<p><img alt="Captura: navegador en el puerto 5001 (API vía WAF)" src="terraform/img/navegador-api-5001.png" /></p>
+<p><img alt="Captura: navegador en el puerto 5001 (API vía WAF)" src="https://raw.githubusercontent.com/alejandroquinonesgamez/medical_register/dev/docs/terraform/img/navegador-api-5001.png" /></p>
 </section>
 </section>
 <section id="datos-y-env">
@@ -545,7 +545,7 @@ redimensionar o aplicar un nuevo <code class="docutils literal notranslate"><spa
 <strong><code class="docutils literal notranslate"><span class="pre">http://&lt;IP_VM&gt;:8080/</span></code></strong> (nginx de DefectDojo). Si no
 usáis ese perfil, podéis <strong>no</strong> generar esta imagen (el enlace quedará vacío en el
 visor Markdown hasta que exista el fichero).</p>
-<p><img alt="Captura: DefectDojo en el puerto 8080" src="terraform/img/navegador-defectdojo-8080.png" /></p>
+<p><img alt="Captura: DefectDojo en el puerto 8080" src="https://raw.githubusercontent.com/alejandroquinonesgamez/medical_register/dev/docs/terraform/img/navegador-defectdojo-8080.png" /></p>
 </section>
 </section>
 </section>
@@ -735,8 +735,8 @@ ansible-playbook<span class="w"> </span>site.yml<span class="w"> </span>-i<span 
 <h3>Evidencia sugerida: conectividad Ansible y recap del playbook<a class="headerlink" href="#evidencia-sugerida-conectividad-ansible-y-recap-del-playbook" title="Link to this heading">¶</a></h3>
 <p>Ejecuta <strong><code class="docutils literal notranslate"><span class="pre">ansible</span> <span class="pre">medical</span> <span class="pre">-m</span> <span class="pre">ping</span></code></strong> y <strong><code class="docutils literal notranslate"><span class="pre">ansible-playbook</span></code></strong> como arriba; captura
 <strong>éxito en ping</strong> y el bloque <strong>PLAY RECAP</strong> con <code class="docutils literal notranslate"><span class="pre">failed=0</span></code>.</p>
-<p><img alt="Captura: ansible ping al grupo medical" src="terraform/img/ansible-ping-ok.png" /></p>
-<p><img alt="Captura: PLAY RECAP del site.yml" src="terraform/img/ansible-playbook-recap.png" /></p>
+<p><img alt="Captura: ansible ping al grupo medical" src="https://raw.githubusercontent.com/alejandroquinonesgamez/medical_register/dev/docs/terraform/img/ansible-ping-ok.png" /></p>
+<p><img alt="Captura: PLAY RECAP del site.yml" src="https://raw.githubusercontent.com/alejandroquinonesgamez/medical_register/dev/docs/terraform/img/ansible-playbook-recap.png" /></p>
 <p>Más detalle operativo: <code class="docutils literal notranslate"><span class="pre">terraform/aplicacion-medica/README.md</span></code>.</p>
 </section>
 </section>
@@ -801,8 +801,8 @@ el puerto <strong>5001</strong> del host (servicio <code class="docutils literal
 <h3>Evidencia sugerida: estado de contenedores y código HTTP<a class="headerlink" href="#evidencia-sugerida-estado-de-contenedores-y-codigo-http" title="Link to this heading">¶</a></h3>
 <p>En la misma sesión SSH (o con <code class="docutils literal notranslate"><span class="pre">ansible</span> <span class="pre">medical</span> <span class="pre">-m</span> <span class="pre">shell</span></code>), deja visible el listado de
 <strong><code class="docutils literal notranslate"><span class="pre">docker</span> <span class="pre">compose</span> <span class="pre">ps</span></code></strong> y la línea de <strong><code class="docutils literal notranslate"><span class="pre">curl</span></code></strong> con <strong><code class="docutils literal notranslate"><span class="pre">HTTP:200</span></code></strong>.</p>
-<p><img alt="Captura: docker compose ps (web y waf)" src="terraform/img/docker-ps-waf-web.png" /></p>
-<p><img alt="Captura: curl HTTP 200 en el puerto 5001" src="terraform/img/curl-api-5001.png" /></p>
+<p><img alt="Captura: docker compose ps (web y waf)" src="https://raw.githubusercontent.com/alejandroquinonesgamez/medical_register/dev/docs/terraform/img/docker-ps-waf-web.png" /></p>
+<p><img alt="Captura: curl HTTP 200 en el puerto 5001" src="https://raw.githubusercontent.com/alejandroquinonesgamez/medical_register/dev/docs/terraform/img/curl-api-5001.png" /></p>
 <hr class="docutils" />
 <p><strong>Autores</strong>: Alejandro Quiñones Gámez &amp; Adrián Bertos Gómez</p>
 <p><strong>Asignatura</strong>: PPS — Puesta a Producción Segura</p>

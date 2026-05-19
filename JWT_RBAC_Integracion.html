@@ -576,49 +576,49 @@
 <section id="registro-del-primer-usuario-admin-automatico">
 <h3>3.1 Registro del primer usuario (admin automático)<a class="headerlink" href="#registro-del-primer-usuario-admin-automatico" title="Link to this heading">¶</a></h3>
 <p>Al registrar el primer usuario (<code class="docutils literal notranslate"><span class="pre">firstuser</span></code>), el servidor detecta que no hay usuarios en la BD y le asigna automáticamente el rol <code class="docutils literal notranslate"><span class="pre">admin</span></code>:</p>
-<p><img alt="Registro del primer usuario con rol admin" src="_images/registro-usuario-1.png" /></p>
+<p><img alt="Registro del primer usuario con rol admin" src="https://raw.githubusercontent.com/alejandroquinonesgamez/medical_register/dev/docs/capturas/registro-usuario-1.png" /></p>
 <p>Se observa que la respuesta incluye <code class="docutils literal notranslate"><span class="pre">&quot;role&quot;:</span> <span class="pre">&quot;admin&quot;</span></code> y <code class="docutils literal notranslate"><span class="pre">&quot;user_id&quot;:</span> <span class="pre">1</span></code>.</p>
 </section>
 <section id="registro-de-un-segundo-usuario-rol-user">
 <h3>3.2 Registro de un segundo usuario (rol user)<a class="headerlink" href="#registro-de-un-segundo-usuario-rol-user" title="Link to this heading">¶</a></h3>
 <p>Al registrar un segundo usuario (<code class="docutils literal notranslate"><span class="pre">alejandro</span></code>), al existir ya un usuario en la BD, se le asigna el rol <code class="docutils literal notranslate"><span class="pre">user</span></code>:</p>
-<p><img alt="Registro del segundo usuario con rol user" src="_images/registro-usuario-estandar.png" /></p>
+<p><img alt="Registro del segundo usuario con rol user" src="https://raw.githubusercontent.com/alejandroquinonesgamez/medical_register/dev/docs/capturas/registro-usuario-estandar.png" /></p>
 <p>Se observa que la respuesta incluye <code class="docutils literal notranslate"><span class="pre">&quot;role&quot;:</span> <span class="pre">&quot;user&quot;</span></code> y <code class="docutils literal notranslate"><span class="pre">&quot;user_id&quot;:</span> <span class="pre">2</span></code>.</p>
 </section>
 <section id="acceso-denegado-por-rol-insuficiente-403-forbidden">
 <h3>3.3 Acceso denegado por rol insuficiente (403 Forbidden)<a class="headerlink" href="#acceso-denegado-por-rol-insuficiente-403-forbidden" title="Link to this heading">¶</a></h3>
 <p>El usuario <code class="docutils literal notranslate"><span class="pre">alejandro</span></code> (rol <code class="docutils literal notranslate"><span class="pre">user</span></code>) obtiene un access token e intenta acceder a la ruta de administración <code class="docutils literal notranslate"><span class="pre">/api/wstg/status</span></code>. El middleware <code class="docutils literal notranslate"><span class="pre">require_role(&quot;admin&quot;)</span></code> deniega el acceso:</p>
-<p><img alt="Acceso denegado con error de permisos" src="_images/acceso-restringido.png" /></p>
+<p><img alt="Acceso denegado con error de permisos" src="https://raw.githubusercontent.com/alejandroquinonesgamez/medical_register/dev/docs/capturas/acceso-restringido.png" /></p>
 <p>La respuesta muestra <code class="docutils literal notranslate"><span class="pre">&quot;error&quot;:</span> <span class="pre">&quot;No</span> <span class="pre">tienes</span> <span class="pre">permisos</span> <span class="pre">para</span> <span class="pre">realizar</span> <span class="pre">esta</span> <span class="pre">acción&quot;</span></code>.</p>
 <p>Con la opción <code class="docutils literal notranslate"><span class="pre">-i</span></code> de curl, se puede verificar el código HTTP <strong>403 FORBIDDEN</strong> en las cabeceras de respuesta:</p>
-<p><img alt="Respuesta HTTP 403 FORBIDDEN con cabeceras" src="_images/acceso-restringido-403.png" /></p>
+<p><img alt="Respuesta HTTP 403 FORBIDDEN con cabeceras" src="https://raw.githubusercontent.com/alejandroquinonesgamez/medical_register/dev/docs/capturas/acceso-restringido-403.png" /></p>
 </section>
 <section id="token-expirado-401-unauthorized">
 <h3>3.4 Token expirado (401 Unauthorized)<a class="headerlink" href="#token-expirado-401-unauthorized" title="Link to this heading">¶</a></h3>
 <p>Cuando un access token expira (tras 15 minutos), el servidor responde con <strong>401 UNAUTHORIZED</strong> y el mensaje <code class="docutils literal notranslate"><span class="pre">&quot;Token</span> <span class="pre">expirado&quot;</span></code>. Esto demuestra que la validación de expiración funciona correctamente:</p>
-<p><img alt="Respuesta 401 con token expirado" src="_images/acceso-no-autorizado-token-expirado.png" /></p>
+<p><img alt="Respuesta 401 con token expirado" src="https://raw.githubusercontent.com/alejandroquinonesgamez/medical_register/dev/docs/capturas/acceso-no-autorizado-token-expirado.png" /></p>
 </section>
 <section id="acceso-autorizado-con-rol-admin-200-ok">
 <h3>3.5 Acceso autorizado con rol admin (200 OK)<a class="headerlink" href="#acceso-autorizado-con-rol-admin-200-ok" title="Link to this heading">¶</a></h3>
 <p>El usuario <code class="docutils literal notranslate"><span class="pre">firstuser</span></code> (rol <code class="docutils literal notranslate"><span class="pre">admin</span></code>) obtiene un nuevo access token y accede a la misma ruta <code class="docutils literal notranslate"><span class="pre">/api/wstg/status</span></code>. El middleware <code class="docutils literal notranslate"><span class="pre">require_role(&quot;admin&quot;)</span></code> permite el acceso y devuelve <strong>200 OK</strong>:</p>
-<p><img alt="Acceso autorizado para admin con 200 OK" src="_images/acceso-autorizado.png" /></p>
+<p><img alt="Acceso autorizado para admin con 200 OK" src="https://raw.githubusercontent.com/alejandroquinonesgamez/medical_register/dev/docs/capturas/acceso-autorizado.png" /></p>
 </section>
 <section id="admin-cambia-el-rol-de-un-usuario">
 <h3>3.6 Admin cambia el rol de un usuario<a class="headerlink" href="#admin-cambia-el-rol-de-un-usuario" title="Link to this heading">¶</a></h3>
 <p>El admin (<code class="docutils literal notranslate"><span class="pre">firstuser</span></code>) promueve al usuario <code class="docutils literal notranslate"><span class="pre">alejandro</span></code> (user_id: 2) al rol <code class="docutils literal notranslate"><span class="pre">admin</span></code> mediante <code class="docutils literal notranslate"><span class="pre">PUT</span> <span class="pre">/api/admin/users/2/role</span></code>:</p>
-<p><img alt="Cambio de rol de user a admin" src="_images/cambio-de-rol.png" /></p>
+<p><img alt="Cambio de rol de user a admin" src="https://raw.githubusercontent.com/alejandroquinonesgamez/medical_register/dev/docs/capturas/cambio-de-rol.png" /></p>
 <p>La respuesta confirma: <code class="docutils literal notranslate"><span class="pre">&quot;Rol</span> <span class="pre">de</span> <span class="pre">'alejandro'</span> <span class="pre">actualizado</span> <span class="pre">a</span> <span class="pre">'admin'&quot;</span></code>.</p>
 </section>
 <section id="verificacion-del-cambio-de-rol">
 <h3>3.7 Verificación del cambio de rol<a class="headerlink" href="#verificacion-del-cambio-de-rol" title="Link to this heading">¶</a></h3>
 <p>Tras el cambio de rol, <code class="docutils literal notranslate"><span class="pre">alejandro</span></code> obtiene un nuevo access token (que ahora contiene <code class="docutils literal notranslate"><span class="pre">&quot;role&quot;:</span> <span class="pre">&quot;admin&quot;</span></code> en el JWT) y accede a la ruta <code class="docutils literal notranslate"><span class="pre">/api/wstg/status</span></code> que antes le denegaba. Ahora recibe <strong>200 OK</strong>:</p>
-<p><img alt="Acceso permitido tras cambio de rol" src="_images/suplantacion-token-acceso-user.png" /></p>
+<p><img alt="Acceso permitido tras cambio de rol" src="https://raw.githubusercontent.com/alejandroquinonesgamez/medical_register/dev/docs/capturas/suplantacion-token-acceso-user.png" /></p>
 <p>Esto demuestra que el sistema RBAC es dinámico: al cambiar el rol en la BD, el siguiente token emitido refleja el nuevo rol.</p>
 </section>
 <section id="tests-automatizados-225-pasados">
 <h3>3.8 Tests automatizados (225 pasados)<a class="headerlink" href="#tests-automatizados-225-pasados" title="Link to this heading">¶</a></h3>
 <p>Se ejecutan 225 tests automatizados que cubren JWT, RBAC, validación de datos y lógica de negocio. Los 3 skipped corresponden a SQLCipher (no disponible en el entorno de test local):</p>
-<p><img alt="225 tests pasados, 3 skipped" src="_images/Tests.png" /></p>
+<p><img alt="225 tests pasados, 3 skipped" src="https://raw.githubusercontent.com/alejandroquinonesgamez/medical_register/dev/docs/capturas/Tests.png" /></p>
 </section>
 </section>
 <hr class="docutils" />

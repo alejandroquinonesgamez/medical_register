@@ -97,7 +97,7 @@ jobs:
 4. Documentar captura del log y el listado de hallazgos.  
 5. Borrar el secreto del commit (`git rm` de `_demo_gitleaks/`) y volver a ejecutar CI hasta obtener el check en verde.
 
-![Run gitleaks: detección de secreto (fallo esperado, regla `github-pat`)](../img/PPS_git/gitleaks/action-fallo.png)
+![Run gitleaks: detección de secreto (fallo esperado, regla `github-pat`)](https://raw.githubusercontent.com/alejandroquinonesgamez/medical_register/dev/docs/git_docs/img/PPS_git/gitleaks/action-fallo.png)
 
 ---
 
@@ -178,13 +178,13 @@ Rama de trabajo de la práctica: `pps/gitleaks-setup` → PR a `dev`.
 
 Tras integrar el workflow, el PR inicial muestra el check **gitleaks** en verde (sin secreto en el diff):
 
-![PR: check gitleaks en verde](../img/PPS_git/gitleaks/action-verde-setup.png)
+![PR: check gitleaks en verde](https://raw.githubusercontent.com/alejandroquinonesgamez/medical_register/dev/docs/git_docs/img/PPS_git/gitleaks/action-verde-setup.png)
 
-![Run gitleaks: sin fugas](../img/PPS_git/gitleaks/action-verde-setup-detail.png)
+![Run gitleaks: sin fugas](https://raw.githubusercontent.com/alejandroquinonesgamez/medical_register/dev/docs/git_docs/img/PPS_git/gitleaks/action-verde-setup-detail.png)
 
 Tras la prueba negativa del §4.1 y la limpieza (`git rm` de `_demo_gitleaks/`), el pipeline vuelve a verde:
 
-![Run gitleaks tras limpiar demo (sin fugas)](../img/PPS_git/gitleaks/action-ok-tras-limpieza.png)
+![Run gitleaks tras limpiar demo (sin fugas)](https://raw.githubusercontent.com/alejandroquinonesgamez/medical_register/dev/docs/git_docs/img/PPS_git/gitleaks/action-ok-tras-limpieza.png)
 
 **Flujo documentado**: integración en CI → prueba negativa (fallo en §4.1) → limpieza y revocación de credenciales de prueba si se usó un PAT real.
 

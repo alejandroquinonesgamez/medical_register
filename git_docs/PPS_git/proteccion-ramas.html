@@ -372,9 +372,9 @@ git<span class="w"> </span>push<span class="w"> </span>origin<span class="w"> </
 <li><p><strong>Lock branch</strong> solo en situaciones excepcionales (congelación de release).</p></li>
 </ul>
 <p>En <strong><code class="docutils literal notranslate"><span class="pre">medical_register</span></code></strong> (backend) se configuró la regla sobre la rama <strong><code class="docutils literal notranslate"><span class="pre">dev</span></code></strong>: PR obligatorio, aprobaciones y <em>status check</em> <strong><code class="docutils literal notranslate"><span class="pre">build</span></code></strong> (<em>Build and Deploy Sphinx Docs</em>):</p>
-<p><img alt="Regla de protección en dev (1/3)" src="../../_images/regla-backend-dev1.png" /></p>
-<p><img alt="Regla de protección en dev (2/3)" src="../../_images/regla-backend-dev2.png" /></p>
-<p><img alt="Regla de protección en dev (3/3)" src="../../_images/regla-backend-dev3.png" /></p>
+<p><img alt="Regla de protección en dev (1/3)" src="https://raw.githubusercontent.com/alejandroquinonesgamez/medical_register/dev/docs/git_docs/img/PPS_git/proteccion-ramas/regla-backend-dev1.png" /></p>
+<p><img alt="Regla de protección en dev (2/3)" src="https://raw.githubusercontent.com/alejandroquinonesgamez/medical_register/dev/docs/git_docs/img/PPS_git/proteccion-ramas/regla-backend-dev2.png" /></p>
+<p><img alt="Regla de protección en dev (3/3)" src="https://raw.githubusercontent.com/alejandroquinonesgamez/medical_register/dev/docs/git_docs/img/PPS_git/proteccion-ramas/regla-backend-dev3.png" /></p>
 </section>
 <section id="como-documentar-el-funcionamiento">
 <h3>3.3. Cómo documentar el funcionamiento<a class="headerlink" href="#como-documentar-el-funcionamiento" title="Link to this heading">¶</a></h3>
@@ -390,15 +390,15 @@ git<span class="w"> </span>push<span class="w"> </span>origin<span class="w"> </
 </div>
 <p>Resultado esperado: <code class="docutils literal notranslate"><span class="pre">remote:</span> <span class="pre">error:</span> <span class="pre">GH006:</span> <span class="pre">Protected</span> <span class="pre">branch</span> <span class="pre">update</span> <span class="pre">failed...</span></code> o mensaje equivalente de GitHub indicando que la rama está protegida.</p>
 <p>En <strong><code class="docutils literal notranslate"><span class="pre">medical_register_apk</span></code></strong> (rama <strong><code class="docutils literal notranslate"><span class="pre">main</span></code></strong> protegida):</p>
-<p><img alt="Push a main rechazado por rama protegida" src="../../_images/push-rechazado-android.png" /></p>
+<p><img alt="Push a main rechazado por rama protegida" src="https://raw.githubusercontent.com/alejandroquinonesgamez/medical_register/dev/docs/git_docs/img/PPS_git/proteccion-ramas/push-rechazado-android.png" /></p>
 <blockquote>
 <div><p>Si en algún momento el push directo a <code class="docutils literal notranslate"><span class="pre">main</span></code> fue aceptado (antes de activar la regla o con bypass), puede quedar <code class="docutils literal notranslate"><span class="pre">push-aceptado-android.png</span></code> como contraste; la evidencia principal es el <strong>rechazo</strong> con la regla activa.</p>
 </div></blockquote>
-<p><img alt="Push a main aceptado (referencia / antes de protección o sin regla)" src="../../_images/push-aceptado-android.png" /></p>
+<p><img alt="Push a main aceptado (referencia / antes de protección o sin regla)" src="https://raw.githubusercontent.com/alejandroquinonesgamez/medical_register/dev/docs/git_docs/img/PPS_git/proteccion-ramas/push-aceptado-android.png" /></p>
 </li>
 <li><p><strong>Flujo correcto</strong>: crear rama, abrir PR hacia la rama protegida, esperar checks verdes y aprobación, fusionar desde la UI (o con <em>merge queue</em> si aplica).</p>
 <p>Pull Request hacia <strong><code class="docutils literal notranslate"><span class="pre">dev</span></code></strong> en el backend: el job <strong><code class="docutils literal notranslate"><span class="pre">build</span></code></strong> aparece en verde en <strong>Checks</strong>:</p>
-<p><img alt="Checks del PR: job build en verde" src="../../_images/pr-checks-build.png" /></p>
+<p><img alt="Checks del PR: job build en verde" src="https://raw.githubusercontent.com/alejandroquinonesgamez/medical_register/dev/docs/git_docs/img/PPS_git/proteccion-ramas/pr-checks-build.png" /></p>
 <p>No se incluyen capturas dedicadas de PR bloqueado / listo para merge: la evidencia del enunciado queda cubierta con la regla en <code class="docutils literal notranslate"><span class="pre">dev</span></code> (§3.2), el check <strong><code class="docutils literal notranslate"><span class="pre">build</span></code></strong> en PR y el push directo bloqueado en Android.</p>
 </li>
 </ol>

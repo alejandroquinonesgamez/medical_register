@@ -116,7 +116,7 @@ Con el playbook terminado y los contenedores en marcha, abre en el navegador del
 de prácticas `http://<IP_VM>:5001/` (sustituye `<IP_VM>` por la salida de
 `terraform output vm_ip_address`).
 
-![Captura: navegador en el puerto 5001 (API vía WAF)](img/navegador-api-5001.png)
+![Captura: navegador en el puerto 5001 (API vía WAF)](https://raw.githubusercontent.com/alejandroquinonesgamez/medical_register/dev/docs/terraform/img/navegador-api-5001.png)
 
 ### 2.3. Datos y `.env`
 
@@ -174,7 +174,7 @@ Si levantaste el perfil **`defectdojo`**, la interfaz web del stack suele estar 
 usáis ese perfil, podéis **no** generar esta imagen (el enlace quedará vacío en el
 visor Markdown hasta que exista el fichero).
 
-![Captura: DefectDojo en el puerto 8080](img/navegador-defectdojo-8080.png)
+![Captura: DefectDojo en el puerto 8080](https://raw.githubusercontent.com/alejandroquinonesgamez/medical_register/dev/docs/terraform/img/navegador-defectdojo-8080.png)
 
 ---
 
@@ -268,9 +268,9 @@ ansible-playbook site.yml -i inventory.ini -e @extra_vars.yml
 Ejecuta **`ansible medical -m ping`** y **`ansible-playbook`** como arriba; captura
 **éxito en ping** y el bloque **PLAY RECAP** con `failed=0`.
 
-![Captura: ansible ping al grupo medical](img/ansible-ping-ok.png)
+![Captura: ansible ping al grupo medical](https://raw.githubusercontent.com/alejandroquinonesgamez/medical_register/dev/docs/terraform/img/ansible-ping-ok.png)
 
-![Captura: PLAY RECAP del site.yml](img/ansible-playbook-recap.png)
+![Captura: PLAY RECAP del site.yml](https://raw.githubusercontent.com/alejandroquinonesgamez/medical_register/dev/docs/terraform/img/ansible-playbook-recap.png)
 
 Más detalle operativo: `terraform/aplicacion-medica/README.md`.
 
@@ -341,9 +341,9 @@ el puerto **5001** del host (servicio `waf`).
 En la misma sesión SSH (o con `ansible medical -m shell`), deja visible el listado de
 **`docker compose ps`** y la línea de **`curl`** con **`HTTP:200`**.
 
-![Captura: docker compose ps (web y waf)](img/docker-ps-waf-web.png)
+![Captura: docker compose ps (web y waf)](https://raw.githubusercontent.com/alejandroquinonesgamez/medical_register/dev/docs/terraform/img/docker-ps-waf-web.png)
 
-![Captura: curl HTTP 200 en el puerto 5001](img/curl-api-5001.png)
+![Captura: curl HTTP 200 en el puerto 5001](https://raw.githubusercontent.com/alejandroquinonesgamez/medical_register/dev/docs/terraform/img/curl-api-5001.png)
 
 ---
 

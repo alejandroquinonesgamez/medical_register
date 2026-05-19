@@ -139,7 +139,7 @@ Cada bypass genera **registro** para administración: alertas en **Security → 
 1. En el repositorio: **Settings → Advanced Security** (o *Code security and analysis*).  
 2. Activar **Secret Protection** y **Push protection** según [Enabling push protection for your repository](https://docs.github.com/en/code-security/how-tos/secure-your-secrets/prevent-future-leaks/enabling-push-protection-for-your-repository).
 
-   ![Secret Protection y Push protection habilitados](../img/PPS_git/github/options-enabled.png)
+   ![Secret Protection y Push protection habilitados](https://raw.githubusercontent.com/alejandroquinonesgamez/medical_register/dev/docs/git_docs/img/PPS_git/github/options-enabled.png)
 
 3. Crear un **PAT de prueba** (caducidad 1 día) y un commit con el token en un fichero de demo.  
 4. `git push` debe ser **rechazado** (`GH013`, *Push cannot contain secrets*).  
@@ -173,7 +173,7 @@ git push -u origin pps/github-push-protection-demo
 
 Resultado esperado en terminal: `GH013`, *GITHUB PUSH PROTECTION*, *GitHub Personal Access Token*, ruta `docs/git_docs/PPS_git/_demo_github/leak.txt`.
 
-![Push rechazado por GitHub Push Protection (GH013)](../img/PPS_git/github/push-rejected.png)
+![Push rechazado por GitHub Push Protection (GH013)](https://raw.githubusercontent.com/alejandroquinonesgamez/medical_register/dev/docs/git_docs/img/PPS_git/github/push-rejected.png)
 
 Repositorio de la prueba: **`alejandroquinonesgamez/medical_register`**. Rama: `pps/github-push-protection-demo`.
 
