@@ -12,17 +12,17 @@
 
 ---
 
-## Repositorios de este trabajo (espacio de trabajo PPS)
+## Repositorios de este trabajo
 
-| Proyecto | Ruta local | Remoto `origin` (SSH) | Rama habitual |
+| Proyecto | Repositorio GitHub | Remoto `origin` (SSH) | Rama habitual |
 |---|---|---|---|
-| Cliente Android | `/home/alejandro/DriveLocal/alejandro/Ciberseguridad/PPS - Puesta a Producción Segura/medical_register_android` | `git@github.com:alejandroquinonesgamez/medical_register_apk.git` | `main` |
-| Backend | `/home/alejandro/DriveLocal/alejandro/Ciberseguridad/PPS - Puesta a Producción Segura/Aplicación Médica` | `git@github.com:alejandroquinonesgamez/medical_register.git` | `dev` |
+| Cliente Android | [medical_register_apk](https://github.com/alejandroquinonesgamez/medical_register_apk) | `git@github.com:alejandroquinonesgamez/medical_register_apk.git` | `main` |
+| Backend | [medical_register](https://github.com/alejandroquinonesgamez/medical_register) | `git@github.com:alejandroquinonesgamez/medical_register.git` | `dev` |
 
-El workflow de ejemplo del §4 conviene añadirlo en el repo donde tengáis CI (normalmente el **backend**). Escaneo local: ejecutar `gitleaks detect` desde la raíz de cada clone tras `cd` a la ruta correspondiente.
+El workflow de ejemplo del §4 conviene añadirlo en el repo donde tengáis CI (normalmente el **backend**). Escaneo local: ejecutar `gitleaks detect` desde la raíz del clone.
 
 ```bash
-cd "/home/alejandro/DriveLocal/alejandro/Ciberseguridad/PPS - Puesta a Producción Segura/Aplicación Médica"
+# Raíz del clone de medical_register
 gitleaks detect --verbose
 ```
 
@@ -97,7 +97,9 @@ jobs:
 2. Añadir un fichero con un token **ficticio pero con formato** reconocible (o un PAT de GitHub de práctica revocable).  
 3. Abrir PR y ver el job **fallar** con el informe de Gitleaks.  
 4. Documentar captura del log y el listado de hallazgos.  
-5. Borrar el secreto del commit y cerrar la PR sin fusionar (o fusionar solo tras limpieza).
+5. Borrar el secreto del commit (`git rm` de `_demo_gitleaks/`) y volver a ejecutar CI hasta obtener el check en verde.
+
+![Run gitleaks: detección de secreto (fallo esperado, regla `github-pat`)](../img/PPS_git/gitleaks/action-fallo.png)
 
 ---
 
@@ -176,28 +178,17 @@ Workflow desplegado en [`.github/workflows/gitleaks.yml`](../../../.github/workf
 
 Rama de trabajo de la práctica: `pps/gitleaks-setup` → PR a `dev`.
 
----
-
-## 9. Evidencias (entrega) — Apartado 3: Gitleaks
-
-| # | Qué demuestra | Fichero |
-|---|---------------|---------|
-| 1 | PR con check **gitleaks** en verde (sin secreto en el diff) | [`../img/PPS_git/gitleaks/action-verde-setup.png`](../img/PPS_git/gitleaks/action-verde-setup.png) |
-| 2 | Detalle del run: **No leaks detected** / job `gitleaks` correcto | [`../img/PPS_git/gitleaks/action-verde-setup-detail.png`](../img/PPS_git/gitleaks/action-verde-setup-detail.png) |
-| 3 | Run en **rojo** tras PAT ficticio en `_demo_gitleaks/leak.txt` (regla `github-pat`) | [`../img/PPS_git/gitleaks/action-fallo.png`](../img/PPS_git/gitleaks/action-fallo.png) |
-| 4 | Run verde tras eliminar la carpeta demo (`git rm` de `_demo_gitleaks`) | [`../img/PPS_git/gitleaks/action-ok-tras-limpieza.png`](../img/PPS_git/gitleaks/action-ok-tras-limpieza.png) |
+Tras integrar el workflow, el PR inicial muestra el check **gitleaks** en verde (sin secreto en el diff):
 
 ![PR: check gitleaks en verde](../img/PPS_git/gitleaks/action-verde-setup.png)
 
 ![Run gitleaks: sin fugas](../img/PPS_git/gitleaks/action-verde-setup-detail.png)
 
-![Run gitleaks: detección de secreto (fallo esperado)](../img/PPS_git/gitleaks/action-fallo.png)
+Tras la prueba negativa del §4.1 y la limpieza (`git rm` de `_demo_gitleaks/`), el pipeline vuelve a verde:
 
 ![Run gitleaks tras limpiar demo (sin fugas)](../img/PPS_git/gitleaks/action-ok-tras-limpieza.png)
 
-**Flujo documentado**: integración en CI → prueba negativa (fallo) → limpieza y revocación de credenciales de prueba si se usó un PAT real.
-
-**Guía operativa**: [`pasos.md`](pasos.md) §3.
+**Flujo documentado**: integración en CI → prueba negativa (fallo en §4.1) → limpieza y revocación de credenciales de prueba si se usó un PAT real.
 
 ---
 

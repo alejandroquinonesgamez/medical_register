@@ -268,25 +268,25 @@
 <div><p><strong>Nota (evidencia)</strong>: en <code class="docutils literal notranslate"><span class="pre">medical_register</span></code>, la rama <code class="docutils literal notranslate"><span class="pre">dev</span></code> exige el <em>status check</em> <code class="docutils literal notranslate"><span class="pre">build</span></code> (workflow <em>Build and Deploy Sphinx Docs</em>) antes de fusionar.</p>
 </div></blockquote>
 <hr class="docutils" />
-<section id="repositorios-de-este-trabajo-espacio-de-trabajo-pps">
-<h2>Repositorios de este trabajo (espacio de trabajo PPS)<a class="headerlink" href="#repositorios-de-este-trabajo-espacio-de-trabajo-pps" title="Link to this heading">¶</a></h2>
+<section id="repositorios-de-este-trabajo">
+<h2>Repositorios de este trabajo<a class="headerlink" href="#repositorios-de-este-trabajo" title="Link to this heading">¶</a></h2>
 <div class="table-wrapper colwidths-auto docutils container">
 <table class="docutils align-default">
 <thead>
 <tr class="row-odd"><th class="head"><p>Proyecto</p></th>
-<th class="head"><p>Ruta local</p></th>
+<th class="head"><p>Repositorio GitHub</p></th>
 <th class="head"><p>Remoto <code class="docutils literal notranslate"><span class="pre">origin</span></code> (SSH)</p></th>
 <th class="head"><p>Rama habitual</p></th>
 </tr>
 </thead>
 <tbody>
 <tr class="row-even"><td><p>Cliente Android</p></td>
-<td><p><code class="docutils literal notranslate"><span class="pre">/home/alejandro/DriveLocal/alejandro/Ciberseguridad/PPS</span> <span class="pre">-</span> <span class="pre">Puesta</span> <span class="pre">a</span> <span class="pre">Producción</span> <span class="pre">Segura/medical_register_android</span></code></p></td>
+<td><p><a class="reference external" href="https://github.com/alejandroquinonesgamez/medical_register_apk">medical_register_apk</a></p></td>
 <td><p><code class="docutils literal notranslate"><span class="pre">git&#64;github.com:alejandroquinonesgamez/medical_register_apk.git</span></code></p></td>
 <td><p><code class="docutils literal notranslate"><span class="pre">main</span></code></p></td>
 </tr>
 <tr class="row-odd"><td><p>Backend</p></td>
-<td><p><code class="docutils literal notranslate"><span class="pre">/home/alejandro/DriveLocal/alejandro/Ciberseguridad/PPS</span> <span class="pre">-</span> <span class="pre">Puesta</span> <span class="pre">a</span> <span class="pre">Producción</span> <span class="pre">Segura/Aplicación</span> <span class="pre">Médica</span></code></p></td>
+<td><p><a class="reference external" href="https://github.com/alejandroquinonesgamez/medical_register">medical_register</a></p></td>
 <td><p><code class="docutils literal notranslate"><span class="pre">git&#64;github.com:alejandroquinonesgamez/medical_register.git</span></code></p></td>
 <td><p><code class="docutils literal notranslate"><span class="pre">dev</span></code></p></td>
 </tr>
@@ -295,7 +295,7 @@
 </div>
 <p>Las reglas de protección se configuran <strong>en GitHub</strong>, en el repositorio remoto que corresponda (<code class="docutils literal notranslate"><span class="pre">medical_register_apk</span></code> y/o <code class="docutils literal notranslate"><span class="pre">medical_register</span></code>). El ejemplo de push directo bloqueado (§3.3) debe usar la <strong>rama que hayáis protegido</strong> (<code class="docutils literal notranslate"><span class="pre">main</span></code> en Android, <code class="docutils literal notranslate"><span class="pre">dev</span></code> o <code class="docutils literal notranslate"><span class="pre">main</span></code> en el backend).</p>
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="c1"># Ejemplo: push directo a main en el cliente Android (debe fallar si main está protegida)</span>
-<span class="nb">cd</span><span class="w"> </span><span class="s2">&quot;/home/alejandro/DriveLocal/alejandro/Ciberseguridad/PPS - Puesta a Producción Segura/medical_register_android&quot;</span>
+<span class="nb">cd</span><span class="w"> </span>medical_register_apk<span class="w">   </span><span class="c1"># raíz del clone</span>
 git<span class="w"> </span>push<span class="w"> </span>origin<span class="w"> </span>main
 </pre></div>
 </div>
@@ -372,12 +372,16 @@ git<span class="w"> </span>push<span class="w"> </span>origin<span class="w"> </
 <li><p><strong>Require linear history</strong> (evita merge commits si se prefiere <em>rebase</em>/<em>squash</em>).</p></li>
 <li><p><strong>Lock branch</strong> solo en situaciones excepcionales (congelación de release).</p></li>
 </ul>
+<p>En <strong><code class="docutils literal notranslate"><span class="pre">medical_register</span></code></strong> (backend) se configuró la regla sobre la rama <strong><code class="docutils literal notranslate"><span class="pre">dev</span></code></strong>: PR obligatorio, aprobaciones y <em>status check</em> <strong><code class="docutils literal notranslate"><span class="pre">build</span></code></strong> (<em>Build and Deploy Sphinx Docs</em>):</p>
+<p><img alt="Regla de protección en dev (1/3)" src="../../_images/regla-backend-dev1.png" /></p>
+<p><img alt="Regla de protección en dev (2/3)" src="../../_images/regla-backend-dev2.png" /></p>
+<p><img alt="Regla de protección en dev (3/3)" src="../../_images/regla-backend-dev3.png" /></p>
 </section>
 <section id="como-documentar-el-funcionamiento">
 <h3>3.3. Cómo documentar el funcionamiento<a class="headerlink" href="#como-documentar-el-funcionamiento" title="Link to this heading">¶</a></h3>
 <ol class="arabic">
-<li><p><strong>Intento de push directo</strong> (debe fallar). Sustituye rama y ruta según el repo que estés probando (<code class="docutils literal notranslate"><span class="pre">main</span></code> en Android, <code class="docutils literal notranslate"><span class="pre">dev</span></code> en el backend si es la rama protegida):</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="nb">cd</span><span class="w"> </span><span class="s2">&quot;/home/alejandro/DriveLocal/alejandro/Ciberseguridad/PPS - Puesta a Producción Segura/medical_register_android&quot;</span>
+<li><p><strong>Intento de push directo</strong> (debe fallar). Sustituye rama y repositorio según el caso (<code class="docutils literal notranslate"><span class="pre">main</span></code> en Android, <code class="docutils literal notranslate"><span class="pre">dev</span></code> en el backend si es la rama protegida):</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="nb">cd</span><span class="w"> </span>medical_register_apk<span class="w">   </span><span class="c1"># raíz del clone del cliente Android</span>
 git<span class="w"> </span>checkout<span class="w"> </span>main
 git<span class="w"> </span>pull<span class="w"> </span>origin<span class="w"> </span>main
 <span class="nb">echo</span><span class="w"> </span><span class="s2">&quot;# test&quot;</span><span class="w"> </span>&gt;&gt;<span class="w"> </span>README.md
@@ -386,9 +390,18 @@ git<span class="w"> </span>push<span class="w"> </span>origin<span class="w"> </
 </pre></div>
 </div>
 <p>Resultado esperado: <code class="docutils literal notranslate"><span class="pre">remote:</span> <span class="pre">error:</span> <span class="pre">GH006:</span> <span class="pre">Protected</span> <span class="pre">branch</span> <span class="pre">update</span> <span class="pre">failed...</span></code> o mensaje equivalente de GitHub indicando que la rama está protegida.</p>
+<p>En <strong><code class="docutils literal notranslate"><span class="pre">medical_register_apk</span></code></strong> (rama <strong><code class="docutils literal notranslate"><span class="pre">main</span></code></strong> protegida):</p>
+<p><img alt="Push a main rechazado por rama protegida" src="../../_images/push-rechazado-android.png" /></p>
+<blockquote>
+<div><p>Si en algún momento el push directo a <code class="docutils literal notranslate"><span class="pre">main</span></code> fue aceptado (antes de activar la regla o con bypass), puede quedar <code class="docutils literal notranslate"><span class="pre">push-aceptado-android.png</span></code> como contraste; la evidencia principal es el <strong>rechazo</strong> con la regla activa.</p>
+</div></blockquote>
+<p><img alt="Push a main aceptado (referencia / antes de protección o sin regla)" src="../../_images/push-aceptado-android.png" /></p>
 </li>
-<li><p><strong>Flujo correcto</strong>: crear rama, abrir PR hacia la rama protegida, esperar checks verdes y aprobación, fusionar desde la UI (o con <em>merge queue</em> si aplica).</p></li>
-<li><p><strong>Evidencias gráficas</strong>: ver §5 (capturas en <code class="docutils literal notranslate"><span class="pre">docs/git_docs/img/PPS_git/proteccion-ramas/</span></code>).</p></li>
+<li><p><strong>Flujo correcto</strong>: crear rama, abrir PR hacia la rama protegida, esperar checks verdes y aprobación, fusionar desde la UI (o con <em>merge queue</em> si aplica).</p>
+<p>Pull Request hacia <strong><code class="docutils literal notranslate"><span class="pre">dev</span></code></strong> en el backend: el job <strong><code class="docutils literal notranslate"><span class="pre">build</span></code></strong> aparece en verde en <strong>Checks</strong>:</p>
+<p><img alt="Checks del PR: job build en verde" src="../../_images/pr-checks-build.png" /></p>
+<p>No se incluyen capturas dedicadas de PR bloqueado / listo para merge: la evidencia del enunciado queda cubierta con la regla en <code class="docutils literal notranslate"><span class="pre">dev</span></code> (§3.2), el check <strong><code class="docutils literal notranslate"><span class="pre">build</span></code></strong> en PR y el push directo bloqueado en Android.</p>
+</li>
 </ol>
 </section>
 </section>
@@ -399,94 +412,11 @@ git<span class="w"> </span>push<span class="w"> </span>origin<span class="w"> </
 <li><p><strong>Gitleaks / Semgrep</strong>: si sus workflows publican checks con nombre estable, pueden formar parte de los <em>status checks</em> obligatorios.</p></li>
 <li><p><strong>GitHub Secret scanning / Push protection</strong>: son políticas a nivel de código y seguridad, no sustituyen la revisión humana ni los tests.</p></li>
 </ul>
-</section>
-<hr class="docutils" />
-<section id="evidencias-entrega-apartado-2-proteccion-de-ramas">
-<h2>5. Evidencias (entrega) — Apartado 2: protección de ramas<a class="headerlink" href="#evidencias-entrega-apartado-2-proteccion-de-ramas" title="Link to this heading">¶</a></h2>
-<p>Material gráfico del ejercicio, almacenado en <code class="docutils literal notranslate"><span class="pre">docs/git_docs/img/PPS_git/proteccion-ramas/</span></code>.</p>
-<section id="regla-de-proteccion-en-dev-medical-register">
-<h3>5.1. Regla de protección en <code class="docutils literal notranslate"><span class="pre">dev</span></code> (<code class="docutils literal notranslate"><span class="pre">medical_register</span></code>)<a class="headerlink" href="#regla-de-proteccion-en-dev-medical-register" title="Link to this heading">¶</a></h3>
-<p>Configuración en <strong>Settings → Branches</strong> del backend: PR obligatorio, aprobaciones, <em>status checks</em> y check <strong><code class="docutils literal notranslate"><span class="pre">build</span></code></strong> (<em>Build and Deploy Sphinx Docs</em>).</p>
-<div class="table-wrapper colwidths-auto docutils container">
-<table class="docutils align-default">
-<thead>
-<tr class="row-odd"><th class="head"><p>Captura</p></th>
-<th class="head"><p>Contenido</p></th>
-</tr>
-</thead>
-<tbody>
-<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">regla-backend-dev1.png</span></code></p></td>
-<td><p>Vista general de la regla / opciones de protección</p></td>
-</tr>
-<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">regla-backend-dev2.png</span></code></p></td>
-<td><p>Detalle de revisiones y comprobaciones</p></td>
-</tr>
-<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">regla-backend-dev3.png</span></code></p></td>
-<td><p><em>Status checks</em> requeridos (incl. <code class="docutils literal notranslate"><span class="pre">build</span></code>)</p></td>
-</tr>
-</tbody>
-</table>
-</div>
-<p><img alt="Regla de protección en dev (1/3)" src="../../_images/regla-backend-dev1.png" /></p>
-<p><img alt="Regla de protección en dev (2/3)" src="../../_images/regla-backend-dev2.png" /></p>
-<p><img alt="Regla de protección en dev (3/3)" src="../../_images/regla-backend-dev3.png" /></p>
-</section>
-<section id="status-check-build-en-pull-request">
-<h3>5.2. Status check <code class="docutils literal notranslate"><span class="pre">build</span></code> en Pull Request<a class="headerlink" href="#status-check-build-en-pull-request" title="Link to this heading">¶</a></h3>
-<p>Pull Request hacia la rama <strong><code class="docutils literal notranslate"><span class="pre">dev</span></code></strong>: el workflow de documentación ejecuta el job <strong><code class="docutils literal notranslate"><span class="pre">build</span></code></strong> y aparece en la sección <strong>Checks</strong> del PR.</p>
-<p><img alt="Checks del PR: job build en verde" src="../../_images/pr-checks-build.png" /></p>
-</section>
-<section id="push-directo-a-rama-protegida-medical-register-apk-main">
-<h3>5.3. Push directo a rama protegida (<code class="docutils literal notranslate"><span class="pre">medical_register_apk</span></code> · <code class="docutils literal notranslate"><span class="pre">main</span></code>)<a class="headerlink" href="#push-directo-a-rama-protegida-medical-register-apk-main" title="Link to this heading">¶</a></h3>
-<p>Intento de <code class="docutils literal notranslate"><span class="pre">git</span> <span class="pre">push</span> <span class="pre">origin</span> <span class="pre">main</span></code> sin pasar por PR cuando la rama <strong><code class="docutils literal notranslate"><span class="pre">main</span></code></strong> está protegida: GitHub rechaza la actualización.</p>
-<p><img alt="Push a main rechazado por rama protegida" src="../../_images/push-rechazado-android.png" /></p>
-<blockquote>
-<div><p><strong>Nota</strong>: si en algún momento el push directo a <code class="docutils literal notranslate"><span class="pre">main</span></code> fue aceptado (p. ej. antes de activar la regla o con permisos de bypass), puede quedar constancia en <code class="docutils literal notranslate"><span class="pre">push-aceptado-android.png</span></code> como contraste; la evidencia principal del control es el <strong>rechazo</strong> una vez activada la protección.</p>
-</div></blockquote>
-<p><img alt="Push a main aceptado (referencia / antes de protección o sin regla)" src="../../_images/push-aceptado-android.png" /></p>
-</section>
-<section id="resumen-de-hitos">
-<h3>5.4. Resumen de hitos<a class="headerlink" href="#resumen-de-hitos" title="Link to this heading">¶</a></h3>
-<div class="table-wrapper colwidths-auto docutils container">
-<table class="docutils align-default">
-<thead>
-<tr class="row-odd"><th class="head"><p>#</p></th>
-<th class="head"><p>Hito</p></th>
-<th class="head"><p>Estado</p></th>
-<th class="head"><p>Captura</p></th>
-</tr>
-</thead>
-<tbody>
-<tr class="row-even"><td><p>1</p></td>
-<td><p>Regla en <code class="docutils literal notranslate"><span class="pre">dev</span></code> con PR + approvals + check <code class="docutils literal notranslate"><span class="pre">build</span></code></p></td>
-<td><p>✅</p></td>
-<td><p><code class="docutils literal notranslate"><span class="pre">regla-backend-dev1.png</span></code> … <code class="docutils literal notranslate"><span class="pre">regla-backend-dev3.png</span></code></p></td>
-</tr>
-<tr class="row-odd"><td><p>2</p></td>
-<td><p>Check <code class="docutils literal notranslate"><span class="pre">build</span></code> en PR a <code class="docutils literal notranslate"><span class="pre">dev</span></code></p></td>
-<td><p>✅</p></td>
-<td><p><code class="docutils literal notranslate"><span class="pre">pr-checks-build.png</span></code></p></td>
-</tr>
-<tr class="row-even"><td><p>3</p></td>
-<td><p>Push directo a <code class="docutils literal notranslate"><span class="pre">main</span></code> (Android) bloqueado</p></td>
-<td><p>✅</p></td>
-<td><p><code class="docutils literal notranslate"><span class="pre">push-rechazado-android.png</span></code></p></td>
-</tr>
-<tr class="row-odd"><td><p>4</p></td>
-<td><p>PR bloqueado / listo para merge (capturas dedicadas)</p></td>
-<td><p>No incluido</p></td>
-<td><p>La evidencia del enunciado queda cubierta con la regla en <code class="docutils literal notranslate"><span class="pre">dev</span></code> (§5.1), el check <strong><code class="docutils literal notranslate"><span class="pre">build</span></code></strong> en PR (<code class="docutils literal notranslate"><span class="pre">pr-checks-build.png</span></code>) y el push directo bloqueado en Android (<code class="docutils literal notranslate"><span class="pre">push-rechazado-android.png</span></code>).</p></td>
-</tr>
-</tbody>
-</table>
-</div>
-<p><strong>Guía operativa</strong>: <a class="reference internal" href="pasos.html"><span class="std std-doc"><code class="docutils literal notranslate"><span class="pre">pasos.md</span></code></span></a> §2.</p>
 <hr class="docutils" />
 <p><strong>Autores</strong>: Alejandro Quiñones Gámez &amp; Adrián Bertos Gómez</p>
 <p><strong>Asignatura</strong>: PPS — Puesta a Producción Segura</p>
 <p><strong>Curso</strong>: Curso de Especialización en Ciberseguridad en Tecnologías de la Información</p>
 <p><strong>Centro</strong>: IES Zaidín-Vergeles</p>
-</section>
 </section>
 </section>
 
@@ -528,7 +458,7 @@ git<span class="w"> </span>push<span class="w"> </span>origin<span class="w"> </
           <div class="toc-tree">
             <ul>
 <li><a class="reference internal" href="#">Protección de ramas (Branch protection rules)</a><ul>
-<li><a class="reference internal" href="#repositorios-de-este-trabajo-espacio-de-trabajo-pps">Repositorios de este trabajo (espacio de trabajo PPS)</a></li>
+<li><a class="reference internal" href="#repositorios-de-este-trabajo">Repositorios de este trabajo</a></li>
 <li><a class="reference internal" href="#introduccion">1. Introducción</a></li>
 <li><a class="reference internal" href="#caracteristicas-resumen-del-enunciado">2. Características (resumen del enunciado)</a></li>
 <li><a class="reference internal" href="#actividad-configuracion-recomendada-en-github">3. Actividad: configuración recomendada en GitHub</a><ul>
@@ -538,13 +468,6 @@ git<span class="w"> </span>push<span class="w"> </span>origin<span class="w"> </
 </ul>
 </li>
 <li><a class="reference internal" href="#relacion-con-otros-ejercicios-pps">4. Relación con otros ejercicios PPS</a></li>
-<li><a class="reference internal" href="#evidencias-entrega-apartado-2-proteccion-de-ramas">5. Evidencias (entrega) — Apartado 2: protección de ramas</a><ul>
-<li><a class="reference internal" href="#regla-de-proteccion-en-dev-medical-register">5.1. Regla de protección en <code class="docutils literal notranslate"><span class="pre">dev</span></code> (<code class="docutils literal notranslate"><span class="pre">medical_register</span></code>)</a></li>
-<li><a class="reference internal" href="#status-check-build-en-pull-request">5.2. Status check <code class="docutils literal notranslate"><span class="pre">build</span></code> en Pull Request</a></li>
-<li><a class="reference internal" href="#push-directo-a-rama-protegida-medical-register-apk-main">5.3. Push directo a rama protegida (<code class="docutils literal notranslate"><span class="pre">medical_register_apk</span></code> · <code class="docutils literal notranslate"><span class="pre">main</span></code>)</a></li>
-<li><a class="reference internal" href="#resumen-de-hitos">5.4. Resumen de hitos</a></li>
-</ul>
-</li>
 </ul>
 </li>
 </ul>

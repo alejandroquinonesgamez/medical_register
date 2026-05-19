@@ -264,32 +264,32 @@
 <p>Objetivo: configurar la firma criptográfica de commits con GPG en los
 repositorios de la asignatura y demostrar que GitHub muestra el badge
 <strong>“Verified”</strong> en los commits firmados.</p>
-<p><strong>Ubicación:</strong> <code class="docutils literal notranslate"><span class="pre">docs/git_docs/PPS_git/firma_commits.md</span></code> (repositorio <em>Aplicación Médica</em>).</p>
+<p><strong>Ubicación:</strong> <code class="docutils literal notranslate"><span class="pre">docs/git_docs/PPS_git/firma_commits.md</span></code> (repositorio <a class="reference external" href="https://github.com/alejandroquinonesgamez/medical_register">medical_register</a>).</p>
 </div></blockquote>
 <p><strong>Autores</strong>: Alejandro Quiñones Gámez &amp; Adrián Bertos Gómez</p>
 <p><strong>Asignatura</strong>: PPS — Puesta a Producción Segura</p>
 <p><strong>Curso</strong>: Curso de Especialización en Ciberseguridad en Tecnologías de la Información</p>
 <p><strong>Centro</strong>: IES Zaidín-Vergeles</p>
 <hr class="docutils" />
-<section id="repositorios-de-este-trabajo-espacio-de-trabajo-pps">
-<h2>Repositorios de este trabajo (espacio de trabajo PPS)<a class="headerlink" href="#repositorios-de-este-trabajo-espacio-de-trabajo-pps" title="Link to this heading">¶</a></h2>
+<section id="repositorios-de-este-trabajo">
+<h2>Repositorios de este trabajo<a class="headerlink" href="#repositorios-de-este-trabajo" title="Link to this heading">¶</a></h2>
 <div class="table-wrapper colwidths-auto docutils container">
 <table class="docutils align-default">
 <thead>
 <tr class="row-odd"><th class="head"><p>Proyecto</p></th>
-<th class="head"><p>Ruta local</p></th>
+<th class="head"><p>Repositorio GitHub</p></th>
 <th class="head"><p>Remoto <code class="docutils literal notranslate"><span class="pre">origin</span></code> (SSH)</p></th>
 <th class="head"><p>Rama habitual</p></th>
 </tr>
 </thead>
 <tbody>
 <tr class="row-even"><td><p>Cliente Android</p></td>
-<td><p><code class="docutils literal notranslate"><span class="pre">/home/alejandro/DriveLocal/alejandro/Ciberseguridad/PPS</span> <span class="pre">-</span> <span class="pre">Puesta</span> <span class="pre">a</span> <span class="pre">Producción</span> <span class="pre">Segura/medical_register_android</span></code></p></td>
+<td><p><a class="reference external" href="https://github.com/alejandroquinonesgamez/medical_register_apk">medical_register_apk</a></p></td>
 <td><p><code class="docutils literal notranslate"><span class="pre">git&#64;github.com:alejandroquinonesgamez/medical_register_apk.git</span></code></p></td>
 <td><p><code class="docutils literal notranslate"><span class="pre">main</span></code></p></td>
 </tr>
 <tr class="row-odd"><td><p>Backend</p></td>
-<td><p><code class="docutils literal notranslate"><span class="pre">/home/alejandro/DriveLocal/alejandro/Ciberseguridad/PPS</span> <span class="pre">-</span> <span class="pre">Puesta</span> <span class="pre">a</span> <span class="pre">Producción</span> <span class="pre">Segura/Aplicación</span> <span class="pre">Médica</span></code></p></td>
+<td><p><a class="reference external" href="https://github.com/alejandroquinonesgamez/medical_register">medical_register</a></p></td>
 <td><p><code class="docutils literal notranslate"><span class="pre">git&#64;github.com:alejandroquinonesgamez/medical_register.git</span></code></p></td>
 <td><p><code class="docutils literal notranslate"><span class="pre">dev</span></code></p></td>
 </tr>
@@ -297,7 +297,8 @@ repositorios de la asignatura y demostrar que GitHub muestra el badge
 </table>
 </div>
 <p>Si el remoto del Android no apunta al repo de la APK:</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="nb">cd</span><span class="w"> </span><span class="s2">&quot;/home/alejandro/DriveLocal/alejandro/Ciberseguridad/PPS - Puesta a Producción Segura/medical_register_android&quot;</span>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>git<span class="w"> </span>clone<span class="w"> </span>git@github.com:alejandroquinonesgamez/medical_register_apk.git
+<span class="nb">cd</span><span class="w"> </span>medical_register_apk
 git<span class="w"> </span>remote<span class="w"> </span>set-url<span class="w"> </span>origin<span class="w"> </span>git@github.com:alejandroquinonesgamez/medical_register_apk.git
 git<span class="w"> </span>remote<span class="w"> </span>-v
 </pre></div>
@@ -327,8 +328,8 @@ verde <strong><code class="docutils literal notranslate"><span class="pre">Verif
 proyectos de la asignatura, incluyendo la salida real de cada comando como
 evidencia:</p>
 <ul class="simple">
-<li><p>Cliente Android: directorio <code class="docutils literal notranslate"><span class="pre">medical_register_android</span></code> → remoto GitHub <strong><code class="docutils literal notranslate"><span class="pre">medical_register_apk</span></code></strong>.</p></li>
-<li><p>Backend: directorio <code class="docutils literal notranslate"><span class="pre">Aplicación</span> <span class="pre">Médica</span></code> → remoto GitHub <strong><code class="docutils literal notranslate"><span class="pre">medical_register</span></code></strong>.</p></li>
+<li><p>Cliente Android: repositorio GitHub <a class="reference external" href="https://github.com/alejandroquinonesgamez/medical_register_apk"><strong>medical_register_apk</strong></a> (rama <code class="docutils literal notranslate"><span class="pre">main</span></code>).</p></li>
+<li><p>Backend: repositorio GitHub <a class="reference external" href="https://github.com/alejandroquinonesgamez/medical_register"><strong>medical_register</strong></a> (rama <code class="docutils literal notranslate"><span class="pre">dev</span></code>).</p></li>
 </ul>
 <blockquote>
 <div><p><strong>Nota (2026-05-14):</strong> la documentación del <code class="docutils literal notranslate"><span class="pre">.gitignore</span></code> de ambos proyectos
@@ -481,9 +482,9 @@ Passphrase: ***REDACTED***
 <p>Ejecución:</p>
 <div class="highlight-text notranslate"><div class="highlight"><pre><span></span>$ gpg --batch --pinentry-mode loopback --generate-key /tmp/gpg_batch.txt
 gpg: Generando clave Ed25519 para Alejandro Quiñones
-gpg: creado el directorio &#39;/home/alejandro/.gnupg/openpgp-revocs.d&#39;
+gpg: creado el directorio &#39;~/.gnupg/openpgp-revocs.d&#39;
 gpg: certificado de revocación guardado como
-     &#39;/home/alejandro/.gnupg/openpgp-revocs.d/6DF65CE25E4CDA2BF3B0E38C54B736719B025729.rev&#39;
+     &#39;~/.gnupg/openpgp-revocs.d/6DF65CE25E4CDA2BF3B0E38C54B736719B025729.rev&#39;
 gpg: Clave generada
 
 $ rm -v /tmp/gpg_batch.txt
@@ -626,9 +627,9 @@ alejandroquinonesgamez@users.noreply.github.com
 </pre></div>
 </div>
 </section>
-<section id="ajuste-local-en-aplicacion-medica">
-<h3>5.2. Ajuste local en <code class="docutils literal notranslate"><span class="pre">Aplicación</span> <span class="pre">Médica</span></code><a class="headerlink" href="#ajuste-local-en-aplicacion-medica" title="Link to this heading">¶</a></h3>
-<p>El repositorio <code class="docutils literal notranslate"><span class="pre">Aplicación</span> <span class="pre">Médica</span></code> tenía configurado localmente
+<section id="ajuste-en-medical-register">
+<h3>5.2. Ajuste en <code class="docutils literal notranslate"><span class="pre">medical_register</span></code><a class="headerlink" href="#ajuste-en-medical-register" title="Link to this heading">¶</a></h3>
+<p>El repositorio <code class="docutils literal notranslate"><span class="pre">medical_register</span></code> tenía configurado
 <code class="docutils literal notranslate"><span class="pre">user.email</span> <span class="pre">=</span> <span class="pre">alejandroquinonesgamez&#64;gmail.com</span></code> (anulando la global). Como el
 UID de la clave es el email <em>noreply</em>, GitHub solo marcará <code class="docutils literal notranslate"><span class="pre">Verified</span></code> si el
 <strong>email del commit coincide con un UID de la clave</strong> subida. Por tanto se
@@ -687,12 +688,13 @@ gazekJ++oAO0z6QFwXC87DUE
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>gh<span class="w"> </span>api<span class="w"> </span>user/gpg_keys<span class="w"> </span>--jq<span class="w"> </span><span class="s1">&#39;.[] | {name: .name, key_id: .key_id, emails: .emails}&#39;</span>
 </pre></div>
 </div>
+<p><img alt="Clave GPG en GitHub" src="../../_images/GPG_created.png" /></p>
 </section>
 <section id="hacer-commits-firmados">
 <h2>7. Hacer commits firmados<a class="headerlink" href="#hacer-commits-firmados" title="Link to this heading">¶</a></h2>
 <p>Con <code class="docutils literal notranslate"><span class="pre">commit.gpgsign</span> <span class="pre">=</span> <span class="pre">true</span></code> en la configuración global, <strong>cualquier <code class="docutils literal notranslate"><span class="pre">git</span> <span class="pre">commit</span></code></strong> lo firmará automáticamente. No hace falta el flag <code class="docutils literal notranslate"><span class="pre">-S</span></code>.</p>
-<section id="commit-firmado-en-medical-register-android">
-<h3>7.1. Commit firmado en <code class="docutils literal notranslate"><span class="pre">medical_register_android</span></code><a class="headerlink" href="#commit-firmado-en-medical-register-android" title="Link to this heading">¶</a></h3>
+<section id="commit-firmado-en-medical-register-apk">
+<h3>7.1. Commit firmado en <code class="docutils literal notranslate"><span class="pre">medical_register_apk</span></code><a class="headerlink" href="#commit-firmado-en-medical-register-apk" title="Link to this heading">¶</a></h3>
 <div class="highlight-text notranslate"><div class="highlight"><pre><span></span>$ git add docs/gitignore.md
 
 $ git commit -m &quot;docs: añadir gitignore.md documentando ambos proyectos
@@ -728,9 +730,10 @@ f56b28e N docs: regenerar MSTG_RESILIENCE.pdf (Pandoc + xelatex)
 </pre></div>
 </div>
 <p>El commit <code class="docutils literal notranslate"><span class="pre">4f4c9f5</span></code> pasa de <code class="docutils literal notranslate"><span class="pre">N</span></code> (sin firma) a <strong><code class="docutils literal notranslate"><span class="pre">G</span></code></strong> (firma válida).</p>
+<p><img alt="Commit Verified — medical_register_apk (rama )" src="../../_images/verified_android.png" /></p>
 </section>
-<section id="commit-firmado-en-aplicacion-medica">
-<h3>7.2. Commit firmado en <code class="docutils literal notranslate"><span class="pre">Aplicación</span> <span class="pre">Médica</span></code><a class="headerlink" href="#commit-firmado-en-aplicacion-medica" title="Link to this heading">¶</a></h3>
+<section id="commit-firmado-en-medical-register">
+<h3>7.2. Commit firmado en <code class="docutils literal notranslate"><span class="pre">medical_register</span></code><a class="headerlink" href="#commit-firmado-en-medical-register" title="Link to this heading">¶</a></h3>
 <p>Antes del commit hubo que igualar el <code class="docutils literal notranslate"><span class="pre">user.email</span></code> local al UID de la clave
 (ver §5.2). Tras eso:</p>
 <div class="highlight-text notranslate"><div class="highlight"><pre><span></span>$ git add docs/gitignore.md       # solo el fichero nuevo, sin tocar WIP
@@ -767,6 +770,7 @@ dae5bf3 N chore: normalizar permisos de scripts
 </pre></div>
 </div>
 <p>El commit <code class="docutils literal notranslate"><span class="pre">65fc9cc</span></code> también queda con <strong><code class="docutils literal notranslate"><span class="pre">G</span></code></strong>.</p>
+<p><img alt="Commit Verified — medical_register (rama )" src="../../_images/verified_appmedica.png" /></p>
 </section>
 </section>
 <section id="push-a-github-y-badge-verified">
@@ -774,11 +778,11 @@ dae5bf3 N chore: normalizar permisos de scripts
 <p>Una vez subida la clave pública a GitHub (§6), basta con hacer <code class="docutils literal notranslate"><span class="pre">git</span> <span class="pre">push</span></code> en
 ambos repos:</p>
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="c1"># Cliente Android → GitHub medical_register_apk (rama main)</span>
-<span class="nb">cd</span><span class="w"> </span><span class="s2">&quot;/home/alejandro/DriveLocal/alejandro/Ciberseguridad/PPS - Puesta a Producción Segura/medical_register_android&quot;</span>
+<span class="nb">cd</span><span class="w"> </span>medical_register_apk<span class="w">   </span><span class="c1"># raíz del clone</span>
 git<span class="w"> </span>push<span class="w"> </span>origin<span class="w"> </span>main
 
 <span class="c1"># Backend → GitHub medical_register (rama dev)</span>
-<span class="nb">cd</span><span class="w"> </span><span class="s2">&quot;/home/alejandro/DriveLocal/alejandro/Ciberseguridad/PPS - Puesta a Producción Segura/Aplicación Médica&quot;</span>
+<span class="c1"># (desde la raíz de este repositorio)</span>
 git<span class="w"> </span>push<span class="w"> </span>origin<span class="w"> </span>dev
 </pre></div>
 </div>
@@ -789,33 +793,7 @@ Signed by: Alejandro Quiñones
 GPG key ID: 54B736719B025729
 </pre></div>
 </div>
-<section id="evidencia-visual-capturas">
-<h3>8.1. Evidencia visual (capturas)<a class="headerlink" href="#evidencia-visual-capturas" title="Link to this heading">¶</a></h3>
-<p>Las capturas se almacenan bajo <code class="docutils literal notranslate"><span class="pre">docs/git_docs/img/</span></code> (ver también §11).</p>
-<div class="table-wrapper colwidths-auto docutils container">
-<table class="docutils align-default">
-<thead>
-<tr class="row-odd"><th class="head"><p>Archivo</p></th>
-<th class="head"><p>Qué demuestra</p></th>
-</tr>
-</thead>
-<tbody>
-<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">img/GPG/GPG_created.png</span></code></p></td>
-<td><p>Clave GPG pública registrada en la cuenta GitHub (<strong>Settings → SSH and GPG keys</strong>).</p></td>
-</tr>
-<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">img/PPS_git/GPG/verified_android.png</span></code></p></td>
-<td><p>Commit en el remoto <strong><code class="docutils literal notranslate"><span class="pre">medical_register_apk</span></code></strong> (rama <code class="docutils literal notranslate"><span class="pre">main</span></code>) con badge <strong>Verified</strong>.</p></td>
-</tr>
-<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">img/PPS_git/GPG/verified_appmedica.png</span></code></p></td>
-<td><p>Commit en el remoto <strong><code class="docutils literal notranslate"><span class="pre">medical_register</span></code></strong> (rama <code class="docutils literal notranslate"><span class="pre">dev</span></code>) con badge <strong>Verified</strong>.</p></td>
-</tr>
-</tbody>
-</table>
-</div>
-<p><img alt="Clave GPG en GitHub" src="../../_images/GPG_created.png" /></p>
-<p><img alt="Commit Verified — medical_register_apk (Android)" src="../../_images/verified_android.png" /></p>
-<p><img alt="Commit Verified — medical_register (backend)" src="../../_images/verified_appmedica.png" /></p>
-</section>
+<p>Las capturas anteriores (§6 y §7) muestran la clave en la cuenta y los badges <strong>Verified</strong> en ambos remotos tras el <code class="docutils literal notranslate"><span class="pre">git</span> <span class="pre">push</span></code>.</p>
 </section>
 <section id="buenas-practicas-y-vigilant-mode">
 <h2>9. Buenas prácticas y “Vigilant Mode”<a class="headerlink" href="#buenas-practicas-y-vigilant-mode" title="Link to this heading">¶</a></h2>
@@ -846,103 +824,6 @@ o a un keyserver.</p></li>
 secretos; la segunda evita suplantaciones. Idealmente se combinan con
 <code class="docutils literal notranslate"><span class="pre">pre-commit</span></code> (gitleaks, ruff) y CI/CD que rechace commits no firmados.</p></li>
 </ul>
-</section>
-</section>
-<section id="resumen-de-evidencias">
-<h2>10. Resumen de evidencias<a class="headerlink" href="#resumen-de-evidencias" title="Link to this heading">¶</a></h2>
-<div class="table-wrapper colwidths-auto docutils container">
-<table class="docutils align-default">
-<thead>
-<tr class="row-odd"><th class="head"><p>Hito</p></th>
-<th class="head"><p>Comando</p></th>
-<th class="head"><p>Salida clave</p></th>
-<th class="head"><p>Estado</p></th>
-</tr>
-</thead>
-<tbody>
-<tr class="row-even"><td><p>1. Generar clave</p></td>
-<td><p><code class="docutils literal notranslate"><span class="pre">gpg</span> <span class="pre">--batch</span> <span class="pre">--generate-key</span> <span class="pre">...</span></code></p></td>
-<td><p><code class="docutils literal notranslate"><span class="pre">gpg:</span> <span class="pre">Clave</span> <span class="pre">generada</span></code></p></td>
-<td><p>✅</p></td>
-</tr>
-<tr class="row-odd"><td><p>2. Listar clave</p></td>
-<td><p><code class="docutils literal notranslate"><span class="pre">gpg</span> <span class="pre">--list-secret-keys</span> <span class="pre">--keyid-format=LONG</span></code></p></td>
-<td><p><code class="docutils literal notranslate"><span class="pre">sec</span> <span class="pre">ed25519/54B736719B025729</span></code></p></td>
-<td><p>✅</p></td>
-</tr>
-<tr class="row-even"><td><p>3. Config Git</p></td>
-<td><p><code class="docutils literal notranslate"><span class="pre">git</span> <span class="pre">config</span> <span class="pre">--global</span> <span class="pre">user.signingkey</span> <span class="pre">54B736719B025729</span></code> + <code class="docutils literal notranslate"><span class="pre">commit.gpgsign</span> <span class="pre">true</span></code></p></td>
-<td><p></p></td>
-<td><p>✅</p></td>
-</tr>
-<tr class="row-odd"><td><p>4. Commit Android</p></td>
-<td><p><code class="docutils literal notranslate"><span class="pre">git</span> <span class="pre">commit</span> <span class="pre">-m</span> <span class="pre">&quot;docs:</span> <span class="pre">añadir</span> <span class="pre">gitignore.md</span> <span class="pre">...&quot;</span></code></p></td>
-<td><p>commit <code class="docutils literal notranslate"><span class="pre">4f4c9f5</span></code> con <code class="docutils literal notranslate"><span class="pre">%G?</span> <span class="pre">=</span> <span class="pre">G</span></code></p></td>
-<td><p>✅</p></td>
-</tr>
-<tr class="row-even"><td><p>5. Commit App Médica</p></td>
-<td><p><code class="docutils literal notranslate"><span class="pre">git</span> <span class="pre">commit</span> <span class="pre">-m</span> <span class="pre">&quot;docs:</span> <span class="pre">añadir</span> <span class="pre">gitignore.md</span> <span class="pre">...&quot;</span></code></p></td>
-<td><p>commit <code class="docutils literal notranslate"><span class="pre">65fc9cc</span></code> con <code class="docutils literal notranslate"><span class="pre">%G?</span> <span class="pre">=</span> <span class="pre">G</span></code></p></td>
-<td><p>✅</p></td>
-</tr>
-<tr class="row-odd"><td><p>6. Subir clave a GitHub</p></td>
-<td><p>UI web <em>Settings → SSH and GPG keys</em></p></td>
-<td><p><code class="docutils literal notranslate"><span class="pre">img/GPG/GPG_created.png</span></code></p></td>
-<td><p>✅</p></td>
-</tr>
-<tr class="row-even"><td><p>7. Push y verificación en GitHub</p></td>
-<td><p><code class="docutils literal notranslate"><span class="pre">git</span> <span class="pre">push</span></code> + commit en la UI</p></td>
-<td><p><code class="docutils literal notranslate"><span class="pre">verified_android.png</span></code>, <code class="docutils literal notranslate"><span class="pre">verified_appmedica.png</span></code></p></td>
-<td><p>✅</p></td>
-</tr>
-<tr class="row-odd"><td><p>8. Vigilant Mode</p></td>
-<td><p>Cuenta GitHub → <em>Flag unsigned commits as unverified</em></p></td>
-<td><p><code class="docutils literal notranslate"><span class="pre">img/PPS_git/GPG/vigilant-mode.png</span></code></p></td>
-<td><p>✅</p></td>
-</tr>
-</tbody>
-</table>
-</div>
-</section>
-<hr class="docutils" />
-<section id="evidencias-entrega-apartado-1-firma-de-commits">
-<h2>11. Evidencias (entrega) — Apartado 1: firma de commits<a class="headerlink" href="#evidencias-entrega-apartado-1-firma-de-commits" title="Link to this heading">¶</a></h2>
-<p>Resumen de material gráfico incluido en el repositorio del backend (<em>Aplicación Médica</em>), enlazado desde este informe.</p>
-<div class="table-wrapper colwidths-auto docutils container">
-<table class="docutils align-default">
-<thead>
-<tr class="row-odd"><th class="head"><p>#</p></th>
-<th class="head"><p>Evidencia</p></th>
-<th class="head"><p>Repositorio / ámbito</p></th>
-<th class="head"><p>Ruta del fichero</p></th>
-</tr>
-</thead>
-<tbody>
-<tr class="row-even"><td><p>1</p></td>
-<td><p>Clave GPG asociada a la cuenta</p></td>
-<td><p>Cuenta GitHub</p></td>
-<td><p><a class="reference download internal" download="" href="../../_downloads/7b2a4ea6a6ccc8172847732ac8070996/GPG_created.png"><span class="xref download myst"><code class="docutils literal notranslate"><span class="pre">../img/GPG/GPG_created.png</span></code></span></a></p></td>
-</tr>
-<tr class="row-odd"><td><p>2</p></td>
-<td><p>Commit firmado visible en remoto</p></td>
-<td><p><code class="docutils literal notranslate"><span class="pre">alejandroquinonesgamez/medical_register_apk</span></code> · rama <code class="docutils literal notranslate"><span class="pre">main</span></code></p></td>
-<td><p><a class="reference download internal" download="" href="../../_downloads/f85944dc4ee4b1d9a5698d9e18ad08b4/verified_android.png"><span class="xref download myst"><code class="docutils literal notranslate"><span class="pre">../img/PPS_git/GPG/verified_android.png</span></code></span></a></p></td>
-</tr>
-<tr class="row-even"><td><p>3</p></td>
-<td><p>Commit firmado visible en remoto</p></td>
-<td><p><code class="docutils literal notranslate"><span class="pre">alejandroquinonesgamez/medical_register</span></code> · rama <code class="docutils literal notranslate"><span class="pre">dev</span></code></p></td>
-<td><p><a class="reference download internal" download="" href="../../_downloads/319e930527773c1788c8ceba1b573536/verified_appmedica.png"><span class="xref download myst"><code class="docutils literal notranslate"><span class="pre">../img/PPS_git/GPG/verified_appmedica.png</span></code></span></a></p></td>
-</tr>
-<tr class="row-odd"><td><p>4</p></td>
-<td><p>Vigilant Mode</p></td>
-<td><p>Cuenta GitHub</p></td>
-<td><p><a class="reference download internal" download="" href="../../_downloads/2e316831d473bef49780f391e1247106/vigilant-mode.png"><span class="xref download myst"><code class="docutils literal notranslate"><span class="pre">../img/PPS_git/GPG/vigilant-mode.png</span></code></span></a></p></td>
-</tr>
-</tbody>
-</table>
-</div>
-<p><strong>Complemento local</strong> (sin captura): verificación con <code class="docutils literal notranslate"><span class="pre">git</span> <span class="pre">log</span> <span class="pre">--show-signature</span></code> y <code class="docutils literal notranslate"><span class="pre">%G?</span> <span class="pre">=</span> <span class="pre">G</span></code> en los commits firmados (§7 y tabla anterior).</p>
-<p><strong>Guía operativa</strong>: <a class="reference internal" href="pasos.html"><span class="std std-doc"><code class="docutils literal notranslate"><span class="pre">pasos.md</span></code></span></a> §1.</p>
 <p><strong>Documentos relacionados (PPS Git)</strong>: <a class="reference internal" href="github.html"><span class="std std-doc"><code class="docutils literal notranslate"><span class="pre">github.md</span></code></span></a>, <a class="reference internal" href="gitleaks.html"><span class="std std-doc"><code class="docutils literal notranslate"><span class="pre">gitleaks.md</span></code></span></a>, <a class="reference internal" href="proteccion-ramas.html"><span class="std std-doc"><code class="docutils literal notranslate"><span class="pre">proteccion-ramas.md</span></code></span></a>, <a class="reference internal" href="semgrep.html"><span class="std std-doc"><code class="docutils literal notranslate"><span class="pre">semgrep.md</span></code></span></a>, <a class="reference internal" href="gitignore.html"><span class="std std-doc"><code class="docutils literal notranslate"><span class="pre">gitignore.md</span></code></span></a>.</p>
 <hr class="docutils" />
 <p><strong>Autores</strong>: Alejandro Quiñones Gámez &amp; Adrián Bertos Gómez</p>
@@ -950,6 +831,7 @@ secretos; la segunda evita suplantaciones. Idealmente se combinan con
 <p><strong>Curso</strong>: Curso de Especialización en Ciberseguridad en Tecnologías de la Información</p>
 <p><strong>Centro</strong>: IES Zaidín-Vergeles</p>
 <p><strong>Ejercicio</strong>: Firma de commits (Fernando Raya, 2026-04-20)</p>
+</section>
 </section>
 </section>
 
@@ -991,7 +873,7 @@ secretos; la segunda evita suplantaciones. Idealmente se combinan con
           <div class="toc-tree">
             <ul>
 <li><a class="reference internal" href="#">Firma de commits con GPG</a><ul>
-<li><a class="reference internal" href="#repositorios-de-este-trabajo-espacio-de-trabajo-pps">Repositorios de este trabajo (espacio de trabajo PPS)</a></li>
+<li><a class="reference internal" href="#repositorios-de-este-trabajo">Repositorios de este trabajo</a></li>
 <li><a class="reference internal" href="#introduccion">1. Introducción</a></li>
 <li><a class="reference internal" href="#estado-inicial">2. Estado inicial</a><ul>
 <li><a class="reference internal" href="#versiones-de-las-herramientas">2.1. Versiones de las herramientas</a></li>
@@ -1009,25 +891,20 @@ secretos; la segunda evita suplantaciones. Idealmente se combinan con
 <li><a class="reference internal" href="#configurar-gpg-agent-para-uso-no-interactivo">4. Configurar gpg-agent para uso no interactivo</a></li>
 <li><a class="reference internal" href="#configurar-git-para-usar-la-clave">5. Configurar Git para usar la clave</a><ul>
 <li><a class="reference internal" href="#configuracion-global">5.1. Configuración global</a></li>
-<li><a class="reference internal" href="#ajuste-local-en-aplicacion-medica">5.2. Ajuste local en <code class="docutils literal notranslate"><span class="pre">Aplicación</span> <span class="pre">Médica</span></code></a></li>
+<li><a class="reference internal" href="#ajuste-en-medical-register">5.2. Ajuste en <code class="docutils literal notranslate"><span class="pre">medical_register</span></code></a></li>
 </ul>
 </li>
 <li><a class="reference internal" href="#exportar-la-clave-publica-y-subirla-a-github">6. Exportar la clave pública y subirla a GitHub</a></li>
 <li><a class="reference internal" href="#hacer-commits-firmados">7. Hacer commits firmados</a><ul>
-<li><a class="reference internal" href="#commit-firmado-en-medical-register-android">7.1. Commit firmado en <code class="docutils literal notranslate"><span class="pre">medical_register_android</span></code></a></li>
-<li><a class="reference internal" href="#commit-firmado-en-aplicacion-medica">7.2. Commit firmado en <code class="docutils literal notranslate"><span class="pre">Aplicación</span> <span class="pre">Médica</span></code></a></li>
+<li><a class="reference internal" href="#commit-firmado-en-medical-register-apk">7.1. Commit firmado en <code class="docutils literal notranslate"><span class="pre">medical_register_apk</span></code></a></li>
+<li><a class="reference internal" href="#commit-firmado-en-medical-register">7.2. Commit firmado en <code class="docutils literal notranslate"><span class="pre">medical_register</span></code></a></li>
 </ul>
 </li>
-<li><a class="reference internal" href="#push-a-github-y-badge-verified">8. Push a GitHub y badge “Verified”</a><ul>
-<li><a class="reference internal" href="#evidencia-visual-capturas">8.1. Evidencia visual (capturas)</a></li>
-</ul>
-</li>
+<li><a class="reference internal" href="#push-a-github-y-badge-verified">8. Push a GitHub y badge “Verified”</a></li>
 <li><a class="reference internal" href="#buenas-practicas-y-vigilant-mode">9. Buenas prácticas y “Vigilant Mode”</a><ul>
 <li><a class="reference internal" href="#limitaciones-de-la-firma-de-commits">Limitaciones de la firma de commits</a></li>
 </ul>
 </li>
-<li><a class="reference internal" href="#resumen-de-evidencias">10. Resumen de evidencias</a></li>
-<li><a class="reference internal" href="#evidencias-entrega-apartado-1-firma-de-commits">11. Evidencias (entrega) — Apartado 1: firma de commits</a></li>
 </ul>
 </li>
 </ul>

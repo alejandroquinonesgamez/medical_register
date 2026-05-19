@@ -265,33 +265,33 @@
 <p><strong>Centro</strong>: IES Zaidín-Vergeles</p>
 <p><strong>Enunciado</strong>: <code class="docutils literal notranslate"><span class="pre">docs/git_docs/PPS_git/gitleaks.html</span></code> (Fernando Raya, 2026-04-20)</p>
 <hr class="docutils" />
-<section id="repositorios-de-este-trabajo-espacio-de-trabajo-pps">
-<h2>Repositorios de este trabajo (espacio de trabajo PPS)<a class="headerlink" href="#repositorios-de-este-trabajo-espacio-de-trabajo-pps" title="Link to this heading">¶</a></h2>
+<section id="repositorios-de-este-trabajo">
+<h2>Repositorios de este trabajo<a class="headerlink" href="#repositorios-de-este-trabajo" title="Link to this heading">¶</a></h2>
 <div class="table-wrapper colwidths-auto docutils container">
 <table class="docutils align-default">
 <thead>
 <tr class="row-odd"><th class="head"><p>Proyecto</p></th>
-<th class="head"><p>Ruta local</p></th>
+<th class="head"><p>Repositorio GitHub</p></th>
 <th class="head"><p>Remoto <code class="docutils literal notranslate"><span class="pre">origin</span></code> (SSH)</p></th>
 <th class="head"><p>Rama habitual</p></th>
 </tr>
 </thead>
 <tbody>
 <tr class="row-even"><td><p>Cliente Android</p></td>
-<td><p><code class="docutils literal notranslate"><span class="pre">/home/alejandro/DriveLocal/alejandro/Ciberseguridad/PPS</span> <span class="pre">-</span> <span class="pre">Puesta</span> <span class="pre">a</span> <span class="pre">Producción</span> <span class="pre">Segura/medical_register_android</span></code></p></td>
+<td><p><a class="reference external" href="https://github.com/alejandroquinonesgamez/medical_register_apk">medical_register_apk</a></p></td>
 <td><p><code class="docutils literal notranslate"><span class="pre">git&#64;github.com:alejandroquinonesgamez/medical_register_apk.git</span></code></p></td>
 <td><p><code class="docutils literal notranslate"><span class="pre">main</span></code></p></td>
 </tr>
 <tr class="row-odd"><td><p>Backend</p></td>
-<td><p><code class="docutils literal notranslate"><span class="pre">/home/alejandro/DriveLocal/alejandro/Ciberseguridad/PPS</span> <span class="pre">-</span> <span class="pre">Puesta</span> <span class="pre">a</span> <span class="pre">Producción</span> <span class="pre">Segura/Aplicación</span> <span class="pre">Médica</span></code></p></td>
+<td><p><a class="reference external" href="https://github.com/alejandroquinonesgamez/medical_register">medical_register</a></p></td>
 <td><p><code class="docutils literal notranslate"><span class="pre">git&#64;github.com:alejandroquinonesgamez/medical_register.git</span></code></p></td>
 <td><p><code class="docutils literal notranslate"><span class="pre">dev</span></code></p></td>
 </tr>
 </tbody>
 </table>
 </div>
-<p>El workflow de ejemplo del §4 conviene añadirlo en el repo donde tengáis CI (normalmente el <strong>backend</strong>). Escaneo local: ejecutar <code class="docutils literal notranslate"><span class="pre">gitleaks</span> <span class="pre">detect</span></code> desde la raíz de cada clone tras <code class="docutils literal notranslate"><span class="pre">cd</span></code> a la ruta correspondiente.</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="nb">cd</span><span class="w"> </span><span class="s2">&quot;/home/alejandro/DriveLocal/alejandro/Ciberseguridad/PPS - Puesta a Producción Segura/Aplicación Médica&quot;</span>
+<p>El workflow de ejemplo del §4 conviene añadirlo en el repo donde tengáis CI (normalmente el <strong>backend</strong>). Escaneo local: ejecutar <code class="docutils literal notranslate"><span class="pre">gitleaks</span> <span class="pre">detect</span></code> desde la raíz del clone.</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="c1"># Raíz del clone de medical_register</span>
 gitleaks<span class="w"> </span>detect<span class="w"> </span>--verbose
 </pre></div>
 </div>
@@ -378,8 +378,9 @@ gitleaks<span class="w"> </span>detect<span class="w"> </span>--verbose
 <li><p>Añadir un fichero con un token <strong>ficticio pero con formato</strong> reconocible (o un PAT de GitHub de práctica revocable).</p></li>
 <li><p>Abrir PR y ver el job <strong>fallar</strong> con el informe de Gitleaks.</p></li>
 <li><p>Documentar captura del log y el listado de hallazgos.</p></li>
-<li><p>Borrar el secreto del commit y cerrar la PR sin fusionar (o fusionar solo tras limpieza).</p></li>
+<li><p>Borrar el secreto del commit (<code class="docutils literal notranslate"><span class="pre">git</span> <span class="pre">rm</span></code> de <code class="docutils literal notranslate"><span class="pre">_demo_gitleaks/</span></code>) y volver a ejecutar CI hasta obtener el check en verde.</p></li>
 </ol>
+<p><img alt="Run gitleaks: detección de secreto (fallo esperado, regla )" src="../../_images/action-fallo.png" /></p>
 </section>
 </section>
 <hr class="docutils" />
@@ -454,44 +455,12 @@ gitleaks<span class="w"> </span>detect<span class="w"> </span>--verbose
 <li><p>Si existe la carpeta de demo <code class="docutils literal notranslate"><span class="pre">docs/git_docs/PPS_git/_demo_gitleaks/</span></code>, escaneo directo con <code class="docutils literal notranslate"><span class="pre">--no-git</span></code> (útil para reproducir el fallo en re-runs).</p></li>
 </ul>
 <p>Rama de trabajo de la práctica: <code class="docutils literal notranslate"><span class="pre">pps/gitleaks-setup</span></code> → PR a <code class="docutils literal notranslate"><span class="pre">dev</span></code>.</p>
-</section>
-<hr class="docutils" />
-<section id="evidencias-entrega-apartado-3-gitleaks">
-<h2>9. Evidencias (entrega) — Apartado 3: Gitleaks<a class="headerlink" href="#evidencias-entrega-apartado-3-gitleaks" title="Link to this heading">¶</a></h2>
-<div class="table-wrapper colwidths-auto docutils container">
-<table class="docutils align-default">
-<thead>
-<tr class="row-odd"><th class="head"><p>#</p></th>
-<th class="head"><p>Qué demuestra</p></th>
-<th class="head"><p>Fichero</p></th>
-</tr>
-</thead>
-<tbody>
-<tr class="row-even"><td><p>1</p></td>
-<td><p>PR con check <strong>gitleaks</strong> en verde (sin secreto en el diff)</p></td>
-<td><p><a class="reference download internal" download="" href="../../_downloads/72d5a6e3886c52b1ac8fb236931df5f4/action-verde-setup.png"><span class="xref download myst"><code class="docutils literal notranslate"><span class="pre">../img/PPS_git/gitleaks/action-verde-setup.png</span></code></span></a></p></td>
-</tr>
-<tr class="row-odd"><td><p>2</p></td>
-<td><p>Detalle del run: <strong>No leaks detected</strong> / job <code class="docutils literal notranslate"><span class="pre">gitleaks</span></code> correcto</p></td>
-<td><p><a class="reference download internal" download="" href="../../_downloads/1cdca73a5de0ce37c0152ca38303a032/action-verde-setup-detail.png"><span class="xref download myst"><code class="docutils literal notranslate"><span class="pre">../img/PPS_git/gitleaks/action-verde-setup-detail.png</span></code></span></a></p></td>
-</tr>
-<tr class="row-even"><td><p>3</p></td>
-<td><p>Run en <strong>rojo</strong> tras PAT ficticio en <code class="docutils literal notranslate"><span class="pre">_demo_gitleaks/leak.txt</span></code> (regla <code class="docutils literal notranslate"><span class="pre">github-pat</span></code>)</p></td>
-<td><p><a class="reference download internal" download="" href="../../_downloads/1ce06fa701e5f7192516713facc59950/action-fallo.png"><span class="xref download myst"><code class="docutils literal notranslate"><span class="pre">../img/PPS_git/gitleaks/action-fallo.png</span></code></span></a></p></td>
-</tr>
-<tr class="row-odd"><td><p>4</p></td>
-<td><p>Run verde tras eliminar la carpeta demo (<code class="docutils literal notranslate"><span class="pre">git</span> <span class="pre">rm</span></code> de <code class="docutils literal notranslate"><span class="pre">_demo_gitleaks</span></code>)</p></td>
-<td><p><a class="reference download internal" download="" href="../../_downloads/61988842745feaf0cbc6063fee71d9b6/action-ok-tras-limpieza.png"><span class="xref download myst"><code class="docutils literal notranslate"><span class="pre">../img/PPS_git/gitleaks/action-ok-tras-limpieza.png</span></code></span></a></p></td>
-</tr>
-</tbody>
-</table>
-</div>
+<p>Tras integrar el workflow, el PR inicial muestra el check <strong>gitleaks</strong> en verde (sin secreto en el diff):</p>
 <p><img alt="PR: check gitleaks en verde" src="../../_images/action-verde-setup.png" /></p>
 <p><img alt="Run gitleaks: sin fugas" src="../../_images/action-verde-setup-detail.png" /></p>
-<p><img alt="Run gitleaks: detección de secreto (fallo esperado)" src="../../_images/action-fallo.png" /></p>
+<p>Tras la prueba negativa del §4.1 y la limpieza (<code class="docutils literal notranslate"><span class="pre">git</span> <span class="pre">rm</span></code> de <code class="docutils literal notranslate"><span class="pre">_demo_gitleaks/</span></code>), el pipeline vuelve a verde:</p>
 <p><img alt="Run gitleaks tras limpiar demo (sin fugas)" src="../../_images/action-ok-tras-limpieza.png" /></p>
-<p><strong>Flujo documentado</strong>: integración en CI → prueba negativa (fallo) → limpieza y revocación de credenciales de prueba si se usó un PAT real.</p>
-<p><strong>Guía operativa</strong>: <a class="reference internal" href="pasos.html"><span class="std std-doc"><code class="docutils literal notranslate"><span class="pre">pasos.md</span></code></span></a> §3.</p>
+<p><strong>Flujo documentado</strong>: integración en CI → prueba negativa (fallo en §4.1) → limpieza y revocación de credenciales de prueba si se usó un PAT real.</p>
 <hr class="docutils" />
 <p><strong>Autores</strong>: Alejandro Quiñones Gámez &amp; Adrián Bertos Gómez</p>
 <p><strong>Asignatura</strong>: PPS — Puesta a Producción Segura</p>
@@ -538,7 +507,7 @@ gitleaks<span class="w"> </span>detect<span class="w"> </span>--verbose
           <div class="toc-tree">
             <ul>
 <li><a class="reference internal" href="#">Gitleaks — Escaneo de secretos en Git y CI</a><ul>
-<li><a class="reference internal" href="#repositorios-de-este-trabajo-espacio-de-trabajo-pps">Repositorios de este trabajo (espacio de trabajo PPS)</a></li>
+<li><a class="reference internal" href="#repositorios-de-este-trabajo">Repositorios de este trabajo</a></li>
 <li><a class="reference internal" href="#que-es-gitleaks">1. Qué es Gitleaks</a></li>
 <li><a class="reference internal" href="#si-gitleaks-detecta-algo">2. Si Gitleaks detecta algo</a></li>
 <li><a class="reference internal" href="#beneficios-en-equipo">3. Beneficios en equipo</a></li>
@@ -555,7 +524,6 @@ gitleaks<span class="w"> </span>detect<span class="w"> </span>--verbose
 <li><a class="reference internal" href="#falsos-positivos-y-gitleaks-toml">6. Falsos positivos y <code class="docutils literal notranslate"><span class="pre">.gitleaks.toml</span></code></a></li>
 <li><a class="reference internal" href="#lecturas-adicionales">7. Lecturas adicionales</a></li>
 <li><a class="reference internal" href="#implementacion-en-medical-register">8. Implementación en <code class="docutils literal notranslate"><span class="pre">medical_register</span></code></a></li>
-<li><a class="reference internal" href="#evidencias-entrega-apartado-3-gitleaks">9. Evidencias (entrega) — Apartado 3: Gitleaks</a></li>
 </ul>
 </li>
 </ul>

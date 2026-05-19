@@ -265,41 +265,42 @@
 <p><strong>Centro</strong>: IES Zaidín-Vergeles</p>
 <p><strong>Enunciado</strong>: <code class="docutils literal notranslate"><span class="pre">docs/git_docs/PPS_git/github.html</span></code> (Fernando Raya, 2026-04-20)</p>
 <hr class="docutils" />
-<section id="repositorios-de-este-trabajo-espacio-de-trabajo-pps">
-<h2>Repositorios de este trabajo (espacio de trabajo PPS)<a class="headerlink" href="#repositorios-de-este-trabajo-espacio-de-trabajo-pps" title="Link to this heading">¶</a></h2>
-<p>Las pruebas de GitHub (secret scanning, push protection, reglas de rama, Actions) se documentan sobre los <strong>dos clones</strong> del curso:</p>
+<section id="repositorios-de-este-trabajo">
+<h2>Repositorios de este trabajo<a class="headerlink" href="#repositorios-de-este-trabajo" title="Link to this heading">¶</a></h2>
+<p>Las pruebas de GitHub (secret scanning, push protection, reglas de rama, Actions) se documentan sobre los <strong>dos repositorios</strong> del curso:</p>
 <div class="table-wrapper colwidths-auto docutils container">
 <table class="docutils align-default">
 <thead>
 <tr class="row-odd"><th class="head"><p>Proyecto</p></th>
-<th class="head"><p>Ruta local</p></th>
+<th class="head"><p>Repositorio GitHub</p></th>
 <th class="head"><p>Remoto <code class="docutils literal notranslate"><span class="pre">origin</span></code> (SSH)</p></th>
 <th class="head"><p>Rama habitual</p></th>
 </tr>
 </thead>
 <tbody>
 <tr class="row-even"><td><p>Cliente Android (APK)</p></td>
-<td><p><code class="docutils literal notranslate"><span class="pre">/home/alejandro/DriveLocal/alejandro/Ciberseguridad/PPS</span> <span class="pre">-</span> <span class="pre">Puesta</span> <span class="pre">a</span> <span class="pre">Producción</span> <span class="pre">Segura/medical_register_android</span></code></p></td>
+<td><p><a class="reference external" href="https://github.com/alejandroquinonesgamez/medical_register_apk">medical_register_apk</a></p></td>
 <td><p><code class="docutils literal notranslate"><span class="pre">git&#64;github.com:alejandroquinonesgamez/medical_register_apk.git</span></code></p></td>
 <td><p><code class="docutils literal notranslate"><span class="pre">main</span></code></p></td>
 </tr>
-<tr class="row-odd"><td><p>Backend <em>Aplicación Médica</em></p></td>
-<td><p><code class="docutils literal notranslate"><span class="pre">/home/alejandro/DriveLocal/alejandro/Ciberseguridad/PPS</span> <span class="pre">-</span> <span class="pre">Puesta</span> <span class="pre">a</span> <span class="pre">Producción</span> <span class="pre">Segura/Aplicación</span> <span class="pre">Médica</span></code></p></td>
+<tr class="row-odd"><td><p>Backend</p></td>
+<td><p><a class="reference external" href="https://github.com/alejandroquinonesgamez/medical_register">medical_register</a></p></td>
 <td><p><code class="docutils literal notranslate"><span class="pre">git&#64;github.com:alejandroquinonesgamez/medical_register.git</span></code></p></td>
 <td><p><code class="docutils literal notranslate"><span class="pre">dev</span></code></p></td>
 </tr>
 </tbody>
 </table>
 </div>
-<p>Fijar o comprobar el remoto del Android (equivalente a tu flujo habitual):</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="nb">cd</span><span class="w"> </span><span class="s2">&quot;/home/alejandro/DriveLocal/alejandro/Ciberseguridad/PPS - Puesta a Producción Segura/medical_register_android&quot;</span>
+<p>Fijar o comprobar el remoto del Android:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>git<span class="w"> </span>clone<span class="w"> </span>git@github.com:alejandroquinonesgamez/medical_register_apk.git
+<span class="nb">cd</span><span class="w"> </span>medical_register_apk
 git<span class="w"> </span>remote<span class="w"> </span>set-url<span class="w"> </span>origin<span class="w"> </span>git@github.com:alejandroquinonesgamez/medical_register_apk.git
 git<span class="w"> </span>remote<span class="w"> </span>-v
 git<span class="w"> </span>push<span class="w"> </span>origin<span class="w"> </span>main
 </pre></div>
 </div>
-<p>Backend (documentación y workflows en este árbol):</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="nb">cd</span><span class="w"> </span><span class="s2">&quot;/home/alejandro/DriveLocal/alejandro/Ciberseguridad/PPS - Puesta a Producción Segura/Aplicación Médica&quot;</span>
+<p>Backend (documentación y workflows en este repositorio):</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="c1"># Raíz del clone de medical_register</span>
 git<span class="w"> </span>remote<span class="w"> </span>-v
 git<span class="w"> </span>push<span class="w"> </span>origin<span class="w"> </span>dev
 </pre></div>
@@ -434,9 +435,11 @@ Por ejemplo, un Personal Access Token de GitHub con permisos mínimos y caducida
 </section>
 <section id="actividad-habilitar-push-protection-y-documentar-una-prueba">
 <h3>3.5. Actividad: habilitar Push protection y documentar una prueba<a class="headerlink" href="#actividad-habilitar-push-protection-y-documentar-una-prueba" title="Link to this heading">¶</a></h3>
-<ol class="arabic simple">
+<ol class="arabic">
 <li><p>En el repositorio: <strong>Settings → Advanced Security</strong> (o <em>Code security and analysis</em>).</p></li>
-<li><p>Activar <strong>Secret Protection</strong> y <strong>Push protection</strong> según <a class="reference external" href="https://docs.github.com/en/code-security/how-tos/secure-your-secrets/prevent-future-leaks/enabling-push-protection-for-your-repository">Enabling push protection for your repository</a>.</p></li>
+<li><p>Activar <strong>Secret Protection</strong> y <strong>Push protection</strong> según <a class="reference external" href="https://docs.github.com/en/code-security/how-tos/secure-your-secrets/prevent-future-leaks/enabling-push-protection-for-your-repository">Enabling push protection for your repository</a>.</p>
+<p><img alt="Secret Protection y Push protection habilitados" src="../../_images/options-enabled.png" /></p>
+</li>
 <li><p>Crear un <strong>PAT de prueba</strong> (caducidad 1 día) y un commit con el token en un fichero de demo.</p></li>
 <li><p><code class="docutils literal notranslate"><span class="pre">git</span> <span class="pre">push</span></code> debe ser <strong>rechazado</strong> (<code class="docutils literal notranslate"><span class="pre">GH013</span></code>, <em>Push cannot contain secrets</em>).</p></li>
 <li><p>Revocar el PAT, eliminar el fichero del commit y no usar <em>bypass</em> en producción.</p></li>
@@ -465,7 +468,7 @@ Por ejemplo, un Personal Access Token de GitHub con permisos mínimos y caducida
 </section>
 <section id="comandos-usados-en-medical-register">
 <h4>Comandos usados en <code class="docutils literal notranslate"><span class="pre">medical_register</span></code><a class="headerlink" href="#comandos-usados-en-medical-register" title="Link to this heading">¶</a></h4>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="nb">cd</span><span class="w"> </span><span class="s2">&quot;</span><span class="nv">$PPS_BACKEND</span><span class="s2">&quot;</span>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="c1"># Raíz del clone de medical_register</span>
 git<span class="w"> </span>checkout<span class="w"> </span>dev<span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span>git<span class="w"> </span>pull<span class="w"> </span>origin<span class="w"> </span>dev
 git<span class="w"> </span>checkout<span class="w"> </span>-b<span class="w"> </span>pps/github-push-protection-demo
 
@@ -478,6 +481,10 @@ git<span class="w"> </span>push<span class="w"> </span>-u<span class="w"> </span
 </pre></div>
 </div>
 <p>Resultado esperado en terminal: <code class="docutils literal notranslate"><span class="pre">GH013</span></code>, <em>GITHUB PUSH PROTECTION</em>, <em>GitHub Personal Access Token</em>, ruta <code class="docutils literal notranslate"><span class="pre">docs/git_docs/PPS_git/_demo_github/leak.txt</span></code>.</p>
+<p><img alt="Push rechazado por GitHub Push Protection (GH013)" src="../../_images/push-rejected.png" /></p>
+<p>Repositorio de la prueba: <strong><code class="docutils literal notranslate"><span class="pre">alejandroquinonesgamez/medical_register</span></code></strong>. Rama: <code class="docutils literal notranslate"><span class="pre">pps/github-push-protection-demo</span></code>.</p>
+<p>GitHub impidió que el PAT entrara en el historial remoto (<strong>GH013</strong>). La remediación correcta es <strong>revocar</strong> el token de prueba (aunque el push fallara) y no confiar en borrar el fichero local sin rotación.</p>
+<p>Con <em>push protection</em> activo el secreto <strong>no llega al remoto</strong>, por lo que <strong>no</strong> suele generarse alerta en <em>Secret scanning</em>. No se aportan capturas <code class="docutils literal notranslate"><span class="pre">alerta-abierta</span></code> / <code class="docutils literal notranslate"><span class="pre">alerta-cerrada</span></code>: la evidencia del control es la configuración (paso 2) y el rechazo del push. El PAT de prueba usado en la demo <strong>caducó o fue revocado</strong> tras el ejercicio.</p>
 </section>
 </section>
 </section>
@@ -489,36 +496,6 @@ git<span class="w"> </span>push<span class="w"> </span>-u<span class="w"> </span
 <li><p><strong>Android</strong> (<code class="docutils literal notranslate"><span class="pre">medical_register_apk</span></code>, rama <code class="docutils literal notranslate"><span class="pre">main</span></code>): si añades Actions allí, los nombres de los checks aparecerán en la UI de GitHub de ese repo.</p></li>
 </ul>
 <p>Push protection y Secret scanning son independientes de los <em>status checks</em> (secretos frente a calidad de código).</p>
-</section>
-<hr class="docutils" />
-<section id="evidencias-entrega-apartado-4-github">
-<h2>5. Evidencias (entrega) — Apartado 4: GitHub<a class="headerlink" href="#evidencias-entrega-apartado-4-github" title="Link to this heading">¶</a></h2>
-<p>Repositorio: <strong><code class="docutils literal notranslate"><span class="pre">alejandroquinonesgamez/medical_register</span></code></strong>. Rama de prueba: <code class="docutils literal notranslate"><span class="pre">pps/github-push-protection-demo</span></code>.</p>
-<div class="table-wrapper colwidths-auto docutils container">
-<table class="docutils align-default">
-<thead>
-<tr class="row-odd"><th class="head"><p>#</p></th>
-<th class="head"><p>Qué demuestra</p></th>
-<th class="head"><p>Fichero</p></th>
-</tr>
-</thead>
-<tbody>
-<tr class="row-even"><td><p>1</p></td>
-<td><p>Secret Protection y Push protection <strong>activados</strong></p></td>
-<td><p><a class="reference download internal" download="" href="../../_downloads/801ff32e35c044fee0284b34e30eb37a/options-enabled.png"><span class="xref download myst"><code class="docutils literal notranslate"><span class="pre">../img/PPS_git/github/options-enabled.png</span></code></span></a></p></td>
-</tr>
-<tr class="row-odd"><td><p>2</p></td>
-<td><p><code class="docutils literal notranslate"><span class="pre">git</span> <span class="pre">push</span></code> <strong>rechazado</strong> (<code class="docutils literal notranslate"><span class="pre">GH013</span></code>, PAT en <code class="docutils literal notranslate"><span class="pre">leak.txt</span></code>)</p></td>
-<td><p><a class="reference download internal" download="" href="../../_downloads/65210814a647abe17cb754382ff5ea98/push-rejected.png"><span class="xref download myst"><code class="docutils literal notranslate"><span class="pre">../img/PPS_git/github/push-rejected.png</span></code></span></a></p></td>
-</tr>
-</tbody>
-</table>
-</div>
-<p><img alt="Secret Protection y Push protection habilitados" src="../../_images/options-enabled.png" /></p>
-<p><img alt="Push rechazado por GitHub Push Protection (GH013)" src="../../_images/push-rejected.png" /></p>
-<p><strong>Interpretación</strong>: GitHub impidió que el PAT entrara en el historial remoto (<strong>GH013</strong>). La remediación correcta es <strong>revocar</strong> el token de prueba (aunque el push fallara) y no confiar en borrar el fichero local sin rotación.</p>
-<p><strong>Alertas en Security</strong>: con <em>push protection</em> activo el secreto <strong>no llega al remoto</strong>, por lo que <strong>no</strong> suele generarse alerta en <em>Secret scanning</em>. No se aportan capturas <code class="docutils literal notranslate"><span class="pre">alerta-abierta</span></code> / <code class="docutils literal notranslate"><span class="pre">alerta-cerrada</span></code>: la evidencia del control es <code class="docutils literal notranslate"><span class="pre">push-rejected.png</span></code> más la configuración en <code class="docutils literal notranslate"><span class="pre">options-enabled.png</span></code>, conforme al flujo del enunciado cuando el bloqueo en <code class="docutils literal notranslate"><span class="pre">git</span> <span class="pre">push</span></code> funciona. El PAT de prueba usado en la demo <strong>caducó o fue revocado</strong> tras el ejercicio; no se creó uno nuevo.</p>
-<p><strong>Guía operativa</strong>: <a class="reference internal" href="pasos.html"><span class="std std-doc"><code class="docutils literal notranslate"><span class="pre">pasos.md</span></code></span></a> §4.</p>
 <hr class="docutils" />
 <p><strong>Autores</strong>: Alejandro Quiñones Gámez &amp; Adrián Bertos Gómez</p>
 <p><strong>Asignatura</strong>: PPS — Puesta a Producción Segura</p>
@@ -565,7 +542,7 @@ git<span class="w"> </span>push<span class="w"> </span>-u<span class="w"> </span
           <div class="toc-tree">
             <ul>
 <li><a class="reference internal" href="#">GitHub — Secret Scanning y Push Protection</a><ul>
-<li><a class="reference internal" href="#repositorios-de-este-trabajo-espacio-de-trabajo-pps">Repositorios de este trabajo (espacio de trabajo PPS)</a></li>
+<li><a class="reference internal" href="#repositorios-de-este-trabajo">Repositorios de este trabajo</a></li>
 <li><a class="reference internal" href="#introduccion">1. Introducción</a></li>
 <li><a class="reference internal" href="#secret-scanning-escaneo-de-secretos">2. Secret scanning (escaneo de secretos)</a><ul>
 <li><a class="reference internal" href="#que-hace">2.1. Qué hace</a></li>
@@ -586,7 +563,6 @@ git<span class="w"> </span>push<span class="w"> </span>-u<span class="w"> </span
 </ul>
 </li>
 <li><a class="reference internal" href="#relacion-con-los-proyectos-del-espacio-de-trabajo">4. Relación con los proyectos del espacio de trabajo</a></li>
-<li><a class="reference internal" href="#evidencias-entrega-apartado-4-github">5. Evidencias (entrega) — Apartado 4: GitHub</a></li>
 </ul>
 </li>
 </ul>
