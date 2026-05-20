@@ -1,4 +1,4 @@
-# Ansible — Configuración y despliegue Docker (Aplicación Médica)
+# Informe — Ansible (Docker en VM Proxmox, Aplicación Médica)
 
 **Autores**: Alejandro Quiñones Gámez & Adrián Bertos Gómez
 
@@ -10,19 +10,31 @@
 
 ---
 
+## Conformidad con la entrega (PPS)
+
+Este paquete cumple lo pedido para la parte **Ansible** de la práctica:
+
+| Requisito | Dónde se cubre en este informe |
+|---|---|
+| **Proyecto Ansible** que configura la **VM** (Docker, Compose, despliegue de la app) | §1.2 (playbook y roles), §2 (qué se despliega), código en **`ansible/`** (`site.yml`, `roles/`, etc.). |
+| **Documentación** que demuestre el **despliegue correcto** | §2.2, §4 y §7 (capturas: ping, playbook, contenedores, HTTP **200**, navegador en **:5001**). Las figuras enlazan a imágenes en GitHub (`raw.githubusercontent.com`, rama `dev`). |
+| **Coordinación con Terraform** | §5: la VM se crea con Terraform; este módulo aprovisiona el stack en la misma máquina. |
+
+El aprovisionamiento de la **VM en Proxmox** se describe en el **[Informe Terraform](https://raw.githubusercontent.com/alejandroquinonesgamez/medical_register/dev/terraform/aplicacion-medica/Informe.md)**.
+
+---
+
 ## 1. Introducción
 
-Este documento describe el **módulo Ansible** en la carpeta **`ansible/`**
-(junto a este informe en el paquete de entrega; en el monorepo del curso:
-`terraform/aplicacion-medica/ansible/`), que configura la **VM ya creada por Terraform**
-(Proxmox): instala **Docker Engine** y **Compose v2**, sincroniza el repositorio
-**Aplicación Médica** en la VM y ejecuta **`docker compose up`** según el
-`docker-compose.yml` de la raíz del repo.
+Este documento describe el **módulo Ansible** en la carpeta **`ansible/`** del paquete
+de entrega, que configura la **VM ya creada por Terraform** (Proxmox): instala
+**Docker Engine** y **Compose v2**, sincroniza el repositorio **Aplicación Médica** en
+la VM y ejecuta **`docker compose up`** según el `docker-compose.yml` de la raíz del
+repositorio.
 
-A continuación se explica **qué hace cada rol y cada fichero relevante**, cómo se
-controlan los **perfiles** de Compose (`medical_compose_profiles`), qué queda
-ejecutándose por defecto y cómo validar el despliegue. El aprovisionamiento de la VM
-está en el **[Informe Terraform](https://raw.githubusercontent.com/alejandroquinonesgamez/medical_register/dev/terraform/aplicacion-medica/Informe.md)**. Las figuras enlazan a **`raw.githubusercontent.com`** (rama **`dev`**, repo **`medical_register`**) para que se vean al abrir el `.md` **desde el ZIP de entrega** (solo contiene `ansible/` + este informe) con conexión a Internet.
+A continuación se detalla **qué hace cada rol y cada fichero relevante**, cómo se
+controlan los **perfiles** de Compose (`medical_compose_profiles`), qué servicios quedan
+en ejecución y cómo se validó el despliegue.
 
 ### 1.1. Qué es Ansible (resumen operativo)
 
@@ -36,7 +48,7 @@ en la VM: solo **SSH** y Python en el remoto (el intérprete se descubre al hace
 | Ruta / elemento | Función |
 |---|---|
 | `site.yml` | Play único: `hosts: medical`, `become: true`, roles **`docker`** y **`medical_compose`** en ese orden. |
-| `inventory.ini` | Inventario real (no versionado): grupo `[medical]` con `ansible_host`, `ansible_user`, `ansible_ssh_private_key_file`. |
+| `inventory.ini` | Inventario del host: grupo `[medical]` con `ansible_host`, `ansible_user`, `ansible_ssh_private_key_file`. |
 | `inventory.ini.example` | Plantilla mínima de inventario. |
 | `ansible.cfg` | Ajustes del proyecto (véase **1.3**). |
 | `requirements.yml` | Declara la colección **`ansible.posix`** (necesaria para `synchronize`). |
@@ -54,7 +66,7 @@ en la VM: solo **SSH** y Python en el remoto (el intérprete se descubre al hace
 
 | Sección / clave | Valor | Efecto |
 |---|---|---|
-| `[defaults]` `inventory` | `inventory.ini` | Si ejecutas `ansible-playbook` sin `-i`, usa ese fichero. |
+| `[defaults]` `inventory` | `inventory.ini` | Sin `-i` en la línea de comandos, se usa ese fichero por defecto. |
 | `[defaults]` `host_key_checking` | `false` | No bloquea el primer SSH por huella desconocida (adecuado en **laboratorio**; en producción convendría `true` y `known_hosts` gestionado). |
 | `[defaults]` `retry_files_enabled` | `false` | No deja `.retry` en fallos. |
 | `[defaults]` `command_warnings` | `false` | Reduce avisos ruidosos de comandos shell. |
@@ -66,7 +78,7 @@ en la VM: solo **SSH** y Python en el remoto (el intérprete se descubre al hace
 |---|---|---|
 | `medical_app_deploy_path` | `/opt/aplicacion-medica` | Directorio en la VM donde vive una copia del repo. |
 | `medical_compose_project_name` | `medical_register` | `COMPOSE_PROJECT_NAME` (coherente con `docker-compose.env.example`). |
-| `medical_compose_profiles` | `[]` | Lista de **`--profile`** de Compose. **Vacía** ⇒ solo servicios **sin** cláusula `profiles:` (**`web`** + **`waf`**). Para DefectDojo hay que pasar **`[defectdojo]`** (véase sección 2.5). |
+| `medical_compose_profiles` | `[]` | Lista de **`--profile`** de Compose. **Vacía** ⇒ solo servicios **sin** cláusula `profiles:` (**`web`** + **`waf`**). DefectDojo requiere **`[defectdojo]`** (véase §2.5). |
 | `medical_flask_env` | `production` | Inyectado en `.env` vía `blockinfile` (bloque Ansible). |
 | `medical_app_supervisor` | `"0"` | Inyectado en `.env`; desactiva el supervisor de tráfico/DB en servidor (coherente con comentarios del `docker-compose.yml`). |
 
@@ -74,11 +86,11 @@ en la VM: solo **SSH** y Python en el remoto (el intérprete se descubre al hace
 
 ## 2. Qué se despliega con Ansible y de qué manera
 
-**Resumen — despliegue completo (PPS):** en Terraform, **`deployment_mode = "full"`**
-dimensiona la VM para soportar **DefectDojo** además de **waf** y **web**. En Ansible,
-hay que definir **`medical_compose_profiles: [defectdojo]`** (plantilla
-[`extra_vars.full.example.yml`](../extra_vars.full.example.yml).
-Sin ese perfil, el playbook levanta solo **`web`** + **`waf`**.
+**Resumen — despliegue completo (PPS):** con **`deployment_mode = "full"`** en Terraform
+la VM queda dimensionada para **DefectDojo** además de **waf** y **web**. En Ansible,
+el perfil **`defectdojo`** se activa con **`medical_compose_profiles: [defectdojo]`**
+(plantilla [`extra_vars.full.example.yml`](../extra_vars.full.example.yml)). En este
+informe se documenta el despliegue con stack mínimo **`web`** + **`waf`**.
 
 ### 2.1. Mecanismo (orden real de ejecución)
 
@@ -111,13 +123,10 @@ servicios **sin** `profiles:` en el YAML:
 **`waf`** tiene **`depends_on: web`** con condición **`service_healthy`**: hasta que
 `web` pase el healthcheck interno, el WAF no estabiliza.
 
-#### Evidencia sugerida: API detrás del WAF en el navegador
+#### Comprobación en navegador (API vía WAF, puerto 5001)
 
-Con el playbook terminado y los contenedores en marcha, abre en el navegador del PC
-de prácticas `http://<IP_VM>:5001/` (sustituye `<IP_VM>` por la salida de
-`terraform output vm_ip_address`).
-
-> **Nota (evidencias PNG):** las capturas (`navegador-api-5001.png`, …) deben existir en **`terraform/docs/img/`** en el repo (y en **rama `dev`** en GitHub) para que los enlaces `raw.githubusercontent.com` respondan. Genera las capturas en tu despliegue y súbelas con esos nombres exactos.
+Tras el playbook, el acceso a **`http://<IP_VM>:5001/`** (IP de la VM creada por
+Terraform) muestra la aplicación detrás del WAF ModSecurity.
 
 ![Captura: navegador en el puerto 5001 (API vía WAF)](https://raw.githubusercontent.com/alejandroquinonesgamez/medical_register/dev/terraform/aplicacion-medica/terraform/docs/img/navegador-api-5001.png)
 
@@ -128,7 +137,7 @@ Si **no** existe `.env` en la VM, se copia desde **`docker-compose.env.example`*
 **`APP_SUPERVISOR`** y se fuerza modo **`0644`** en el fichero para que el usuario
 **`appuser` (UID 1000)** del contenedor `web` pueda leer **`/app/.env`** (bind mount
 `.:/app`). El **`rsync`** **excluye** `.env` para no pisar secretos desde el
-portátil en sucesivas ejecuciones.
+nodo de control en sucesivas ejecuciones.
 
 **`STORAGE_BACKEND`** en Compose cae por defecto en **`sqlite`** si no se define en
 `.env` (laboratorio sin PostgreSQL “global” de la app en el stack mínimo).
@@ -140,7 +149,7 @@ portátil en sucesivas ejecuciones.
 | **API + WAF** | Sí en condiciones normales (contenedores **healthy**, red a la VM). |
 | **DefectDojo + dependencias** | Solo con **`medical_compose_profiles`** que incluya **`defectdojo`**. |
 | **Producción / HTTPS / secretos fuertes** | No; requiere trabajo adicional manual o otras herramientas. |
-| **Cliente Android** | No; hay que configurar la URL base hacia la VM. |
+| **Cliente Android** | Fuera de este módulo; la URL base debe apuntar a la IP de la VM. |
 
 ### 2.5. Variable `medical_compose_profiles` (perfiles Compose)
 
@@ -158,26 +167,20 @@ DefectDojo + `wstg-sync` asociado), **`tests`** (`frontend-tests`), **`local`**
 (frontend alternativo; **conflictivo** con el puerto **5001** del `waf` si se
 mezcla sin criterio).
 
-**Recursos**: con **`deployment_mode = "full"`** en Terraform se orienta la VM a
-**16G / 6 vCPU / 80G** salvo overrides en `terraform.tfvars`. Si la VM sigue con menos
-RAM (p. ej. `vm_memory_mb` explícito antiguo), **no** actives `defectdojo` hasta
-redimensionar o aplicar un nuevo `terraform apply`.
+**Recursos**: con **`deployment_mode = "full"`** en Terraform la VM queda orientada a
+**16G / 6 vCPU / 80G** salvo overrides en `terraform.tfvars`. El perfil **`defectdojo`**
+exige dimensionamiento acorde; en caso contrario conviene ajustar la VM con Terraform
+antes de activarlo en Ansible.
 
 #### Coordinación Terraform + Ansible (DefectDojo)
 
-1. `terraform apply` con recursos acordes (salida **`effective_vm_sizing`**).
-2. `ansible-playbook … -e @extra_vars.yml` donde `extra_vars.yml` incluya
-   **`medical_compose_profiles: [defectdojo]`** (o copia desde
+1. **`terraform apply`** con recursos acordes (salida **`effective_vm_sizing`**).
+2. **`ansible-playbook`** con **`medical_compose_profiles: [defectdojo]`** (plantilla
    `extra_vars.full.example.yml`).
 
-#### Evidencia sugerida: DefectDojo en el navegador (solo con perfil activo)
-
-Si levantaste el perfil **`defectdojo`**, la interfaz web del stack suele estar en
-**`http://<IP_VM>:8080/`** (nginx de DefectDojo). Si no
-usáis ese perfil, podéis **no** generar esta imagen (el enlace quedará vacío en el
-visor Markdown hasta que exista el fichero).
-
-![Captura: DefectDojo en el puerto 8080](https://raw.githubusercontent.com/alejandroquinonesgamez/medical_register/dev/terraform/aplicacion-medica/terraform/docs/img/navegador-defectdojo-8080.png)
+Con ese perfil, la interfaz web de DefectDojo queda en **`http://<IP_VM>:8080/`**
+(nginx del stack). En el despliegue documentado en este informe se utilizó el stack
+mínimo **web + waf** (sin perfil `defectdojo`).
 
 ---
 
@@ -185,17 +188,17 @@ visor Markdown hasta que exista el fichero).
 
 ### 3.1. Inventario y conexión
 
-Copia `inventory.ini.example` → `inventory.ini` y rellena **`ansible_host`** con la
-IP de **`terraform output vm_ip_address`** (o la línea `ansible_inventory_line`).
+El inventario se define en **`inventory.ini`** (a partir de `inventory.ini.example`),
+con **`ansible_host`** igual a la IP de **`terraform output vm_ip_address`** o a la
+línea **`ansible_inventory_line`**.
 
-**Problema frecuente**: rutas con **espacios** en `ansible_ssh_private_key_file` **sin
-comillas** rompen el parser INI. Solución: **comillas dobles** alrededor de la ruta
-completa.
+Las rutas con **espacios** en `ansible_ssh_private_key_file` deben ir entre **comillas
+dobles** en el fichero INI para que el parser no las divida.
 
 ### 3.2. Variable `medical_app_source`
 
-Debe ser la ruta **absoluta** en la máquina que ejecuta Ansible al **directorio raíz
-del repo** (donde están `docker-compose.yml` y el `Dockerfile`).
+Es la ruta **absoluta** en el nodo de control Ansible al **directorio raíz del
+repositorio** (donde están `docker-compose.yml` y el `Dockerfile`).
 
 | Problema | Causa | Solución |
 |---|---|---|
@@ -241,41 +244,36 @@ permiso + `mode` en `blockinfile` (véase tabla en **3.4**).
 
 ### 3.5. Colección `ansible.posix`
 
-Instalación previa:
-
-```bash
-cd terraform/aplicacion-medica/ansible
-ansible-galaxy collection install -r requirements.yml
-```
-
-Sin la colección, el módulo **`synchronize`** no está disponible.
+El playbook declara la colección en `requirements.yml`; sin **`ansible.posix`** el
+módulo **`synchronize`** no está disponible.
 
 ---
 
-## 4. Flujo mínimo de uso
+## 4. Procedimiento de despliegue
 
-1. Crear **`inventory.ini`** (IP, usuario, clave SSH entrecomillada si la ruta tiene espacios).
-2. Crear **`extra_vars.yml`** (no versionado):
-   - Solo API+WAF: copia [`extra_vars.example.yml`](../extra_vars.example.yml) y rellena `medical_app_source`.
-   - **Completo** con DefectDojo: copia [`extra_vars.full.example.yml`](../extra_vars.full.example.yml) y ajusta la ruta.
-3. Ejecutar:
+1. **Inventario** (`inventory.ini`): host del grupo `[medical]`, usuario SSH y clave
+   privada (ruta entrecomillada si contiene espacios).
+2. **Variables** (`extra_vars.yml`): ruta absoluta **`medical_app_source`** al repo;
+   plantillas [`extra_vars.example.yml`](../extra_vars.example.yml) (solo **web + waf**)
+   o [`extra_vars.full.example.yml`](../extra_vars.full.example.yml) (añade perfil
+   **`defectdojo`**).
+3. **Colección y playbook**:
 
 ```bash
-cd terraform/aplicacion-medica/ansible
+cd ansible
 ansible-galaxy collection install -r requirements.yml
+ansible medical -m ping -i inventory.ini
 ansible-playbook site.yml -i inventory.ini -e @extra_vars.yml
 ```
 
-#### Evidencia sugerida: conectividad Ansible y recap del playbook
+#### Conectividad SSH y resultado del playbook
 
-Ejecuta **`ansible medical -m ping`** y **`ansible-playbook`** como arriba; captura
-**éxito en ping** y el bloque **PLAY RECAP** con `failed=0`.
+El módulo **`ping`** confirma acceso SSH al grupo **`medical`**. El **`site.yml`**
+finaliza con **`failed=0`** en el **PLAY RECAP**.
 
 ![Captura: ansible ping al grupo medical](https://raw.githubusercontent.com/alejandroquinonesgamez/medical_register/dev/terraform/aplicacion-medica/terraform/docs/img/ansible-ping-ok.png)
 
 ![Captura: PLAY RECAP del site.yml](https://raw.githubusercontent.com/alejandroquinonesgamez/medical_register/dev/terraform/aplicacion-medica/terraform/docs/img/ansible-playbook-recap.png)
-
-Más detalle operativo: `terraform/aplicacion-medica/README.md`.
 
 ---
 
@@ -309,8 +307,8 @@ flowchart LR
 
 ## 6. Seguridad y buenas prácticas
 
-- **`inventory.ini`** y **`extra_vars.yml`** pueden contener rutas a claves o datos
-  sensibles: no publicarlos si no deben serlo.
+- **`inventory.ini`** y **`extra_vars.yml`** contienen datos de acceso (claves, rutas);
+  no forman parte del paquete de entrega por contener información sensible.
 - **`rsync` excluye `.env`**: los secretos se mantienen en la VM entre ejecuciones.
 - **`.env` 0644** en la VM es un **compromiso de laboratorio** para el bind mount;
   endurecer implicaría otra estrategia (secrets de Docker, variables solo en
@@ -318,35 +316,21 @@ flowchart LR
 
 ---
 
-## 7. Validación
+## 7. Validación del despliegue
 
-En la máquina de control:
+En la VM desplegada, los contenedores **`web`** y **`waf`** aparecen en estado
+**healthy** y la comprobación HTTP al puerto **5001** devuelve **`HTTP:200`**.
 
-```bash
-cd terraform/aplicacion-medica/ansible
-ansible-galaxy collection install -r requirements.yml
-ansible medical -m ping -i inventory.ini
-ansible-playbook site.yml -i inventory.ini -e @extra_vars.yml
-```
+![Captura: docker compose ps (web y waf)](https://raw.githubusercontent.com/alejandroquinonesgamez/medical_register/dev/terraform/aplicacion-medica/terraform/docs/img/docker-ps-waf-web.png)
 
-En la VM (o vía `ansible … -m shell`):
+![Captura: curl HTTP 200 en el puerto 5001](https://raw.githubusercontent.com/alejandroquinonesgamez/medical_register/dev/terraform/aplicacion-medica/terraform/docs/img/curl-api-5001.png)
+
+Comandos equivalentes en la VM:
 
 ```bash
 sudo docker compose -f /opt/aplicacion-medica/docker-compose.yml ps
 curl -sS -o /dev/null -w "HTTP:%{http_code}\n" http://127.0.0.1:5001/
 ```
-
-Tras un despliegue correcto del stack **waf+web**, lo habitual es **`HTTP:200`** en
-el puerto **5001** del host (servicio `waf`).
-
-#### Evidencia sugerida: estado de contenedores y código HTTP
-
-En la misma sesión SSH (o con `ansible medical -m shell`), deja visible el listado de
-**`docker compose ps`** y la línea de **`curl`** con **`HTTP:200`**.
-
-![Captura: docker compose ps (web y waf)](https://raw.githubusercontent.com/alejandroquinonesgamez/medical_register/dev/terraform/aplicacion-medica/terraform/docs/img/docker-ps-waf-web.png)
-
-![Captura: curl HTTP 200 en el puerto 5001](https://raw.githubusercontent.com/alejandroquinonesgamez/medical_register/dev/terraform/aplicacion-medica/terraform/docs/img/curl-api-5001.png)
 
 ---
 
