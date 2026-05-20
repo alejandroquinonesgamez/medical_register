@@ -131,3 +131,13 @@ Desde este directorio (`terraform/aplicacion-medica/`):
 ```
 
 Genera **`terraform-aplicacion-medica-entrega.zip`** en la raíz del repo, con **`Informe.md` en la raíz del ZIP** y el módulo en **`terraform/`** (listo para descomprimir y revisar).
+
+## ZIP de entrega (Ansible + Informe)
+
+Desde este directorio (`terraform/aplicacion-medica/`):
+
+```bash
+./pack-entrega-ansible.sh
+```
+
+Genera **`ansible-aplicacion-medica-entrega.zip`** en la raíz del repo, con **`Informe.md` en la raíz del ZIP** (contenido de `ansible/docs/Ansible.md`) y el módulo en **`ansible/`** (incluye capturas en `ansible/docs/img/`).

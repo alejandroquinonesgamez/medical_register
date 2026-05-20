@@ -12,15 +12,17 @@
 
 ## 1. Introducción
 
-Este documento describe el **módulo Ansible** bajo `terraform/aplicacion-medica/ansible/`,
-que configura la **VM ya creada por Terraform** (Proxmox): instala **Docker Engine** y
-**Compose v2**, sincroniza el repositorio **Aplicación Médica** en la VM y ejecuta
-**`docker compose up`** según el `docker-compose.yml` de la raíz del repo.
+Este documento describe el **módulo Ansible** en la carpeta **`ansible/`**
+(junto a este informe en el paquete de entrega; en el monorepo del curso:
+`terraform/aplicacion-medica/ansible/`), que configura la **VM ya creada por Terraform**
+(Proxmox): instala **Docker Engine** y **Compose v2**, sincroniza el repositorio
+**Aplicación Médica** en la VM y ejecuta **`docker compose up`** según el
+`docker-compose.yml` de la raíz del repo.
 
 A continuación se explica **qué hace cada rol y cada fichero relevante**, cómo se
 controlan los **perfiles** de Compose (`medical_compose_profiles`), qué queda
 ejecutándose por defecto y cómo validar el despliegue. El aprovisionamiento de la VM
-está en **[Informe.md](../../Informe.md)**. Las capturas enlazan a PNG publicados en **`terraform/docs/img/`** del repo (misma ruta en **rama `dev`** en GitHub); los `![](…)` usan **`raw.githubusercontent.com`** para vista previa fuera del clon.
+está en el **[Informe Terraform](https://raw.githubusercontent.com/alejandroquinonesgamez/medical_register/dev/terraform/aplicacion-medica/Informe.md)**. Las figuras enlazan a **`raw.githubusercontent.com`** (rama **`dev`**, repo **`medical_register`**) para que se vean al abrir el `.md` **desde el ZIP de entrega** (solo contiene `ansible/` + este informe) con conexión a Internet.
 
 ### 1.1. Qué es Ansible (resumen operativo)
 
@@ -300,7 +302,7 @@ flowchart LR
   D --> E
 ```
 
-1. **Terraform** crea la VM (véase [Informe.md](../../Informe.md)).
+1. **Terraform** crea la VM (véase el [Informe Terraform](https://raw.githubusercontent.com/alejandroquinonesgamez/medical_register/dev/terraform/aplicacion-medica/Informe.md)).
 2. **Ansible** instala Docker y levanta el stack (sección **2** de este documento).
 
 ---

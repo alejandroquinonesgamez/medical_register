@@ -65,5 +65,6 @@ data/*_db_dump.sql
 # Carpeta de entrega (documentos y enlaces de entregas académicas; no subir a GitHub)
 entrega/
 
-# ZIP de entrega Terraform (generado localmente)
+# ZIP de entrega Terraform / Ansible (generados localmente)
 terraform-aplicacion-medica-entrega.zip
+ansible-aplicacion-medica-entrega.zip
